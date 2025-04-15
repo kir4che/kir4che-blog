@@ -1,0 +1,104 @@
+---
+title: How to Deploy TypeScript Express App to Vercel
+date: 2025-02-07T00:00:00.000Z
+description: >-
+  I recently refactored a project, which caused Vercel deployment to break.
+  After extensive debugging, I fixed the issues and am documenting the solution
+  for future reference.
+categories:
+  - Backend
+  - NodeJS
+tags:
+  - Express
+  - Vercel
+  - NodeJS
+  - 部署
+wordCount: 324
+---
+
+Recently, I’ve been refactoring a project, and after updating it, Vercel deployment completely broke. The backend kept throwing 404 or 500 errors and just wouldn’t work properly. After a long debugging session and trying countless fixes, I finally got it running again. I’m documenting the solution here for future reference.
+
+This project follows a frontend-backend separation approach:
+
+- Frontend: React
+- Backend: Express
+- Language: TypeScript
+- Deployment: Vercel
+
+> Vercel’s **Serverless Function** only run when triggered by a request. That means all API endpoints must be routed through `api/index.ts`, which serves as the entry point for the Express app. Additionally, request forwarding must be configured in `vercel.json` to ensure proper routing.
+
+Backend Folder Structure:
+
+<Image
+  src='/posts/deploy-express-typescript-to-vercel/server-folder-structure.png'
+  alt='server-folder-structure'
+  width='240px'
+/>
+
+**Setting Up the Express Server:**
+
+To check if the backend is running properly, I added a simple homepage route that returns a response.
+
+```typescript title="app.ts"
+import express from "express";
+import cors from "cors";
+
+const app: express();
+
+app.use(cors());
+app.use(express.json());
+
+// confirm the backend is working
+app.get('/', (req, res) => res.send('Express on Vercel.'));
+
+export default app;
+```
+
+**Entry Point for Vercel:**
+
+Vercel only executes files inside the api/ folder as API endpoints, we need to create `index.ts` in api folder to load our Express app.
+
+```typescript title="api/index.ts"
+import app from '../src/app';
+
+export default app;
+```
+
+If your Express app isn’t located inside api/, you’ll need to configure a rewrite rule to redirect.
+
+**Routing Requests Correctly:**
+
+This config file ensures that all incoming requests are routed to `api/index.ts`.
+
+```json title="vercel.json"
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.ts"
+    }
+  ]
+}
+```
+
+No special configurations are needed in `tsconfig.json` or `package.json`.
+
+### Deployment Success!
+
+Once deployed, visiting the backend URL should display “Express on Vercel.” (the response from the homepage route)
+
+If you see this, congratulations—your backend is up and running! 🎉
+
+<Image
+  src='/posts/deploy-express-typescript-to-vercel/express-on-vercel-deploy-success.png'
+  alt='express-on-vercel-deploy-success'
+/>
+
+Refer to [How to deploy your Express.js app at Vercel](https://ziadab.medium.com/how-to-deploy-your-express-js-app-at-vercel-0e0c104d8386)

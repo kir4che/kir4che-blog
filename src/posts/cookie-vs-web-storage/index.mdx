@@ -1,0 +1,162 @@
+---
+title: Cookie vs LocalStorage vs SessionStorage
+description: 深入探討瀏覽器儲存機制：Cookie、LocalStorage 和 SessionStorage 的差異與使用場景，以及如何選擇適合的儲存方式。
+date: 2024-12-23T00:00:00.000Z
+categories:
+  - 前端
+tags:
+  - Frontend
+  - Web Storage
+wordCount: 1767
+---
+
+## Cookie
+
+Cookie 是伺服器發送到瀏覽器的一小段資料，會在後續的每次 HTTP 請求中自動附加到 header，用於與伺服器交互。簡單來說，它是一種**瀏覽器的存儲機制**，可幫助伺服器辨識用戶狀態，如：在登入網站後，伺服器可透過 Cookie 記住你的身份，讓後續請求保持登入狀態。
+
+- **存放位置**：儲存在瀏覽器（Client 端）並自動傳輸至伺服器
+- **存取方式**：使用 `document.cookie` 進行存取與修改
+- **容量限制**：單一 Cookie 的大小約為 4KB
+- **安全性**：可設定 HttpOnly、Secure 和 SameSite 等屬性來提高安全性
+
+根據生命週期分爲：
+
+- **會話 Cookie（Session Cookie）**：被儲存在瀏覽器的資料僅在當前會話（用戶打開瀏覽器到關閉瀏覽器的這段時間）有效，關閉瀏覽器後即被刪除。
+- **永久 Cookie（Persistent Cookie）**：可設定 `expires` 或 `max-age` 屬性，資料將保存至指定時間或至用戶手動刪除。
+
+> 現代瀏覽器可能會保存會話（重啟瀏覽器會恢復標籤頁），此情況下 Cookie 可能會被保留。
+
+### 缺點
+
+- **容量小**：大小限制約爲 4KB，無法儲存大量資料。
+- **佔用網路流量**：Cookie 會附加在每個 HTTP 請求，增加了傳輸流量，若資料太多會影響效能。
+- **資料安全性低**：Cookie 是夾帶在 header 一起被傳送（明文傳遞），沒有另外加密，除非用超文字傳輸安全協定。
+
+> **如何提高 Cookie 的安全性？**
+>
+> - **HttpOnly**：防止 JavaScript 存取 Cookie，有效減少 XSS 攻擊風險。
+> - **Secure**：確保 Cookie 僅在 HTTPS 連線中傳輸，防止 Cookie 在傳輸過程中被竊取。
+> - **SameSite**：設定 Strict 或 Lax，防止跨站請求偽造攻擊（CSRF）。
+
+### 產生流程
+
+1. 瀏覽器向伺服器發出請求
+2. 伺服器在請求中透過 Set-Cookie header 傳遞 Cookie 給瀏覽器
+3. 瀏覽器將 Cookie 儲存起來，並按照設定的屬性（如：expires、max-age）管理。
+4. 瀏覽器再次向相同伺服器發出請求時，會自動將該 Cookie 附加到 header，供伺服器識別及使用。
+
+### 適用場景
+
+- 儲存伺服器需要的資料，如：Session ID 或身份驗證 Token。
+- 需要跨瀏覽器分頁同步的資料
+- 儲存用戶偏好，如：語言設定或主題模式。
+
+---
+
+## WebStorage
+
+WebStorage 是一種由瀏覽器提供 Client 端的存儲機制，包含 LocalStorage 和 SessionStorage，相較於 Cookie，具有以下優勢：
+
+- **容量提升**：通常約 **5MB**，相較於 Cookie 的 **4KB** 空間更大。
+- **降低網路負擔**：數據不隨 HTTP 請求自動傳送，減少不必要的流量。
+- **易於使用**：提供簡易的 API（如 setItem、getItem）便於操作數據
+
+## LocalStorage vs SessionStorage
+
+<Table
+  data={{
+    headers: ['特性', 'LocalStorage（本地儲存）', 'SessionStorage（會話儲存）'],
+    rows: [
+      [
+        '存儲期限',
+        '永久保存，除非用戶手動或程式刪除，否則會一直存在於瀏覽器中。',
+        '僅在當前會話有效，關閉瀏覽器後即刪除。',
+      ],
+      ['跨會話存取', '✅（同一網域下）', '❌'],
+      [
+        '存放位置',
+        '僅存在於 Client 端，不隨 HTTP 請求傳送到伺服器，但可手動傳輸（如透過 AJAX）。',
+        '僅存在於 Client 端，不隨 HTTP 請求傳送到伺服器，但可手動傳輸（如透過 AJAX）。',
+      ],
+      ['容量限制', '約 5MB（視瀏覽器而定）', '約 5MB（視瀏覽器而定）'],
+      [
+        '安全性',
+        '易受 XSS 攻擊，不適合存儲敏感資訊。',
+        '易受 XSS 攻擊，不適合存儲敏感資訊。',
+      ],
+      [
+        '適用場景',
+        '長期使用或需跨分頁同步的非敏感數據，如使用者偏好、暫存應用數據等，且取代 Cookie 儲存購物車資訊。',
+        '短期、不跨頁的臨時性資料，如表單資料暫存或頁面內的狀態保存。',
+      ],
+    ],
+  }}
+/>
+
+💡 如需儲存敏感資訊，建議使用 Session 並搭配 HttpOnly Cookie 儲存 Session ID。
+
+---
+
+## Session
+
+Session 是伺服器端的一種狀態管理技術，用於實現**用戶與伺服器之間的狀態保持**，特別是在 HTTP 這種無狀態協定中。
+
+- **儲存位置**：Session 資料存儲在伺服器端，而 Client 端只需保存 Session ID（通常透過 Cookie 或 URL 傳遞）。
+- **生命週期**
+  - 預設為瀏覽器關閉後失效，但伺服器可設定特定時間以控制 Session 的存留時間。
+  - 若搭配 Cookie 使用則會受到 Cookie 的有效期影響。
+
+### 適用場景
+
+- 因資料存於伺服器，相較於 LocalStorage 或 Cookie 更適合**儲存敏感資訊**，如使用者登入狀態的管理。
+- 儲存需伺服器控制的動態資料，如購物車。
+
+### 安全性強化
+
+- 定期更新 Session ID，降低 Session 劫持風險（Session Fixation 攻擊）。
+- 使用伺服器端加密或驗證，確保 Session 的完整性與合法性。
+- 如果發現用戶異常登錄（如多地同時登錄），可以強制使舊的 Session 失效。
+
+### Session 與 Cookie 的協作
+
+Session 本身不直接依賴 Cookie，但通常會用 Cookie 存放 Session ID，以實現伺服器端的會話管理，如：
+
+<br />
+用戶登入後，伺服器生成 Session，將 Session ID 回傳給瀏覽器存放於 Cookie
+中。後續請求中，瀏覽器自動攜帶該 Cookie，伺服器根據 Session ID 確認用戶身份。
+
+> 若只選用其中一個就會有一些問題，如 :
+>
+> - 只用 Session : Session ID 儲存在 Client 端，一旦瀏覽器或分頁關閉，Session ID 就會不見。
+> - 只用 Cookie : 所有資訊存於 Client 端，空間受限且若電腦遭駭，資料易被竊取。
+
+---
+
+## 如何選擇適合的儲存方式？
+
+- **需要與伺服器互動嗎？**
+  - 是 → 考慮 **Cookie 或 Session**（視是否需要狀態保持而定）
+  - 否 → **LocalStorage 或 SessionStorage**
+- **資料需要長期或跨分頁保存嗎？**
+  - 是 → **LocalStorage**（適合長期或跨分頁使用）
+  - 否 → **SessionStorage**（適合臨時、單頁面使用）
+- **資料是否敏感？**
+  - 是 → 使用 **Session 或 HttpOnly Cookie** 儲存
+  - 否 → 使用 **LocalStorage 或 SessionStorage**
+
+**總結整理**
+
+- 長期儲存非敏感資料：**LocalStorage**
+- 單頁內的臨時性資料：**SessionStorage**
+- 小型且需自動攜帶的資料：**Cookie**
+- 與伺服器的敏感會話資料：**Session + Cookie**
+
+---
+
+## 參考
+
+[1] [使用 HTTP Cookie](https://developer.mozilla.org/zh-TW/docs/Web/HTTP/Cookies)<br />
+[2] [19. Cookie/ LocalStorage/ SessionStorage
+的差別](https://ithelp.ithome.com.tw/articles/10268532)<br />
+[3] [【前端新手日記】前端儲存資料好幫手！Web Storage &
+Cookie差異是什麼？](https://pink-learn-frontend.medium.com/前端新手日記-前端儲存資料好幫手-web-storage-cookie差異是什麼-76e729a77e09)

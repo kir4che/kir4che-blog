@@ -1,0 +1,193 @@
+@import 'tailwindcss';
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --breakpoint-2xl: 90em;
+
+  --yellow-100: #feeec7;
+  --yellow-200: #ffe8b3;
+  --yellow-300: #ffda8b;
+  --yellow-400: #ffcb52;
+
+  --pink-50: #fff9f9;
+  --pink-100: #ffecf0;
+  --pink-200: #ffd6e0;
+  --pink-300: #f8bdd2;
+  --pink-400: #ffb2c5;
+  --pink-500: #ff9db4;
+  --pink-600: #f77e9d;
+  --pink-700: #e95c85;
+  --pink-800: #e03d72;
+  --pink-900: #d61f60;
+
+  --bg-primary: var(--color-pink-50);
+  --bg-secondary: white;
+
+  --text-primary: #262626;
+  --text-secondary: #f2f2f2;
+  --text-gray-dark: #333333;
+  --text-gray: #666666;
+  --text-gray-light: #999999;
+  --text-gray-lighter: #cccccc;
+}
+
+:root[class~='dark'] {
+  --bg-primary: #191919;
+  --bg-secondary: #262626;
+
+  --text-primary: white;
+  --text-secondary: #262626;
+}
+
+@theme inline {
+  --breakpoint-xxs: 22.5rem;
+  --breakpoint-xs: 30rem;
+
+  --font-main: var(--font-dm-sans), var(--font-noto-tc);
+
+  --text-2.5xl: 1.625rem;
+  --text-1.5xl: 1.375rem;
+
+  --color-yellow-100: #feeec7;
+  --color-yellow-200: #ffe8b3;
+  --color-yellow-300: #ffda8b;
+  --color-yellow-400: #ffcb52;
+
+  --color-pink-50: var(--pink-50);
+  --color-pink-100: var(--pink-100);
+  --color-pink-200: var(--pink-200);
+  --color-pink-300: var(--pink-300);
+  --color-pink-400: var(--pink-400);
+  --color-pink-500: var(--pink-500);
+  --color-pink-600: var(--pink-600);
+  --color-pink-700: var(--pink-700);
+  --color-pink-800: var(--pink-800);
+  --color-pink-900: var(--pink-900);
+
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-gray-dark: var(--text-gray-dark);
+  --color-text-gray: var(--text-gray);
+  --color-text-gray-light: var(--text-gray-light);
+  --color-text-gray-lighter: var(--text-gray-lighter);
+
+  --animate-skeletonFadeIn: skeletonFadeIn 350ms ease-out forwards;
+
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes skeletonFadeIn {
+    0% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+}
+
+@layer base {
+  html {
+    box-sizing: border-box;
+  }
+  *,
+  *::before,
+  *::after {
+    box-sizing: inherit;
+  }
+
+  body {
+    @apply bg-bg-primary text-text-primary font-main m-0 min-h-screen tracking-[0.5px] antialiased transition-colors duration-300 sm:px-4;
+  }
+
+  h1 {
+    @apply text-2.5xl/9 font-bold;
+  }
+
+  h2 {
+    @apply text-1.5xl/8 font-semibold md:text-2xl;
+  }
+
+  h3 {
+    @apply text-xl font-medium;
+  }
+
+  h4 {
+    @apply text-lg font-medium;
+  }
+
+  h5 {
+    @apply text-base font-medium;
+  }
+
+  h6 {
+    @apply text-sm font-medium;
+  }
+
+  a {
+    @apply hover:no-underline;
+  }
+
+  a,
+  button,
+  select {
+    @apply cursor-pointer focus:outline-none disabled:cursor-not-allowed;
+  }
+}
+
+@layer components {
+  .heading {
+    @apply border-l-4 border-pink-700 pl-3 md:pl-5 dark:border-pink-500;
+  }
+}
+
+.dark {
+  [style*='--category-color'] {
+    color: var(--category-color-dark) !important;
+  }
+
+  [style*='--subcategory-color'] {
+    color: var(--subcategory-color-dark) !important;
+  }
+}
+
+.article-content blockquote p {
+  @apply my-4;
+}
+
+.article-content ul ul {
+  list-style-type: circle; /* 第二層：空心 */
+}
+
+.article-content ul ul ul {
+  list-style-type: square; /* 第三層：方塊 */
+}
+
+.article-content code {
+  @apply font-mono text-sm;
+}
+
+.article-content code:not(pre code) {
+  @apply dark:bg-text-gray-lighter/20 bg-gray-100/80 px-1 py-0.5 font-mono text-pink-900 dark:text-pink-300;
+}
+
+.expressive-code {
+  @apply my-4;
+}
+
+.expressive-code .header .title {
+  @apply text-xs opacity-80;
+}

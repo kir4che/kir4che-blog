@@ -1,0 +1,114 @@
+{
+  "common": {
+    "all": "All",
+    "allPosts": "All Posts",
+    "readMore": "Read More",
+    "unit": {
+      "posts": "posts",
+      "words": "words"
+    },
+    "button": {
+      "retry": "Retry",
+      "submit": "Submit",
+      "verifying": "Verifying..."
+    },
+    "search": {
+      "placeholder": "Search posts...",
+      "noResults": "No matching posts found."
+    },
+    "pagination": {
+      "title": "Pagination",
+      "previous": "Previous",
+      "next": "Next",
+      "goToPage": "Go to page {page}"
+    }
+  },
+  "settings": {
+    "theme": {
+      "title": "Switch Theme",
+      "dark": "Dark Mode",
+      "light": "Light Mode"
+    },
+    "language": {
+      "title": "Select Language",
+      "current": "Current Language",
+      "tw": "繁體中文",
+      "en": "English",
+      "short": {
+        "tw": "繁中",
+        "en": "EN"
+      }
+    }
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "archives": "Archives",
+    "misc": "Misc"
+  },
+  "sidebar": {
+    "profile": {
+      "name": "Molly",
+      "subtitle": "Front-End Developer"
+    },
+    "popularPosts": "Popular Posts",
+    "categories": "Categories",
+    "tags": "Tags",
+    "latestVideo": "Latest Video"
+  },
+  "HomePage": {
+    "title": "Post List",
+    "search": "Search Posts",
+    "publishedAt": "Published on",
+    "latestPosts": "Latest Posts",
+    "morePosts": "More Posts",
+    "noContent": "Empty here"
+  },
+  "AboutPage": {
+    "title": "About Me",
+    "intro": "Hi, I'm Molly",
+    "coverImageAlt": "About page cover image",
+    "personalInfo": {
+      "job": "👩🏻‍💻 Currently working as a Front-end Engineer",
+      "education": "🏫 Graduated from National Taipei University of Technology (NTUT), Department of Information and Finance Management",
+      "personality": "🦫 Super introverted but love making new friends - ISTJ",
+      "hobbies": "💖 Hobbies: Crocheting, Gaming, Watching LOL Tournaments, Traveling, Food"
+    },
+    "vlogIntro": "I love trying new things, and recently started vlogging to document every moment of life.",
+    "streamingIntro": "Sometimes I also stream gaming, drawing, or just doing my own things~",
+    "title_2": "💌 How to reach me:"
+  },
+  "PostsPage": {
+    "title": "Posts",
+    "search": "Search Posts",
+    "publishedAt": "Published at",
+    "latestPosts": "Latest Posts",
+    "morePosts": "More Posts",
+    "noPosts": "No posts yet.",
+    "loadFailed": "Failed to load posts. Please try again later."
+  },
+  "PostPage": {
+    "relatedPosts": "Related Posts",
+    "thanks": "If you found this post helpful, consider buying me a milktea (◍•ᴗ•◍)❤",
+    "enterPassword": "Enter password",
+    "wrongPassword": "Incorrect password, please try again!"
+  },
+  "CategoriesPage": {
+    "title": "Categories",
+    "postCount": "{count} posts in total",
+    "noCategories": "No Categories yet.",
+    "loadFailed": "Failed to load categories. Please try again later.",
+    "backToCategories": "Back to Categories"
+  },
+  "TagsPage": {
+    "title": "Tags",
+    "postCount": "{count} posts in total",
+    "noTags": "No Tags yet.",
+    "loadFailed": "Failed to load tags. Please try again later.",
+    "backToTags": "Back to Tags"
+  },
+  "MiscPage": {
+    "title": "Miscellaneous",
+    "description": "Nothing here for now ヾ(｡ꏿ﹏ꏿ)ﾉﾞ"
+  }
+}

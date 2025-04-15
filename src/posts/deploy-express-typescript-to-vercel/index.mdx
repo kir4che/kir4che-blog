@@ -1,0 +1,93 @@
+---
+title: 如何將 Express + TypeScript 部署到 Vercel
+slug: deploy-express-typescript-to-vercel
+date: 2025-02-07T00:00:00.000Z
+description: >-
+  最近在重構一個專案，更新後發現 Vercel 部署那邊壞掉，後端一直 404 或 500
+  無法正常運作，找了好久，嘗試很多方法，最後終於解決了，這邊記錄一下。
+categories:
+  - 後端
+  - NodeJS
+tags:
+  - Express
+  - Vercel
+  - NodeJS
+  - 部署
+wordCount: 486
+---
+
+最近在重構一個專案，更新後發現 Vercel 部署那邊壞掉，後端一直 404 或 500 無法正常運作，找了好久，嘗試很多方法，最後終於解決了，這邊記錄一下。
+
+我的專案是前後端分離，前端使用 React，後端使用 Express，皆以 TypeScript 撰寫，並且都部署在 Vercel 上。
+
+要先記得，Vercel 的 **Serverless Function** 只在請求時執行，所有 API 必須透過 `api/index.ts` 進入 Express 應用，並透過 `vercel.json` 設定路由轉發請求。
+
+> Serverless Function 是一種無需長時間運行伺服器的後端執行方式，當有請求時，Vercel 會啟動程式碼執行 API，處理完後立即釋放資源。如此可以節省成本、提高擴展性，但每次請求都會重啟環境。
+
+後端資料夾結構如下圖：
+
+<Image
+  src='/posts/deploy-express-typescript-to-vercel/server-folder-structure.png'
+  alt='server-folder-structure'
+  width='240px'
+/>
+
+移除了不必要的部分，主要是設定了一個首頁路由，用來確認後端運作正常。
+
+```typescript title="app.ts"
+import express from "express";
+import cors from "cors";
+
+const app: express();
+
+app.use(cors());
+app.use(express.json());
+
+// 設定首頁路由，確認後端運作正常。
+app.get('/', (req, res) => res.send('Express on Vercel.'));
+
+export default app;
+```
+
+Vercel 只會執行 api/ 中的檔案作為 API 入口，所以需要在 api/ 新建一個 `index.ts` 來載入 app。
+
+```typescript title="api/index.ts"
+import app from '../src/app';
+
+export default app;
+```
+
+如果你想從 api 以外的資料夾匯出 app，需要使用 rewrite 重新導向。
+
+設定路由轉發，將所有請求導向到 `api/index.ts`。
+
+```json title="vercel.json"
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.ts"
+    }
+  ]
+}
+```
+
+`tsconfig.json` 跟 `package.json` 都不需要特別設定什麼。
+
+### 成功部署!
+
+成功部署後，點進後端網址會看到 Express on Vercel.（一開始設定的首頁路由回傳的字串），這樣就代表正常運作啦 ｡:.ﾟヽ(\*´∀`)ﾉﾟ.:｡
+
+<Image
+  src='/posts/deploy-express-typescript-to-vercel/express-on-vercel-deploy-success.png'
+  alt='express-on-vercel-deploy-success'
+/>
+
+參考 [How to deploy your Express.js app at Vercel](https://ziadab.medium.com/how-to-deploy-your-express-js-app-at-vercel-0e0c104d8386)

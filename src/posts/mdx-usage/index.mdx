@@ -1,0 +1,113 @@
+---
+title: MDX 使用指南
+date: 2025-04-15T00:00:00.000Z
+draft: true
+wordCount: 261
+---
+
+<Image
+  src='/posts/deploy-express-typescript-to-vercel/server-folder-structure.png'
+  alt='server-folder-structure'
+  title='server-folder-structure'
+  width='240px'
+/>
+
+<Images
+  images={[
+    {
+      src: '/posts/gitlab-pages-add-custom-domain/add-new-domain.webp',
+      alt: 'Image 1',
+    },
+    {
+      src: '/posts/gitlab-pages-add-custom-domain/add-new-domain.webp',
+      alt: 'Image 2',
+      width: '50%',
+    },
+    {
+      src: '/posts/gitlab-pages-add-custom-domain/add-new-domain.webp',
+      alt: 'Image 3',
+    },
+    {
+      src: '/posts/gitlab-pages-add-custom-domain/add-new-domain.webp',
+      alt: 'Image 4',
+    },
+    {
+      src: '/posts/gitlab-pages-add-custom-domain/add-new-domain.webp',
+      alt: 'Image 5',
+    },
+    {
+      src: '/posts/gitlab-pages-add-custom-domain/add-new-domain.webp',
+      alt: 'Image 6',
+    },
+  ]}
+  height='150px'
+/>
+
+```html
+<!-- src/content/index.html -->
+<div>File name comment example</div>
+```
+
+```powershell title="PowerShell terminal example"
+Write-Output "This one has a title!"
+```
+
+```sh frame="none"
+echo "Look ma, no frame!"
+```
+
+```js title="line-markers.js" del={2} ins={3-4} {6}
+function demo() {
+  console.log('this line is marked as deleted');
+  // This line and the next one are marked as inserted
+  console.log('this is the second inserted line');
+
+  return 'this line uses the neutral default marker type';
+}
+```
+
+```js {1, 4, 7-8}
+// Line 1 - targeted by line number
+// Line 2
+// Line 3
+// Line 4 - targeted by line number
+// Line 5
+// Line 6
+// Line 7 - targeted by range "7-8"
+// Line 8 - targeted by range "7-8"
+```
+
+```jsx {"1":5} del={"2":7-8} ins={"3":10-12}
+// labeled-line-markers.jsx
+<button
+  role='button'
+  {...props}
+  value={value}
+  className={buttonClassName}
+  disabled={disabled}
+  active={active}
+>
+  {children &&
+    !active &&
+    (typeof children === 'string' ? <span>{children}</span> : children)}
+</button>
+```
+
+```js "return true;" ins="inserted" del="deleted"
+function demo() {
+  console.log('These are inserted and deleted marker types');
+  // The return statement uses the default marker type
+  return true;
+}
+```
+
+```sh //ho.*//
+echo "Test" > /home/test.txt
+```
+
+```js "given text"
+function demo() {
+  // Mark any given text inside lines
+  return 'Multiple matches of the given text are supported';
+}
+```
