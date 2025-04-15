@@ -1,0 +1,114 @@
+{
+  "common": {
+    "all": "全部",
+    "allPosts": "所有文章",
+    "readMore": "閱讀更多",
+    "unit": {
+      "posts": "篇",
+      "words": "字"
+    },
+    "button": {
+      "retry": "重試",
+      "submit": "送出",
+      "verifying": "驗證中..."
+    },
+    "search": {
+      "placeholder": "搜尋文章...",
+      "noResults": "沒有找到相關文章"
+    },
+    "pagination": {
+      "title": "分頁導覽",
+      "previous": "上一頁",
+      "next": "下一頁",
+      "goToPage": "前往第 {page} 頁"
+    }
+  },
+  "profile": {
+    "name": "Molly",
+    "subtitle": "Front-End Developer"
+  },
+  "settings": {
+    "theme": {
+      "title": "切換主題",
+      "dark": "深色模式",
+      "light": "淺色模式"
+    },
+    "language": {
+      "title": "選擇語言",
+      "current": "當前語言",
+      "tw": "繁體中文",
+      "en": "English",
+      "short": {
+        "tw": "繁中",
+        "en": "EN"
+      }
+    }
+  },
+  "nav": {
+    "home": "首頁",
+    "about": "關於",
+    "archives": "文章",
+    "misc": "雜七雜八"
+  },
+  "sidebar": {
+    "popularPosts": "熱門文章",
+    "categories": "文章分類",
+    "tags": "標籤雲",
+    "latestVideo": "最新影片"
+  },
+  "HomePage": {
+    "title": "文章列表",
+    "search": "搜尋文章",
+    "publishedAt": "發布於",
+    "latestPosts": "最新文章",
+    "morePosts": "更多文章",
+    "noContent": "空空如也"
+  },
+  "AboutPage": {
+    "title": "關於我",
+    "intro": "嗨，我是 Molly 🍒",
+    "coverImageAlt": "關於我的封面圖片",
+    "personalInfo": {
+      "job": "👩🏻‍💻 目前是一名前端工程師",
+      "education": "🏫 畢業於國立臺北科技大學 (NTUT) 資訊與財金管理學系",
+      "personality": "🦫 超級 I 但喜歡認識新朋友的 ISTJ",
+      "hobbies": "💖 愛好：鉤織、打電動、看實況、看 LOL 比賽、旅行、美食"
+    },
+    "vlogIntro": "喜歡嘗試很多事情，最近開始拍 Vlog 想要紀錄生活的每一刻。",
+    "streamingIntro": "有時間也會開實況玩遊戲、畫畫或做自己的事情～",
+    "title_2": "💌 如何聯繫我："
+  },
+  "PostsPage": {
+    "title": "文章列表",
+    "search": "搜尋文章",
+    "publishedAt": "發布於",
+    "latestPosts": "最新文章",
+    "morePosts": "更多文章",
+    "noPosts": "尚無文章",
+    "loadFailed": "無法載入文章，請稍後再試。"
+  },
+  "PostPage": {
+    "relatedPosts": "相關文章",
+    "thanks": "如果你覺得這篇文章對你有幫助，可以請我喝杯奶茶 (◍•ᴗ•◍)❤",
+    "enterPassword": "輸入密碼",
+    "wrongPassword": "密碼錯誤，請再試一次！"
+  },
+  "CategoriesPage": {
+    "title": "文章分類",
+    "postCount": "共 {count} 篇文章",
+    "noCategories": "尚無分類",
+    "loadFailed": "無法載入分類，請稍後再試。",
+    "backToCategories": "返回分類列表"
+  },
+  "TagsPage": {
+    "title": "標籤",
+    "postCount": "共 {count} 篇文章",
+    "noTags": "尚無標籤",
+    "loadFailed": "無法載入標籤，請稍後再試。",
+    "backToTags": "返回標籤列表"
+  },
+  "MiscPage": {
+    "title": "雜七雜八",
+    "description": "暫時什麼東西都沒有 ヾ(｡ꏿ﹏ꏿ)ﾉﾞ"
+  }
+}
