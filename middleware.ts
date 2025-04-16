@@ -1,26 +1,12 @@
-// middleware.ts
 import { NextRequest, NextResponse } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
-import { match as matchLocale } from '@formatjs/intl-localematcher';
-import Negotiator from 'negotiator';
 
 import common from '@/config/common';
 import { routing } from '@/i18n/routing';
+import { detectLocale } from '@/utils/detectLocale';
 
 const LOCALES = common.languages.langs;
-const DEFAULT_LOCALE = common.languages.defaultLocale;
 const DEFAULT_PATH = common.paths.languagePaths.tw;
-
-// 語言偵測：從 header 中取出 Accept-Language 並做 locale 匹配
-const detectLocale = (request: NextRequest): string => {
-  const headers: Record<string, string> = {};
-  request.headers.forEach((value, key) => {
-    headers[key] = value;
-  });
-
-  const languages = new Negotiator({ headers }).languages();
-  return matchLocale(languages, LOCALES, DEFAULT_LOCALE);
-};
 
 export const middleware = (request: NextRequest) => {
   const { pathname } = request.nextUrl;
