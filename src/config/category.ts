@@ -4,7 +4,7 @@ export const categoryMap: CategoryMap = {
   frontend: {
     name: {
       tw: '前端',
-      en: 'FE',
+      en: 'Frontend',
     },
     slug: 'frontend',
     color: {
@@ -39,7 +39,7 @@ export const categoryMap: CategoryMap = {
   backend: {
     name: {
       tw: '後端',
-      en: 'BE',
+      en: 'Backend',
     },
     slug: 'backend',
     color: {
