@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import type { JSX } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Github, Instagram, Youtube } from 'lucide-react';
@@ -9,41 +10,46 @@ import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/style';
 
 import ThemeToggle from '@/components/common/ThemeToggle';
-import LangSelector from '@/components/common/LangSelector';
+import LangMenu from '@/components/common/LangMenu';
 import ExternalLink from '@/components/ui/ExternalLink';
 
 interface SocialLink {
   label: string;
   href: string;
-  icon: React.ReactNode;
+  icon: () => JSX.Element;
 }
 
 const socialLinks: SocialLink[] = [
   {
     label: 'GitHub',
     href: 'https://github.com/kir4che',
-    icon: <Github className='h-4.5 w-4.5 text-pink-600 dark:text-pink-400' />,
+    icon: () => (
+      <Github className='h-4.5 w-4.5 text-pink-600 dark:text-pink-400' />
+    ),
   },
   {
     label: 'Instagram',
     href: 'https://www.instagram.com/kir4che',
-    icon: (
+    icon: () => (
       <Instagram className='h-4.5 w-4.5 text-pink-600 dark:text-pink-400' />
     ),
   },
   {
     label: 'YouTube',
     href: 'https://www.youtube.com/@kir4che',
-    icon: <Youtube className='h-4.5 w-4.5 text-pink-600 dark:text-pink-400' />,
+    icon: () => (
+      <Youtube className='h-4.5 w-4.5 text-pink-600 dark:text-pink-400' />
+    ),
   },
 ];
 
 const SocialLinks: React.FC<{ className?: string }> = ({ className }) => (
   <ul className={cn('flex items-center space-x-2.5', className)}>
-    {socialLinks.map(({ href, icon, label }) => (
+    {socialLinks.map(({ label, href, icon }) => (
       <li key={label}>
         <ExternalLink href={href} title={label}>
-          {icon}
+          {icon()}
+          <span className='sr-only'>{label}</span>
         </ExternalLink>
       </li>
     ))}
@@ -51,7 +57,7 @@ const SocialLinks: React.FC<{ className?: string }> = ({ className }) => (
 );
 
 const LeftSidebar: React.FC = () => {
-  const t = useTranslations('sidebar.profile');
+  const t = useTranslations('profile');
 
   return (
     <aside className='flex flex-col justify-between pt-4 pb-0 md:sticky md:top-0 md:h-screen md:w-48 md:py-8'>
@@ -85,7 +91,7 @@ const LeftSidebar: React.FC = () => {
       <SocialLinks className='hidden md:flex' />
       <div className='mt-auto hidden space-y-4 text-sm md:block'>
         <ThemeToggle />
-        <LangSelector />
+        <LangMenu className='dropdown-top dropdown-start' />
       </div>
     </aside>
   );

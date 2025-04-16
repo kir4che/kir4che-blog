@@ -7,7 +7,7 @@ import { Link } from '@/i18n/navigation';
 
 type Params = Promise<{
   lang: Language;
-}>
+}>;
 
 const TagsPage = async ({ params }: { params: Params }) => {
   const { lang } = await params;

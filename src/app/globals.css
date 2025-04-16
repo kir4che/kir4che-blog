@@ -1,4 +1,6 @@
 @import 'tailwindcss';
+@plugin "daisyui";
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
@@ -44,6 +46,8 @@
   --breakpoint-xs: 30rem;
 
   --font-main: var(--font-dm-sans), var(--font-noto-tc);
+  --font-portfolio: var(--font-noto-tc);
+  --font-rubikDoodleShadow: var(--font-rubik-doodle);
 
   --text-2.5xl: 1.625rem;
   --text-1.5xl: 1.375rem;
@@ -110,7 +114,7 @@
   }
 
   body {
-    @apply bg-bg-primary text-text-primary font-main m-0 min-h-screen tracking-[0.5px] antialiased transition-colors duration-300 sm:px-4;
+    @apply text-text-primary m-0 min-h-screen tracking-[0.5px] antialiased transition-colors duration-300;
   }
 
   h1 {

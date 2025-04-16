@@ -11,7 +11,11 @@ export async function GET(request: Request) {
   const slug = parts.at(-2);
   const subSlug = parts.at(-1);
 
-  if (!slug || !subSlug) return NextResponse.json({ message: 'Missing parameters.' }, { status: 400 });
+  if (!slug || !subSlug)
+    return NextResponse.json(
+      { message: 'Missing parameters.' },
+      { status: 400 }
+    );
 
   try {
     const lang = getLangFromHeader(request);

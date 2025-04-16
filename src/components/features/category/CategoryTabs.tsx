@@ -31,7 +31,7 @@ const CategoryTabs = ({
         className={cn(
           'relative px-4 py-2.5 text-sm font-medium',
           activeTab === 'all' &&
-            'text-primary border-text-primary border-b-2 font-semibold'
+            'text-text-primary border-text-primary border-b-2 font-semibold'
         )}
       >
         {t('all')}

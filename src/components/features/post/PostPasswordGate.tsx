@@ -64,13 +64,13 @@ const PostPasswordGate = ({ slug, lang, onSuccess }: PostPasswordGateProps) => {
             onChange={(e) => setPassword(e.target.value)}
             disabled={isLoading}
             placeholder={t('enterPassword')}
-            className='w-full rounded-md border border-text-gray-lighter bg-bg-secondary px-4 py-3 pr-12 text-text-priamry placeholder-text-gray-light focus:outline-none disabled:opacity-60 dark:border-text-gray/80'
+            className='border-text-gray-lighter bg-bg-secondary text-text-priamry placeholder-text-gray-light dark:border-text-gray/80 w-full rounded-md border px-4 py-3 pr-12 focus:outline-none disabled:opacity-60'
           />
           <button
             type='button'
             onClick={() => setShowPassword((prev) => !prev)}
             aria-label={showPassword ? 'Hide password' : 'Show password'}
-            className='absolute top-1/2 right-4 -translate-y-1/2 text-text-gray-light dark:text-text-gray-lighter focus:outline-none'
+            className='text-text-gray-light dark:text-text-gray-lighter absolute top-1/2 right-4 -translate-y-1/2 focus:outline-none'
             tabIndex={-1}
           >
             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -79,7 +79,7 @@ const PostPasswordGate = ({ slug, lang, onSuccess }: PostPasswordGateProps) => {
         <button
           type='submit'
           disabled={isLoading}
-          className='w-full rounded-md bg-pink-700 py-3 font-medium text-text-secondary focus:outline-none disabled:opacity-60 dark:bg-pink-300'
+          className='text-text-secondary w-full rounded-md bg-pink-700 py-3 font-medium focus:outline-none disabled:opacity-60 dark:bg-pink-300'
         >
           {isLoading ? t_common('button.verifying') : t_common('button.submit')}
         </button>

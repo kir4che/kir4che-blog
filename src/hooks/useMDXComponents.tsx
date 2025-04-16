@@ -40,7 +40,7 @@ export const useMDXComponents = (): MDXComponents => {
     ol: ({ children }) => (
       <ol className='my-2 list-inside list-decimal pl-4'>{children}</ol>
     ),
-    li: ({ children }) => <li className='leading-[1.8]'>{children}</li>,
+    li: ({ children }) => <li className='leading-[1.85]'>{children}</li>,
     a: ({ children, href }) => (
       <a
         href={href}

@@ -10,7 +10,7 @@ import PostCard from '@/components/features/posts/PostCard';
 
 type Params = Promise<{
   lang: Language;
-}>
+}>;
 
 const Home = async ({ params }: { params: Params }) => {
   const { lang } = await params;

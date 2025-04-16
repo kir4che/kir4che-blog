@@ -9,7 +9,8 @@ export const GET = async (request: Request) => {
   const pathParts = url.pathname.split('/');
   const slug = pathParts.at(-1);
 
-  if (!slug) return NextResponse.json({ message: 'Missing slug.' }, { status: 400 });
+  if (!slug)
+    return NextResponse.json({ message: 'Missing slug.' }, { status: 400 });
 
   try {
     const lang = getLangFromHeader(request);

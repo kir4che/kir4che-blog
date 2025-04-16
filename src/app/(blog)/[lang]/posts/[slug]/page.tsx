@@ -1,5 +1,5 @@
 import React from 'react';
-import { notFound } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { serialize } from 'next-mdx-remote/serialize';
 
 import rehypeSlug from 'rehype-slug';
@@ -52,13 +52,14 @@ const rehypeExpressiveCodeOptions = {
 type Params = Promise<{
   lang: Language;
   slug: string;
-}>
+}>;
 
 const PostPage = async ({ params }: { params: Params }) => {
   const { lang, slug } = await params;
 
   try {
     const post = await getPostData(lang, slug);
+
     // serialize 會將 MDX 內容轉換成 React 組件
     const mdxSource = await serialize(post.content, {
       parseFrontmatter: true, // 解析文章開頭的配置
@@ -87,7 +88,7 @@ const PostPage = async ({ params }: { params: Params }) => {
     );
   } catch (err) {
     console.error('Error fetching post data:', err);
-    return notFound();
+    redirect(`/${lang}/`);
   }
 };
 

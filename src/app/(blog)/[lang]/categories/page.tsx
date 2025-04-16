@@ -8,7 +8,7 @@ import { getCategoryStyle } from '@/lib/style';
 
 type Params = Promise<{
   lang: Language;
-}>
+}>;
 
 const CategoriesPage = async ({ params }: { params: Params }) => {
   const { lang } = await params;

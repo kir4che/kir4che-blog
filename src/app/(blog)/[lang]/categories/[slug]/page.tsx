@@ -7,7 +7,7 @@ import CategoryPosts from '@/components/features/category/CategoryPosts';
 type Params = Promise<{
   lang: Language;
   slug: string;
-}>
+}>;
 
 const CategoryPage = async ({ params }: { params: Params }) => {
   const { lang, slug } = await params;

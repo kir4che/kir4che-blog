@@ -27,6 +27,6 @@ const SubCategoryPage = async ({ params }: { params: Params }) => {
   if (!category) return notFound();
 
   return <CategoryPosts slug={subSlug} category={category} />;
-}
+};
 
 export default SubCategoryPage;

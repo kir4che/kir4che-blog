@@ -16,11 +16,11 @@ import Footer from '@/components/layouts/Footer';
 import LeftSidebar from '@/components/layouts/LeftSidebar';
 import RightSidebar from '@/components/layouts/RightSidebar';
 
-import './globals.css';
+import '@/app/globals.css';
 
 export const metadata: Metadata = {
-  title: common.siteInfo.title,
-  description: common.siteInfo.description,
+  title: common.siteInfo.blog.title,
+  description: common.siteInfo.blog.description,
 };
 
 const notoSansTC = Noto_Sans_TC({
@@ -31,7 +31,7 @@ const notoSansTC = Noto_Sans_TC({
 });
 
 const dmSans = DM_Sans({
-  weight: ['400', '500', '600', '700', '800', '900'],
+  weight: ['400', '500', '600', '700', '800'],
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-dm-sans',
@@ -42,17 +42,19 @@ interface RootLayoutProps {
   params: { lang: Language };
 }
 
-const RootLayout = async ({ children, params }: RootLayoutProps) => {
-  const { lang } = await params;
+const RootLayout = ({ children, params }: RootLayoutProps) => {
+  const { lang } = params;
 
   const supportedLocales = routing.locales;
   if (!hasLocale(supportedLocales, lang)) notFound();
 
   return (
     <html lang={lang} suppressHydrationWarning>
-      <body className={`${notoSansTC.variable} ${dmSans.variable}`}>
+      <body
+        className={`bg-bg-primary font-main sm:px-4 ${notoSansTC.variable} ${dmSans.variable}`}
+      >
         <Toaster position='top-center' toastOptions={{ duration: 3000 }} />
-        <NextIntlClientProvider locale={lang}>
+        <NextIntlClientProvider>
           <ThemeProvider attribute='class' defaultTheme='light' enableSystem>
             <AlertProvider>
               <div className='mx-auto flex max-w-screen-2xl flex-col px-4 md:flex-row md:px-2'>

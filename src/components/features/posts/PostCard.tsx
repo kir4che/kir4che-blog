@@ -45,7 +45,12 @@ const PostCard = ({ post }: PostCardProps) => {
             categories={post.categories}
             categoryInfoMap={categoryInfoMap}
           />
-          <PostMetaInfo t={t} date={post.date} wordCount={post.wordCount} className='ml-auto' />
+          <PostMetaInfo
+            t={t}
+            date={post.date}
+            wordCount={post.wordCount}
+            className='ml-auto'
+          />
         </div>
       </div>
     </article>

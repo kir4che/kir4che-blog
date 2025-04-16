@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 
-import { SOCIAL_LINKS } from '@/config/constants';
+import { EMAIL, SOCIAL_LINKS } from '@/config/constants';
 import { getTranslations } from 'next-intl/server';
 
 import YouTubeVideoList from '@/components/features/YouTubeVideoList';
@@ -23,7 +23,7 @@ const AboutPage = async () => {
       />
       <div className='bg-bg-secondary relative z-0 space-y-8 rounded-b-xl px-8 py-6 shadow'>
         <section>
-          <h2 className='text-primary mb-4'>{t('title')}</h2>
+          <h2 className='text-text-primary mb-4'>{t('title')}</h2>
           <h3 className='heading mb-4 -ml-8'>{t('intro')}</h3>
           <ul className='list-inside list-disc leading-7'>
             <li>{t('personalInfo.job')}</li>
@@ -53,10 +53,10 @@ const AboutPage = async () => {
         <section className='relative space-y-2'>
           <h3 className='heading -ml-8'>{t('title_2')}</h3>
           <ExternalLink
-            href='mailto:mollydcxxiii@gmail.com'
+            href={`mailto:${EMAIL}`}
             className='relative text-xl/7 font-medium break-words text-pink-600 hover:no-underline dark:text-pink-300'
           >
-            mollydcxxiii@gmail.com
+            {EMAIL}
             <span className='absolute top-full left-0 h-[3px] w-full origin-left scale-x-0 bg-pink-200 transition-transform duration-300 ease-in-out group-hover:scale-x-100'></span>
           </ExternalLink>
           <DecorativeImage

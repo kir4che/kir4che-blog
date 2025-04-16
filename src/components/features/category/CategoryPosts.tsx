@@ -53,7 +53,6 @@ const CategoryPosts = ({ category, slug }: CategoryPostsProps) => {
           {t('postCount', { count: Number(pagination.totalPosts) })}
         </span>
       </h1>
-
       {category?.subcategories &&
         Object.keys(category.subcategories).length > 0 && (
           <CategoryTabs
@@ -62,7 +61,6 @@ const CategoryPosts = ({ category, slug }: CategoryPostsProps) => {
             subcategories={category.subcategories}
           />
         )}
-
       <div className='space-y-4'>
         {error ? (
           <ErrorRetry

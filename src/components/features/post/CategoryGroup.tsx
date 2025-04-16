@@ -13,7 +13,11 @@ interface CategoryGroupProps {
   categoryInfoMap: Record<string, CategoryInfo>;
 }
 
-const CategoryGroup = ({ showHr = false, categories, categoryInfoMap }: CategoryGroupProps) => {
+const CategoryGroup = ({
+  showHr = false,
+  categories,
+  categoryInfoMap,
+}: CategoryGroupProps) => {
   if (!categories || categories.length === 0) return null;
 
   return (
@@ -40,7 +44,9 @@ const CategoryGroup = ({ showHr = false, categories, categoryInfoMap }: Category
           );
         })}
       </div>
-      {showHr && categories.length > 0 && <hr className='xs:block border-text-gray-light hidden h-3.5 border-[0.5px] dark:border-white/50' />}
+      {showHr && categories.length > 0 && (
+        <hr className='xs:block border-text-gray-light hidden h-3.5 border-[0.5px] dark:border-white/50' />
+      )}
     </>
   );
 };

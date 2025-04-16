@@ -31,7 +31,7 @@ const TagPosts = ({ tag }: TagPostsProps) => {
   return (
     <div className='space-y-6'>
       <h1 className='mb-4 flex items-baseline justify-between'>
-        <span className='text-primary'># {tag.name}</span>
+        <span className='text-text-primary'># {tag.name}</span>
         <span className='text-text-gray dark:text-text-gray-lighter text-sm font-normal'>
           {t('postCount', { count: pagination.totalPosts })}
         </span>

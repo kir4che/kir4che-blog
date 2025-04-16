@@ -23,6 +23,10 @@
       "goToPage": "前往第 {page} 頁"
     }
   },
+  "profile": {
+    "name": "Molly",
+    "subtitle": "Front-End Developer"
+  },
   "settings": {
     "theme": {
       "title": "切換主題",
@@ -47,10 +51,6 @@
     "misc": "雜七雜八"
   },
   "sidebar": {
-    "profile": {
-      "name": "Molly",
-      "subtitle": "Front-End Developer"
-    },
     "popularPosts": "熱門文章",
     "categories": "文章分類",
     "tags": "標籤雲",
@@ -72,7 +72,7 @@
       "job": "👩🏻‍💻 目前是一名前端工程師",
       "education": "🏫 畢業於國立臺北科技大學 (NTUT) 資訊與財金管理學系",
       "personality": "🦫 超級 I 但喜歡認識新朋友的 ISTJ",
-      "hobbies": "💖 愛好：鉤織、打電動、看 LOL 比賽、旅行、美食"
+      "hobbies": "💖 愛好：鉤織、打電動、看實況、看 LOL 比賽、旅行、美食"
     },
     "vlogIntro": "喜歡嘗試很多事情，最近開始拍 Vlog 想要紀錄生活的每一刻。",
     "streamingIntro": "有時間也會開實況玩遊戲、畫畫或做自己的事情～",

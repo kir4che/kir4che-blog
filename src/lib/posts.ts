@@ -129,7 +129,13 @@ export const getPostData = async (
   slug: string
 ): Promise<PostMeta & { content: string }> => {
   const postDir = path.join(postsDirectory, slug);
-  const files = await fs.promises.readdir(postDir);
+
+  let files: string[];
+  try {
+    files = await fs.promises.readdir(postDir);
+  } catch (err) {
+    throw new Error(`Error reading directory ${postDir}: ${err.message}.`);
+  }
 
   // 根據當前語系選擇對應的 mdx 檔案
   const mdxFile = files.find((file) => {

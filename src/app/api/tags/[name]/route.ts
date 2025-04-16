@@ -10,7 +10,8 @@ export const GET = async (request: Request) => {
   const pathParts = url.pathname.split('/');
   const tagName = decodeURIComponent(pathParts.at(-1) || '');
 
-  if (!tagName) return NextResponse.json({ message: 'Missing tag name.' }, { status: 400 });
+  if (!tagName)
+    return NextResponse.json({ message: 'Missing tag name.' }, { status: 400 });
 
   try {
     const lang = getLangFromHeader(request);

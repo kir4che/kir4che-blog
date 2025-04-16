@@ -31,7 +31,11 @@ const PostList: React.FC<PostListProps> = ({ t, posts }) => {
             </Link>
           </h2>
           <div className='flex flex-wrap items-center gap-x-3 gap-y-1 text-sm'>
-            <CategoryGroup showHr={true} categories={post.categories} categoryInfoMap={categoryInfoMap} />
+            <CategoryGroup
+              showHr={true}
+              categories={post.categories}
+              categoryInfoMap={categoryInfoMap}
+            />
             <PostMetaInfo t={t} date={post.date} wordCount={post.wordCount} />
           </div>
         </article>

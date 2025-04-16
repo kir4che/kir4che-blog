@@ -129,7 +129,7 @@ const PostLayout = ({ post, children }: PostLayoutProps) => {
                 t={t_common}
                 date={date}
                 wordCount={wordCount}
-                className='dark:text-white/85 text-sm'
+                className='text-sm dark:text-white/85'
               />
               {availableLangs.length > 0 && (
                 <LangMenu

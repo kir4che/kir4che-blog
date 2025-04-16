@@ -23,6 +23,10 @@
       "goToPage": "Go to page {page}"
     }
   },
+  "profile": {
+    "name": "Molly",
+    "subtitle": "Front-End Developer"
+  },
   "settings": {
     "theme": {
       "title": "Switch Theme",
@@ -47,10 +51,6 @@
     "misc": "Misc"
   },
   "sidebar": {
-    "profile": {
-      "name": "Molly",
-      "subtitle": "Front-End Developer"
-    },
     "popularPosts": "Popular Posts",
     "categories": "Categories",
     "tags": "Tags",
@@ -72,7 +72,7 @@
       "job": "👩🏻‍💻 Currently working as a Front-end Engineer",
       "education": "🏫 Graduated from National Taipei University of Technology (NTUT), Department of Information and Finance Management",
       "personality": "🦫 Super introverted but love making new friends - ISTJ",
-      "hobbies": "💖 Hobbies: Crocheting, Gaming, Watching LOL Tournaments, Traveling, Food"
+      "hobbies": "💖 Hobbies: Crocheting, Gaming, Watching Streams & LOL Tournaments, Traveling, Food"
     },
     "vlogIntro": "I love trying new things, and recently started vlogging to document every moment of life.",
     "streamingIntro": "Sometimes I also stream gaming, drawing, or just doing my own things~",

@@ -11,7 +11,8 @@ export async function GET(request: Request) {
 
   const slug = pathParts.at(-1);
 
-  if (!slug) return NextResponse.json({ message: 'Missing slug.' }, { status: 400 });
+  if (!slug)
+    return NextResponse.json({ message: 'Missing slug.' }, { status: 400 });
 
   try {
     const lang = getLangFromHeader(request);

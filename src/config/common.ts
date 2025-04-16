@@ -1,7 +1,9 @@
 const common = {
   siteInfo: {
-    title: 'kir4che blog',
-    description: "kir4che's blog",
+    blog: {
+      title: 'kir4che blog',
+      description: "kir4che's blog",
+    },
   },
   languages: {
     langs: ['tw', 'en'] as const,
