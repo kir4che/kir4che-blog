@@ -8,7 +8,15 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ message: 'Invalid secret' }, { status: 401 });
 
   try {
-    const paths = ['/', '/posts', '/categories', '/tags'];
+    const locales = ['/tw', '/en'];
+    const basePaths = ['/', '/posts', '/categories', '/tags'];
+
+    // 組合出完整的多語系路徑
+    const paths = locales.flatMap((locale) =>
+      basePaths.map((base) => (base === '/' ? locale : `${locale}${base}`))
+    );
+
+    // 逐一重新驗證每個路徑（使用 ISR）
     for (const path of paths) revalidatePath(path);
 
     return NextResponse.json({ revalidated: true, paths });
