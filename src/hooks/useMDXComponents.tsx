@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import type { MDXComponents } from 'mdx/types';
 
 import {
@@ -16,21 +15,30 @@ import Details, { Summary } from '@/components/mdx/Details';
 import CustomImage from '@/components/mdx/Image';
 import Images from '@/components/mdx/Images';
 
-export const useMDXComponents = (): MDXComponents => {
+export const useMDXComponents = (
+  imageMetas: Record<string, any> = {}
+): MDXComponents => {
   return {
+    Correction,
+    Highlight,
+    Table: Table,
+    Details: Details,
+    Summary: Summary,
+    img: (props) => {
+      const meta = imageMetas[props.src ?? ''] ?? {};
+      return <CustomImage {...props} {...meta} />;
+    },
+    Image: (props) => {
+      const meta = imageMetas[props.src ?? ''] ?? {};
+      return <CustomImage {...props} {...meta} />;
+    },
+    Images: Images,
     h1: CustomH1,
     h2: CustomH2,
     h3: CustomH3,
     h4: CustomH4,
     h5: CustomH5,
     h6: CustomH6,
-    Image: CustomImage,
-    Images: Images,
-    Table: Table,
-    Details: Details,
-    Summary: Summary,
-    Correction,
-    Highlight,
     p: ({ children }) => (
       <p className='text-text-primary my-6 block text-base/7'>{children}</p>
     ),
@@ -50,16 +58,6 @@ export const useMDXComponents = (): MDXComponents => {
       >
         {children}
       </a>
-    ),
-    img: ({ src = '', alt = '' }) => (
-      <Image
-        src={src}
-        alt={alt}
-        width={800}
-        height={600}
-        className='max-h-[600px] w-full rounded-md object-cover'
-        style={{ width: '100%', height: 'auto' }}
-      />
     ),
     blockquote: ({ children }) => (
       <blockquote className='my-6 border-l-4 border-pink-500 bg-pink-50 px-5 py-3 dark:border-pink-500 dark:bg-pink-700/15'>
