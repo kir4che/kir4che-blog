@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { categoryMap } from '@/config/category';
 import type { Category, CategoryInfo } from '@/types/category';
 import type { PostMeta, PostInfo } from '@/types/post';
@@ -175,87 +176,84 @@ export const getCategoriesByPosts = (
 };
 
 // 根據 slug 取得分類資訊（所有語系名稱、slug、color、parentSlug、postCount、子分類）
-export const getCategoryBySlug = (
-  slug: string,
-  posts: PostInfo[]
-): Category | null => {
-  const mainCategory = categoryMap[slug];
+export const getCategoryBySlug = cache(
+  (slug: string, posts: PostInfo[]): Category | null => {
+    const mainCategory = categoryMap[slug];
 
-  // 處理子分類
-  if (!mainCategory) {
-    for (const [parentSlug, category] of Object.entries(categoryMap)) {
-      const subcategory = category.subcategories?.[slug];
-      if (subcategory) {
-        const categoryPosts = posts.filter((post) =>
-          isPostInCategory(post, subcategory.name, slug)
+    // 處理子分類
+    if (!mainCategory) {
+      for (const [parentSlug, category] of Object.entries(categoryMap)) {
+        const subcategory = category.subcategories?.[slug];
+        if (subcategory) {
+          const categoryPosts = posts.filter((post) =>
+            isPostInCategory(post, subcategory.name, slug)
+          );
+
+          if (categoryPosts.length === 0) return null;
+
+          return {
+            ...subcategory,
+            slug,
+            parentSlug,
+            postCount: categoryPosts.length,
+            subcategories: {},
+          };
+        }
+      }
+      return null;
+    }
+
+    // 處理主分類
+    const categoryPosts = posts.filter((post) => {
+      const isMainCategory = isPostInCategory(post, mainCategory.name, slug);
+      const hasSubcategory =
+        mainCategory.subcategories &&
+        Object.values(mainCategory.subcategories).some((sub) =>
+          isPostInCategory(post, sub.name, sub.slug)
         );
 
-        if (categoryPosts.length === 0) return null;
+      return isMainCategory || hasSubcategory;
+    });
 
-        return {
-          ...subcategory,
-          slug,
-          parentSlug,
-          postCount: categoryPosts.length,
-          subcategories: {},
-        };
-      }
-    }
-    return null;
+    const nameToSlugMap = createCategoryNameToSlugMap();
+    const postCounts = calculatePostCounts(categoryPosts, nameToSlugMap);
+    const processedSubcategories = processSubcategories(
+      mainCategory.subcategories,
+      postCounts,
+      slug
+    );
+
+    if (categoryPosts.length === 0) return null;
+
+    return {
+      ...mainCategory,
+      slug,
+      postCount: categoryPosts.length,
+      subcategories: processedSubcategories,
+    };
   }
-
-  // 處理主分類
-  const categoryPosts = posts.filter((post) => {
-    const isMainCategory = isPostInCategory(post, mainCategory.name, slug);
-    const hasSubcategory =
-      mainCategory.subcategories &&
-      Object.values(mainCategory.subcategories).some((sub) =>
-        isPostInCategory(post, sub.name, sub.slug)
-      );
-
-    return isMainCategory || hasSubcategory;
-  });
-
-  const nameToSlugMap = createCategoryNameToSlugMap();
-  const postCounts = calculatePostCounts(categoryPosts, nameToSlugMap);
-  const processedSubcategories = processSubcategories(
-    mainCategory.subcategories,
-    postCounts,
-    slug
-  );
-
-  if (categoryPosts.length === 0) return null;
-
-  return {
-    ...mainCategory,
-    slug,
-    postCount: categoryPosts.length,
-    subcategories: processedSubcategories,
-  };
-};
+);
 
 // 根據主分類和子分類的 slug 取得子分類的分類資訊
-export const getSubcategoryBySlug = (
-  parentSlug: string,
-  subSlug: string,
-  posts: PostInfo[]
-): Category | null => {
-  const mainCategory = categoryMap[parentSlug];
-  if (!mainCategory) return null;
+export const getSubcategoryBySlug = cache(
+  (parentSlug: string, subSlug: string, posts: PostInfo[]): Category | null => {
+    const mainCategory = categoryMap[parentSlug];
+    if (!mainCategory) return null;
 
-  const subCategory = mainCategory.subcategories?.[subSlug];
-  if (!subCategory) return null;
+    const subCategory = mainCategory.subcategories?.[subSlug];
+    if (!subCategory) return null;
 
-  const categoryPosts = posts.filter((post) =>
-    isPostInCategory(post, subCategory.name, subSlug)
-  );
-  if (categoryPosts.length === 0) return null;
+    const categoryPosts = posts.filter((post) =>
+      isPostInCategory(post, subCategory.name, subSlug)
+    );
+    if (categoryPosts.length === 0) return null;
 
-  return {
-    ...subCategory,
-    slug: subSlug,
-    parentSlug,
-    postCount: categoryPosts.length,
-    subcategories: {},
-  };
-};
+    return {
+      ...subCategory,
+      slug: subSlug,
+      parentSlug,
+      postCount: categoryPosts.length,
+      subcategories: {},
+    };
+  }
+);

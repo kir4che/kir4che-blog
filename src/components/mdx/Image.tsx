@@ -1,7 +1,6 @@
-'use client';
-
 import Image from 'next/image';
 import { PhotoProvider, PhotoView } from 'react-photo-view';
+
 import 'react-photo-view/dist/react-photo-view.css';
 
 import { cn } from '@/lib/style';
@@ -13,6 +12,8 @@ interface CustomImageProps {
   align?: 'left' | 'center' | 'right';
   width?: number | string;
   height?: number | string;
+  priority?: boolean;
+  blurDataURL?: string;
 }
 
 const CustomImage: React.FC<CustomImageProps> = ({
@@ -22,31 +23,37 @@ const CustomImage: React.FC<CustomImageProps> = ({
   align = 'left',
   width = '100%',
   height = 'auto',
+  priority = false,
+  blurDataURL,
 }) => {
   const isWidthNumber = typeof width === 'number';
   const isHeightNumber = typeof height === 'number';
 
-  const alignmentClass = {
-    left: 'text-left',
-    center: 'text-center',
-    right: 'text-right',
+  const alignmentStyles = {
+    left: 'justify-start',
+    center: 'justify-center',
+    right: 'justify-end',
   }[align];
 
   return (
     <PhotoProvider>
       <figure
-        className={cn('my-6 overflow-hidden rounded-md', alignmentClass)}
+        className={cn('my-6 flex overflow-hidden rounded-md', alignmentStyles)}
         style={{ width, height }}
       >
         <PhotoView src={src}>
           <Image
             src={src}
             alt={alt}
-            layout='responsive'
+            layout={width && height ? 'intrinsic' : 'responsive'}
             width={isWidthNumber ? width : 800}
             height={isHeightNumber ? height : 533}
-            sizes='(min-width: 768px) 600px, 100vw'
+            sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
             className='max-h-[600px] cursor-zoom-in object-cover object-center'
+            priority={priority}
+            placeholder={blurDataURL ? 'blur' : 'empty'}
+            loading='lazy'
+            blurDataURL={blurDataURL}
           />
         </PhotoView>
         {title && (

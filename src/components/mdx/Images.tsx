@@ -1,16 +1,19 @@
-'use client';
-
 import React from 'react';
-import Image from 'next/image';
-import { cn } from '@/lib/style';
 import { PhotoProvider, PhotoView } from 'react-photo-view';
+
 import 'react-photo-view/dist/react-photo-view.css';
+
+import { cn } from '@/lib/style';
+
+import CustomImage from '@/components/mdx/Image';
 
 interface ImageItem {
   src: string;
   alt?: string;
   title?: string;
   width?: number | string; // 支援百分比或 px
+  height?: number | string;
+  blurDataURL?: string;
 }
 
 interface ImagesProps {
@@ -23,43 +26,38 @@ const Images: React.FC<ImagesProps> = ({
   images,
   height = 'auto',
   className,
-}) => {
-  return (
-    <PhotoProvider>
-      <div className={cn('my-6 flex flex-wrap gap-4', className)}>
-        {images.map((img, idx) => {
-          const flexBasis = img.width
-            ? typeof img.width === 'number'
-              ? `${img.width}px`
-              : img.width
-            : `${100 / images.length}%`;
+}) => (
+  <PhotoProvider>
+    <div className={cn('my-6 flex flex-wrap gap-4', className)}>
+      {images.map((img, index) => {
+        const flexBasis =
+          img.width && typeof img.width === 'number'
+            ? `${Math.min(img.width, 100)}%`
+            : img.width
+              ? img.width
+              : `${100 / images.length}%`;
 
-          return (
-            <figure
-              key={idx}
-              style={{ flexBasis, height }}
-              className='relative flex flex-col items-center justify-center overflow-hidden rounded-md'
-            >
-              <PhotoView src={img.src}>
-                <Image
-                  src={img.src}
-                  alt={img.alt || ''}
-                  width={800}
-                  height={600}
-                  className='h-full w-full cursor-zoom-in object-cover object-center'
-                />
-              </PhotoView>
-              {img.title && (
-                <figcaption className='mt-2 text-center text-xs text-pink-600 dark:text-pink-200'>
-                  {img.title}
-                </figcaption>
-              )}
-            </figure>
-          );
-        })}
-      </div>
-    </PhotoProvider>
-  );
-};
+        return (
+          <figure
+            key={index}
+            style={{ flexBasis, height }}
+            className='relative flex flex-col items-center justify-center overflow-hidden rounded-md'
+          >
+            <PhotoView src={img.src}>
+              <CustomImage
+                src={img.src}
+                alt={img.alt || ''}
+                title={img.title}
+                width={img.width || '100%'}
+                height={height}
+                blurDataURL={img.blurDataURL}
+              />
+            </PhotoView>
+          </figure>
+        );
+      })}
+    </div>
+  </PhotoProvider>
+);
 
 export default Images;

@@ -9,12 +9,12 @@ import remarkSupersub from 'remark-supersub';
 import remarkGfm from 'remark-gfm';
 import remarkIns from 'remark-ins';
 import remarkCustomHeaderId from 'remark-custom-header-id';
+import rehypeUnwrapImages from 'rehype-unwrap-images';
 import { remarkMark } from 'remark-mark-highlight';
 import remarkImages from 'remark-images';
 import rehypeExpressiveCode from 'rehype-expressive-code';
 import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
 import { createInlineSvgUrl } from '@expressive-code/core';
-import rehypeImageNativeLazyLoading from 'rehype-plugin-image-native-lazy-loading';
 
 import type { Language } from '@/types/language';
 import { getPostData } from '@/lib/posts';
@@ -78,11 +78,11 @@ const PostPage = async ({ params }: Props) => {
 
     // serialize 會將 MDX 內容轉換成 React 組件
     const mdxSource = await serialize(post.content, {
-      parseFrontmatter: true, // 解析文章開頭的配置
+      parseFrontmatter: true,
       mdxOptions: {
         rehypePlugins: [
           [rehypeExpressiveCode, rehypeExpressiveCodeOptions],
-          [rehypeImageNativeLazyLoading as unknown as any],
+          rehypeUnwrapImages,
           rehypeSlug,
           rehypeHighlight,
         ],
@@ -94,13 +94,13 @@ const PostPage = async ({ params }: Props) => {
           remarkImages, // 貼圖片 link 會直接顯示圖片
           remarkGfm,
         ],
-        format: 'mdx', // 處理標準的 MDX 格式
+        format: 'mdx',
       },
     });
 
     return (
       <PostLayout post={post}>
-        <MDXContent content={mdxSource} />
+        <MDXContent content={mdxSource} imageMetas={post.imageMetas} />
       </PostLayout>
     );
   } catch (err) {

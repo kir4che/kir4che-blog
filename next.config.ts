@@ -6,9 +6,8 @@ const nextConfig: NextConfig = {
   pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
   reactStrictMode: true,
   images: {
-    deviceSizes: [640, 750, 1080, 1200, 1920],
-    imageSizes: [16, 32, 48, 64, 96],
-    unoptimized: false,
+    formats: ['image/avif', 'image/webp'],
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -21,7 +20,7 @@ const nextConfig: NextConfig = {
       ...config.resolve.alias,
       '@': path.resolve(__dirname, './src'),
     };
-
+    // 處理 client 端的 Node.js module
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -29,30 +28,7 @@ const nextConfig: NextConfig = {
         path: false,
       };
     }
-
     return config;
-  },
-  async headers() {
-    return [
-      {
-        source: '/(.*)\\.(jpg|jpeg|png|gif|webp|css|js)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      {
-        source: '/api/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'private, max-age=3600',
-          },
-        ],
-      },
-    ];
   },
 };
 
