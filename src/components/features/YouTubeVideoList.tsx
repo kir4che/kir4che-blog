@@ -64,8 +64,8 @@ const YouTubeVideoList = ({
             <Image
               src={video.thumbnail}
               alt={video.title}
-              width={200}
-              height={200}
+              width={240}
+              height={135}
               className='h-full w-full object-cover transition-transform group-hover:scale-105'
               loading='lazy'
             />

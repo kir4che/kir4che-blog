@@ -65,10 +65,10 @@ const LeftSidebar: React.FC = () => {
         <div className='relative block h-16 w-16 md:h-26 md:w-26'>
           <Link href='/'>
             <Image
-              src='/images/avatar.png'
+              src='/images/avatar.webp'
               alt='Avatar'
-              width={300}
-              height={300}
+              width={100}
+              height={100}
               className='relative block h-16 min-h-16 w-16 min-w-16 rounded-full shadow md:h-26 md:w-26'
               priority
               onError={(e) => (e.currentTarget.style.display = 'none')}

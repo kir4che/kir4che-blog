@@ -45,7 +45,7 @@ const Experience: React.FC = () => {
               <div className='mb-3 flex flex-wrap items-center justify-between gap-y-2'>
                 <div className='flex items-center gap-x-2'>
                   <Image
-                    src={`/images/portfolio/${key}.png`}
+                    src={`/images/portfolio/${key}.webp`}
                     alt={key}
                     width={40}
                     height={40}

@@ -14,7 +14,7 @@ const AboutPage = async () => {
   return (
     <>
       <Image
-        src='/images/about-cover.png'
+        src='/images/about-cover.webp'
         alt={t('coverImageAlt')}
         layout='responsive'
         width={1200}
@@ -60,22 +60,22 @@ const AboutPage = async () => {
             <span className='absolute top-full left-0 h-[3px] w-full origin-left scale-x-0 bg-pink-200 transition-transform duration-300 ease-in-out group-hover:scale-x-100'></span>
           </ExternalLink>
           <DecorativeImage
-            src='/images/arrows-illustration.png'
+            src='/images/arrows-illustration.webp'
             desktopOnly={false}
             className='xxs:block absolute bottom-3 left-44 hidden max-h-24 max-w-24 rotate-6'
           />
         </section>
         <DecorativeImage
-          src='/images/butterfly-illustration.png'
+          src='/images/butterfly-illustration.webp'
           desktopOnly={false}
           className='absolute top-8 right-0 max-h-40 max-w-40 xl:right-8'
         />
         <DecorativeImage
-          src='/images/butterfly-illustration-2.png'
+          src='/images/butterfly-illustration-2.webp'
           className='absolute right-2 bottom-80 max-h-32 max-w-32 lg:right-60 2xl:right-72'
         />
         <DecorativeImage
-          src='/images/about-illustration.png'
+          src='/images/about-illustration.webp'
           className='absolute -right-4 -bottom-8 max-h-80 max-w-80'
         />
       </div>
