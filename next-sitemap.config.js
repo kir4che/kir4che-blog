@@ -2,6 +2,7 @@
 module.exports = {
   siteUrl: 'https://kir4che.com',
   generateRobotsTxt: true,
+  generateIndexSitemap: true,
   changefreq: 'weekly',
   priority: 0.7,
   sitemapSize: 5000,
@@ -11,7 +12,7 @@ module.exports = {
   alternateRefs: [
     {
       href: 'https://kir4che.com/tw',
-      hreflang: 'tw',
+      hreflang: 'zh-TW',
     },
     {
       href: 'https://kir4che.com/en',
