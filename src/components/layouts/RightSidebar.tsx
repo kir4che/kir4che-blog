@@ -35,7 +35,6 @@ const RightSidebar: React.FC = () => {
         headers: {
           'Accept-Language': lang,
         },
-        next: { revalidate: 3600 },
       })
         .then((res) => {
           if (!res.ok) throw new Error('Fetch failed.');
