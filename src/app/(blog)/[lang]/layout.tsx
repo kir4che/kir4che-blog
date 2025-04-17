@@ -18,31 +18,10 @@ import RightSidebar from '@/components/layouts/RightSidebar';
 
 import '@/app/globals.css';
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { lang: Language };
-}): Promise<Metadata> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-  const { locales } = routing;
-
-  const languages: Record<string, string> = {};
-  locales.forEach((locale) => {
-    languages[locale] = `${baseUrl}/${locale}`;
-  });
-
-  return {
-    title: common.siteInfo.blog.title,
-    description: common.siteInfo.blog.description,
-    alternates: {
-      canonical: `${baseUrl}/${params.lang}`,
-      languages: {
-        ...languages,
-        'x-default': baseUrl,
-      },
-    },
-  };
-}
+export const metadata: Metadata = {
+  title: common.siteInfo.blog.title,
+  description: common.siteInfo.blog.description,
+};
 
 const notoSansTC = Noto_Sans_TC({
   weight: ['400', '500', '600', '700', '800', '900'],

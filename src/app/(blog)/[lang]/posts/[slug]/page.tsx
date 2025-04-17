@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { serialize } from 'next-mdx-remote/serialize';
 
@@ -20,6 +21,25 @@ import { getPostData } from '@/lib/posts';
 
 import PostLayout from '@/components/features/post/PostLayout';
 import MDXContent from '@/components/mdx/MDXContent';
+
+type Props = {
+  params: Promise<{
+    lang: Language;
+    slug: string;
+  }>;
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const lang = (await params).lang;
+  const slug = (await params).slug;
+
+  const post = await getPostData(lang, slug);
+
+  return {
+    title: post.title,
+    description: post.description,
+  };
+}
 
 const terminalIconMacStyle = createInlineSvgUrl(`
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="7" viewBox="0 0 34 10" preserveAspectRatio="xMidYMid meet">
@@ -50,12 +70,7 @@ const rehypeExpressiveCodeOptions = {
   plugins: [pluginLineNumbers()],
 };
 
-type Params = Promise<{
-  lang: Language;
-  slug: string;
-}>;
-
-const PostPage = async ({ params }: { params: Params }) => {
+const PostPage = async ({ params }: Props) => {
   const { lang, slug } = await params;
 
   try {
