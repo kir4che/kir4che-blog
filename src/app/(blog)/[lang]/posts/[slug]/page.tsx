@@ -13,6 +13,7 @@ import remarkImages from 'remark-images';
 import rehypeExpressiveCode from 'rehype-expressive-code';
 import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
 import { createInlineSvgUrl } from '@expressive-code/core';
+import rehypeImageNativeLazyLoading from 'rehype-plugin-image-native-lazy-loading';
 
 import type { Language } from '@/types/language';
 import { getPostData } from '@/lib/posts';
@@ -66,6 +67,7 @@ const PostPage = async ({ params }: { params: Params }) => {
       mdxOptions: {
         rehypePlugins: [
           [rehypeExpressiveCode, rehypeExpressiveCodeOptions],
+          [rehypeImageNativeLazyLoading as unknown as any],
           rehypeSlug,
           rehypeHighlight,
         ],
