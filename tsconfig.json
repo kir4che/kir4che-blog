@@ -30,7 +30,8 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx",
-    "src/posts/test/index.mdx"
+    "src/posts/test/index.mdx",
+    "next-sitemap.config.js"
   ],
   "exclude": ["node_modules"]
 }

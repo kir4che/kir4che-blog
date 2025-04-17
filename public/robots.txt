@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://kir4che.com
+
+# Sitemaps
+Sitemap: https://kir4che.com/sitemap.xml
