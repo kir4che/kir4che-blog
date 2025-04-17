@@ -66,7 +66,7 @@ const Header: React.FC = () => {
         <div className='flex items-center justify-start lg:w-1/3'>
           <Link href='/portfolio' className='flex items-center'>
             <Image
-              src='/images/portfolio/logo.png'
+              src='/images/portfolio/logo.webp'
               alt={`${SITE_NAME} logo`}
               width={32}
               height={32}

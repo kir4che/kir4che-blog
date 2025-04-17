@@ -15,7 +15,7 @@ const DecorativeImage: React.FC<DecorativeImageProps> = ({
 }) => (
   <Image
     src={src}
-    alt='裝飾圖片'
+    alt='Decorative image'
     layout='responsive'
     width={200}
     height={200}

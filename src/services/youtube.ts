@@ -13,7 +13,10 @@ export const fetchYouTubeVideos = (
   maxResults: number = 1
 ): Promise<VideoData[]> => {
   return fetch(
-    `${BASE_URL}?key=${API_KEY}&playlistId=${PLAYLIST_ID}&part=snippet&maxResults=${maxResults}`
+    `${BASE_URL}?key=${API_KEY}&playlistId=${PLAYLIST_ID}&part=snippet&maxResults=${maxResults}`,
+    {
+      next: { revalidate: 604800 }, // 7 days
+    }
   )
     .then((res) => {
       if (!res.ok) throw new Error('Fetch failed.');

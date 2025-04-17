@@ -33,7 +33,7 @@ const About: React.FC = () => {
         </div>
         <div className='order-1 mx-auto md:order-none'>
           <Image
-            src='/images/portfolio/molly.jpg'
+            src='/images/portfolio/molly.webp'
             alt='Portrait of Molly'
             width={500}
             height={500}

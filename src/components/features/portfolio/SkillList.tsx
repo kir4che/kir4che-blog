@@ -6,6 +6,7 @@ import { useMessages, useTranslations } from 'next-intl';
 
 import Title from '@/components/features/portfolio/Title';
 import Paragraphs from '@/components/ui/Paragraphs';
+import DecorativeImage from '@/components/ui/DecorativeImage';
 
 const categories = ['frontend', 'backend', 'languages', 'others'] as const;
 type Category = (typeof categories)[number];
@@ -53,7 +54,12 @@ const SkillList: React.FC = () => {
         {t('tip')}
       </p>
       <div className='rounded-lg bg-pink-200 py-5'>
-        <div className='xs:rounded-xl xs:space-y-5 mx-auto max-w-screen-md space-y-4 bg-white py-6'>
+        <div className='xs:rounded-xl xs:space-y-5 relative mx-auto max-w-screen-md space-y-4 bg-white py-6'>
+          <DecorativeImage
+            src='/images/portfolio/beaver.webp'
+            desktopOnly={false}
+            className='absolute -bottom-8 z-50 hidden max-h-40 max-w-40 rotate-3 sm:block lg:-left-16'
+          />
           {categories.map((cat) => (
             <ul
               key={cat}

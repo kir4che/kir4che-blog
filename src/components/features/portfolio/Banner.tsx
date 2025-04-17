@@ -11,7 +11,7 @@ const Banner: React.FC = () => {
   return (
     <section className='flex items-center justify-center gap-12 bg-pink-100/50 px-8 py-16 sm:px-16 md:ml-12 md:gap-12 md:rounded-s-full md:py-20 lg:ml-20 lg:gap-20 lg:px-0'>
       <Image
-        src='/images/portfolio/banner.png'
+        src='/images/portfolio/banner.webp'
         alt='Illustration of portfolio banner'
         width={400}
         height={400}

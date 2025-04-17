@@ -42,7 +42,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
       <div className='flex max-w-screen-xl flex-col gap-x-4 px-8 lg:flex-row lg:gap-x-8'>
         <div className='space-y-3 lg:max-w-xl'>
           <Image
-            src={`/images/portfolio/${project}.png`}
+            src={`/images/portfolio/${project}.webp`}
             alt={project}
             width={500}
             height={500}
