@@ -47,7 +47,6 @@ const CustomImage: React.FC<CustomImageProps> = ({
             height={isHeightNumber ? height : 533}
             sizes='(min-width: 768px) 600px, 100vw'
             className='max-h-[600px] cursor-zoom-in object-cover object-center'
-            loading='lazy'
           />
         </PhotoView>
         {title && (

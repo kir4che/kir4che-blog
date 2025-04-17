@@ -70,7 +70,8 @@ const LeftSidebar: React.FC = () => {
               width={100}
               height={100}
               className='relative block h-16 min-h-16 w-16 min-w-16 rounded-full shadow md:h-26 md:w-26'
-              priority
+              sizes="(max-width: 600px) 100px, (max-width: 1000px) 200px, 300px"
+              loading="lazy"
               onError={(e) => (e.currentTarget.style.display = 'none')}
             />
           </Link>
