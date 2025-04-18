@@ -6,17 +6,20 @@ import { Circle } from 'lucide-react';
 import type { CategoryInfo } from '@/types/category';
 import { Link } from '@/i18n/navigation';
 import { getCategoryStyle } from '@/lib/style';
+import { cn } from '@/lib/style';
 
 interface CategoryGroupProps {
   showHr?: boolean;
   categories: string[];
   categoryInfoMap: Record<string, CategoryInfo>;
+  className?: string;
 }
 
 const CategoryGroup = ({
   showHr = false,
   categories,
   categoryInfoMap,
+  className,
 }: CategoryGroupProps) => {
   if (!categories || categories.length === 0) return null;
 
@@ -29,7 +32,10 @@ const CategoryGroup = ({
             <Link
               key={catName}
               href={`/categories${categoryInfo?.parentSlug ? `/${categoryInfo.parentSlug}` : ''}/${categoryInfo?.slug ?? ''}`}
-              className='flex items-center gap-x-1 text-[var(--category-color)] hover:opacity-85'
+              className={cn(
+                'flex items-center gap-x-1 text-sm text-[var(--category-color)] hover:opacity-85',
+                className
+              )}
               style={
                 categoryInfo ? getCategoryStyle(categoryInfo.color) : undefined
               }

@@ -7,7 +7,7 @@ import type { Language } from '@/types/language';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/style';
 
-import PostCard from '@/components/features/posts/PostCard';
+import PostPreview from '@/components/features/post/PostPreview';
 
 type Params = Promise<{
   lang: Language;
@@ -75,7 +75,9 @@ const Home = async ({ params }: { params: Params }) => {
             )}
           >
             {posts?.length > 0 ? (
-              posts.map((post) => <PostCard key={post.slug} post={post} />)
+              posts.map((post) => (
+                <PostPreview key={post.slug} post={post} variant='card' />
+              ))
             ) : (
               <p className='text-text-gray-dark dark:text-text-gray-light col-span-full py-8 text-center'>
                 {t('PostsPage.noPosts')}
