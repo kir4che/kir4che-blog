@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-import { useAlert } from '@/context/AlertContext';
+import { useAlert } from '@/contexts/AlertContext';
 import type { PostMeta, PaginationData } from '@/types/post';
 
 interface UsePaginationParams {

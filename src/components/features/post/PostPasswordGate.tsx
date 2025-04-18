@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { LockKeyhole, Eye, EyeOff } from 'lucide-react';
-import { useAlert } from '@/context/AlertContext';
+import { useAlert } from '@/contexts/AlertContext';
 
 interface PostPasswordGateProps {
   slug: string;

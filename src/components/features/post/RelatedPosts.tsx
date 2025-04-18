@@ -3,7 +3,7 @@ import { useTranslations } from 'next-intl';
 
 import type { PostMeta } from '@/types/post';
 import { Link } from '@/i18n/navigation';
-import { useAlert } from '@/context/AlertContext';
+import { useAlert } from '@/contexts/AlertContext';
 
 interface RelatedPostsProps {
   lang: string;

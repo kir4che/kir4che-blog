@@ -6,7 +6,7 @@ import { useLocale } from 'next-intl';
 import type { Language } from '@/types/language';
 import type { Category } from '@/types/category';
 import type { Tag } from '@/types/tag';
-import { useAlert } from '@/context/AlertContext';
+import { useAlert } from '@/contexts/AlertContext';
 
 import SearchBar from '@/components/features/sidebar/SearchBar';
 import PopularPosts from '@/components/features/sidebar/PopularPosts';
