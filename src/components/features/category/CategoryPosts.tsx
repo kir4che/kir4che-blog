@@ -8,7 +8,7 @@ import type { Category } from '@/types/category';
 import { getCategoryStyle } from '@/lib/style';
 import { usePagination } from '@/hooks/usePagination';
 
-import PostList from '@/components/features/posts/PostList';
+import PostPreview from '@/components/features/post/PostPreview';
 import Pagination from '@/components/ui/Pagination';
 import CategoryTabs from '@/components/features/category/CategoryTabs';
 import ErrorRetry from '@/components/ui/ErrorRetry';
@@ -72,7 +72,11 @@ const CategoryPosts = ({ category, slug }: CategoryPostsProps) => {
           <Skeleton variant='post' />
         ) : (
           <>
-            <PostList t={t_common} posts={posts} />
+            <section className='card space-y-4'>
+              {posts.map((post) => (
+                <PostPreview key={post.slug} post={post} variant='list' />
+              ))}
+            </section>
             {pagination.totalPages > 1 && (
               <Pagination
                 currentPage={pagination.currentPage}

@@ -7,7 +7,7 @@ import type { Language } from '@/types/language';
 import type { Tag } from '@/types/tag';
 import { usePagination } from '@/hooks/usePagination';
 
-import PostList from '@/components/features/posts/PostList';
+import PostPreview from '@/components/features/post/PostPreview';
 import Pagination from '@/components/ui/Pagination';
 import ErrorRetry from '@/components/ui/ErrorRetry';
 import Skeleton from '@/components/ui/Skeleton';
@@ -47,7 +47,11 @@ const TagPosts = ({ tag }: TagPostsProps) => {
           <Skeleton variant='post' />
         ) : (
           <>
-            <PostList t={t_common} posts={posts} />
+            <section className='card space-y-4'>
+              {posts.map((post) => (
+                <PostPreview key={post.slug} post={post} variant='list' />
+              ))}
+            </section>
             {pagination.totalPages > 1 && (
               <Pagination
                 currentPage={pagination.currentPage}
