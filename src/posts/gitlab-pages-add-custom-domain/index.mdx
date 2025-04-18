@@ -15,7 +15,7 @@ wordCount: 328
 
 首先前往你的專案，側邊欄選擇 `Deploy (部署)`，然後選擇 `Pages`，點擊 `New Domain (新網域)` 新增自訂域名，OK 就會進到編輯畫面。
 
-<Image
+<img
   src='/posts/gitlab-pages-add-custom-domain/add-new-domain.webp'
   alt='add-new-domain'
   title='add-new-domain'
@@ -25,7 +25,7 @@ wordCount: 328
 
 請直接==忽略 DNS ALIAS==，只需**複製 TXT Record 的值**，然後前往 NameCheap 設定。
 
-<Image
+<img
   src='/posts/gitlab-pages-add-custom-domain/gitlab-pages-dns-records.webp'
   alt='gitlab-pages-dns-records'
   title='gitlab-pages-dns-records'
@@ -36,7 +36,7 @@ wordCount: 328
 1. Type: `TXT Record`，Host: `@`，Value: `gitlab-pages-verification-code=xxxxxxxxxxxxxxxxxxxxxx` (剛剛複製的)
 2. Type: `A Record`，Host: `@`，Value: `35.185.44.232`
 
-<Image
+<img
   src='/posts/gitlab-pages-add-custom-domain/namecheap-host-records-setting.webp'
   alt='namecheap-host-records-setting'
   title='namecheap-host-records-setting'

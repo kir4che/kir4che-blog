@@ -172,6 +172,10 @@
   @apply my-4;
 }
 
+.article-content a {
+  @apply hover:underline hover:underline-offset-2;
+}
+
 .article-content ul ul {
   list-style-type: circle; /* 第二層：空心 */
 }
@@ -188,10 +192,18 @@
   @apply dark:bg-text-gray-lighter/20 bg-gray-100/80 px-1 py-0.5 font-mono text-pink-900 dark:text-pink-300;
 }
 
-.expressive-code {
+.article-content .expressive-code {
   @apply my-4;
 }
 
-.expressive-code .header .title {
+.article-content .expressive-code .header .title {
   @apply text-xs opacity-80;
+}
+
+.collapse:is([open], :focus:not(.collapse-close)) > :where(.collapse-content),
+.collapse:not(.collapse-close)
+  > :where(
+    input:is([type='checkbox'], [type='radio']):checked ~ .collapse-content
+  ) {
+  @apply pb-0;
 }

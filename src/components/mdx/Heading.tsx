@@ -26,9 +26,9 @@ const createHeading = <T extends HeadingTag>(tag: T) => {
   return Comp;
 };
 
-export const CustomH1 = createHeading('h1');
-export const CustomH2 = createHeading('h2');
-export const CustomH3 = createHeading('h3');
-export const CustomH4 = createHeading('h4');
-export const CustomH5 = createHeading('h5');
-export const CustomH6 = createHeading('h6');
+export const H1 = createHeading('h1');
+export const H2 = createHeading('h2');
+export const H3 = createHeading('h3');
+export const H4 = createHeading('h4');
+export const H5 = createHeading('h5');
+export const H6 = createHeading('h6');
