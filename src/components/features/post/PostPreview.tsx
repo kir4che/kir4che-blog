@@ -77,7 +77,7 @@ const PostPreview: React.FC<PostPreviewProps> = ({
             className='text-xs sm:text-sm'
           />
           <PostMetaInfo
-            t={t || defaultT}
+            t={t}
             date={post.date}
             wordCount={post.wordCount}
             className='ml-auto'
