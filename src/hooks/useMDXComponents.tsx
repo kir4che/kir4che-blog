@@ -1,47 +1,41 @@
 import type { MDXComponents } from 'mdx/types';
 
-import {
-  CustomH1,
-  CustomH2,
-  CustomH3,
-  CustomH4,
-  CustomH5,
-  CustomH6,
-} from '@/components/mdx/Heading';
+import { H1, H2, H3, H4, H5, H6 } from '@/components/mdx/Heading';
 import Correction from '@/components/mdx/Correction';
 import Highlight from '@/components/mdx/Highlight';
 import Table from '@/components/mdx/Table';
-import Details, { Summary } from '@/components/mdx/Details';
+import Accordion from '@/components/mdx/Accordion';
+import CustomLink from '@/components/mdx/Link';
 import CustomImage from '@/components/mdx/Image';
-import Images from '@/components/mdx/Images';
+import ImageGallery from '@/components/mdx/ImageGallery';
 
 export const useMDXComponents = (
   imageMetas: Record<string, any> = {}
 ): MDXComponents => {
   return {
-    Correction,
-    Highlight,
-    Table: Table,
-    Details: Details,
-    Summary: Summary,
-    img: (props) => {
-      const meta = imageMetas[props.src ?? ''] ?? {};
-      return <CustomImage {...props} {...meta} />;
-    },
-    Image: (props) => {
-      const meta = imageMetas[props.src ?? ''] ?? {};
-      return <CustomImage {...props} {...meta} />;
-    },
-    Images: Images,
-    h1: CustomH1,
-    h2: CustomH2,
-    h3: CustomH3,
-    h4: CustomH4,
-    h5: CustomH5,
-    h6: CustomH6,
+    h1: H1,
+    h2: H2,
+    h3: H3,
+    h4: H4,
+    h5: H5,
+    h6: H6,
+    Table: Table, // <Table data={{ headers: [], rows: [[], []] }} />
+    Images: ImageGallery, // <Images images={[{ src: '', alt: '', width: '' }, ... ]} height='150px' />
+    Accordion, // <Accordion variant="primary" title="Title">{children}</Accordion>
+    Correction, // <Correction wrong="A" correct="B" />
+    Highlight, // <Highlight color="pink">{children}</Highlight>
+    Kbd: ({ children }) => (
+      <kbd className='kbd border-neutral-400 bg-neutral-200'>{children}</kbd>
+    ), // <Kbd>Enter</Kbd>
     p: ({ children }) => (
       <p className='text-text-primary my-6 block text-base/7'>{children}</p>
     ),
+    a: CustomLink, // [Text](url)
+    img: (props) => {
+      // \![alt](url)
+      const meta = imageMetas[props.src ?? ''] ?? {};
+      return <CustomImage {...props} {...meta} />;
+    },
     ul: ({ children }) => (
       <ul className='my-2 list-inside list-disc pl-4'>{children}</ul>
     ),
@@ -49,27 +43,23 @@ export const useMDXComponents = (
       <ol className='my-2 list-inside list-decimal pl-4'>{children}</ol>
     ),
     li: ({ children }) => <li className='leading-[1.85]'>{children}</li>,
-    a: ({ children, href }) => (
-      <a
-        href={href}
-        target='_blank'
-        rel='noopener noreferrer'
-        className='text-blue-600 underline underline-offset-2 dark:text-blue-300'
-      >
-        {children}
-      </a>
-    ),
-    blockquote: ({ children }) => (
+    blockquote: (
+      { children } // > Text
+    ) => (
       <blockquote className='my-6 border-l-4 border-pink-500 bg-pink-50 px-5 py-3 dark:border-pink-500 dark:bg-pink-700/15'>
         {children}
       </blockquote>
     ),
-    mark: ({ children }) => (
+    mark: (
+      { children } // ==Text==
+    ) => (
       <mark className='text-text-primary bg-pink-100 dark:bg-pink-500/30'>
         {children}
       </mark>
     ),
-    del: ({ children }) => (
+    del: (
+      { children } // ~~Text~~
+    ) => (
       <del className='decoration-pink-700 decoration-2 dark:decoration-pink-400'>
         {children}
       </del>
@@ -79,12 +69,15 @@ export const useMDXComponents = (
         {children}
       </ins>
     ),
-    sup: ({ children }) => (
-      <sup className='text-text-gray-lighter dark:text-text-gray text-sm'>
+    sup: (
+      { children } // ^Text^
+    ) => (
+      <sup className='px-0.5 text-xs text-pink-600 dark:text-pink-400'>
         {children}
       </sup>
     ),
     hr: () => (
+      // ---
       <hr className='text-text-gray-lighter dark:text-text-gray mx-auto my-8 w-20' />
     ),
   };

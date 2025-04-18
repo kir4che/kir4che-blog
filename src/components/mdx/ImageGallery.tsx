@@ -16,13 +16,13 @@ interface ImageItem {
   blurDataURL?: string;
 }
 
-interface ImagesProps {
+interface ImageGalleryProps {
   images: ImageItem[];
   height?: number | string;
   className?: string;
 }
 
-const Images: React.FC<ImagesProps> = ({
+const ImageGallery: React.FC<ImageGalleryProps> = ({
   images,
   height = 'auto',
   className,
@@ -60,4 +60,4 @@ const Images: React.FC<ImagesProps> = ({
   </PhotoProvider>
 );
 
-export default Images;
+export default ImageGallery;

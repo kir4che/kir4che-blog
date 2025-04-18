@@ -17,8 +17,8 @@ const colorMap: Record<string, string> = {
 };
 
 const Highlight = ({
-  children,
   color = 'pink',
+  children,
   className = '',
 }: HighlightProps) => (
   <mark className={cn('text-text-primary px-0.5', colorMap[color], className)}>
