@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "new-post": "ts-node --project scripts/tsconfig.scripts.json scripts/create-post.ts",
     "dev": "rimraf .next && next dev --turbopack",
     "test": "echo \"No tests specified\" && exit 0",
     "build": "next build",
@@ -59,6 +60,7 @@
     "remark-mark-highlight": "^0.1.1",
     "rimraf": "^6.0.1",
     "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   }
 }
