@@ -58,6 +58,7 @@
   },
   "HomePage": {
     "title": "文章列表",
+    "announcement": "我的部落格已從 Hugo 搬家到 Next.js 啦 🎉",
     "search": "搜尋文章",
     "publishedAt": "發布於",
     "latestPosts": "最新文章",
