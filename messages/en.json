@@ -58,6 +58,7 @@
   },
   "HomePage": {
     "title": "Post List",
+    "announcement": "My blog has moved from Hugo to Next.js 🎉",
     "search": "Search Posts",
     "publishedAt": "Published on",
     "latestPosts": "Latest Posts",

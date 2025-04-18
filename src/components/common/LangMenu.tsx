@@ -53,7 +53,7 @@ const LangMenu: React.FC<LangMenuProps> = ({
             <button
               type='button'
               onClick={() => changeLanguage(cur)}
-              className='w-full px-3 py-2 text-left hover:bg-pink-100'
+              className='w-full px-3 py-2 text-left hover:bg-pink-100 dark:hover:bg-pink-900/20'
               disabled={isPending}
             >
               {t(`language.${cur}`)}
