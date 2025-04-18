@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Play } from 'lucide-react';
 
-import { useAlert } from '@/context/AlertContext';
+import { useAlert } from '@/contexts/AlertContext';
 import { fetchYouTubeVideos } from '@/services/youtube';
 import { cn } from '@/lib/style';
 

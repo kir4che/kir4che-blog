@@ -5,7 +5,7 @@ import { Sparkles } from 'lucide-react';
 import type { Language } from '@/types/language';
 import type { PostMeta } from '@/types/post';
 import { Link } from '@/i18n/navigation';
-import { useAlert } from '@/context/AlertContext';
+import { useAlert } from '@/contexts/AlertContext';
 
 type Post = Pick<PostMeta, 'slug' | 'title'>;
 

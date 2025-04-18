@@ -9,7 +9,7 @@ import type { PostMeta } from '@/types/post';
 import { LANGUAGES } from '@/types/language';
 import { Link } from '@/i18n/navigation';
 import { convertToSlug } from '@/lib/tags';
-import { useAlert } from '@/context/AlertContext';
+import { useAlert } from '@/contexts/AlertContext';
 import { useCategoryInfoMap } from '@/hooks/useCategoryInfoMap';
 
 import PostPasswordGate from '@/components/features/post/PostPasswordGate';

@@ -1,15 +1,15 @@
 import React from 'react';
 import { Metadata } from 'next';
 import { Noto_Sans_TC, DM_Sans } from 'next/font/google';
-import { NextIntlClientProvider, hasLocale } from 'next-intl';
-import { ThemeProvider } from 'next-themes';
+import { hasLocale } from 'next-intl';
+import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Toaster } from 'react-hot-toast';
 
 import common from '@/config/common';
 import { routing } from '@/i18n/routing';
 import type { Language } from '@/types/language';
-import { AlertProvider } from '@/context/AlertContext';
+import Providers from '@/contexts/Providers';
 
 import Header from '@/components/layouts/Header';
 import Footer from '@/components/layouts/Footer';
@@ -42,11 +42,13 @@ interface RootLayoutProps {
   params: { lang: Language };
 }
 
-const RootLayout = ({ children, params }: RootLayoutProps) => {
-  const { lang } = params;
+const RootLayout = async ({ children, params }: RootLayoutProps) => {
+  const { lang } = await params;
 
   const supportedLocales = routing.locales;
   if (!hasLocale(supportedLocales, lang)) notFound();
+
+  const messages = await getMessages({ locale: lang });
 
   return (
     <html lang={lang} suppressHydrationWarning>
@@ -54,25 +56,21 @@ const RootLayout = ({ children, params }: RootLayoutProps) => {
         className={`bg-bg-primary font-main sm:px-4 ${notoSansTC.variable} ${dmSans.variable}`}
       >
         <Toaster position='top-center' toastOptions={{ duration: 3000 }} />
-        <NextIntlClientProvider>
-          <ThemeProvider attribute='class' defaultTheme='light' enableSystem>
-            <AlertProvider>
-              <div className='mx-auto flex max-w-screen-2xl flex-col px-4 md:flex-row md:px-2'>
-                <LeftSidebar />
-                <div className='flex flex-1 gap-x-8 md:pt-8'>
-                  <div className='w-full max-w-screen flex-grow'>
-                    <Header />
-                    <main className='h-auto min-h-[calc(100vh-9rem)]'>
-                      {children}
-                    </main>
-                    <Footer />
-                  </div>
-                  <RightSidebar />
-                </div>
+        <Providers locale={lang} messages={messages}>
+          <div className='mx-auto flex max-w-screen-2xl flex-col px-4 md:flex-row md:px-2'>
+            <LeftSidebar />
+            <div className='flex flex-1 gap-x-8 md:pt-8'>
+              <div className='w-full max-w-screen flex-grow'>
+                <Header />
+                <main className='h-auto min-h-[calc(100vh-9rem)]'>
+                  {children}
+                </main>
+                <Footer />
               </div>
-            </AlertProvider>
-          </ThemeProvider>
-        </NextIntlClientProvider>
+              <RightSidebar />
+            </div>
+          </div>
+        </Providers>
       </body>
     </html>
   );

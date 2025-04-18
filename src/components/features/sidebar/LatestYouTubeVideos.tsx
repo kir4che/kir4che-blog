@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Video } from 'lucide-react';
 
 import { fetchYouTubeVideos, type VideoData } from '@/services/youtube';
-import { useAlert } from '@/context/AlertContext';
+import { useAlert } from '@/contexts/AlertContext';
 
 import YouTubeVideoList from '@/components/features/YouTubeVideoList';
 
