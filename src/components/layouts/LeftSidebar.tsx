@@ -63,16 +63,18 @@ const LeftSidebar: React.FC = () => {
     <aside className='flex flex-col justify-between pt-4 pb-0 md:sticky md:top-0 md:h-screen md:w-48 md:py-8'>
       <div className='flex items-center gap-x-3 gap-y-2 md:mb-2.5 md:flex-col md:items-start'>
         <div className='relative block h-16 w-16 md:h-26 md:w-26'>
-          <Link href='/'>
+          <Link href='/' className='avatar'>
             <Image
               src='/images/avatar.webp'
               alt='Avatar'
               width={100}
               height={100}
-              className='relative block h-16 min-h-16 w-16 min-w-16 rounded-full shadow md:h-26 md:w-26'
-              sizes='(max-width: 600px) 100px, (max-width: 1000px) 200px, 300px'
+              className='min-h-16 min-w-16 rounded-full shadow'
               loading='lazy'
-              onError={(e) => (e.currentTarget.style.display = 'none')}
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = '/icons/no-image.svg';
+              }}
             />
           </Link>
           <span className='bg-bg-secondary absolute right-0 bottom-0 flex h-6 w-6 items-center justify-center rounded-full text-sm shadow md:h-8 md:w-8 md:text-xl'>
