@@ -11,8 +11,8 @@ const askQuestion = (question: string): Promise<string> => {
   return new Promise((resolve) => rl.question(question, resolve));
 };
 
-const formatDate = (date: Date): string => {
-  return date.toISOString().split('T')[0];
+const formatDateTime = (date: Date): string => {
+  return date.toISOString();
 };
 
 (async () => {
@@ -21,7 +21,9 @@ const formatDate = (date: Date): string => {
   // 將 input 轉為小寫並將空格轉為 "-"
   const slug = input.trim().toLowerCase().replace(/\s+/g, '-');
 
-  const date = formatDate(new Date());
+  const updatedAt = formatDateTime(new Date());
+  const date = updatedAt.split('T')[0]; // 只抓日期部分（YYYY-MM-DD）
+
   const folderPath = path.join(__dirname, '../src/posts', slug);
 
   if (fs.existsSync(folderPath)) {
@@ -38,7 +40,7 @@ date: ${date}
 description: 
 categories: []
 tags: []
-updatedAt: ${date}
+updatedAt: ${updatedAt}
 ---
 
 `;
