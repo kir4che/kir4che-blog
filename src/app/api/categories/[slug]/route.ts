@@ -2,12 +2,13 @@ import { NextResponse } from 'next/server';
 
 import { getPostsInfo } from '@/lib/posts';
 import { getCategoryBySlug } from '@/lib/categories';
-import { getLangFromHeader } from '@/utils/getLangFromHeader';
+
 import { responseWithCache } from '@/utils/responseWithCache';
 
 export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const pathParts = url.pathname.split('/');
+  const { pathname, searchParams } = new URL(request.url);
+  const pathParts = pathname.split('/');
+  const lang = searchParams.get('lang') === 'en' ? 'en' : 'tw';
 
   const slug = pathParts.at(-1);
 
@@ -15,7 +16,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ message: 'Missing slug.' }, { status: 400 });
 
   try {
-    const lang = getLangFromHeader(request);
     const posts = await getPostsInfo(lang);
     const category = await getCategoryBySlug(slug, posts);
 

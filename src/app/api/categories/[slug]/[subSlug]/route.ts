@@ -2,14 +2,14 @@ import { NextResponse } from 'next/server';
 
 import { getSubcategoryBySlug } from '@/lib/categories';
 import { getPostsInfo } from '@/lib/posts';
-import { getLangFromHeader } from '@/utils/getLangFromHeader';
 import { responseWithCache } from '@/utils/responseWithCache';
 
 export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const parts = url.pathname.split('/');
+  const { pathname, searchParams } = new URL(request.url);
+  const parts = pathname.split('/');
   const slug = parts.at(-2);
   const subSlug = parts.at(-1);
+  const lang = searchParams.get('lang') === 'en' ? 'en' : 'tw';
 
   if (!slug || !subSlug)
     return NextResponse.json(
@@ -18,7 +18,6 @@ export async function GET(request: Request) {
     );
 
   try {
-    const lang = getLangFromHeader(request);
     const posts = await getPostsInfo(lang);
     const category = await getSubcategoryBySlug(slug, subSlug, posts);
 

@@ -31,22 +31,13 @@ const RightSidebar: React.FC = () => {
 
   useEffect(() => {
     const fetchTaxonomy = () => {
-      fetch(`/api/taxonomy?limit=30`, {
-        headers: {
-          'Accept-Language': lang,
-        },
-      })
+      fetch(`/api/taxonomy?limit=30&lang=${lang}`)
         .then((res) => {
           if (!res.ok) throw new Error('Fetch failed.');
           return res.json();
         })
         .then((data) => setTaxonomyData(data))
-        .catch((err) =>
-          showError(
-            'Failed to fetch taxonomy: ' +
-              (err instanceof Error ? err.message : err)
-          )
-        );
+        .catch((err) => showError(err instanceof Error ? err.message : err));
     };
 
     fetchTaxonomy();

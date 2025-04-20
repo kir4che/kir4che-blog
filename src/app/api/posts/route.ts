@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import type { Language } from '@/types/language';
 import type { PostInfo } from '@/types/post';
 import { getPostsInfo, getPostsByCategory, getPostsByTag } from '@/lib/posts';
-import { getLangFromHeader } from '@/utils/getLangFromHeader';
+
 import { responseWithCache } from '@/utils/responseWithCache';
 
 const DEFAULT_POSTS_PER_PAGE = 6;
@@ -30,7 +30,7 @@ const paginate = (posts: PostInfo[], page: number, postsPerPage: number) => {
 };
 
 const getFilteredPosts = async (
-  lang: Language,
+  lang: Language = 'tw',
   category?: string | null,
   tag?: string | null,
   keyword?: string | null
@@ -62,9 +62,10 @@ const getFilteredPosts = async (
 };
 
 export async function GET(request: Request) {
-  try {
-    const lang = getLangFromHeader(request);
+  const { searchParams } = new URL(request.url);
+  const lang = searchParams.get('lang') === 'en' ? 'en' : 'tw';
 
+  try {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
     const tag = searchParams.get('tag');

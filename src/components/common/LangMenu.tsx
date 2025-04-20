@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useTransition } from 'react';
-import { Locale, useLocale, useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Languages, ChevronDown } from 'lucide-react';
 
+import type { Language } from '@/types/language';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import { routing } from '@/i18n/routing';
 import { cn } from '@/lib/style';
@@ -17,14 +18,14 @@ const LangMenu: React.FC<LangMenuProps> = ({
   showIcon = true,
   className = 'dropdown-bottom dropdown-end',
 }) => {
-  const locale = useLocale() as Locale;
+  const locale = useLocale() as Language;
   const t = useTranslations('settings');
 
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
 
-  const changeLanguage = (nextLocale: Locale) => {
+  const changeLanguage = (nextLocale: Language) => {
     startTransition(() => {
       router.replace(pathname, { locale: nextLocale });
     });

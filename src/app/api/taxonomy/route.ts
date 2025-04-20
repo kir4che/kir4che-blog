@@ -3,13 +3,14 @@ import { NextResponse } from 'next/server';
 import { getPostsInfo } from '@/lib/posts';
 import { getCategoriesByPosts } from '@/lib/categories';
 import { getTagsByPosts } from '@/lib/tags';
-import { getLangFromHeader } from '@/utils/getLangFromHeader';
+
 import { responseWithCache } from '@/utils/responseWithCache';
 
 export const GET = async (request: Request) => {
-  try {
-    const lang = getLangFromHeader(request);
+  const { searchParams } = new URL(request.url);
+  const lang = searchParams.get('lang') === 'en' ? 'en' : 'tw';
 
+  try {
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '30', 30);
 

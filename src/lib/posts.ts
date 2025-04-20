@@ -135,12 +135,9 @@ export const getPostData = cache(
   > => {
     const postDir = path.join(postsDirectory, slug);
 
-    let files: string[];
-    try {
-      files = await fs.promises.readdir(postDir);
-    } catch (err) {
-      throw new Error(`Error reading directory ${postDir}: ${err.message}.`);
-    }
+    if (!fs.existsSync(postDir))
+      throw new Error(`Post directory does not exist: ${postDir}.`);
+    const files = await fs.promises.readdir(postDir);
 
     // 根據當前語系選擇對應的 mdx 檔案
     const mdxFile = files.find((file) => {
@@ -156,7 +153,7 @@ export const getPostData = cache(
     const { data, content } = matter(fileContents);
 
     if (!data.date)
-      throw new Error(`Missing "date" in frontmatter for post: ${slug}`);
+      throw new Error(`Missing "date" in frontmatter for post: ${slug}.`);
 
     // 防止顯示 draft 文章
     if (data.draft && process.env.NEXT_PUBLIC_NODE_ENV !== 'development') {
@@ -200,6 +197,39 @@ export const getPostData = cache(
       updatedAt: data.updatedAt,
       content,
       imageMetas,
+    };
+  }
+);
+
+// 根據 slug 取得文章的 title 與 description
+export const getPostMetaBySlug = cache(
+  async (
+    lang: Language = 'tw',
+    slug: string
+  ): Promise<{ title: string; description: string }> => {
+    const postDir = path.join(postsDirectory, slug);
+
+    if (!fs.existsSync(postDir))
+      throw new Error(`Post directory does not exist: ${postDir}.`);
+    const files = await fs.promises.readdir(postDir);
+
+    // 根據當前語系選擇對應的 mdx 檔案
+    const mdxFile = files.find((file) => {
+      if (lang === 'en') return file === 'index.en.mdx';
+      return file === 'index.mdx';
+    });
+    if (!mdxFile)
+      throw new Error(`No MDX file found for slug ${slug} and lang ${lang}.`);
+    const filePath = path.join(postDir, mdxFile);
+    const fileContents = await fs.promises.readFile(filePath, 'utf8');
+    const { data } = matter(fileContents);
+
+    if (!data.title)
+      throw new Error(`Missing "title" in frontmatter for post: ${slug}.`);
+
+    return {
+      title: data.title,
+      description: data.description,
     };
   }
 );

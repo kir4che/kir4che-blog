@@ -1,19 +1,18 @@
 import { NextResponse } from 'next/server';
 
 import { getPostData } from '@/lib/posts';
-import { getLangFromHeader } from '@/utils/getLangFromHeader';
 import { responseWithCache } from '@/utils/responseWithCache';
 
 export const GET = async (request: Request) => {
-  const url = new URL(request.url);
-  const pathParts = url.pathname.split('/');
+  const { pathname, searchParams } = new URL(request.url);
+  const pathParts = pathname.split('/');
   const slug = pathParts.at(-1);
+  const lang = searchParams.get('lang') === 'en' ? 'en' : 'tw';
 
   if (!slug)
     return NextResponse.json({ message: 'Missing slug.' }, { status: 400 });
 
   try {
-    const lang = getLangFromHeader(request);
     const checkExistence = request.headers.get('X-Check-Existence') === 'true';
 
     try {

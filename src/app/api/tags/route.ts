@@ -2,13 +2,14 @@ import { NextResponse } from 'next/server';
 
 import { getTagsByPosts } from '@/lib/tags';
 import { getPostsInfo } from '@/lib/posts';
-import { getLangFromHeader } from '@/utils/getLangFromHeader';
+
 import { responseWithCache } from '@/utils/responseWithCache';
 
 export async function GET(request: Request) {
-  try {
-    const lang = getLangFromHeader(request);
+  const { searchParams } = new URL(request.url);
+  const lang = searchParams.get('lang') === 'en' ? 'en' : 'tw';
 
+  try {
     const posts = await getPostsInfo(lang);
     const tags = getTagsByPosts(posts);
 
