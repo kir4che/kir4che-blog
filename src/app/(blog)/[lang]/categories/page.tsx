@@ -1,3 +1,5 @@
+export const dynamic = 'force-static';
+
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
@@ -7,9 +9,9 @@ import { LANGUAGES } from '@/types/language';
 import { Link } from '@/i18n/navigation';
 import { getCategoryStyle } from '@/lib/style';
 
-type Params = {
+type Params = Promise<{
   lang: Language;
-};
+}>;
 
 export async function generateStaticParams() {
   return LANGUAGES.map((lang) => ({ lang }));
@@ -19,15 +21,20 @@ const CategoriesPage = async ({ params }: { params: Params }) => {
   const { lang } = await params;
   const t = await getTranslations('CategoriesPage');
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/categories?lang=${lang}`,
-    { cache: 'force-cache' }
-  );
+  let categories;
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/categories?lang=${lang}`
+    );
+    if (!res.ok) return notFound();
 
-  if (!res.ok) return notFound();
+    const data = await res.json();
+    categories = data.categories;
 
-  const { categories } = await res.json();
-  if (!Array.isArray(categories)) return notFound();
+    if (!Array.isArray(categories)) return notFound();
+  } catch {
+    return notFound();
+  }
 
   return (
     <>

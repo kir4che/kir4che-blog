@@ -1,3 +1,5 @@
+export const dynamic = 'force-static';
+
 import React from 'react';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
@@ -6,9 +8,9 @@ import type { Language } from '@/types/language';
 import { LANGUAGES } from '@/types/language';
 import { Link } from '@/i18n/navigation';
 
-type Params = {
+type Params = Promise<{
   lang: Language;
-};
+}>;
 
 export async function generateStaticParams() {
   return LANGUAGES.map((lang) => ({ lang }));
@@ -18,15 +20,20 @@ const TagsPage = async ({ params }: { params: Params }) => {
   const { lang } = await params;
   const t = await getTranslations('TagsPage');
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/tags?lang=${lang}`,
-    { cache: 'force-cache' }
-  );
+  let tags;
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/tags?lang=${lang}`
+    );
+    if (!res.ok) return notFound();
 
-  if (!res.ok) return notFound();
+    const data = await res.json();
+    tags = data.tags;
 
-  const { tags } = await res.json();
-  if (!Array.isArray(tags)) return notFound();
+    if (!Array.isArray(tags)) return notFound();
+  } catch {
+    return notFound();
+  }
 
   return (
     <>

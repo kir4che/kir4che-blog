@@ -16,17 +16,10 @@ export const fetchYouTubeVideos = async (
     const res = await fetch(
       `${BASE_URL}?key=${API_KEY}&playlistId=${PLAYLIST_ID}&part=snippet&maxResults=${maxResults}`
     );
-
-    if (!res.ok) {
-      const errorData = await res.json();
-      console.error('YouTube API Error:', errorData);
-      throw new Error(
-        `YouTube API error: ${res.status} ${res.statusText} - ${errorData.error?.message || 'Unknown error'}`
-      );
-    }
+    if (!res.ok)
+      throw new Error(`YouTube API request failed: ${res.statusText}`);
 
     const data = await res.json();
-
     if (!Array.isArray(data.items)) return [];
 
     return data.items
@@ -43,7 +36,6 @@ export const fetchYouTubeVideos = async (
         publishedAt: new Date(item.snippet.publishedAt).toLocaleDateString(),
       }));
   } catch (err) {
-    console.error('Failed to fetch YouTube videos:', err);
     throw new Error(
       err instanceof Error ? err.message : 'Failed to fetch YouTube videos.'
     );
