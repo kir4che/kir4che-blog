@@ -9,22 +9,17 @@ import { cn } from '@/lib/style';
 
 import PostPreview from '@/components/features/post/PostPreview';
 
-type Params = Promise<{
+type Params = {
   lang: Language;
-}>;
+};
 
 const Home = async ({ params }: { params: Params }) => {
   const { lang } = await params;
   const t = await getTranslations('HomePage');
 
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/posts?postsPerPage=${4}`,
-    {
-      headers: {
-        'Accept-Language': lang,
-      },
-      next: { revalidate: 3600 },
-    }
+    `${process.env.NEXT_PUBLIC_API_URL}/api/posts?postsPerPage=4&lang=${lang}`,
+    { cache: 'force-cache' }
   );
 
   if (!res.ok) return notFound();

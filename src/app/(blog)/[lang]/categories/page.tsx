@@ -3,21 +3,26 @@ import { getTranslations } from 'next-intl/server';
 
 import type { Language } from '@/types/language';
 import type { CategoryInfo } from '@/types/category';
+import { LANGUAGES } from '@/types/language';
 import { Link } from '@/i18n/navigation';
 import { getCategoryStyle } from '@/lib/style';
 
-type Params = Promise<{
+type Params = {
   lang: Language;
-}>;
+};
+
+export async function generateStaticParams() {
+  return LANGUAGES.map((lang) => ({ lang }));
+}
 
 const CategoriesPage = async ({ params }: { params: Params }) => {
   const { lang } = await params;
   const t = await getTranslations('CategoriesPage');
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`, {
-    headers: { 'Accept-Language': lang },
-    next: { revalidate: 3600 },
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/categories?lang=${lang}`,
+    { cache: 'force-cache' }
+  );
 
   if (!res.ok) return notFound();
 

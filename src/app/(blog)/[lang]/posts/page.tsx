@@ -1,6 +1,7 @@
 'use client';
 
-import { useLocale, useTranslations } from 'next-intl';
+import React, { use } from 'react';
+import { useTranslations } from 'next-intl';
 import { format } from 'date-fns';
 
 import type { Language } from '@/types/language';
@@ -12,8 +13,12 @@ import Pagination from '@/components/ui/Pagination';
 import ErrorRetry from '@/components/ui/ErrorRetry';
 import Skeleton from '@/components/ui/Skeleton';
 
-const PostsPage = () => {
-  const lang = useLocale() as Language;
+type Params = Promise<{
+  lang: Language;
+}>;
+
+const PostsPage = ({ params }: { params: Params }) => {
+  const { lang } = use(params);
   const t = useTranslations('PostsPage');
   const t_common = useTranslations('common');
 
@@ -24,9 +29,7 @@ const PostsPage = () => {
   const postsByYear = posts.reduce(
     (acc, post) => {
       const year = format(new Date(post.date), 'yyyy');
-      if (!acc[year]) {
-        acc[year] = [];
-      }
+      if (!acc[year]) acc[year] = [];
       acc[year].push(post);
       return acc;
     },

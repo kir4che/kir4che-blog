@@ -28,9 +28,7 @@ const RelatedPosts = ({ lang, currentSlug, categories }: RelatedPostsProps) => {
         categories: categoryParam,
       });
 
-      fetch(`/api/posts?${params}`, {
-        headers: { 'Accept-Language': lang },
-      })
+      fetch(`/api/posts?${params}&lang=${lang}`)
         .then((res) => {
           if (!res.ok) throw new Error('Fetch failed.');
           return res.json();
@@ -41,10 +39,7 @@ const RelatedPosts = ({ lang, currentSlug, categories }: RelatedPostsProps) => {
           setRelatedPosts(posts);
         })
         .catch((err) => {
-          showError(
-            'Error fetching related posts: ' +
-              (err instanceof Error ? err.message : err)
-          );
+          showError(err instanceof Error ? err.message : err);
         });
     };
 

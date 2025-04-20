@@ -49,9 +49,8 @@ const PostLayout = ({ post, children }: PostLayoutProps) => {
   const checkAvailableLangs = useCallback(() => {
     Promise.all(
       LANGUAGES.filter((l) => l !== lang).map((targetLang) =>
-        fetch(`/api/posts/${slug}`, {
+        fetch(`/api/posts/${slug}&lang=${lang}`, {
           headers: {
-            'Accept-Language': targetLang,
             'X-Check-Existence': 'true',
           },
         })
@@ -84,10 +83,7 @@ const PostLayout = ({ post, children }: PostLayoutProps) => {
         setAvailableLangs(filtered);
       })
       .catch((err) => {
-        showError(
-          'Error checking available languages: ' +
-            (err instanceof Error ? err.message : err)
-        );
+        showError(err instanceof Error ? err.message : err);
       });
   }, [slug, lang, t_settings, showError]);
 

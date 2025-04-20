@@ -21,22 +21,13 @@ const SearchBar: React.FC = () => {
   // 延遲搜尋
   const debouncedSearch = useMemo(() => {
     const fn = debounce((query: string) => {
-      fetch(`/api/posts?keyword=${encodeURIComponent(query)}`, {
-        headers: {
-          'Accept-Language': lang,
-        },
-      })
+      fetch(`/api/posts?keyword=${encodeURIComponent(query)}&lang=${lang}`)
         .then((res) => {
           if (!res.ok) throw new Error('Fetch failed.');
           return res.json();
         })
         .then((data) => setSearchResults(data.posts || []))
-        .catch((err) =>
-          showError(
-            'Failed to fetch search results: ' +
-              (err instanceof Error ? err.message : err)
-          )
-        );
+        .catch((err) => showError(err instanceof Error ? err.message : err));
     }, 300);
 
     return fn;

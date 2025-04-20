@@ -3,22 +3,25 @@ import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
 import type { Language } from '@/types/language';
+import { LANGUAGES } from '@/types/language';
 import { Link } from '@/i18n/navigation';
 
-type Params = Promise<{
+type Params = {
   lang: Language;
-}>;
+};
+
+export async function generateStaticParams() {
+  return LANGUAGES.map((lang) => ({ lang }));
+}
 
 const TagsPage = async ({ params }: { params: Params }) => {
   const { lang } = await params;
   const t = await getTranslations('TagsPage');
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tags`, {
-    headers: {
-      'Accept-Language': lang,
-    },
-    next: { revalidate: 3600 },
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/tags?lang=${lang}`,
+    { cache: 'force-cache' }
+  );
 
   if (!res.ok) return notFound();
 

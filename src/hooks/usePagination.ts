@@ -33,9 +33,9 @@ export const usePagination = ({ type, slug, lang }: UsePaginationParams) => {
     if (type && slug) queryParams.append(type, slug);
     queryParams.append('page', currentPage.toString());
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/posts?${queryParams}`, {
-      headers: { 'Accept-Language': lang },
-    })
+    fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/posts?${queryParams}&lang=${lang}`
+    )
       .then((res) => {
         if (!res.ok) throw new Error('Fetch failed.');
         return res.json();
@@ -46,9 +46,7 @@ export const usePagination = ({ type, slug, lang }: UsePaginationParams) => {
       })
       .catch((err) => {
         setError(err as Error);
-        showError(
-          'Failed to fetch posts: ' + (err instanceof Error ? err.message : err)
-        );
+        showError(err instanceof Error ? err.message : err);
       })
       .finally(() => setIsLoading(false));
   }, [lang, type, slug, currentPage, showError]);

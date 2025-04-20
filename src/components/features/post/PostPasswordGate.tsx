@@ -37,12 +37,7 @@ const PostPasswordGate = ({ slug, lang, onSuccess }: PostPasswordGateProps) => {
           setPassword('');
         }
       })
-      .catch((err) => {
-        showError(
-          'Failed to verify password: ' +
-            (err instanceof Error ? err.message : err)
-        );
-      })
+      .catch((err) => showError(err instanceof Error ? err.message : err))
       .finally(() => setIsLoading(false));
   };
 

@@ -17,21 +17,14 @@ const PopularPosts: React.FC = () => {
   const [popularPosts, setPopularPosts] = useState<Post[]>([]);
 
   useEffect(() => {
-    fetch(`/api/posts?filter=popular&limit=5`, {
-      headers: {
-        'Accept-Language': lang,
-      },
-    })
+    fetch(`/api/posts?filter=popular&limit=5&lang=${lang}`)
       .then((res) => {
         if (!res.ok) throw new Error('Fetch failed.');
         return res.json();
       })
       .then((data) => setPopularPosts(data.posts ?? []))
       .catch((err) => {
-        showError(
-          'Failed to fetch popular posts: ' +
-            (err instanceof Error ? err.message : err)
-        );
+        showError(err instanceof Error ? err.message : err);
         setPopularPosts([]);
       });
   }, [lang, showError]);
