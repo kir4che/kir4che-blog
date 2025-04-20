@@ -12,7 +12,11 @@ interface ProvidersProps {
 }
 
 const Providers = ({ locale, messages, children }: ProvidersProps) => (
-  <NextIntlClientProvider locale={locale} messages={messages}>
+  <NextIntlClientProvider
+    locale={locale}
+    messages={messages}
+    timeZone='Asia/Taipei'
+  >
     <ThemeProvider attribute='class' defaultTheme='light' enableSystem>
       <AlertProvider>{children}</AlertProvider>
     </ThemeProvider>
