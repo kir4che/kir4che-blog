@@ -1,3 +1,5 @@
+export const dynamic = 'force-static';
+
 import React from 'react';
 import { redirect, notFound } from 'next/navigation';
 
@@ -17,7 +19,9 @@ type Params = Promise<{
 export async function generateStaticParams() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/posts`);
   if (!res.ok) return [];
+
   const { posts } = await res.json();
+  if (!Array.isArray(posts)) return [];
 
   return LANGUAGES.flatMap((lang) =>
     posts.map(({ slug }: { slug: string }) => ({
@@ -41,8 +45,7 @@ const PostPage = async ({ params }: { params: Params }) => {
 
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/posts/${slug}?lang=${lang}`,
-      { cache: 'force-cache' }
+      `${process.env.NEXT_PUBLIC_API_URL}/api/posts/${slug}?lang=${lang}`
     );
 
     if (!res.ok) return notFound();

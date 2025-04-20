@@ -1,3 +1,5 @@
+export const dynamic = 'force-static';
+
 import { useState, useEffect, useCallback } from 'react';
 
 import { useAlert } from '@/contexts/AlertContext';
@@ -37,7 +39,7 @@ export const usePagination = ({ type, slug, lang }: UsePaginationParams) => {
       `${process.env.NEXT_PUBLIC_API_URL}/api/posts?${queryParams}&lang=${lang}`
     )
       .then((res) => {
-        if (!res.ok) throw new Error('Fetch failed.');
+        if (!res.ok) return null;
         return res.json();
       })
       .then((data) => {

@@ -9,16 +9,12 @@ import { isPostInCategory, getCategoryBySlug } from '@/lib/categories';
 import { convertToSlug } from '@/lib/tags';
 import { getImageMeta, extractImageSources } from '@/lib/image';
 
-if (typeof window !== 'undefined')
-  throw new Error('This module must be used on the server side.');
-
 // 文章所在的資料夾路徑
 const postsDirectory = path.join(process.cwd(), 'src', 'posts');
 
 // 回傳所有文章所在的資料夾路徑
 export const getPostsDirs = cache(async (): Promise<string[]> => {
-  if (typeof window !== 'undefined')
-    throw new Error('This function can only be called on the server side.');
+  if (typeof window !== 'undefined') return [];
 
   // 讀取 postsDirectory 資料夾內的所有內容（資料夾、檔案）
   const entries = await fs.promises.readdir(postsDirectory, {
@@ -62,8 +58,7 @@ const updateWordCount = async (
 // 根據當前語系取得所有文章的 metadata，並依照日期排序（由新到舊）。
 export const getPostsInfo = cache(
   async (lang: Language = 'tw'): Promise<PostInfo[]> => {
-    if (typeof window !== 'undefined')
-      throw new Error('This function can only be called on the server side.');
+    if (typeof window !== 'undefined') return [];
 
     const dirs = await getPostsDirs();
 
@@ -108,20 +103,16 @@ export const getPostsInfo = cache(
           };
 
           return post;
-        } catch (err) {
-          throw new Error(`Error loading post ${dirPath}: ${err.message}.`);
+        } catch {
+          return null;
         }
       })
     );
 
-    // 篩掉讀取失敗的文章
-    const validPosts = postsData.filter(
-      (post): post is PostInfo => post !== null
-    );
-    // 根據日期排序
-    return validPosts.sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
+    // 篩掉讀取失敗的文章，並根據日期排序。
+    return postsData
+      .filter((post): post is PostInfo => post !== null)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }
 );
 
@@ -131,12 +122,11 @@ export const getPostData = cache(
     lang: Language = 'tw',
     slug: string
   ): Promise<
-    PostMeta & { content: string; imageMetas: Record<string, any> }
+    (PostMeta & { content: string; imageMetas: Record<string, any> }) | null
   > => {
     const postDir = path.join(postsDirectory, slug);
 
-    if (!fs.existsSync(postDir))
-      throw new Error(`Post directory does not exist: ${postDir}.`);
+    if (!fs.existsSync(postDir)) return null;
     const files = await fs.promises.readdir(postDir);
 
     // 根據當前語系選擇對應的 mdx 檔案
@@ -145,15 +135,13 @@ export const getPostData = cache(
       return file === 'index.mdx';
     });
 
-    if (!mdxFile)
-      throw new Error(`No MDX file found for slug ${slug} and lang ${lang}.`);
+    if (!mdxFile) return null;
 
     const filePath = path.join(postDir, mdxFile);
     const fileContents = await fs.promises.readFile(filePath, 'utf8');
     const { data, content } = matter(fileContents);
 
-    if (!data.date)
-      throw new Error(`Missing "date" in frontmatter for post: ${slug}.`);
+    if (!data.date) return null;
 
     // 防止顯示 draft 文章
     if (data.draft && process.env.NEXT_PUBLIC_NODE_ENV !== 'development') {
@@ -174,8 +162,8 @@ export const getPostData = cache(
         if (!src.startsWith('/')) return;
         try {
           imageMetas[src] = await getImageMeta(src.slice(1));
-        } catch (err) {
-          throw new Error(`Error loading image ${src}: ${err.message}.`);
+        } catch {
+          return null;
         }
       })
     );
@@ -206,11 +194,10 @@ export const getPostMetaBySlug = cache(
   async (
     lang: Language = 'tw',
     slug: string
-  ): Promise<{ title: string; description: string }> => {
+  ): Promise<{ title: string; description: string } | null> => {
     const postDir = path.join(postsDirectory, slug);
 
-    if (!fs.existsSync(postDir))
-      throw new Error(`Post directory does not exist: ${postDir}.`);
+    if (!fs.existsSync(postDir)) return null;
     const files = await fs.promises.readdir(postDir);
 
     // 根據當前語系選擇對應的 mdx 檔案
@@ -218,14 +205,14 @@ export const getPostMetaBySlug = cache(
       if (lang === 'en') return file === 'index.en.mdx';
       return file === 'index.mdx';
     });
-    if (!mdxFile)
-      throw new Error(`No MDX file found for slug ${slug} and lang ${lang}.`);
+
+    if (!mdxFile) return null;
+
     const filePath = path.join(postDir, mdxFile);
     const fileContents = await fs.promises.readFile(filePath, 'utf8');
     const { data } = matter(fileContents);
 
-    if (!data.title)
-      throw new Error(`Missing "title" in frontmatter for post: ${slug}.`);
+    if (!data.title) return null;
 
     return {
       title: data.title,

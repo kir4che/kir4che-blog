@@ -1,3 +1,5 @@
+export const dynamic = 'force-static';
+
 import { notFound } from 'next/navigation';
 
 import type { Language } from '@/types/language';
@@ -5,11 +7,11 @@ import { LANGUAGES } from '@/types/language';
 
 import CategoryPosts from '@/components/features/category/CategoryPosts';
 
-type Params = {
+type Params = Promise<{
   lang: Language;
   slug: string;
   subSlug: string;
-};
+}>;
 
 export async function generateStaticParams() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`);
@@ -41,17 +43,22 @@ export async function generateStaticParams() {
 const SubCategoryPage = async ({ params }: { params: Params }) => {
   const { lang, slug, subSlug } = await params;
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/categories/${slug}/${subSlug}?lang=${lang}`,
-    { cache: 'force-cache' }
-  );
+  let categoryData;
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/categories/${slug}/${subSlug}?lang=${lang}`
+    );
+    if (!res.ok) return notFound();
 
-  if (!res.ok) return notFound();
+    const data = await res.json();
+    categoryData = data.category;
 
-  const { category } = await res.json();
-  if (!category) return notFound();
+    if (!categoryData) return notFound();
+  } catch {
+    return notFound();
+  }
 
-  return <CategoryPosts slug={subSlug} category={category} />;
+  return <CategoryPosts slug={subSlug} category={categoryData} />;
 };
 
 export default SubCategoryPage;

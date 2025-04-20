@@ -9,9 +9,9 @@ import { cn } from '@/lib/style';
 
 import PostPreview from '@/components/features/post/PostPreview';
 
-type Params = {
+type Params = Promise<{
   lang: Language;
-};
+}>;
 
 const Home = async ({ params }: { params: Params }) => {
   const { lang } = await params;
