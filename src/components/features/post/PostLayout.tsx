@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import { format } from 'date-fns';
 
 import type { AvailableLang } from '@/types/language';
 import type { PostMeta } from '@/types/post';
@@ -115,7 +116,7 @@ const PostLayout = ({ post, children }: PostLayoutProps) => {
       <article className='dark:bg-text-gray-dark/35 rounded-b-md bg-white p-4 md:p-6'>
         <header className='space-y-4'>
           <h1>{title || slug}</h1>
-          <div className='mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-1'>
+          <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-1'>
             <CategoryGroup
               categories={categories}
               categoryInfoMap={categoryInfoMap}
@@ -137,6 +138,14 @@ const PostLayout = ({ post, children }: PostLayoutProps) => {
               )}
             </div>
           </div>
+          {post.updatedAt && (
+            <p className='text-text-gray text-right text-xs dark:text-white/85'>
+              {t('lastUpdated')}{' '}
+              <time dateTime={post.updatedAt}>
+                {format(new Date(post.updatedAt), 'yyyy.MM.dd')}
+              </time>
+            </p>
+          )}
         </header>
         <section className='article-content'>{children}</section>
         <hr className='text-text-gray-lighter dark:text-text-gray mx-auto my-8 w-20' />
