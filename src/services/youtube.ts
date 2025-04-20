@@ -9,29 +9,43 @@ const PLAYLIST_ID = process.env.NEXT_PUBLIC_YOUTUBE_PLAYLIST_ID;
 const API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
 const BASE_URL = 'https://www.googleapis.com/youtube/v3/playlistItems';
 
-export const fetchYouTubeVideos = (
+export const fetchYouTubeVideos = async (
   maxResults: number = 1
 ): Promise<VideoData[]> => {
-  return fetch(
-    `${BASE_URL}?key=${API_KEY}&playlistId=${PLAYLIST_ID}&part=snippet&maxResults=${maxResults}`,
-    {
-      next: { revalidate: 604800 }, // 7 days
+  try {
+    const res = await fetch(
+      `${BASE_URL}?key=${API_KEY}&playlistId=${PLAYLIST_ID}&part=snippet&maxResults=${maxResults}`
+    );
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      console.error('YouTube API Error:', errorData);
+      throw new Error(
+        `YouTube API error: ${res.status} ${res.statusText} - ${errorData.error?.message || 'Unknown error'}`
+      );
     }
-  )
-    .then((res) => {
-      if (!res.ok) throw new Error('Fetch failed.');
-      return res.json();
-    })
-    .then((data) => {
-      if (!data.items?.length) return [];
-      return data.items.map((item: any) => ({
+
+    const data = await res.json();
+
+    if (!Array.isArray(data.items)) return [];
+
+    return data.items
+      .filter(
+        (item: any) =>
+          item?.snippet &&
+          item.snippet.resourceId?.videoId &&
+          item.snippet.thumbnails?.medium?.url
+      )
+      .map((item: any) => ({
         id: item.snippet.resourceId.videoId,
         title: item.snippet.title,
         thumbnail: item.snippet.thumbnails.medium.url,
         publishedAt: new Date(item.snippet.publishedAt).toLocaleDateString(),
       }));
-    })
-    .catch(() => {
-      throw new Error('Failed to fetch YouTube videos');
-    });
+  } catch (err) {
+    console.error('Failed to fetch YouTube videos:', err);
+    throw new Error(
+      err instanceof Error ? err.message : 'Failed to fetch YouTube videos.'
+    );
+  }
 };

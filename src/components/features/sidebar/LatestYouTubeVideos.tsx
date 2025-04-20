@@ -1,38 +1,16 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Video } from 'lucide-react';
-
-import { fetchYouTubeVideos, type VideoData } from '@/services/youtube';
-import { useAlert } from '@/contexts/AlertContext';
 
 import YouTubeVideoList from '@/components/features/YouTubeVideoList';
 
 const LatestYouTubeVideos: React.FC = () => {
   const t = useTranslations('sidebar');
-  const { showError } = useAlert();
 
-  const [video, setVideo] = useState<VideoData | null>(null);
-
-  useEffect(() => {
-    const fetchVideo = () => {
-      fetchYouTubeVideos(1)
-        .then((videos) => {
-          if (videos.length > 0) setVideo(videos[0]);
-        })
-        .catch((err) =>
-          showError(
-            'Failed to fetch YouTube video: ' +
-              (err instanceof Error ? err.message : err)
-          )
-        );
-    };
-
-    fetchVideo();
-  }, [showError]);
-
-  if (!video) return null;
+  const [hasError, setHasError] = useState(false);
+  if (hasError) return null;
 
   return (
     <div className='space-y-4'>
@@ -43,7 +21,11 @@ const LatestYouTubeVideos: React.FC = () => {
         />
         {t('latestVideo')}
       </h3>
-      <YouTubeVideoList count={1} showTitle={false} />
+      <YouTubeVideoList
+        count={1}
+        showTitle={false}
+        onError={() => setHasError(true)}
+      />
     </div>
   );
 };
