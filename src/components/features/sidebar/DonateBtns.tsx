@@ -6,7 +6,7 @@ const DonateBtns: React.FC = () => (
   <div className='space-y-2'>
     <p className='text-text-primary dark:text-text-gray-light'>
       ─────────<span className='text-pink-600 dark:text-pink-300'>୨ৎ</span>
-      ─────────
+      ────────
     </p>
     <div className='flex items-center justify-between'>
       <ExternalLink
@@ -28,7 +28,7 @@ const DonateBtns: React.FC = () => (
     </div>
     <p className='text-text-primary dark:text-text-gray-light'>
       ─────────<span className='text-pink-600 dark:text-pink-300'>୨ৎ</span>
-      ─────────
+      ────────
     </p>
   </div>
 );
