@@ -60,7 +60,6 @@
     "title": "Post List",
     "announcement": "My blog has moved from Hugo to Next.js 🎉",
     "search": "Search Posts",
-    "publishedAt": "Published on",
     "latestPosts": "Latest Posts",
     "morePosts": "More Posts",
     "noContent": "Empty here"
@@ -82,15 +81,15 @@
   "PostsPage": {
     "title": "Posts",
     "search": "Search Posts",
-    "publishedAt": "Published at",
     "latestPosts": "Latest Posts",
     "morePosts": "More Posts",
     "noPosts": "No posts yet.",
     "loadFailed": "Failed to load posts. Please try again later."
   },
   "PostPage": {
-    "relatedPosts": "Related Posts",
+    "lastUpdated": "Last updated on",
     "thanks": "If you found this post helpful, consider buying me a milktea (◍•ᴗ•◍)❤",
+    "relatedPosts": "Related Posts",
     "enterPassword": "Enter password",
     "wrongPassword": "Incorrect password, please try again!"
   },
