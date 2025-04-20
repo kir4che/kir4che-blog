@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Play } from 'lucide-react';
 
-import { useAlert } from '@/contexts/AlertContext';
 import { fetchYouTubeVideos } from '@/services/youtube';
 import { cn } from '@/lib/style';
 
@@ -23,6 +22,7 @@ interface YouTubeVideoListProps {
   showDate?: boolean;
   className?: string;
   titleStyle?: string;
+  onError?: () => void;
 }
 
 const YouTubeVideoList = ({
@@ -31,26 +31,27 @@ const YouTubeVideoList = ({
   showDate = false,
   className,
   titleStyle,
+  onError = () => {},
 }: YouTubeVideoListProps) => {
-  const { showError } = useAlert();
-
   const [videos, setVideos] = useState<Video[]>([]);
 
   useEffect(() => {
     fetchYouTubeVideos(count)
-      .then((data) => setVideos(data))
-      .catch((err) => {
+      .then((data) => {
+        if (data.length === 0) {
+          setVideos([]);
+          onError?.();
+        } else setVideos(data);
+      })
+      .catch(() => {
         setVideos([]);
-        showError(
-          'Failed to fetch YouTube videos: ' +
-            (err instanceof Error ? err.message : err)
-        );
+        onError?.();
       });
-  }, [count, showError]);
+  }, [count, onError]);
 
   return (
     <section
-      className={cn('flex flex-wrap gap-3', className)}
+      className={cn('flex flex-wrap gap-x-4 gap-y-3', className)}
       role='region'
       aria-label="kir4che's youtube"
     >
@@ -58,7 +59,7 @@ const YouTubeVideoList = ({
         <ExternalLink
           key={video.id}
           href={`https://www.youtube.com/watch?v=${video.id}`}
-          className='group text-text-gray-dark dark:text-text-gray-light w-60 hover:no-underline'
+          className='group text-text-gray-dark dark:text-text-gray-light flex w-60 flex-col items-start hover:no-underline'
         >
           <div className='relative mb-1 aspect-video rounded-md'>
             <Image
@@ -81,7 +82,7 @@ const YouTubeVideoList = ({
           {showTitle && (
             <h4
               className={cn(
-                'text-text-primary dark:text-text-gray-light truncate text-xs font-medium',
+                'text-text-primary dark:text-text-gray-light w-full truncate text-xs font-medium',
                 titleStyle
               )}
             >
