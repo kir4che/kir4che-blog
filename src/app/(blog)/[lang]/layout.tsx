@@ -23,7 +23,8 @@ export async function generateMetadata({
 }: {
   params: { lang: Language };
 }): Promise<Metadata> {
-  return getSeoConfig(params.lang);
+  const { lang } = await params;
+  return getSeoConfig(lang);
 }
 
 const notoSansTC = Noto_Sans_TC({
