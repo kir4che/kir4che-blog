@@ -6,11 +6,10 @@ import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Toaster } from 'react-hot-toast';
 
-import common from '@/config/common';
-import { routing } from '@/i18n/routing';
 import type { Language } from '@/types/language';
 import routing from '@/i18n/routing';
 import Providers from '@/contexts/Providers';
+import { getSeoConfig } from '@/utils/seo';
 
 import Header from '@/components/layouts/Header';
 import Footer from '@/components/layouts/Footer';
@@ -19,10 +18,13 @@ import RightSidebar from '@/components/layouts/RightSidebar';
 
 import '@/app/globals.css';
 
-export const metadata: Metadata = {
-  title: common.siteInfo.blog.title,
-  description: common.siteInfo.blog.description,
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: { lang: Language };
+}): Promise<Metadata> {
+  return getSeoConfig(params.lang);
+}
 
 const notoSansTC = Noto_Sans_TC({
   weight: ['400', '500', '600', '700', '800', '900'],

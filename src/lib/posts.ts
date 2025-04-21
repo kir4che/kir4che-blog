@@ -189,12 +189,12 @@ export const getPostData = cache(
   }
 );
 
-// 根據 slug 取得文章的 title 與 description
-export const getPostMetaBySlug = cache(
+// 根據 slug 取得文章的 title、description、date、tags 等 metadata
+export const getPostInfoBySlug = cache(
   async (
     lang: Language = 'tw',
     slug: string
-  ): Promise<{ title: string; description: string } | null> => {
+  ): Promise<Partial<PostInfo> | null> => {
     const postDir = path.join(postsDirectory, slug);
 
     if (!fs.existsSync(postDir)) return null;
@@ -212,11 +212,13 @@ export const getPostMetaBySlug = cache(
     const fileContents = await fs.promises.readFile(filePath, 'utf8');
     const { data } = matter(fileContents);
 
-    if (!data.title) return null;
+    if (!data.title || !data.date) return null;
 
     return {
       title: data.title,
-      description: data.description,
+      description: data.description || '',
+      date: data.date,
+      tags: data.tags || [],
     };
   }
 );
