@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 
 import common from '@/config/common';
-import { routing } from '@/i18n/routing';
+import routing from '@/i18n/routing';
 import { detectLocale } from '@/utils/detectLocale';
 
 const LOCALES = common.languages.langs;

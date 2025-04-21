@@ -7,6 +7,7 @@ import type { Language } from '@/types/language';
 import { LANGUAGES } from '@/types/language';
 import { getPostMetaBySlug } from '@/lib/posts';
 import { parseMDX } from '@/lib/mdx';
+import common from '@/config/common';
 
 import PostLayout from '@/components/features/post/PostLayout';
 import MDXContent from '@/components/mdx/MDXContent';

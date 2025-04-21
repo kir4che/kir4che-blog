@@ -9,6 +9,7 @@ import { Toaster } from 'react-hot-toast';
 import common from '@/config/common';
 import { routing } from '@/i18n/routing';
 import type { Language } from '@/types/language';
+import routing from '@/i18n/routing';
 import Providers from '@/contexts/Providers';
 
 import Header from '@/components/layouts/Header';

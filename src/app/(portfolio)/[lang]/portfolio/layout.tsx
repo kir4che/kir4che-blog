@@ -4,9 +4,9 @@ import { Noto_Sans_TC, Rubik_Doodle_Shadow } from 'next/font/google';
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
 import { notFound } from 'next/navigation';
 
-import common from '@/config/common';
-import { routing } from '@/i18n/routing';
 import type { Language } from '@/types/language';
+import common from '@/config/common';
+import routing from '@/i18n/routing';
 
 import Header from '@/components/features/portfolio/Header';
 import Footer from '@/components/features/portfolio/Footer';
