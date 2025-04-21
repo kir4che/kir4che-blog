@@ -6,7 +6,7 @@ import { Languages, ChevronDown } from 'lucide-react';
 
 import type { Language } from '@/types/language';
 import { useRouter, usePathname } from '@/i18n/navigation';
-import { routing } from '@/i18n/routing';
+import routing from '@/i18n/routing';
 import { cn } from '@/lib/style';
 
 interface LangMenuProps {
