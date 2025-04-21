@@ -41,32 +41,34 @@ const Experience: React.FC = () => {
                 {t(`${key}.date`)}
               </span>
             </div>
-            <section className='collapse-content rounded-b-md border-2 border-pink-500 bg-white py-4'>
-              <div className='mb-3 flex flex-wrap items-center justify-between gap-y-2'>
+            <section className='collapse-content rounded-b-md border-2 border-pink-500 bg-white py-3'>
+              <div className='mb-3 flex items-center gap-y-2'>
                 <div className='flex items-center gap-x-2'>
                   <Image
                     src={`/images/portfolio/${key}.webp`}
                     alt={key}
                     width={40}
                     height={40}
-                    className='h-auto w-10'
+                    className='-mb-0.5 h-auto w-11'
                   />
-                  <div className='text-text-gray flex w-full items-center gap-x-1'>
-                    <MapPin className='h-3.5 w-3.5' />
-                    <p className='text-xs text-nowrap'>
-                      {t(`${key}.location`)}
+                  <div className='space-y-1'>
+                    <p className='inline-flex items-center gap-x-1 text-sm font-semibold'>
+                      {t(`${key}.title`)}
+                      <ExternalLink
+                        href={t(`${key}.link`)}
+                        className='xs:w-fit flex items-center justify-end gap-x-1'
+                      >
+                        <SquareArrowOutUpRight className='-mb-0.5 h-3.5 w-3.5' />
+                      </ExternalLink>
                     </p>
+                    <div className='text-text-gray flex w-full items-center gap-x-1'>
+                      <MapPin className='h-3.5 w-3.5' />
+                      <p className='text-xs text-nowrap'>
+                        {t(`${key}.location`)}
+                      </p>
+                    </div>
                   </div>
                 </div>
-                <ExternalLink
-                  href={t(`${key}.link`)}
-                  className='xs:w-fit flex items-center justify-end gap-x-1'
-                >
-                  <SquareArrowOutUpRight className='h-4 w-4' />
-                  <span className='xs:text-sm text-xs'>
-                    {t(`${key}.title`)}
-                  </span>
-                </ExternalLink>
               </div>
               <ul className='list-disc pl-5 leading-[1.85] marker:text-pink-800'>
                 {contents[key] && typeof contents[key] === 'object'
@@ -94,7 +96,7 @@ const Experience: React.FC = () => {
                     )
                   : null}
               </ul>
-              <ul className='mt-8 flex flex-wrap items-center gap-2'>
+              <ul className='mt-8 mb-4 flex flex-wrap items-center gap-2'>
                 {skills[key] && typeof skills[key] === 'object'
                   ? Object.values(skills[key] as Record<string, string>).map(
                       (skill, index) => (
