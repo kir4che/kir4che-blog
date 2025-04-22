@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Metadata } from 'next';
 import { Noto_Sans_TC, DM_Sans } from 'next/font/google';
 import { hasLocale } from 'next-intl';
@@ -15,6 +15,7 @@ import Header from '@/components/layouts/Header';
 import Footer from '@/components/layouts/Footer';
 import LeftSidebar from '@/components/layouts/LeftSidebar';
 import RightSidebar from '@/components/layouts/RightSidebar';
+import ScrollRestorer from '@/components/features/ScrollRestorer';
 
 import '@/app/globals.css';
 
@@ -68,6 +69,9 @@ const RootLayout = async ({ children, params }: RootLayoutProps) => {
                 <Header />
                 <main className='h-auto min-h-[calc(100vh-9rem)]'>
                   {children}
+                  <Suspense>
+                    <ScrollRestorer />
+                  </Suspense>
                 </main>
                 <Footer />
               </div>
