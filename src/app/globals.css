@@ -212,6 +212,10 @@
   @apply text-xs opacity-80;
 }
 
+.article-content .rating .mask-half-2 {
+  @apply mr-1;
+}
+
 .collapse:is([open], :focus:not(.collapse-close)) > :where(.collapse-content),
 .collapse:not(.collapse-close)
   > :where(

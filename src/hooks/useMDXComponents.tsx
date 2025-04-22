@@ -8,6 +8,7 @@ import Accordion from '@/components/mdx/Accordion';
 import CustomLink from '@/components/mdx/Link';
 import CustomImage from '@/components/mdx/Image';
 import ImageGallery from '@/components/mdx/ImageGallery';
+import Rating from '@/components/mdx/Rating';
 
 export const useMDXComponents = (
   imageMetas: Record<string, any> = {}
@@ -24,6 +25,7 @@ export const useMDXComponents = (
     Accordion, // <Accordion variant="primary" title="Title">{children}</Accordion>
     Correction, // <Correction wrong="A" correct="B" />
     Highlight, // <Highlight color="pink">{children}</Highlight>
+    Rating, // <Rating type='heart' rating={4} />
     Kbd: ({ children }) => (
       <kbd className='kbd border-neutral-400 bg-neutral-200'>{children}</kbd>
     ), // <Kbd>Enter</Kbd>
