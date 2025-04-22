@@ -20,7 +20,15 @@ export function getSeoConfig(lang: string): Metadata {
     publisher: 'kir4che',
     applicationName: title,
     generator: 'Next.js',
-    keywords: ['kir4che', 'blog', '部落格', 'frontend', '前端開發', '前端技術分享', '生活紀錄'],
+    keywords: [
+      'kir4che',
+      'blog',
+      '部落格',
+      'frontend',
+      '前端開發',
+      '前端技術分享',
+      '生活紀錄',
+    ],
     alternates: {
       canonical: `${url}/${lang}`,
       languages: {
