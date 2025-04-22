@@ -7,9 +7,9 @@ type HeadingProps<T extends HeadingTag> = {
 } & React.ComponentPropsWithRef<T>;
 
 const Heading = React.forwardRef<HTMLHeadingElement, HeadingProps<HeadingTag>>(
-  ({ as: Component, children, ...props }, ref) => {
+  ({ as: Component, children, ...rest }, ref) => {
     return (
-      <Component ref={ref} className='heading my-5 -ml-4 md:-ml-6' {...props}>
+      <Component ref={ref} className='heading my-5 -ml-4 md:-ml-6' {...rest}>
         {children}
       </Component>
     );
@@ -21,7 +21,7 @@ const createHeading = <T extends HeadingTag>(tag: T) => {
   const Comp = React.forwardRef<
     HTMLHeadingElement,
     React.ComponentPropsWithRef<T>
-  >((props, ref) => <Heading as={tag} ref={ref} {...props} />);
+  >((rest, ref) => <Heading as={tag} ref={ref} {...rest} />);
   Comp.displayName = `Custom${tag.toUpperCase()}`;
   return Comp;
 };
