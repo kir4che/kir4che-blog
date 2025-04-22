@@ -98,10 +98,10 @@ const PostPage = async ({ params }: { params: Params }) => {
     if (!res.ok) return notFound();
 
     const post = await res.json();
-    const mdxSource = await parseMDX(post.content);
+    const { mdxSource, headings } = await parseMDX(post.content);
 
     return (
-      <PostLayout post={post}>
+      <PostLayout post={post} headings={headings}>
         <MDXContent content={mdxSource} imageMetas={post.imageMetas} />
       </PostLayout>
     );

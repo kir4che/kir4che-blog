@@ -64,8 +64,8 @@ const RootLayout = async ({ children, params }: RootLayoutProps) => {
         <Providers locale={lang} messages={messages}>
           <div className='mx-auto flex max-w-screen-2xl flex-col px-4 md:flex-row md:px-2'>
             <LeftSidebar />
-            <div className='flex flex-1 gap-x-8 md:pt-8'>
-              <div className='w-full max-w-screen flex-grow'>
+            <div className='flex flex-1 gap-x-8 overflow-hidden md:pt-8'>
+              <div className='w-full flex-grow'>
                 <Header />
                 <main className='h-auto min-h-[calc(100vh-9rem)]'>
                   {children}

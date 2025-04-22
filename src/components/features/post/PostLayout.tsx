@@ -14,6 +14,7 @@ import { useAlert } from '@/contexts/AlertContext';
 import { useCategoryInfoMap } from '@/hooks/useCategoryInfoMap';
 
 import PostPasswordGate from '@/components/features/post/PostPasswordGate';
+import TOC from '@/components/features/post/Toc';
 import LangMenu from '@/components/features/post/LangMenu';
 import CategoryGroup from '@/components/features/post/CategoryGroup';
 import PostMetaInfo from '@/components/features/post/PostMetaInfo';
@@ -22,10 +23,11 @@ import KofiBtn from '@/components/ui/KofiBtn';
 
 interface PostLayoutProps {
   post: PostMeta;
+  headings: { id: string; text: string; level: number }[];
   children: React.ReactNode;
 }
 
-const PostLayout = ({ post, children }: PostLayoutProps) => {
+const PostLayout = ({ post, headings, children }: PostLayoutProps) => {
   const t = useTranslations('PostPage');
   const t_common = useTranslations('common');
   const t_settings = useTranslations('settings');
@@ -169,6 +171,7 @@ const PostLayout = ({ post, children }: PostLayoutProps) => {
           )}
         </footer>
       </article>
+      <TOC headings={headings} />
       {/* <RelatedPosts lang={lang} currentSlug={slug} categories={categories} /> */}
     </>
   );
