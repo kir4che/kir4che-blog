@@ -52,7 +52,7 @@ const PostLayout = ({ post, headings, children }: PostLayoutProps) => {
   const checkAvailableLangs = useCallback(() => {
     Promise.all(
       LANGUAGES.filter((l) => l !== lang).map((targetLang) =>
-        fetch(`/api/posts/${slug}&lang=${lang}`, {
+        fetch(`/api/posts/${slug}?lang=${lang}`, {
           headers: {
             'X-Check-Existence': 'true',
           },
