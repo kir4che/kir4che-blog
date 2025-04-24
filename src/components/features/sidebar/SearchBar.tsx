@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect, ChangeEvent, useMemo } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Search, X } from 'lucide-react';
