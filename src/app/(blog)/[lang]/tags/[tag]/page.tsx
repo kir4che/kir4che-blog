@@ -14,18 +14,22 @@ type Params = Promise<{
 }>;
 
 export async function generateStaticParams() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tags`);
-  if (!res.ok) return [];
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tags`);
+    if (!res.ok) return [];
 
-  const { tags } = await res.json();
-  if (!Array.isArray(tags)) return [];
+    const { tags } = await res.json();
+    if (!Array.isArray(tags)) return [];
 
-  return LANGUAGES.flatMap((lang) =>
-    tags.map(({ slug }) => ({
-      tag: slug,
-      lang,
-    }))
-  );
+    return LANGUAGES.flatMap((lang) =>
+      tags.map(({ slug }) => ({
+        tag: slug,
+        lang,
+      }))
+    );
+  } catch {
+    return [];
+  }
 }
 
 const TagPage = async ({ params }: { params: Params }) => {

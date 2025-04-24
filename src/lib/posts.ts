@@ -5,6 +5,7 @@ import { cache } from 'react';
 
 import type { Language } from '@/types/language';
 import type { PostMeta, PostInfo } from '@/types/post';
+import { LANGUAGES } from '@/types/language';
 import { isPostInCategory, getCategoryBySlug } from '@/lib/categories';
 import { convertToSlug } from '@/lib/tags';
 import { getImageMeta, extractImageSources } from '@/lib/image';
@@ -253,4 +254,16 @@ export const getPostsByTag = async (
       )
     );
   });
+};
+
+export const getPostsMeta = async () => {
+  const allPosts = await Promise.all(
+    LANGUAGES.map((lang) => getPostsInfo(lang))
+  );
+  return allPosts.flat().map((post) => ({
+    slug: post.slug,
+    lang: post.lang,
+    title: post.title,
+    date: post.date,
+  }));
 };

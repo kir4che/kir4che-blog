@@ -13,18 +13,24 @@ type Params = Promise<{
 }>;
 
 export async function generateStaticParams() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`);
-  if (!res.ok) return [];
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/categories`
+    );
+    if (!res.ok) return [];
 
-  const { categories } = await res.json();
-  if (!Array.isArray(categories)) return [];
+    const { categories } = await res.json();
+    if (!Array.isArray(categories)) return [];
 
-  return LANGUAGES.flatMap((lang) =>
-    categories.map(({ slug }: { slug: string }) => ({
-      slug,
-      lang,
-    }))
-  );
+    return LANGUAGES.flatMap((lang) =>
+      categories.map(({ slug }: { slug: string }) => ({
+        slug,
+        lang,
+      }))
+    );
+  } catch {
+    return [];
+  }
 }
 
 const CategoryPage = async ({ params }: { params: Params }) => {
