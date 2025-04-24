@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { getPostData } from '@/lib/posts';
+import { checkPostExistence, getPostData } from '@/lib/posts';
 import { responseWithCache } from '@/utils/responseWithCache';
 
 export const GET = async (request: Request) => {
@@ -15,10 +15,13 @@ export const GET = async (request: Request) => {
   try {
     const checkExistence = request.headers.get('X-Check-Existence') === 'true';
 
+    if (checkExistence) {
+      const exists = await checkPostExistence(lang, slug);
+      return responseWithCache({ exists });
+    }
+
     try {
       const post = await getPostData(lang, slug);
-
-      if (checkExistence) return responseWithCache({ exists: !!post });
       if (!post)
         return NextResponse.json(
           { message: 'Post not found.' },

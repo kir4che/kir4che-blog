@@ -267,3 +267,26 @@ export const getPostsMeta = async () => {
     date: post.date,
   }));
 };
+
+export const checkPostExistence = async (
+  lang: Language,
+  slug: string
+): Promise<boolean> => {
+  const postDir = path.join(postsDirectory, slug);
+
+  if (!fs.existsSync(postDir)) return false;
+
+  try {
+    const files = await fs.promises.readdir(postDir);
+    // 根據語系選擇對應的檔案
+    const mdxFile =
+      lang === 'en'
+        ? files.find((file) => file === 'index.en.mdx')
+        : files.find((file) => file === 'index.mdx');
+    if (!mdxFile) return false;
+
+    return !!mdxFile;
+  } catch {
+    return false;
+  }
+};
