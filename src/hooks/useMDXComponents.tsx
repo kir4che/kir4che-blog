@@ -24,7 +24,9 @@ export const useMDXComponents = (
     Table: Table, // <Table data={{ headers: [], rows: [[], []] }} />
     Image: (props) => {
       const meta = imageMetas[props.src ?? ''] ?? {};
-      return <CustomImage {...meta} {...props} />;
+      const { width: _w, height: _h, ...restMeta } = meta;
+
+      return <CustomImage {...restMeta} {...props} />;
     },
     Images: ImageGallery, // <Images images={[{ src: '', alt: '', width: '' }, ... ]} height='150px' />
     Video: CustomVideo, // <Video src="..." title="..." />
@@ -42,7 +44,9 @@ export const useMDXComponents = (
     img: (props) => {
       // \![alt](url)
       const meta = imageMetas[props.src ?? ''] ?? {};
-      return <CustomImage {...meta} {...props} />;
+      const { width: _w, height: _h, ...restMeta } = meta;
+
+      return <CustomImage {...restMeta} {...props} />;
     },
     ul: ({ children }) => (
       <ul className='my-2 list-inside list-disc pl-4'>{children}</ul>

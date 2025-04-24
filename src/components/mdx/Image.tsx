@@ -65,7 +65,7 @@ const CustomImage: React.FC<CustomImageProps> = ({
           fill
           priority={priority}
           className={cn(
-            'object-cover transition-transform duration-300 hover:scale-105',
+            'h-full w-full object-cover transition-transform duration-300 hover:scale-105',
             objectPosition
           )}
           {...props}
@@ -92,7 +92,7 @@ const CustomImage: React.FC<CustomImageProps> = ({
   const content = (
     <figure
       className={cn(
-        'xs:[max-height:var(--img-max-height)] flex max-h-80 w-full flex-col space-y-2',
+        'xs:[max-height:var(--img-max-height)] flex max-h-80 w-full flex-col gap-y-2',
         width ? 'sm:[max-width:var(--img-width)]' : 'md:max-w-5/6',
         alignment,
         className
@@ -101,7 +101,11 @@ const CustomImage: React.FC<CustomImageProps> = ({
         {
           height: height || (useFill ? '100%' : undefined),
           '--img-width': width || (useFill ? '100%' : undefined),
-          '--img-max-height': height || '360px',
+          '--img-max-height': height
+            ? `max(${
+                typeof height === 'number' ? `${height}px` : height
+              }, 400px)`
+            : '400px',
         } as React.CSSProperties
       }
     >
