@@ -13,8 +13,7 @@ import { getSeoConfig } from '@/utils/seo';
 
 import Header from '@/components/layouts/Header';
 import Footer from '@/components/layouts/Footer';
-import LeftSidebar from '@/components/layouts/LeftSidebar';
-import RightSidebar from '@/components/layouts/RightSidebar';
+import Sidebar from '@/components/layouts/Sidebar';
 import ScrollRestorer from '@/components/features/ScrollRestorer';
 
 import '@/app/globals.css';
@@ -62,22 +61,18 @@ const RootLayout = async ({ children, params }: RootLayoutProps) => {
       >
         <Toaster position='top-center' toastOptions={{ duration: 3000 }} />
         <Providers locale={lang} messages={messages}>
-          <div className='mx-auto flex max-w-screen-2xl flex-col px-4 md:flex-row md:px-2'>
-            <LeftSidebar />
-            <div className='flex flex-1 gap-x-8 overflow-hidden md:pt-8'>
-              <div className='w-full flex-grow'>
-                <Header />
-                <main className='h-auto min-h-[calc(100vh-9rem)]'>
-                  {children}
-                  <Suspense>
-                    <ScrollRestorer />
-                  </Suspense>
-                </main>
-                <Footer />
-              </div>
-              <RightSidebar />
+          <Sidebar lang={lang}>
+            <div className='w-full flex-grow'>
+              <Header />
+              <main className='h-auto min-h-[calc(100vh-9rem)]'>
+                {children}
+                <Suspense>
+                  <ScrollRestorer />
+                </Suspense>
+              </main>
+              <Footer />
             </div>
-          </div>
+          </Sidebar>
         </Providers>
       </body>
     </html>

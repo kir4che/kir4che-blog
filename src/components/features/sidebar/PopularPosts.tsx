@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Sparkles } from 'lucide-react';
