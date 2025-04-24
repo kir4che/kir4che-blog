@@ -9,6 +9,7 @@ import CustomLink from '@/components/mdx/Link';
 import CustomImage from '@/components/mdx/Image';
 import ImageGallery from '@/components/mdx/ImageGallery';
 import Rating from '@/components/mdx/Rating';
+import CustomVideo from '@/components/mdx/Video';
 
 export const useMDXComponents = (
   imageMetas: Record<string, any> = {}
@@ -21,7 +22,12 @@ export const useMDXComponents = (
     h5: H5,
     h6: H6,
     Table: Table, // <Table data={{ headers: [], rows: [[], []] }} />
+    Image: (props) => {
+      const meta = imageMetas[props.src ?? ''] ?? {};
+      return <CustomImage {...meta} {...props} />;
+    },
     Images: ImageGallery, // <Images images={[{ src: '', alt: '', width: '' }, ... ]} height='150px' />
+    Video: CustomVideo, // <Video src="..." title="..." />
     Accordion, // <Accordion variant="primary" title="Title">{children}</Accordion>
     Correction, // <Correction wrong="A" correct="B" />
     Highlight, // <Highlight color="pink">{children}</Highlight>
@@ -36,7 +42,7 @@ export const useMDXComponents = (
     img: (props) => {
       // \![alt](url)
       const meta = imageMetas[props.src ?? ''] ?? {};
-      return <CustomImage {...props} {...meta} />;
+      return <CustomImage {...meta} {...props} />;
     },
     ul: ({ children }) => (
       <ul className='my-2 list-inside list-disc pl-4'>{children}</ul>
@@ -48,7 +54,7 @@ export const useMDXComponents = (
     blockquote: (
       { children } // > Text
     ) => (
-      <blockquote className='my-6 border-l-4 border-pink-500 bg-pink-50 px-5 py-3 dark:border-pink-500 dark:bg-pink-700/15'>
+      <blockquote className='my-6 border-l-[5px] border-pink-500 bg-pink-50 px-5 py-2 dark:border-pink-500 dark:bg-pink-700/15'>
         {children}
       </blockquote>
     ),
