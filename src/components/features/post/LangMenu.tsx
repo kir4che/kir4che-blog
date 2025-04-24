@@ -71,7 +71,7 @@ const LangMenu = ({
         id='lang-menu'
         role='menu'
         className={cn(
-          'dark:bg-text-gray-dark absolute right-0 z-50 mt-2 min-w-24 origin-top-right transform rounded-md bg-white py-1 shadow-lg duration-200',
+          'dark:bg-text-gray-dark absolute right-0 z-50 mt-2 min-w-24 origin-top-right transform rounded bg-white shadow-md duration-200',
           showMenu
             ? 'scale-100 opacity-100'
             : 'pointer-events-none invisible scale-95 opacity-0'
@@ -83,7 +83,7 @@ const LangMenu = ({
             <Link
               key={langOption.code}
               href={`/${langOption.code}/posts/${slug}`}
-              className='text-text-primary block w-full px-4 py-2 hover:bg-gray-50 hover:text-pink-500 dark:hover:bg-gray-800'
+              className='text-text-primary block w-full rounded px-4 py-2 hover:bg-pink-50 hover:font-medium hover:text-pink-600 dark:hover:bg-pink-900/5'
               onClick={() => {
                 clearTimeoutSafely();
                 setShowMenu(false);
