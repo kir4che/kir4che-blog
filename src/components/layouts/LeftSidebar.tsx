@@ -60,7 +60,7 @@ const LeftSidebar: React.FC = () => {
   const t = useTranslations('profile');
 
   return (
-    <aside className='flex flex-col justify-between pt-4 pb-0 md:sticky md:top-0 md:h-screen md:w-48 md:py-8'>
+    <aside className='flex flex-col justify-between pt-4 pb-0 md:sticky md:top-0 md:h-screen md:w-45 md:py-8 lg:w-48'>
       <div className='flex items-center gap-x-3 gap-y-2 md:mb-2.5 md:flex-col md:items-start'>
         <div className='relative block h-16 w-16 md:h-26 md:w-26'>
           <Link href='/' className='avatar'>
