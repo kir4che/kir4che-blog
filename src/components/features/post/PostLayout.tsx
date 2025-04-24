@@ -141,7 +141,7 @@ const PostLayout = ({ post, headings, children }: PostLayoutProps) => {
             </div>
           </div>
           {post.updatedAt && (
-            <p className='text-text-gray text-right text-xs dark:text-white/85'>
+            <p className='text-right text-xs text-pink-400 dark:text-white/50'>
               {t('lastUpdated')}{' '}
               <time dateTime={post.updatedAt}>
                 {format(new Date(post.updatedAt), 'yyyy.MM.dd')}
