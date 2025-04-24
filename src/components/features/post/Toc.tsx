@@ -15,7 +15,7 @@ const TOC: React.FC<TOCProps> = ({ headings }) => {
     <>
       <button
         onClick={() => setShowTOC(!showTOC)}
-        className='chat chat-end fixed right-4 bottom-4 z-50 block md:hidden'
+        className='chat chat-end fixed right-4 bottom-4 z-50 block lg:hidden'
         aria-label='Toggle Table of Contents'
         aria-expanded={showTOC}
       >
@@ -29,17 +29,17 @@ const TOC: React.FC<TOCProps> = ({ headings }) => {
       </button>
       <div
         className={cn(
-          'fixed right-4 bottom-4 z-50 hidden md:block lg:bottom-6',
+          'fixed right-4 bottom-4 z-50 hidden lg:bottom-6 lg:block',
           showTOC &&
-            'animate-fade-in bottom-22 block transition-all duration-300 md:hidden'
+            'animate-fade-in bottom-22 block transition-all duration-300 lg:hidden'
         )}
       >
         <div
-          className='dark:bg-text-secondary max-w-80 rounded-xl border bg-white p-4 shadow-md dark:border-white'
+          className='dark:bg-text-secondary max-w-80 rounded-xl border bg-white p-5 shadow-md dark:border-white'
           role='navigation'
           aria-label='Table of contents'
         >
-          <ul className='max-h-[400px] space-y-2.5 overflow-y-auto'>
+          <ul className='max-h-88 space-y-2.5 overflow-y-auto'>
             {headings.map((h) => (
               <li
                 key={h.id}
