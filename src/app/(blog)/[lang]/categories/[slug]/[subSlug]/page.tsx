@@ -14,30 +14,36 @@ type Params = Promise<{
 }>;
 
 export async function generateStaticParams() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`);
-  if (!res.ok) return [];
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/categories`
+    );
+    if (!res.ok) return [];
 
-  const { categories } = await res.json();
-  if (!Array.isArray(categories)) return [];
+    const { categories } = await res.json();
+    if (!Array.isArray(categories)) return [];
 
-  const subCategoryParams = categories.flatMap(
-    (category: { slug: string; subCategories?: { slug: string }[] }) => {
-      if (!Array.isArray(category.subCategories)) return [];
+    const subCategoryParams = categories.flatMap(
+      (category: { slug: string; subCategories?: { slug: string }[] }) => {
+        if (!Array.isArray(category.subCategories)) return [];
 
-      return category.subCategories.map((sub) => ({
-        slug: category.slug,
-        subSlug: sub.slug,
-      }));
-    }
-  );
+        return category.subCategories.map((sub) => ({
+          slug: category.slug,
+          subSlug: sub.slug,
+        }));
+      }
+    );
 
-  return LANGUAGES.flatMap((lang) =>
-    subCategoryParams.map(({ slug, subSlug }) => ({
-      lang,
-      slug,
-      subSlug,
-    }))
-  );
+    return LANGUAGES.flatMap((lang) =>
+      subCategoryParams.map(({ slug, subSlug }) => ({
+        lang,
+        slug,
+        subSlug,
+      }))
+    );
+  } catch {
+    return [];
+  }
 }
 
 const SubCategoryPage = async ({ params }: { params: Params }) => {

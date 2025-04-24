@@ -57,18 +57,20 @@ const PostsPage = ({ params }: { params: Params }) => {
 
   return (
     <div className='space-y-8'>
-      {Object.entries(postsByYear).map(([year, yearPosts]) => (
-        <section key={year}>
-          <p className='mb-3 font-bold text-pink-800/50 dark:text-pink-200'>
-            {year}
-          </p>
-          <section className='card space-y-4'>
-            {yearPosts.map((post) => (
-              <PostPreview key={post.slug} post={post} variant='list' />
-            ))}
+      {Object.entries(postsByYear)
+        .sort(([a], [b]) => Number(b) - Number(a))
+        .map(([year, yearPosts]) => (
+          <section key={year}>
+            <p className='mb-3 font-bold text-pink-800/50 dark:text-pink-200'>
+              {year}
+            </p>
+            <section className='card space-y-4'>
+              {yearPosts.map((post) => (
+                <PostPreview key={post.slug} post={post} variant='list' />
+              ))}
+            </section>
           </section>
-        </section>
-      ))}
+        ))}
       {pagination.totalPages > 1 && (
         <Pagination
           currentPage={pagination.currentPage}

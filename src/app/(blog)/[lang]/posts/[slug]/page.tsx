@@ -7,6 +7,7 @@ import type { Language } from '@/types/language';
 import { LANGUAGES, LangToLocaleMap } from '@/types/language';
 import { getPostInfoBySlug } from '@/lib/posts';
 import { parseMDX } from '@/lib/mdx';
+import { getPostsMeta } from '@/lib/posts';
 
 import PostLayout from '@/components/features/post/PostLayout';
 import MDXContent from '@/components/mdx/MDXContent';
@@ -17,14 +18,9 @@ type Params = Promise<{
 }>;
 
 export async function generateStaticParams() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/posts`);
-  if (!res.ok) return [];
-
-  const { posts } = await res.json();
-  if (!Array.isArray(posts)) return [];
-
+  const posts = await getPostsMeta();
   return LANGUAGES.flatMap((lang) =>
-    posts.map(({ slug }: { slug: string }) => ({
+    posts.map(({ slug }) => ({
       slug,
       lang,
     }))
