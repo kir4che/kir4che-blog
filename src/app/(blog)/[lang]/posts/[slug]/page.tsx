@@ -1,13 +1,12 @@
 export const dynamic = 'force-static';
 
 import React from 'react';
-import { redirect, notFound } from 'next/navigation';
+import { notFound } from 'next/navigation';
 
 import type { Language } from '@/types/language';
 import { LANGUAGES, LangToLocaleMap } from '@/types/language';
-import { getPostInfoBySlug } from '@/lib/posts';
+import { getPostsMeta, getPostInfoBySlug, getPostData } from '@/lib/posts';
 import { parseMDX } from '@/lib/mdx';
-import { getPostsMeta } from '@/lib/posts';
 
 import PostLayout from '@/components/features/post/PostLayout';
 import MDXContent from '@/components/mdx/MDXContent';
@@ -86,25 +85,16 @@ export async function generateMetadata({ params }: { params: Params }) {
 const PostPage = async ({ params }: { params: Params }) => {
   const { lang, slug } = await params;
 
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/posts/${slug}?lang=${lang}`
-    );
+  const post = await getPostData(lang, slug);
+  if (!post) return notFound();
 
-    if (!res.ok) return notFound();
+  const { mdxSource, headings } = await parseMDX(post.content);
 
-    const post = await res.json();
-    const { mdxSource, headings } = await parseMDX(post.content);
-
-    return (
-      <PostLayout post={post} headings={headings}>
-        <MDXContent content={mdxSource} imageMetas={post.imageMetas} />
-      </PostLayout>
-    );
-  } catch (err) {
-    console.error('Error fetching post data:', err);
-    redirect(`/${lang}/`);
-  }
+  return (
+    <PostLayout post={post} headings={headings}>
+      <MDXContent content={mdxSource} imageMetas={post.imageMetas} />
+    </PostLayout>
+  );
 };
 
 export default PostPage;
