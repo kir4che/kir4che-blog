@@ -1,4 +1,4 @@
-import { MDXRemoteSerializeResult } from 'next-mdx-remote';
+import type { MDXRemoteSerializeResult } from 'next-mdx-remote';
 import type { Language } from '@/types/language';
 
 export interface PostMeta {

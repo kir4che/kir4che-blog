@@ -2,8 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
-import { useTranslations } from 'next-intl';
-import { format } from 'date-fns';
+import { useTranslations, useFormatter } from 'next-intl';
 
 import type { AvailableLang } from '@/types/language';
 import type { PostMeta } from '@/types/post';
@@ -32,6 +31,7 @@ const PostLayout = ({ post, headings, children }: PostLayoutProps) => {
   const t_common = useTranslations('common');
   const t_settings = useTranslations('settings');
   const { showError } = useAlert();
+  const formatter = useFormatter();
 
   const [unlocked, setUnlocked] = useState(false);
   const [availableLangs, setAvailableLangs] = useState<AvailableLang[]>([]);
@@ -144,7 +144,13 @@ const PostLayout = ({ post, headings, children }: PostLayoutProps) => {
             <p className='text-right text-xs text-pink-400 dark:text-white/50'>
               {t('lastUpdated')}{' '}
               <time dateTime={post.updatedAt}>
-                {format(new Date(post.updatedAt), 'yyyy.MM.dd')}
+                {formatter
+                  .dateTime(new Date(post.updatedAt), {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                  })
+                  .replace(/\//g, '.')}
               </time>
             </p>
           )}

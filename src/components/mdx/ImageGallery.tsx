@@ -1,11 +1,20 @@
-import React from 'react';
-import { PhotoProvider, PhotoView } from 'react-photo-view';
-import 'react-photo-view/dist/react-photo-view.css';
+import React, { lazy } from 'react';
 
 import { cn } from '@/lib/style';
 
 import CustomImage from '@/components/mdx/Image';
 import CustomVideo from '@/components/mdx/Video';
+
+const PhotoProvider = lazy(() =>
+  import('react-photo-view').then((module) => ({
+    default: module.PhotoProvider,
+  }))
+);
+const PhotoView = lazy(() =>
+  import('react-photo-view').then((module) => ({ default: module.PhotoView }))
+);
+
+import 'react-photo-view/dist/react-photo-view.css';
 
 type MediaType = 'image' | 'video';
 type Alignment = 'left' | 'center' | 'right';
@@ -75,7 +84,6 @@ const ImageGallery: React.FC<GalleryProps> = ({
   const { container, column } = getAlignment(align);
   const totalSpan = images.reduce((sum, item) => sum + (item.colSpan || 1), 0);
   const baseMinWidth = minWidth || (images.length <= 2 ? 160 : 140);
-  console.log('baseMinWidth', images[0].alt, baseMinWidth);
   const renderMediaItem = (item: MediaItem, index: number) => {
     const span = item.colSpan || 1;
 
