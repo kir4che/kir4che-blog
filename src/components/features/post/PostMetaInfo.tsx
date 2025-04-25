@@ -32,7 +32,7 @@ const PostMetaInfo: React.FC<PostMetaInfoProps> = ({
     <p className='flex items-center gap-x-1'>
       <Pencil className='h-3.5 w-3.5' aria-hidden='true' />
       <span>
-        {wordCount} {t('unit.words')}
+        {wordCount.toLocaleString()} {t('unit.words')}
       </span>
     </p>
   </div>
