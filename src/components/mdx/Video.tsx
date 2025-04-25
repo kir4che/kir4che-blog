@@ -85,7 +85,7 @@ const CustomVideo: React.FC<CustomVideoProps> = ({
           controls={shouldShowControls}
           autoPlay={autoPlay}
           loop={loop}
-          muted={autoPlay || muted}
+          muted={muted}
           playsInline
           preload='auto'
           poster={poster}

@@ -115,7 +115,7 @@ const CustomImage: React.FC<CustomImageProps> = ({
         <PhotoView src={src}>{imageContent}</PhotoView>
       )}
       {title && (
-        <figcaption className='text-center text-xs text-pink-700/80 dark:text-pink-200'>
+        <figcaption className='line-clamp-1 text-center text-xs text-pink-700/80 dark:text-pink-200'>
           {title}
         </figcaption>
       )}
