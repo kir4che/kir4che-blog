@@ -35,11 +35,11 @@ const TOC: React.FC<TOCProps> = ({ headings }) => {
         )}
       >
         <div
-          className='dark:bg-text-secondary max-w-80 rounded-xl border bg-white p-5 shadow-md dark:border-white'
+          className='dark:bg-text-secondary max-w-68 min-w-60 rounded-xl border bg-white p-5 shadow-md xl:max-w-72 2xl:max-w-88 dark:border-white'
           role='navigation'
           aria-label='Table of contents'
         >
-          <ul className='max-h-88 space-y-2.5 overflow-y-auto'>
+          <ul className='max-h-88 space-y-2.5 overflow-y-auto pr-4 2xl:pr-8'>
             {headings.map((h) => (
               <li
                 key={h.id}
