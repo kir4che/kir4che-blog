@@ -13,7 +13,7 @@ tags:
   - Vercel
   - NodeJS
   - 部署
-wordCount: 324
+wordCount: 326
 ---
 
 Recently, I’ve been refactoring a project, and after updating it, Vercel deployment completely broke. The backend kept throwing 404 or 500 errors and just wouldn’t work properly. After a long debugging session and trying countless fixes, I finally got it running again. I’m documenting the solution here for future reference.
@@ -29,10 +29,11 @@ This project follows a frontend-backend separation approach:
 
 Backend Folder Structure:
 
-<img
+<Image
   src='/posts/deploy-express-typescript-to-vercel/server-folder-structure.webp'
   alt='server-folder-structure'
   width='240px'
+  align='left'
 />
 
 **Setting Up the Express Server:**
@@ -96,9 +97,10 @@ Once deployed, visiting the backend URL should display “Express on Vercel.” 
 
 If you see this, congratulations—your backend is up and running! 🎉
 
-<img
+<Image
   src='/posts/deploy-express-typescript-to-vercel/express-on-vercel-deploy-success.webp'
   alt='express-on-vercel-deploy-success'
+  width='100%'
 />
 
 Refer to [How to deploy your Express.js app at Vercel](https://ziadab.medium.com/how-to-deploy-your-express-js-app-at-vercel-0e0c104d8386)

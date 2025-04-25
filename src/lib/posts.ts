@@ -277,9 +277,10 @@ export const checkPostExistence = async (
 
   try {
     const files = await fs.promises.readdir(postDir);
+
     // 根據語系選擇對應的檔案
     const mdxFile =
-      lang === 'en'
+      lang === 'tw'
         ? files.find((file) => file === 'index.en.mdx')
         : files.find((file) => file === 'index.mdx');
     if (!mdxFile) return false;

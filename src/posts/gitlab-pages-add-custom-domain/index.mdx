@@ -6,7 +6,7 @@ categories:
   - Gitlab
 tags:
   - Gitlab
-wordCount: 328
+wordCount: 331
 ---
 
 最近為了幫 Gitlab Pages 加上自訂域名時遇上驗證問題，查了一大堆文章都沒有用，耗費非常多時間 🥲，直到我挖到一篇終於解決了我的問題，在此記錄希望能幫助到其他人。
@@ -15,20 +15,22 @@ wordCount: 328
 
 首先前往你的專案，側邊欄選擇 `Deploy (部署)`，然後選擇 `Pages`，點擊 `New Domain (新網域)` 新增自訂域名，OK 就會進到編輯畫面。
 
-<img
+<Image
   src='/posts/gitlab-pages-add-custom-domain/add-new-domain.webp'
   alt='add-new-domain'
   title='add-new-domain'
+  width='100%'
 />
 
 再來，要設置的 DNS Record 會有兩項，一項為 ALIAS，另一項為 TXT Record。
 
 請直接==忽略 DNS ALIAS==，只需**複製 TXT Record 的值**，然後前往 NameCheap 設定。
 
-<img
+<Image
   src='/posts/gitlab-pages-add-custom-domain/gitlab-pages-dns-records.webp'
   alt='gitlab-pages-dns-records'
   title='gitlab-pages-dns-records'
+  width='100%'
 />
 
 在 NameCheap - Advanced DNS 設定頁面的 HOST RECORDS，新增兩項：
@@ -36,10 +38,11 @@ wordCount: 328
 1. Type: `TXT Record`，Host: `@`，Value: `gitlab-pages-verification-code=xxxxxxxxxxxxxxxxxxxxxx` (剛剛複製的)
 2. Type: `A Record`，Host: `@`，Value: `35.185.44.232`
 
-<img
+<Image
   src='/posts/gitlab-pages-add-custom-domain/namecheap-host-records-setting.webp'
   alt='namecheap-host-records-setting'
   title='namecheap-host-records-setting'
+  width='100%'
 />
 
 保存好設定後，回到 Gitlab Pages 的編輯畫面，就可以點擊重新驗證。

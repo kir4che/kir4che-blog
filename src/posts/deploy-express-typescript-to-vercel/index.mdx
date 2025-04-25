@@ -12,7 +12,7 @@ tags:
   - Vercel
   - NodeJS
   - 部署
-wordCount: 486
+wordCount: 488
 ---
 
 最近在重構一個專案，更新後發現 Vercel 部署那邊壞掉，後端一直 404 或 500 無法正常運作，找了好久，嘗試很多方法，最後終於解決了，這邊記錄一下。
@@ -25,10 +25,11 @@ wordCount: 486
 
 後端資料夾結構如下圖：
 
-<img
+<Image
   src='/posts/deploy-express-typescript-to-vercel/server-folder-structure.webp'
   alt='server-folder-structure'
   width='240px'
+  align='left'
 />
 
 移除了不必要的部分，主要是設定了一個首頁路由，用來確認後端運作正常。
@@ -84,9 +85,10 @@ export default app;
 
 成功部署後，點進後端網址會看到 Express on Vercel.（一開始設定的首頁路由回傳的字串），這樣就代表正常運作啦 ｡:.ﾟヽ(\*´∀`)ﾉﾟ.:｡
 
-<img
+<Image
   src='/posts/deploy-express-typescript-to-vercel/express-on-vercel-deploy-success.webp'
   alt='express-on-vercel-deploy-success'
+  width='100%'
 />
 
 參考 [How to deploy your Express.js app at Vercel](https://ziadab.medium.com/how-to-deploy-your-express-js-app-at-vercel-0e0c104d8386)

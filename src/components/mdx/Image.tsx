@@ -39,7 +39,6 @@ const CustomImage: React.FC<CustomImageProps> = ({
   objPos = 'center',
   blurDataURL,
   noProvider = false,
-  priority = false,
   className,
   ...props
 }) => {
@@ -72,7 +71,6 @@ const CustomImage: React.FC<CustomImageProps> = ({
           placeholder={blurDataURL ? 'blur' : 'empty'}
           blurDataURL={blurDataURL}
           fill
-          priority={priority}
           className={cn(
             'h-full w-full object-cover transition-transform duration-300 hover:scale-105',
             objectPosition
@@ -87,7 +85,6 @@ const CustomImage: React.FC<CustomImageProps> = ({
           blurDataURL={blurDataURL}
           width={800}
           height={600}
-          priority={priority}
           className={cn(
             'h-full w-full object-cover transition-transform duration-300 hover:scale-105',
             objectPosition
