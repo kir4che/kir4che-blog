@@ -1,7 +1,7 @@
 import { useTranslations } from 'next-intl';
 
-const MiscPage = () => {
-  const t = useTranslations('MiscPage');
+const NotesPage = () => {
+  const t = useTranslations('NotesPage');
 
   return (
     <div className='space-y-4'>
@@ -11,4 +11,4 @@ const MiscPage = () => {
   );
 };
 
-export default MiscPage;
+export default NotesPage;

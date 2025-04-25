@@ -48,7 +48,7 @@
     "home": "Home",
     "about": "About",
     "archives": "Archives",
-    "misc": "Misc"
+    "notes": "Notes"
   },
   "sidebar": {
     "popularPosts": "Popular Posts",
@@ -107,8 +107,8 @@
     "loadFailed": "Failed to load tags. Please try again later.",
     "backToTags": "Back to Tags"
   },
-  "MiscPage": {
-    "title": "Miscellaneous",
+  "NotesPage": {
+    "title": "Notes",
     "description": "Nothing here for now ヾ(｡ꏿ﹏ꏿ)ﾉﾞ"
   },
   "PortfolioPage": {

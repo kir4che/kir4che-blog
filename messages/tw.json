@@ -48,7 +48,7 @@
     "home": "首頁",
     "about": "關於",
     "archives": "文章",
-    "misc": "雜七雜八"
+    "notes": "便利貼"
   },
   "sidebar": {
     "popularPosts": "熱門文章",
@@ -107,8 +107,8 @@
     "loadFailed": "無法載入標籤，請稍後再試。",
     "backToTags": "返回標籤列表"
   },
-  "MiscPage": {
-    "title": "雜七雜八",
+  "NotesPage": {
+    "title": "便利貼",
     "description": "暫時什麼東西都沒有 ヾ(｡ꏿ﹏ꏿ)ﾉﾞ"
   },
   "PortfolioPage": {

@@ -10,7 +10,7 @@ const Navbar: React.FC = () => {
   const navItems = [
     { href: '/about', label: t('about') },
     { href: '/posts', label: t('archives') },
-    { href: '/misc', label: t('misc') },
+    { href: '/notes', label: t('notes') },
   ] as const;
 
   return (
