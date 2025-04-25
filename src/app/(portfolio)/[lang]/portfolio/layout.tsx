@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 };
 
 const notoSansTC = Noto_Sans_TC({
-  weight: ['400', '500', '600', '700', '800'],
+  weight: ['400', '500', '600', '700'],
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-noto-tc',
