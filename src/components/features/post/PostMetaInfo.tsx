@@ -7,7 +7,7 @@ import { cn } from '@/lib/style';
 interface PostMetaInfoProps {
   t: (key: string) => string;
   date: string;
-  wordCount: number;
+  wordCount: number | undefined;
   className?: string;
 }
 
@@ -40,12 +40,14 @@ const PostMetaInfo: React.FC<PostMetaInfoProps> = ({
           </span>
         </time>
       ) : null}
-      <p className='flex items-center gap-x-1'>
-        <Pencil className='h-3.5 w-3.5' aria-hidden='true' />
-        <span>
-          {wordCount.toLocaleString()} {t('unit.words')}
-        </span>
-      </p>
+      {wordCount && wordCount > 0 && (
+        <p className='flex items-center gap-x-1'>
+          <Pencil className='h-3.5 w-3.5' aria-hidden='true' />
+          <span>
+            {wordCount.toLocaleString()} {t('unit.words')}
+          </span>
+        </p>
+      )}
     </div>
   );
 };

@@ -12,56 +12,36 @@ import { getImageMeta, extractImageSources } from '@/lib/image';
 
 // 文章所在的資料夾路徑
 const postsDirectory = path.join(process.cwd(), 'src', 'posts');
+const cachedDirs = new Map<string, string[]>();
 
 // 回傳所有文章所在的資料夾路徑
-export const getPostsDirs = cache(async (): Promise<string[]> => {
-  if (typeof window !== 'undefined') return [];
+export const getPostsDirs = cache(
+  async (lang: Language = 'tw'): Promise<string[]> => {
+    if (typeof window !== 'undefined') return [];
+    if (cachedDirs.has(lang)) return cachedDirs.get(lang) || [];
 
-  // 讀取 postsDirectory 資料夾內的所有內容（資料夾、檔案）
-  const entries = await fs.promises.readdir(postsDirectory, {
-    withFileTypes: true,
-  });
+    // 讀取 postsDirectory 資料夾內的所有內容（資料夾、檔案）
+    const entries = await fs.promises.readdir(postsDirectory, {
+      withFileTypes: true,
+    });
 
-  // 篩選出資料夾並排除隱藏資料夾，並回傳資料夾的完整路徑。
-  return entries
-    .filter((entry) => entry.isDirectory() && !entry.name.startsWith('.'))
-    .map((entry) => path.join(postsDirectory, entry.name));
-});
+    // 篩選出資料夾並排除隱藏資料夾，並回傳資料夾的完整路徑。
+    const dirs = entries
+      .filter((entry) => entry.isDirectory() && !entry.name.startsWith('.'))
+      .map((entry) => path.join(postsDirectory, entry.name));
 
-// 計算字數：中文字符數量 + 英文單詞數量
-const calculateWordCount = (content: string): number => {
-  const chineseChars = (content.match(/[\u4e00-\u9fa5]/g) || []).length;
-  const englishWords = content
-    .replace(/[\u4e00-\u9fa5]/g, '')
-    .split(/\s+/)
-    .filter((word) => word.trim().length > 0).length;
+    cachedDirs.set(lang, dirs);
 
-  return chineseChars + englishWords;
-};
-
-// 如果 frontmatter 中沒有 wordCount 或 wordCount 不一致，則更新檔案的 wordCount。
-const updateWordCount = async (
-  filePath: string,
-  content: string,
-  data: any
-) => {
-  const wordCount = calculateWordCount(content);
-  if (
-    data.wordCount !== wordCount &&
-    process.env.NEXT_PUBLIC_NODE_ENV === 'development'
-  ) {
-    const updatedContent = matter.stringify(content, { ...data, wordCount });
-    await fs.promises.writeFile(filePath, updatedContent, 'utf8');
+    return dirs;
   }
-  return wordCount;
-};
+);
 
 // 根據當前語系取得所有文章的 metadata，並依照日期排序（由新到舊）。
 export const getPostsInfo = cache(
   async (lang: Language = 'tw'): Promise<PostInfo[]> => {
     if (typeof window !== 'undefined') return [];
 
-    const dirs = await getPostsDirs();
+    const dirs = await getPostsDirs(lang);
 
     const postsData = await Promise.all(
       dirs.map(async (dirPath) => {
@@ -79,7 +59,7 @@ export const getPostsInfo = cache(
 
           const filePath = path.join(dirPath, targetFile);
           const fileContents = await fs.promises.readFile(filePath, 'utf8');
-          const { data, content } = matter(fileContents);
+          const { data } = matter(fileContents);
 
           // 沒有日期、草稿也跳過
           if (
@@ -88,8 +68,6 @@ export const getPostsInfo = cache(
           )
             return null;
 
-          const wordCount = await updateWordCount(filePath, content, data);
-
           const post: PostInfo = {
             slug: path.basename(dirPath),
             title: data.title,
@@ -97,7 +75,7 @@ export const getPostsInfo = cache(
             date: data.date,
             categories: data.categories || [],
             tags: data.tags || [],
-            wordCount: wordCount,
+            wordCount: data.wordCount || 0,
             lang,
             featured: data.featured ?? false,
             coverImage: data.coverImage,
@@ -151,23 +129,44 @@ export const getPostData = cache(
       throw err;
     }
 
-    const wordCount = await updateWordCount(filePath, content, data);
-
     // 抓取所有本地圖片路徑
     const imageMetas: Record<string, any> = {};
     const imageSrcs = extractImageSources(content);
 
-    // 加載圖片 meta（並行）
-    await Promise.all(
-      Array.from(imageSrcs).map(async (src) => {
-        if (!src.startsWith('/')) return;
-        try {
-          imageMetas[src] = await getImageMeta(src.slice(1));
-        } catch {
-          return null;
-        }
-      })
-    );
+    // 優化圖片 metadata 加載：限制最大並行數
+    const MAX_CONCURRENT = 5;
+    let concurrentCount = 0;
+
+    const loadImageMeta = async (src: string) => {
+      if (!src.startsWith('/')) return;
+      try {
+        imageMetas[src] = await getImageMeta(src.slice(1));
+      } catch (err) {
+        console.error(`Failed to load image metadata for ${src}:`, err);
+      } finally {
+        concurrentCount--;
+      }
+    };
+
+    const imagePromises = Array.from(imageSrcs).map((src) => {
+      // 控制並發數量
+      return new Promise<void>((resolve) => {
+        const loadNext = async () => {
+          if (concurrentCount >= MAX_CONCURRENT) {
+            setTimeout(loadNext, 100); // 等待直到有空閒
+            return;
+          }
+
+          concurrentCount++;
+          await loadImageMeta(src);
+          resolve();
+        };
+        loadNext();
+      });
+    });
+
+    // 等待所有圖片 metadata 加載完成
+    await Promise.all(imagePromises);
 
     return {
       slug,
@@ -176,7 +175,7 @@ export const getPostData = cache(
       date: data.date,
       categories: data.categories || [],
       tags: data.tags || [],
-      wordCount: wordCount,
+      wordCount: data.wordCount || 0,
       lang,
       password: data.password,
       hasPassword: !!data.password,
