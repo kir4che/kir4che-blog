@@ -1,9 +1,11 @@
-import { getPlaiceholder } from 'plaiceholder';
-import fs from 'fs/promises';
-import path from 'path';
-
 // 根據圖片路徑，取得圖片的 base64、metadata。
 export async function getImageMeta(src: string) {
+  const [{ getPlaiceholder }, fs, path] = await Promise.all([
+    import('plaiceholder'),
+    import('fs/promises'),
+    import('path'),
+  ]);
+
   const imagePath = path.resolve(process.cwd(), 'public', src);
   const buffer = await fs.readFile(imagePath);
   const { base64, metadata } = await getPlaiceholder(buffer);

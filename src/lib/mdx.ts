@@ -1,5 +1,5 @@
 import { VFile } from 'vfile'; // 包裝文章內容，讓 plugin 可以讀寫 metadata。
-import { serialize } from 'next-mdx-remote/serialize'; // 把 MDX內容轉換成可以被 React 渲染的格式
+import { serialize } from 'next-mdx-remote/serialize'; // 把 MDX 內容轉換成可以被 React 渲染的格式
 
 // Remark 插件（處理 Markdown 部分）
 import remarkGfm from 'remark-gfm';

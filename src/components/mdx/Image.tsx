@@ -1,9 +1,18 @@
-import React from 'react';
+import React, { lazy } from 'react';
 import Image from 'next/image';
-import { PhotoProvider, PhotoView } from 'react-photo-view';
-import 'react-photo-view/dist/react-photo-view.css';
 
 import { cn } from '@/lib/style';
+
+const PhotoProvider = lazy(() =>
+  import('react-photo-view').then((module) => ({
+    default: module.PhotoProvider,
+  }))
+);
+const PhotoView = lazy(() =>
+  import('react-photo-view').then((module) => ({ default: module.PhotoView }))
+);
+
+import 'react-photo-view/dist/react-photo-view.css';
 
 interface CustomImageProps {
   src: string;
