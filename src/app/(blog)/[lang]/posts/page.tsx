@@ -2,7 +2,6 @@
 
 import React, { use } from 'react';
 import { useTranslations } from 'next-intl';
-import { format } from 'date-fns';
 
 import type { Language } from '@/types/language';
 import type { PostMeta } from '@/types/post';
@@ -28,7 +27,7 @@ const PostsPage = ({ params }: { params: Params }) => {
   // 按年份分組文章
   const postsByYear = posts.reduce(
     (acc, post) => {
-      const year = format(new Date(post.date), 'yyyy');
+      const year = new Date(post.date).getFullYear().toString();
       if (!acc[year]) acc[year] = [];
       acc[year].push(post);
       return acc;
