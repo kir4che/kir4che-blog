@@ -7,7 +7,7 @@ import { getCategoriesByPosts } from '@/lib/categories';
 export const revalidate = 86400; // 每 24 小時更新一次
 
 const langs = LANGUAGES;
-const staticRoutes = ['', '/about', '/portfolio', '/posts', '/tags'];
+const staticRoutes = ['', '/about', '/posts', '/tags'];
 
 export type SitemapFile = {
   url: string;
