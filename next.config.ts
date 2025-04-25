@@ -15,6 +15,16 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  outputFileTracingIncludes: {
+    './src/app/api/**': [
+      './src/lib/',
+      './src/config/',
+      './src/utils/',
+      './src/types/',
+      './src/services/',
+      './public/',
+    ],
+  },
   webpack: (config, { isServer }) => {
     config.resolve.alias = {
       ...config.resolve.alias,
