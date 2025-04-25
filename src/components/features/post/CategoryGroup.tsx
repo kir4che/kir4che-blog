@@ -1,8 +1,10 @@
 'use client';
 
 import React from 'react';
+import { useLocale } from 'next-intl';
 import { Circle } from 'lucide-react';
 
+import type { Language } from '@/types/language';
 import type { CategoryInfo } from '@/types/category';
 import { Link } from '@/i18n/navigation';
 import { getCategoryStyle } from '@/lib/style';
@@ -21,6 +23,7 @@ const CategoryGroup = ({
   categoryInfoMap,
   className,
 }: CategoryGroupProps) => {
+  const lang = useLocale() as Language;
   if (!categories || categories.length === 0) return null;
 
   return (
@@ -45,7 +48,7 @@ const CategoryGroup = ({
                 fill='currentColor'
                 aria-hidden='true'
               />
-              <span>{catName}</span>
+              <span>{categoryInfo.name[lang]}</span>
             </Link>
           );
         })}
