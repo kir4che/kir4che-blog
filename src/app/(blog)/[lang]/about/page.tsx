@@ -19,9 +19,9 @@ const AboutPage = async () => {
         layout='responsive'
         width={1200}
         height={400}
-        className='max-h-72 rounded-t-xl object-cover object-top shadow-lg'
+        className='max-h-56 rounded-t-xl object-cover object-top shadow-lg'
       />
-      <div className='bg-bg-secondary relative z-0 space-y-8 rounded-b-xl px-8 py-6 shadow'>
+      <div className='bg-bg-secondary relative z-0 flex min-h-[760px] flex-col justify-between space-y-8 rounded-b-xl px-8 py-6 shadow'>
         <section>
           <h2 className='text-text-primary mb-4'>{t('title')}</h2>
           <h3 className='heading mb-4 -ml-8'>{t('intro')}</h3>
@@ -35,20 +35,13 @@ const AboutPage = async () => {
           <p>{t('vlogIntro')}</p>
           <ExternalLink
             href={SOCIAL_LINKS.youtube}
-            className='leading-7 hover:no-underline'
+            className='leading-8 hover:no-underline'
           >
-            &gt;&gt;&gt; <span className='group-hover:font-medium'>YT</span>{' '}
+            &gt;&gt;&gt;{' '}
+            <span className='px-2 group-hover:font-medium'>YT</span>
             &lt;&lt;&lt;
           </ExternalLink>
-          <YouTubeVideoList count={3} className='py-3' />
-          <p>{t('streamingIntro')}</p>
-          <ExternalLink
-            href={SOCIAL_LINKS.twitch}
-            className='leading-7 hover:no-underline'
-          >
-            &gt;&gt;&gt; <span className='group-hover:font-medium'>Twitch</span>{' '}
-            &lt;&lt;&lt;
-          </ExternalLink>
+          <YouTubeVideoList count={3} className='py-2' />
         </section>
         <section className='relative space-y-2'>
           <h3 className='heading -ml-8'>{t('title_2')}</h3>
@@ -72,7 +65,7 @@ const AboutPage = async () => {
         />
         <DecorativeImage
           src='/images/butterfly-illustration-2.webp'
-          className='absolute right-2 bottom-80 max-h-32 max-w-32 lg:right-60 2xl:right-72'
+          className='absolute right-2 bottom-92 max-h-32 max-w-32 lg:right-60 2xl:right-72'
         />
         <DecorativeImage
           src='/images/about-illustration.webp'
