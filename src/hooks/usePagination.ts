@@ -2,8 +2,8 @@ export const dynamic = 'force-static';
 
 import { useState, useEffect, useCallback } from 'react';
 
+import type { PostMeta, PaginationData } from '@/types';
 import { useAlert } from '@/contexts/AlertContext';
-import type { PostMeta, PaginationData } from '@/types/post';
 
 interface UsePaginationParams {
   type?: 'category' | 'tag';

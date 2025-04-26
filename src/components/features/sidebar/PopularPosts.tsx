@@ -1,11 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Sparkles } from 'lucide-react';
 
-import type { Language } from '@/types/language';
-import type { PostMeta } from '@/types/post';
+import type { Language, PostMeta } from '@/types';
 import { Link } from '@/i18n/navigation';
 import { useAlert } from '@/contexts/AlertContext';
 

@@ -1,18 +1,16 @@
 import path from 'path';
-import util from 'util';
 import fs from 'fs';
 import remarkParse from 'remark-parse';
 import remarkMdx from 'remark-mdx';
-import { exec } from 'child_process';
+import matter from 'gray-matter';
+import { execSync } from 'child_process';
 import { visit } from 'unist-util-visit';
 import { unified } from 'unified';
-import matter from 'gray-matter';
-
-const execPromise = util.promisify(exec);
 
 const postsDirectory = path.join(__dirname, '../src/posts');
 
-// 掃描整個 posts 資料夾底下的 mdx 檔案
+// 兩種更新方式：
+// 1. --all：更新所有文章（.mdx）的字數
 const getAllPostFiles = async () => {
   const files: string[] = [];
 
@@ -33,40 +31,33 @@ const getAllPostFiles = async () => {
   return files;
 };
 
-// 只掃目前 git 狀態下的變更檔案
-const getChangedFiles = async () => {
-  try {
-    const { stdout: diffStdout } = await execPromise('git diff --name-only');
-    const diffFiles = diffStdout
-      .split('\n')
-      .filter((file) => file.endsWith('.mdx'));
+// 2. 不加參數：僅更新有變動的文章（.mdx）字數
+const getChangedMdxFiles = (): string[] => {
+  const output = execSync('git diff HEAD --name-only --diff-filter=ACM', {
+    encoding: 'utf8',
+  });
 
-    const { stdout: stagedStdout } = await execPromise(
-      'git diff --name-only --cached'
-    );
-    const stagedFiles = stagedStdout
-      .split('\n')
-      .filter((file) => file.endsWith('.mdx'));
-
-    return [...new Set([...diffFiles, ...stagedFiles])];
-  } catch (error) {
-    console.error('❌ Error getting changed files: ', error);
-    return [];
-  }
+  return output
+    .split('\n')
+    .filter((file) => file.endsWith('.mdx') && fs.existsSync(file));
 };
 
-// 解析並計算字數（中文 + 英文，不包含 markdown 語法）
+// 計算文章字數（中文字 + 英文單字）
 const calculateWordCount = async (content: string) => {
+  // 使用 remark 解析 MDX 內容
   const tree = unified().use(remarkParse).use(remarkMdx).parse(content);
 
   let textContent = '';
 
+  // 提取純文字內容
   visit(tree, 'text', (node) => {
     textContent += node.value + ' ';
   });
 
+  // 計算中文字數
   const chineseChars = (textContent.match(/[\u4e00-\u9fa5]/g) || []).length;
 
+  // 計算英文單字數（移除中文後按空格分割）
   const englishWords = textContent
     .replace(/[\u4e00-\u9fa5]/g, '')
     .split(/\s+/)
@@ -75,39 +66,46 @@ const calculateWordCount = async (content: string) => {
   return chineseChars + englishWords;
 };
 
-// 更新 wordCount
+// 更新單一檔案的字數統計
 const updateWordCount = async (filePath: string) => {
-  const fileContents = await fs.promises.readFile(filePath, 'utf8');
-  const { data, content } = matter(fileContents);
+  try {
+    const fileContents = await fs.promises.readFile(filePath, 'utf8');
+    const { data, content } = matter(fileContents);
 
-  const wordCount = await calculateWordCount(content);
+    const wordCount = await calculateWordCount(content);
 
-  if (data.wordCount !== wordCount) {
-    const updatedContent = matter.stringify(content, { ...data, wordCount });
-    await fs.promises.writeFile(filePath, updatedContent, 'utf8');
-    console.log(`✅ Updated word count for: ${filePath}`);
-  } else {
-    console.log(`✅ Word count is already up to date for: ${filePath}`);
+    // 只在字數有變更時才更新檔案
+    if (data.wordCount !== wordCount) {
+      const updatedContent = matter.stringify(content, { ...data, wordCount });
+      await fs.promises.writeFile(filePath, updatedContent, 'utf8');
+      console.log(`✅ 已更新文章字數：${filePath}`);
+    } else {
+      console.log(`ℹ️ 文章字數無變更：${filePath}`);
+    }
+  } catch (err) {
+    console.error(`❌ 更新文章字數時發生錯誤 ${filePath}：`, err);
   }
 };
 
-// 執行流程
-const updatePosts = async () => {
-  const args = process.argv.slice(2);
-  const isAll = args.includes('--all');
+const main = async () => {
+  try {
+    const args = process.argv.slice(2);
+    const isAll = args.includes('--all');
 
-  const files = isAll ? await getAllPostFiles() : await getChangedFiles();
+    // 根據參數決定要處理的檔案範圍
+    const files = isAll ? await getAllPostFiles() : await getChangedMdxFiles();
 
-  if (files.length === 0) {
-    console.log('ℹ️ No posts to update.');
-    return;
-  }
+    if (files.length === 0) {
+      console.log('ℹ️ 沒有需要更新的文章。');
+      return;
+    }
 
-  for (const filePath of files) {
-    await updateWordCount(filePath);
+    // 更新每個檔案的字數
+    for (const filePath of files) await updateWordCount(filePath);
+  } catch (err) {
+    console.error('❌ 執行過程發生錯誤：', err);
+    process.exit(1);
   }
 };
 
-updatePosts().catch((err) => {
-  console.error('❌ 更新 wordCount 時發生錯誤: ', err);
-});
+main();

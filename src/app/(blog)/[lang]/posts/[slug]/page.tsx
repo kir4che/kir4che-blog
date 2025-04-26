@@ -4,12 +4,7 @@ import { notFound } from 'next/navigation';
 
 import type { Language } from '@/types';
 import { LANGUAGES, LANGUAGE_TO_LOCALE_MAP } from '@/config';
-import {
-  getPostsMeta,
-  getPostInfoBySlug,
-  getPostData,
-  checkPostExistence,
-} from '@/lib/posts';
+import { getPostsMeta, getPostInfoBySlug, getPostData } from '@/lib/posts';
 import { parseMDX } from '@/lib/mdx';
 
 import PostLayout from '@/components/features/post/PostLayout';
@@ -20,15 +15,10 @@ type Params = Promise<{
   slug: string;
 }>;
 
-// 預先生成所以文章（所有語系）的靜態路由
+// 預先取得所有語系的所有 { lang, slug }
 export async function generateStaticParams() {
   const posts = await getPostsMeta();
-  return LANGUAGES.flatMap((lang) =>
-    posts.map(({ slug }) => ({
-      slug,
-      lang,
-    }))
-  );
+  return LANGUAGES.flatMap((lang) => posts.map(({ slug }) => ({ lang, slug })));
 }
 
 export async function generateMetadata({ params }: { params: Params }) {
@@ -43,7 +33,7 @@ export async function generateMetadata({ params }: { params: Params }) {
 
   const postUrl = `${baseUrl}/${lang}/posts/${slug}`;
   const ogImage = `${baseUrl}/api/og?title=${encodeURIComponent(title)}&tags=${encodeURIComponent((tags ?? []).join(','))}`;
-  const locale = LangToLocaleMap[lang] ?? 'zh-TW';
+  const locale = LANGUAGE_TO_LOCALE_MAP[lang] ?? 'zh-TW';
 
   return {
     metadataBase: new URL(baseUrl),
@@ -90,7 +80,7 @@ export async function generateMetadata({ params }: { params: Params }) {
 
 const PostPage = async ({ params }: { params: Params }) => {
   const { lang, slug } = await params;
-  const existOtherLangs = await checkPostExistence(lang, slug);
+  const otherLangs = await checkPostExistence(lang, slug);
 
   const post = await getPostData(lang, slug);
   if (!post) return notFound();
@@ -98,11 +88,7 @@ const PostPage = async ({ params }: { params: Params }) => {
   const { mdxSource, headings } = await parseMDX(post.content);
 
   return (
-    <PostLayout
-      post={post}
-      headings={headings}
-      existOtherLangs={existOtherLangs}
-    >
+    <PostLayout post={post} headings={headings} otherLangs={otherLangs}>
       <MDXContent content={mdxSource} imageMetas={post.imageMetas} />
     </PostLayout>
   );

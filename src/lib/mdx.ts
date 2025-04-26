@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { VFile } from 'vfile'; // 包裝文章內容，讓 plugin 可以讀寫 metadata。
 import { serialize } from 'next-mdx-remote/serialize'; // 把 MDX 內容轉換成可以被 React 渲染的格式
 
@@ -17,7 +18,7 @@ import rehypeExpressiveCode from 'rehype-expressive-code';
 import { rehypeExpressiveCodeOptions } from '@/config/expressiveCode';
 import { rehypeHeadings } from '@/utils/rehypeHeadings';
 
-export const parseMDX = async (content: string) => {
+export const parseMDX = cache(async (content: string) => {
   // 用 VFile 包起來，這樣 rehypeHeadings 才能寫入 file.data.headings。
   const file = new VFile({ value: content });
 
@@ -46,4 +47,4 @@ export const parseMDX = async (content: string) => {
   const headings = Array.isArray(file.data.headings) ? file.data.headings : [];
 
   return { mdxSource, headings };
-};
+});

@@ -1,10 +1,9 @@
 'use client';
 
-import React, { use } from 'react';
+import { use } from 'react';
 import { useTranslations } from 'next-intl';
 
-import type { Language } from '@/types/language';
-import type { PostMeta } from '@/types/post';
+import type { Language, PostMeta } from '@/types';
 import { usePagination } from '@/hooks/usePagination';
 
 import PostPreview from '@/components/features/post/PostPreview';
@@ -25,15 +24,12 @@ const PostsPage = ({ params }: { params: Params }) => {
     usePagination({ lang });
 
   // 按年份分組文章
-  const postsByYear = posts.reduce(
-    (acc, post) => {
-      const year = new Date(post.date).getFullYear().toString();
-      if (!acc[year]) acc[year] = [];
-      acc[year].push(post);
-      return acc;
-    },
-    {} as Record<string, PostMeta[]>
-  );
+  const postsByYear = posts.reduce<Record<string, PostMeta[]>>((acc, post) => {
+    const year = new Date(post.date).getFullYear().toString();
+    if (!acc[year]) acc[year] = [];
+    acc[year].push(post);
+    return acc;
+  }, {});
 
   if (error) {
     return (

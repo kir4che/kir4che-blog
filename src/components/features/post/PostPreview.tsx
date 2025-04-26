@@ -1,9 +1,8 @@
 'use client';
 
-import React from 'react';
 import { useTranslations } from 'next-intl';
 
-import type { PostMeta } from '@/types/post';
+import type { PostMeta } from '@/types';
 import { useRouter, Link } from '@/i18n/navigation';
 import { useCategoryInfoMap } from '@/hooks/useCategoryInfoMap';
 

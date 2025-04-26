@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 
-import common from '@/config/common';
 import routing from '@/i18n/routing';
+import { CONFIG } from '@/config';
 import { detectLocale } from '@/utils/detectLocale';
 
-const LOCALES = common.languages.langs;
-const DEFAULT_PATH = common.paths.languagePaths.tw;
+const LOCALES = CONFIG.languages.supportedLanguages;
+const DEFAULT_PATH = CONFIG.paths.languagePaths.tw;
 
 export const middleware = (request: NextRequest) => {
   const { pathname } = request.nextUrl;

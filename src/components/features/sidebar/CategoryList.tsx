@@ -1,9 +1,9 @@
-import React from 'react';
+'use client';
+
 import { useLocale, useTranslations } from 'next-intl';
 import { Folder } from 'lucide-react';
 
-import type { Language } from '@/types/language';
-import type { Category } from '@/types/category';
+import type { Language, Category } from '@/types';
 import { Link } from '@/i18n/navigation';
 import { getCategoryStyle } from '@/lib/style';
 
