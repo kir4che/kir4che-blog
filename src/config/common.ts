@@ -4,10 +4,6 @@ const common = {
       title: 'kir4che blog',
       description: "kir4che's blog",
     },
-    protfolio: {
-      title: 'Molly Su | Front-End Developer',
-      description: "Molly Su's portfolio",
-    },
   },
   languages: {
     langs: ['tw', 'en'] as const,
