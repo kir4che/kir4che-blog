@@ -12,7 +12,8 @@
     "format:fix": "prettier --write --ignore-path .gitignore .",
     "new-post": "ts-node --project scripts/tsconfig.scripts.json scripts/createPost.ts",
     "update-updatedAt": "ts-node --project scripts/tsconfig.scripts.json scripts/updateUpdatedAt.ts",
-    "update-wordCount": "ts-node --project scripts/tsconfig.scripts.json scripts/updateWordCount.ts"
+    "update-wordCount": "ts-node --project scripts/tsconfig.scripts.json scripts/updateWordCount.ts",
+    "update-wordCount:all": "ts-node --project scripts/tsconfig.scripts.json scripts/updateWordCount.ts --all"
   },
   "dependencies": {
     "@expressive-code/plugin-line-numbers": "^0.41.1",
