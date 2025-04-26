@@ -1,10 +1,10 @@
 import React from 'react';
 import Image from 'next/image';
-
-import { EMAIL, SOCIAL_LINKS } from '@/config/constants';
 import { getTranslations } from 'next-intl/server';
 
-import YouTubeVideoList from '@/components/features/YouTubeVideoList';
+import { EMAIL, SOCIAL_LINKS } from '@/config/constants';
+import youtubes from '@/config/youtubes';
+
 import DecorativeImage from '@/components/ui/DecorativeImage';
 import ExternalLink from '@/components/ui/ExternalLink';
 
@@ -41,7 +41,33 @@ const AboutPage = async () => {
             <span className='px-2 group-hover:font-medium'>YT</span>
             &lt;&lt;&lt;
           </ExternalLink>
-          <YouTubeVideoList count={3} className='py-2' />
+          <div
+            className='my-2 flex flex-wrap gap-x-4 gap-y-2'
+            role='region'
+            aria-label="kir4che's youtube"
+          >
+            {Object.entries(youtubes).map(([key, video]) => (
+              <div key={key} className='max-w-60'>
+                <div className='mb-2 aspect-video'>
+                  <iframe
+                    width='400'
+                    height='200'
+                    src={video.url}
+                    title={video.title}
+                    allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+                    allowFullScreen
+                    className='h-full w-full rounded'
+                  ></iframe>
+                </div>
+                <h4 className='text-text-primary dark:text-text-gray-light line-clamp-1 w-full truncate text-sm font-medium'>
+                  {video.title}
+                </h4>
+                <time className='text-text-gray-light text-xs'>
+                  {video.date}
+                </time>
+              </div>
+            ))}
+          </div>
         </section>
         <section className='relative space-y-2'>
           <h3 className='heading -ml-8'>{t('title_2')}</h3>
