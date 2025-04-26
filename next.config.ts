@@ -20,9 +20,7 @@ const nextConfig: NextConfig = {
       './src/lib/',
       './src/config/',
       './src/utils/',
-      './src/types/',
-      './src/services/',
-      './public/',
+      './src/types.ts',
     ],
   },
   webpack: (config, { isServer }) => {

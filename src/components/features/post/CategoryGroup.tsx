@@ -1,11 +1,9 @@
 'use client';
 
-import React from 'react';
 import { useLocale } from 'next-intl';
 import { Circle } from 'lucide-react';
 
-import type { Language } from '@/types/language';
-import type { CategoryInfo } from '@/types/category';
+import type { Language, CategoryInfo } from '@/types';
 import { Link } from '@/i18n/navigation';
 import { getCategoryStyle } from '@/lib/style';
 import { cn } from '@/lib/style';

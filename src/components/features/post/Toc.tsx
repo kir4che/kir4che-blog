@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { AlignJustify, X } from 'lucide-react';
 
 import { Link } from '@/i18n/navigation';

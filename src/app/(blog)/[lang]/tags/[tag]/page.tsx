@@ -1,29 +1,28 @@
 export const dynamic = 'force-static';
 
-import React from 'react';
 import { notFound } from 'next/navigation';
 
-import type { Language } from '@/types/language';
-import { LANGUAGES } from '@/types/language';
+import type { Language } from '@/types';
+import { LANGUAGES } from '@/config';
 
 import TagPosts from '@/components/features/tag/TagPosts';
+import { getPostsByTag, getPostsInfo } from '@/lib/posts';
+import { getTagsByPosts, convertToSlug } from '@/lib/tags';
 
 type Params = Promise<{
   lang: Language;
   tag: string;
 }>;
 
+// 預先取得所有語系的所有 { lang, tag }
 export async function generateStaticParams() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tags`);
-    if (!res.ok) return [];
-
-    const { tags } = await res.json();
-    if (!Array.isArray(tags)) return [];
+    const posts = await getPostsInfo();
+    const tags = getTagsByPosts(posts);
 
     return LANGUAGES.flatMap((lang) =>
-      tags.map(({ slug }) => ({
-        tag: slug,
+      tags.map(({ name }) => ({
+        tag: convertToSlug(name),
         lang,
       }))
     );
@@ -35,22 +34,20 @@ export async function generateStaticParams() {
 const TagPage = async ({ params }: { params: Params }) => {
   const { lang, tag } = await params;
 
-  let tagData;
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/tags/${tag}?lang=${lang}`
-    );
-    if (!res.ok) return notFound();
+    const posts = await getPostsByTag(tag, lang);
+    if (!posts.length) return notFound();
 
-    const data = await res.json();
-    tagData = data.tag;
+    const tagData = {
+      name: tag,
+      slug: convertToSlug(tag),
+      postCount: posts.length,
+    };
 
-    if (!tagData) return notFound();
+    return <TagPosts tag={tagData} />;
   } catch {
     return notFound();
   }
-
-  return <TagPosts tag={tagData} />;
 };
 
 export default TagPage;

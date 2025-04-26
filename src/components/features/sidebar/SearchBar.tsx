@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, ChangeEvent, useMemo } from 'react';
+import { useState, useEffect, ChangeEvent, useMemo } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Search, X } from 'lucide-react';
 import { debounce } from '@/utils/debounce';
 
-import type { Language } from '@/types/language';
-import type { PostMeta } from '@/types/post';
+import type { Language, PostMeta } from '@/types';
 import { Link } from '@/i18n/navigation';
 import { useAlert } from '@/contexts/AlertContext';
 
@@ -74,7 +73,7 @@ const SearchBar: React.FC = () => {
       )}
       {searchQuery && (
         <ul className='bg-bg-secondary absolute top-9 z-10 max-h-60 w-full overflow-auto rounded-md text-sm shadow-md'>
-          {searchResults.length > 0 ? (
+          {searchResults?.length ? (
             searchResults.map(({ slug, title }) => (
               <li key={slug} className='p-2'>
                 <Link

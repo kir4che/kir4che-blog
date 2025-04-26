@@ -2,9 +2,9 @@ import fs from 'fs';
 import matter from 'gray-matter';
 import { execSync } from 'child_process';
 
-// 取得 git 暫存區的 .mdx 檔案
-const getStagedMdxFiles = (): string[] => {
-  const output = execSync('git diff --cached --name-only --diff-filter=ACM', {
+// 取得所有有變動的 .mdx 檔案
+const getChangedMdxFiles = (): string[] => {
+  const output = execSync('git diff HEAD --name-only --diff-filter=ACM', {
     encoding: 'utf8',
   });
 
@@ -14,7 +14,7 @@ const getStagedMdxFiles = (): string[] => {
 };
 
 const updateUpdatedAt = () => {
-  const files = getStagedMdxFiles();
+  const files = getChangedMdxFiles();
   const now = new Date().toISOString();
 
   files.forEach((filePath) => {

@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import type { MDXComponents } from 'mdx/types';
 
 import { H1, H2, H3, H4, H5, H6 } from '@/components/mdx/Heading';
@@ -24,19 +25,10 @@ export const useMDXComponents = (
       h6: H6,
       Table: Table, // <Table data={{ headers: [], rows: [[], []] }} />
       Image: (props) => {
-        const meta = imageMetas[props.src] ?? {};
-        return <CustomImage {...props} {...meta} />;
+        const meta = imageMetas[props.src ?? ''] ?? {};
+        return <CustomImage {...meta} {...props} />;
       },
-      Images: (props) => {
-        const imagesWithMeta = props.images.map((img) => {
-          const meta = imageMetas[img.src] ?? {};
-          return {
-            ...img,
-            ...meta,
-          };
-        });
-        return <ImageGallery {...props} images={imagesWithMeta} />;
-      }, // <Images images={[{ src: '', alt: '', width: '' }, ... ]} height='150px' />
+      Images: ImageGallery, // <Images images={[{ src: '', alt: '', width: '' }, ... ]} height='150px' />
       Video: CustomVideo, // <Video src="..." title="..." />
       Accordion, // <Accordion variant="primary" title="Title">{children}</Accordion>
       Correction, // <Correction wrong="A" correct="B" />
@@ -51,8 +43,8 @@ export const useMDXComponents = (
       a: CustomLink, // [Text](url)
       img: (props) => {
         // \![alt](url)
-        const meta = imageMetas[props.src] ?? {};
-        return <CustomImage {...props} {...meta} />;
+        const meta = imageMetas[props.src ?? ''] ?? {};
+        return <CustomImage {...meta} {...props} />;
       },
       ul: ({ children }) => (
         <ul className='my-2 list-inside list-disc pl-4'>{children}</ul>

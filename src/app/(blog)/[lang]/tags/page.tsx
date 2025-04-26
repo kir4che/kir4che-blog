@@ -1,12 +1,13 @@
 export const dynamic = 'force-static';
 
-import React from 'react';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
-import type { Language } from '@/types/language';
-import { LANGUAGES } from '@/types/language';
+import type { Language } from '@/types';
+import { LANGUAGES } from '@/config';
 import { Link } from '@/i18n/navigation';
+import { getTagsByPosts } from '@/lib/tags';
+import { getPostsInfo } from '@/lib/posts';
 
 type Params = Promise<{
   lang: Language;
@@ -20,20 +21,11 @@ const TagsPage = async ({ params }: { params: Params }) => {
   const { lang } = await params;
   const t = await getTranslations('TagsPage');
 
-  let tags;
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/tags?lang=${lang}`
-    );
-    if (!res.ok) return notFound();
-
-    const data = await res.json();
-    tags = data.tags;
+    const posts = await getPostsInfo(lang);
+    const tags = getTagsByPosts(posts);
 
     if (!Array.isArray(tags)) return notFound();
-  } catch {
-    return notFound();
-  }
 
     return (
       <>

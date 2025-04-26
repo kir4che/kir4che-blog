@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useTransition } from 'react';
+import { useTransition } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Languages, ChevronDown } from 'lucide-react';
 
-import type { Language } from '@/types/language';
+import type { Language } from '@/types';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import routing from '@/i18n/routing';
 import { cn } from '@/lib/style';
@@ -36,7 +36,7 @@ const LangMenu: React.FC<LangMenuProps> = ({
       <div
         tabIndex={0}
         role='button'
-        className='flex items-center gap-x-1.5 hover:bg-inherit'
+        className='flex cursor-pointer items-center gap-x-1.5 hover:bg-inherit'
       >
         {showIcon && <Languages className='h-4 w-4' aria-hidden='true' />}
         <span>{t(`language.${locale}`)}</span>

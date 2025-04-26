@@ -1,4 +1,3 @@
-import React from 'react';
 import { useFormatter } from 'next-intl';
 import { CalendarDays, Pencil } from 'lucide-react';
 

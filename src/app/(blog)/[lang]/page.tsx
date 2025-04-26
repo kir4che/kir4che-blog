@@ -1,9 +1,8 @@
-import React from 'react';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { ChevronRight } from 'lucide-react';
 
-import type { Language } from '@/types/language';
+import type { Language } from '@/types';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/style';
 
@@ -71,7 +70,7 @@ const Home = async ({ params }: { params: Params }) => {
               posts?.length === 1 ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'
             )}
           >
-            {posts?.length > 0 ? (
+            {posts?.length ? (
               posts.map((post) => (
                 <PostPreview key={post.slug} post={post} variant='card' />
               ))

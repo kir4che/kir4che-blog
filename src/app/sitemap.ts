@@ -1,8 +1,9 @@
 import type { MetadataRoute } from 'next';
-import { LANGUAGES } from '@/types/language';
+
+import { LANGUAGES } from '@/config';
 import { getPostsInfo } from '@/lib/posts';
 import { getTagsByPosts } from '@/lib/tags';
-import { getCategoriesByPosts } from '@/lib/categories';
+import { getAllCategoryByPosts } from '@/lib/categories';
 
 export const revalidate = 86400; // 每 24 小時更新一次
 
@@ -48,7 +49,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   );
 
-  const categories = await getCategoriesByPosts(posts);
+  const categories = await getAllCategoryByPosts(posts);
   const categoryPaths: SitemapFile[] = langs.flatMap((lang) =>
     categories.flatMap((cat) => {
       const main = {
