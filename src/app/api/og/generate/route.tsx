@@ -1,6 +1,6 @@
 import { ImageResponse } from '@vercel/og';
 
-import common from '@/config/common';
+import { CONFIG } from '@/config';
 
 export const runtime = 'edge';
 
@@ -27,7 +27,7 @@ export async function POST(req: Request) {
             marginBottom: 24,
           }}
         >
-          <span>{common.siteInfo.blog.title}</span>
+          <span>{CONFIG.siteInfo.blog.title}</span>
         </div>
         <div
           style={{

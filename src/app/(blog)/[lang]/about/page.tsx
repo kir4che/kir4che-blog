@@ -1,8 +1,7 @@
-import React from 'react';
 import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 
-import { EMAIL, SOCIAL_LINKS } from '@/config/constants';
+import { CONFIG } from '@/config';
 import youtubes from '@/config/youtubes';
 
 import DecorativeImage from '@/components/ui/DecorativeImage';
@@ -34,7 +33,7 @@ const AboutPage = async () => {
           <br />
           <p>{t('vlogIntro')}</p>
           <ExternalLink
-            href={SOCIAL_LINKS.youtube}
+            href={CONFIG.siteInfo.socialLinks.youtube}
             className='leading-8 hover:no-underline'
           >
             &gt;&gt;&gt;{' '}
@@ -72,10 +71,10 @@ const AboutPage = async () => {
         <section className='relative space-y-2'>
           <h3 className='heading -ml-8'>{t('title_2')}</h3>
           <ExternalLink
-            href={`mailto:${EMAIL}`}
+            href={`mailto:${CONFIG.siteInfo.email}`}
             className='relative text-xl/7 font-medium break-words text-pink-600 hover:no-underline dark:text-pink-300'
           >
-            {EMAIL}
+            {CONFIG.siteInfo.email}
             <span className='absolute top-full left-0 h-[3px] w-full origin-left scale-x-0 bg-pink-200 transition-transform duration-300 ease-in-out group-hover:scale-x-100'></span>
           </ExternalLink>
           <DecorativeImage

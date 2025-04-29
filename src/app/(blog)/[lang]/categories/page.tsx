@@ -3,9 +3,8 @@ export const dynamic = 'force-static';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
-import type { Language } from '@/types/language';
-import type { CategoryInfo } from '@/types/category';
-import { LANGUAGES } from '@/types/language';
+import type { Language, CategoryInfo } from '@/types';
+import { LANGUAGES } from '@/config';
 import { Link } from '@/i18n/navigation';
 import { getCategoryStyle } from '@/lib/style';
 

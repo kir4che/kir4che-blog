@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { Noto_Sans_TC, DM_Sans } from 'next/font/google';
 import { hasLocale } from 'next-intl';
@@ -6,7 +6,7 @@ import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Toaster } from 'react-hot-toast';
 
-import type { Language } from '@/types/language';
+import type { Language } from '@/types';
 import routing from '@/i18n/routing';
 import Providers from '@/contexts/Providers';
 import { getSeoConfig } from '@/utils/seo';

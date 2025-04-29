@@ -1,10 +1,10 @@
 import { defineRouting } from 'next-intl/routing';
 
-import common from '@/config/common';
+import { CONFIG } from '@/config';
 
 const routing = defineRouting({
-  locales: common.languages.langs,
-  defaultLocale: common.languages.defaultLocale,
+  locales: CONFIG.languages.supportedLanguages,
+  defaultLocale: CONFIG.languages.defaultLanguage,
 });
 
 export default routing;

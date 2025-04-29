@@ -1,9 +1,8 @@
-import React from 'react';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { Heart, ChevronRight } from 'lucide-react';
 
-import type { Language } from '@/types/language';
+import type { Language } from '@/types';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/style';
 

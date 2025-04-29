@@ -16,8 +16,8 @@ export const GET = async (request: Request) => {
     const checkExistence = request.headers.get('X-Check-Existence') === 'true';
 
     if (checkExistence) {
-      const exists = await checkPostExistence(lang, slug);
-      return responseWithCache({ exists });
+      const exist = await checkPostExistence(lang, slug);
+      return responseWithCache({ exist });
     }
 
     try {
@@ -43,7 +43,7 @@ export const GET = async (request: Request) => {
         content: post.content,
       });
     } catch (err) {
-      if (checkExistence) return responseWithCache({ exists: false });
+      if (checkExistence) return responseWithCache({ exist: false });
       throw err;
     }
   } catch {

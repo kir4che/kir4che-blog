@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getPostData } from '@/lib/posts';
 
-import type { Language } from '@/types/language';
+import type { Language } from '@/types';
 
 export async function POST(req: Request) {
   try {

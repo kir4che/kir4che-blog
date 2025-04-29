@@ -1,5 +1,3 @@
-import React from 'react';
-
 import ExternalLink from '@/components/ui/ExternalLink';
 
 const DonateBtns: React.FC = () => (

@@ -1,10 +1,8 @@
 'use client';
 
-import React from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import type { Language } from '@/types/language';
-import type { CategoryInfo } from '@/types/category';
+import type { Language, CategoryInfo } from '@/types';
 import { getCategoryStyle } from '@/lib/style';
 import { cn } from '@/lib/style';
 

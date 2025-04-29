@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useTransition } from 'react';
+import { useTransition } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Languages, ChevronDown } from 'lucide-react';
 
-import type { Language } from '@/types/language';
+import type { Language } from '@/types';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import routing from '@/i18n/routing';
 import { cn } from '@/lib/style';

@@ -1,4 +1,4 @@
-import type { PostInfo } from '@/types/post';
+import type { PostInfo } from '@/types';
 
 // 將 tag name 轉換為 slug 格式
 export const convertToSlug = (tag: string): string => {

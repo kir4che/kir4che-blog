@@ -1,8 +1,9 @@
-import React from 'react';
+'use client';
+
 import { useTranslations } from 'next-intl';
 import { Hash } from 'lucide-react';
 
-import type { Tag } from '@/types/tag';
+import type { Tag } from '@/types';
 import { Link } from '@/i18n/navigation';
 
 interface TagCloudProps {

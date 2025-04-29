@@ -1,6 +1,7 @@
 import { twMerge } from 'tailwind-merge';
 import { type ClassValue, clsx } from 'clsx';
-import type { CategoryColorScheme } from '@/types/category';
+
+import type { CategoryColorScheme } from '@/types';
 
 export const cn = (...inputs: ClassValue[]) => {
   return twMerge(clsx(inputs));

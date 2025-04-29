@@ -1,4 +1,4 @@
-import type { CategoryMap } from '@/types/category';
+import type { CategoryMap } from '@/types';
 
 export const categoryMap: CategoryMap = {
   frontend: {

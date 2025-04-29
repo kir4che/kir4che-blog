@@ -3,8 +3,8 @@ export const dynamic = 'force-static';
 import React from 'react';
 import { notFound } from 'next/navigation';
 
-import type { Language } from '@/types/language';
-import { LANGUAGES, LangToLocaleMap } from '@/types/language';
+import type { Language } from '@/types';
+import { LANGUAGES, LANGUAGE_TO_LOCALE_MAP } from '@/config';
 import { getPostsMeta, getPostInfoBySlug, getPostData } from '@/lib/posts';
 import { parseMDX } from '@/lib/mdx';
 
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: { params: Params }) {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL!;
   const postUrl = `${baseUrl}/${lang}/posts/${slug}`;
   const ogImage = `${baseUrl}/api/og?title=${encodeURIComponent(title)}&tags=${encodeURIComponent((tags ?? []).join(','))}`;
-  const locale = LangToLocaleMap[lang] ?? 'zh-TW';
+  const locale = LANGUAGE_TO_LOCALE_MAP[lang] ?? 'zh-TW';
 
   return {
     metadataBase: new URL(baseUrl),

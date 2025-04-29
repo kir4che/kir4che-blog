@@ -2,10 +2,7 @@ import { NextRequest } from 'next/server';
 import { match as matchLocale } from '@formatjs/intl-localematcher';
 import Negotiator from 'negotiator';
 
-import common from '@/config/common';
-
-const LOCALES = common.languages.langs;
-const DEFAULT_LOCALE = common.languages.defaultLocale;
+import { CONFIG } from '@/config';
 
 // 語言偵測：從 header 中取出 Accept-Language 並做 locale 匹配
 export const detectLocale = (request: NextRequest): string => {
@@ -15,5 +12,9 @@ export const detectLocale = (request: NextRequest): string => {
   });
 
   const languages = new Negotiator({ headers }).languages();
-  return matchLocale(languages, LOCALES, DEFAULT_LOCALE);
+  return matchLocale(
+    languages,
+    CONFIG.languages.supportedLanguages,
+    CONFIG.languages.defaultLanguage
+  );
 };

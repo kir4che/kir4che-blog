@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import type { Language } from '@/types/language';
-import type { PostInfo } from '@/types/post';
+import type { Language, PostInfo } from '@/types';
 import { getPostsInfo, getPostsByCategory, getPostsByTag } from '@/lib/posts';
 
 import { responseWithCache } from '@/utils/responseWithCache';

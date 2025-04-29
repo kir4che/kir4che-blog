@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import type { Language } from '@/types/language';
-import type { Category } from '@/types/category';
+import type { Language, Category } from '@/types';
 import { getCategoryStyle } from '@/lib/style';
 import { usePagination } from '@/hooks/usePagination';
 

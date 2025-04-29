@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { useTranslations, useFormatter } from 'next-intl';
 
-import type { AvailableLang } from '@/types/language';
-import type { PostMeta } from '@/types/post';
-import { LANGUAGES } from '@/types/language';
+import type { AvailableLang, PostMeta } from '@/types';
+import { LANGUAGES } from '@/config';
 import { Link } from '@/i18n/navigation';
 import { convertToSlug } from '@/lib/tags';
 import { useAlert } from '@/contexts/AlertContext';
@@ -61,12 +60,12 @@ const PostLayout = ({ post, headings, children }: PostLayoutProps) => {
             if (!res.ok) throw new Error('Fetch failed.');
             return res.json();
           })
-          .then(({ exists }) =>
-            exists
+          .then(({ exist }) =>
+            exist
               ? {
                   code: targetLang,
                   label: t_settings(`language.short.${targetLang}`),
-                  exists: true,
+                  exist: true,
                 }
               : null
           )
@@ -81,8 +80,8 @@ const PostLayout = ({ post, headings, children }: PostLayoutProps) => {
     )
       .then((results) => {
         const filtered = results.filter(
-          (lang): lang is AvailableLang => lang !== null && lang.exists
-        );
+          (lang): lang is AvailableLang => lang !== null && lang.exist
+        ) as AvailableLang[];
         setAvailableLangs(filtered);
       })
       .catch((err) => {

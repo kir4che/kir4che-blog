@@ -1,13 +1,13 @@
 import { Metadata } from 'next';
 
-import common from '@/config/common';
-import { LangToLocaleMap } from '@/types/language';
+import { CONFIG } from '@/config';
+import { LANGUAGE_TO_LOCALE_MAP } from '@/config';
 
 export function getSeoConfig(lang: string): Metadata {
   const url = process.env.NEXT_PUBLIC_API_URL!;
-  const title = common.siteInfo.blog.title;
-  const description = common.siteInfo.blog.description;
-  const locale = LangToLocaleMap[lang] ?? 'zh-TW';
+  const title = CONFIG.siteInfo.blog.title;
+  const description = CONFIG.siteInfo.blog.description;
+  const locale = LANGUAGE_TO_LOCALE_MAP[lang] ?? 'zh-TW';
 
   return {
     metadataBase: new URL(url),

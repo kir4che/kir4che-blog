@@ -1,10 +1,8 @@
 'use client';
 
-import React from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import type { Language } from '@/types/language';
-import type { Tag } from '@/types/tag';
+import type { Language, Tag } from '@/types';
 import { usePagination } from '@/hooks/usePagination';
 
 import PostPreview from '@/components/features/post/PostPreview';

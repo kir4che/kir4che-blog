@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, ChangeEvent, useMemo } from 'react';
+import { useState, useEffect, ChangeEvent, useMemo } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Search, X } from 'lucide-react';
 import { debounce } from '@/utils/debounce';
 
-import type { Language } from '@/types/language';
-import type { PostMeta } from '@/types/post';
+import type { Language, PostMeta } from '@/types';
 import { Link } from '@/i18n/navigation';
 import { useAlert } from '@/contexts/AlertContext';
 

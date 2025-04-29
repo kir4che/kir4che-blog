@@ -1,7 +1,4 @@
-import React from 'react';
-
-import type { Category } from '@/types/category';
-import type { Tag } from '@/types/tag';
+import type { Category, Tag } from '@/types';
 
 import SearchBar from '@/components/features/sidebar/SearchBar';
 import PopularPosts from '@/components/features/sidebar/PopularPosts';

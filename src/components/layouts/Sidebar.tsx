@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 
-import type { Language } from '@/types/language';
+import type { Language } from '@/types';
 
 import LeftSidebar from '@/components/layouts/LeftSidebar';
 import RightSidebar from '@/components/layouts/RightSidebar';

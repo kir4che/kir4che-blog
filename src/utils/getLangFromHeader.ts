@@ -1,5 +1,5 @@
-import type { Language } from '@/types/language';
-import { LANGUAGES } from '@/types/language';
+import type { Language } from '@/types';
+import { LANGUAGES } from '@/config';
 
 export const getLangFromHeader = (request: Request): Language => {
   const raw = request.headers.get('Accept-Language') ?? '';

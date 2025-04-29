@@ -2,8 +2,8 @@ export const dynamic = 'force-static';
 
 import { notFound } from 'next/navigation';
 
-import type { Language } from '@/types/language';
-import { LANGUAGES } from '@/types/language';
+import type { Language } from '@/types';
+import { LANGUAGES } from '@/config';
 
 import CategoryPosts from '@/components/features/category/CategoryPosts';
 

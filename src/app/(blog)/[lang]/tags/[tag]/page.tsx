@@ -1,10 +1,9 @@
 export const dynamic = 'force-static';
 
-import React from 'react';
 import { notFound } from 'next/navigation';
 
-import type { Language } from '@/types/language';
-import { LANGUAGES } from '@/types/language';
+import type { Language } from '@/types';
+import { LANGUAGES } from '@/config';
 
 import TagPosts from '@/components/features/tag/TagPosts';
 

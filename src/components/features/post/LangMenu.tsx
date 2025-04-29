@@ -1,8 +1,8 @@
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { Languages } from 'lucide-react';
 
-import type { Language, AvailableLang } from '@/types/language';
+import type { Language, AvailableLang } from '@/types';
 import { cn } from '@/lib/style';
 
 interface LangMenuProps {
@@ -78,7 +78,7 @@ const LangMenu = ({
         )}
       >
         {availableLangs
-          .filter((lang) => lang.exists)
+          .filter((lang) => lang.exist)
           .map((langOption) => (
             <Link
               key={langOption.code}

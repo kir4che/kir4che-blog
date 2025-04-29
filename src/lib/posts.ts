@@ -3,9 +3,8 @@ import matter from 'gray-matter';
 import * as fs from 'fs';
 import { cache } from 'react';
 
-import type { Language } from '@/types/language';
-import type { PostMeta, PostInfo } from '@/types/post';
-import { LANGUAGES } from '@/types/language';
+import type { Language, PostMeta, PostInfo } from '@/types';
+import { LANGUAGES } from '@/config';
 import { isPostInCategory, getCategoryBySlug } from '@/lib/categories';
 import { convertToSlug } from '@/lib/tags';
 import { getImageMeta, extractImageSources } from '@/lib/image';

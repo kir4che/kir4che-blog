@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
-import { LANGUAGES } from '@/types/language';
+
+import { LANGUAGES } from '@/config';
 import { getPostsInfo } from '@/lib/posts';
 import { getTagsByPosts } from '@/lib/tags';
 import { getCategoriesByPosts } from '@/lib/categories';

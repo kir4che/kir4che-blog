@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import type { PostMeta } from '@/types/post';
+import type { PostMeta } from '@/types';
 import { getCategoryInfo } from '@/lib/categories';
 
 export const useCategoryInfoMap = (posts: PostMeta | PostMeta[] = []) => {
