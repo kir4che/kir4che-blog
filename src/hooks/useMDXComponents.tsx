@@ -25,10 +25,19 @@ export const useMDXComponents = (
       h6: H6,
       Table: Table, // <Table data={{ headers: [], rows: [[], []] }} />
       Image: (props) => {
-        const meta = imageMetas[props.src ?? ''] ?? {};
-        return <CustomImage {...meta} {...props} />;
+        const meta = imageMetas[props.src] ?? {};
+        return <CustomImage {...props} {...meta} />;
       },
-      Images: ImageGallery, // <Images images={[{ src: '', alt: '', width: '' }, ... ]} height='150px' />
+      Images: (props) => {
+        const imagesWithMeta = props.images.map((img) => {
+          const meta = imageMetas[img.src] ?? {};
+          return {
+            ...img,
+            ...meta,
+          };
+        });
+        return <ImageGallery {...props} images={imagesWithMeta} />;
+      }, // <Images images={[{ src: '', alt: '', width: '' }, ... ]} height='150px' />
       Video: CustomVideo, // <Video src="..." title="..." />
       Accordion, // <Accordion variant="primary" title="Title">{children}</Accordion>
       Correction, // <Correction wrong="A" correct="B" />
@@ -43,8 +52,8 @@ export const useMDXComponents = (
       a: CustomLink, // [Text](url)
       img: (props) => {
         // \![alt](url)
-        const meta = imageMetas[props.src ?? ''] ?? {};
-        return <CustomImage {...meta} {...props} />;
+        const meta = imageMetas[props.src] ?? {};
+        return <CustomImage {...props} {...meta} />;
       },
       ul: ({ children }) => (
         <ul className='my-2 list-inside list-disc pl-4'>{children}</ul>
