@@ -9,7 +9,7 @@ import { Toaster } from 'react-hot-toast';
 import type { Language } from '@/types';
 import routing from '@/i18n/routing';
 import Providers from '@/contexts/Providers';
-import { getSeoConfig } from '@/utils/seo';
+import { getSeoConfig } from '@/utils/getSeoConfig';
 
 import Header from '@/components/layouts/Header';
 import Footer from '@/components/layouts/Footer';
@@ -24,6 +24,7 @@ export async function generateMetadata({
   params: { lang: Language };
 }): Promise<Metadata> {
   const { lang } = await params;
+  console.log('lang', lang);
   return getSeoConfig(lang);
 }
 

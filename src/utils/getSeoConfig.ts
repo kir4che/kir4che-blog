@@ -3,8 +3,8 @@ import { Metadata } from 'next';
 import { CONFIG } from '@/config';
 import { LANGUAGE_TO_LOCALE_MAP } from '@/config';
 
-export function getSeoConfig(lang: string): Metadata {
-  const url = process.env.NEXT_PUBLIC_API_URL!;
+export const getSeoConfig = (lang: string): Metadata => {
+  const url = process.env.NEXT_PUBLIC_API_URL || 'https://kir4che.com';
   const title = CONFIG.siteInfo.blog.title;
   const description = CONFIG.siteInfo.blog.description;
   const locale = LANGUAGE_TO_LOCALE_MAP[lang] ?? 'zh-TW';
@@ -64,4 +64,4 @@ export function getSeoConfig(lang: string): Metadata {
       icon: '/favicon.ico',
     },
   };
-}
+};
