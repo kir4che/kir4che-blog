@@ -16,8 +16,10 @@
     "update-wordCount:all": "ts-node --project scripts/tsconfig.scripts.json scripts/updateWordCount.ts --all"
   },
   "dependencies": {
+    "@expressive-code/core": "^0.41.2",
     "@expressive-code/plugin-line-numbers": "^0.41.1",
     "@formatjs/intl-localematcher": "^0.6.1",
+    "@tailwindcss/postcss": "^4.1.4",
     "@types/mdx": "^2.0.13",
     "@vercel/og": "^0.6.8",
     "clsx": "^2.1.1",
@@ -43,23 +45,23 @@
     "remark-gfm": "^4.0.1",
     "remark-images": "^4.1.0",
     "remark-ins": "^1.1.0",
-    "remark-rehype": "^11.1.2",
     "remark-supersub": "^1.0.0",
-    "tailwind-merge": "^3.2.0"
+    "tailwind-merge": "^3.2.0",
+    "unist-util-visit": "^5.0.0",
+    "vfile": "^6.0.3"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
     "@types/node": "^20.17.30",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19",
-    "daisyui": "^5.0.22",
+    "daisyui": "^5.0.28",
     "eslint": "^9.24.0",
     "eslint-config-next": "15.3.0",
     "eslint-config-prettier": "^10.1.2",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "remark-mark-highlight": "^0.1.1",
-    "tailwindcss": "^4",
+    "tailwindcss": "^4.1.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   }
