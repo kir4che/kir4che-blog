@@ -5,15 +5,16 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "test": "echo \"No tests specified\" && exit 0",
-    "build": "next build",
+    "build": "npm run generate:imageMetas && npm run update:wordCount:all && next build",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --check --ignore-path .gitignore .",
     "format:fix": "prettier --write --ignore-path .gitignore .",
-    "new-post": "ts-node --project scripts/tsconfig.scripts.json scripts/createPost.ts",
-    "update-updatedAt": "ts-node --project scripts/tsconfig.scripts.json scripts/updateUpdatedAt.ts",
-    "update-wordCount": "ts-node --project scripts/tsconfig.scripts.json scripts/updateWordCount.ts",
-    "update-wordCount:all": "ts-node --project scripts/tsconfig.scripts.json scripts/updateWordCount.ts --all"
+    "create:new-post": "ts-node --project scripts/tsconfig.scripts.json scripts/createPost.ts",
+    "update:updatedAt": "ts-node --project scripts/tsconfig.scripts.json scripts/updateUpdatedAt.ts",
+    "update:wordCount": "ts-node --project scripts/tsconfig.scripts.json scripts/updateWordCount.ts",
+    "update:wordCount:all": "ts-node --project scripts/tsconfig.scripts.json scripts/updateWordCount.ts --all",
+    "generate:imageMetas": "ts-node --project scripts/tsconfig.scripts.json scripts/generateImageMetas.ts"
   },
   "dependencies": {
     "@expressive-code/core": "^0.41.2",
