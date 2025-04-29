@@ -7,7 +7,6 @@ import type { Language, PostMeta, PostInfo } from '@/types';
 import { LANGUAGES } from '@/config';
 import { isPostInCategory, getCategoryBySlug } from '@/lib/categories';
 import { convertToSlug } from '@/lib/tags';
-import { getImageMeta, extractImageSources } from '@/lib/image';
 
 // 文章所在的資料夾路徑
 const postsDirectory = path.join(process.cwd(), 'src', 'posts');
@@ -102,89 +101,74 @@ export const getPostData = cache(
   ): Promise<
     (PostMeta & { content: string; imageMetas: Record<string, any> }) | null
   > => {
-    const postDir = path.join(postsDirectory, slug);
+    try {
+      const postDir = path.join(postsDirectory, slug);
+      if (!fs.existsSync(postDir)) return null;
 
-    if (!fs.existsSync(postDir)) return null;
-    const files = await fs.promises.readdir(postDir);
+      // 根據當前語系選擇對應的 mdx 檔案
+      const targetFileName = lang === 'en' ? 'index.en.mdx' : 'index.mdx';
+      const files = await fs.promises.readdir(postDir);
+      const mdxFile = files.find((file) => file === targetFileName);
+      if (!mdxFile) return null;
 
-    // 根據當前語系選擇對應的 mdx 檔案
-    const mdxFile = files.find((file) => {
-      if (lang === 'en') return file === 'index.en.mdx';
-      return file === 'index.mdx';
-    });
+      // 讀取並解析 MDX 文件
+      const filePath = path.join(postDir, mdxFile);
+      const fileContents = await fs.promises.readFile(filePath, 'utf8');
+      const { data, content } = matter(fileContents);
 
-    if (!mdxFile) return null;
-
-    const filePath = path.join(postDir, mdxFile);
-    const fileContents = await fs.promises.readFile(filePath, 'utf8');
-    const { data, content } = matter(fileContents);
-
-    if (!data.date) return null;
-
-    // 防止顯示 draft 文章
-    if (data.draft && process.env.NEXT_PUBLIC_NODE_ENV !== 'development') {
-      const err = new Error('This post is a draft.');
-      (err as any).code = 'DRAFT_POST';
-      throw err;
-    }
-
-    // 抓取所有本地圖片路徑
-    const imageMetas: Record<string, any> = {};
-    const imageSrcs = extractImageSources(content);
-
-    // 優化圖片 metadata 加載：限制最大並行數
-    const MAX_CONCURRENT = 5;
-    let concurrentCount = 0;
-
-    const loadImageMeta = async (src: string) => {
-      if (!src.startsWith('/')) return;
-      try {
-        imageMetas[src] = await getImageMeta(src.slice(1));
-      } catch (err) {
-        console.error(`Failed to load image metadata for ${src}:`, err);
-      } finally {
-        concurrentCount--;
+      // 驗證必要欄位
+      if (!data.title && !data.date) return null;
+      // 防止顯示 draft 文章
+      if (data.draft && process.env.NEXT_PUBLIC_NODE_ENV !== 'development') {
+        const err = new Error('This post is a draft.');
+        (err as any).code = 'DRAFT_POST';
+        throw err;
       }
-    };
 
-    const imagePromises = Array.from(imageSrcs).map((src) => {
-      // 控制並發數量
-      return new Promise<void>((resolve) => {
-        const loadNext = async () => {
-          if (concurrentCount >= MAX_CONCURRENT) {
-            setTimeout(loadNext, 100); // 等待直到有空閒
-            return;
-          }
+      // 從預先生成的 imageMetas.json 中讀取模糊圖資料
+      const imageMetasPath = path.join(
+        process.cwd(),
+        'public',
+        'imageMetas.json'
+      );
+      let imageMetasRaw: Record<string, any> = {};
+      try {
+        const imageMetasFile = await fs.promises.readFile(
+          imageMetasPath,
+          'utf8'
+        );
+        imageMetasRaw = JSON.parse(imageMetasFile);
+      } catch {
+        return null;
+      }
 
-          concurrentCount++;
-          await loadImageMeta(src);
-          resolve();
-        };
-        loadNext();
-      });
-    });
+      // 過濾出這篇文章實際有用到的圖片 metadata
+      const imageMetas: Record<string, any> = {};
+      for (const [src, meta] of Object.entries(imageMetasRaw)) {
+        if (content.includes(src)) imageMetas[src] = meta;
+      }
 
-    // 等待所有圖片 metadata 加載完成
-    await Promise.all(imagePromises);
-
-    return {
-      slug,
-      title: data.title,
-      description: data.description,
-      date: data.date,
-      categories: data.categories || [],
-      tags: data.tags || [],
-      wordCount: data.wordCount || 0,
-      lang,
-      password: data.password,
-      hasPassword: !!data.password,
-      draft: data.draft ?? false,
-      featured: data.featured ?? false,
-      coverImage: data.coverImage,
-      updatedAt: data.updatedAt,
-      content,
-      imageMetas,
-    };
+      return {
+        slug,
+        title: data.title,
+        description: data.description,
+        date: data.date,
+        categories: data.categories || [],
+        tags: data.tags || [],
+        wordCount: data.wordCount || 0,
+        lang,
+        password: data.password,
+        hasPassword: !!data.password,
+        draft: data.draft ?? false,
+        featured: data.featured ?? false,
+        coverImage: data.coverImage,
+        updatedAt: data.updatedAt,
+        content,
+        imageMetas,
+      };
+    } catch {
+      return null;
+    }
   }
 );
 
