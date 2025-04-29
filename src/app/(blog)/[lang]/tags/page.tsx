@@ -6,6 +6,8 @@ import { getTranslations } from 'next-intl/server';
 import type { Language } from '@/types';
 import { LANGUAGES } from '@/config';
 import { Link } from '@/i18n/navigation';
+import { getPostsInfo } from '@/lib/posts';
+import { getTagsByPosts } from '@/lib/tags';
 
 type Params = Promise<{
   lang: Language;
@@ -21,13 +23,8 @@ const TagsPage = async ({ params }: { params: Params }) => {
 
   let tags;
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/tags?lang=${lang}`
-    );
-    if (!res.ok) return notFound();
-
-    const data = await res.json();
-    tags = data.tags;
+    const posts = await getPostsInfo(lang);
+    tags = getTagsByPosts(posts);
 
     if (!Array.isArray(tags)) return notFound();
   } catch {

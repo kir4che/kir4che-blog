@@ -7,6 +7,8 @@ import type { Language, CategoryInfo } from '@/types';
 import { LANGUAGES } from '@/config';
 import { Link } from '@/i18n/navigation';
 import { getCategoryStyle } from '@/lib/style';
+import { getPostsInfo } from '@/lib/posts';
+import { getCategoriesByPosts } from '@/lib/categories';
 
 type Params = Promise<{
   lang: Language;
@@ -22,14 +24,8 @@ const CategoriesPage = async ({ params }: { params: Params }) => {
 
   let categories;
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/categories?lang=${lang}`
-    );
-    if (!res.ok) return notFound();
-
-    const data = await res.json();
-    categories = data.categories;
-
+    const posts = await getPostsInfo(lang);
+    categories = getCategoriesByPosts(posts);
     if (!Array.isArray(categories)) return notFound();
   } catch {
     return notFound();
