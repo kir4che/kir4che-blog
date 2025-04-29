@@ -1,15 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import { useTranslations, useFormatter } from 'next-intl';
 
 import type { AvailableLang, PostMeta } from '@/types';
-import { LANGUAGES } from '@/config';
 import { Link } from '@/i18n/navigation';
-import { convertToSlug } from '@/lib/tags';
-import { useAlert } from '@/contexts/AlertContext';
 import { useCategoryInfoMap } from '@/hooks/useCategoryInfoMap';
+import { convertToSlug } from '@/lib/tags';
 
 import PostPasswordGate from '@/components/features/post/PostPasswordGate';
 import TOC from '@/components/features/post/Toc';
@@ -22,18 +20,23 @@ import KofiBtn from '@/components/ui/KofiBtn';
 interface PostLayoutProps {
   post: PostMeta;
   headings: { id: string; text: string; level: number }[];
+  existOtherLangs: boolean;
   children: React.ReactNode;
 }
 
-const PostLayout = ({ post, headings, children }: PostLayoutProps) => {
+const PostLayout = ({
+  post,
+  headings,
+  existOtherLangs,
+  children,
+}: PostLayoutProps) => {
   const t = useTranslations('PostPage');
   const t_common = useTranslations('common');
   const t_settings = useTranslations('settings');
-  const { showError } = useAlert();
   const formatter = useFormatter();
+  const categoryInfoMap = useCategoryInfoMap(post);
 
   const [unlocked, setUnlocked] = useState(false);
-  const [availableLangs, setAvailableLangs] = useState<AvailableLang[]>([]);
 
   const {
     title,
@@ -46,52 +49,14 @@ const PostLayout = ({ post, headings, children }: PostLayoutProps) => {
     hasPassword,
     coverImage,
   } = post;
-  const categoryInfoMap = useCategoryInfoMap(post);
 
-  const checkAvailableLangs = useCallback(() => {
-    Promise.all(
-      LANGUAGES.filter((l) => l !== lang).map((targetLang) =>
-        fetch(`/api/posts/${slug}?lang=${lang}`, {
-          headers: {
-            'X-Check-Existence': 'true',
-          },
-        })
-          .then((res) => {
-            if (!res.ok) throw new Error('Fetch failed.');
-            return res.json();
-          })
-          .then(({ exist }) =>
-            exist
-              ? {
-                  code: targetLang,
-                  label: t_settings(`language.short.${targetLang}`),
-                  exist: true,
-                }
-              : null
-          )
-          .catch((err) => {
-            showError(
-              `Error checking language ${targetLang}: ` +
-                (err instanceof Error ? err.message : err)
-            );
-            return null;
-          })
-      )
-    )
-      .then((results) => {
-        const filtered = results.filter(
-          (lang): lang is AvailableLang => lang !== null && lang.exist
-        ) as AvailableLang[];
-        setAvailableLangs(filtered);
-      })
-      .catch((err) => {
-        showError(err instanceof Error ? err.message : err);
-      });
-  }, [slug, lang, t_settings, showError]);
-
-  useEffect(() => {
-    checkAvailableLangs();
-  }, [checkAvailableLangs]);
+  const availableLangs: AvailableLang[] = [
+    {
+      code: lang,
+      label: t_settings(`language.short.${lang}`),
+      exist: existOtherLangs,
+    },
+  ];
 
   if (hasPassword && !unlocked)
     return (
