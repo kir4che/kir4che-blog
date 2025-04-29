@@ -36,16 +36,7 @@ const CustomVideo: React.FC<CustomVideoProps> = ({
     const videoElement = videoRef.current;
     if (!videoElement || !autoPlay) return;
 
-    const playVideo = async () => {
-      try {
-        await videoElement.play();
-      } catch {
-        console.error(
-          'Autoplay failed, possibly due to browser policy restrictions.'
-        );
-      }
-    };
-
+    const playVideo = async () => await videoElement.play();
     playVideo();
 
     const handleVisibilityChange = () => {
