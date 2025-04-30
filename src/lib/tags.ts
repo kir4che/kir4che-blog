@@ -11,15 +11,19 @@ export const convertToSlug = (tag: string): string => {
 
 // 取得所有文章的 tag 及其出現次數，且可選擇限制回傳的 tag 數量。
 export const getTagsByPosts = (posts: PostInfo[], limit?: number) => {
-  const tagCounts = new Map<string, number>();
+  if (!Array.isArray(posts) || posts.length === 0) return [];
+
+  // 統計 tag 出現次數
+  const tagCounts: Record<string, number> = {};
 
   posts.forEach((post) => {
     post.tags?.forEach((tag) => {
-      tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+      if (tag) tagCounts[tag] = (tagCounts[tag] || 0) + 1;
     });
   });
 
-  return Array.from(tagCounts.entries())
+  // 將 tagCounts 轉為 array 並加入 slug、postCount
+  return Object.entries(tagCounts)
     .map(([tag, postCount]) => ({
       name: tag,
       slug: convertToSlug(tag),

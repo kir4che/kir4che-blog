@@ -7,8 +7,8 @@ import type { Language, CategoryInfo } from '@/types';
 import { LANGUAGES } from '@/config';
 import { Link } from '@/i18n/navigation';
 import { getCategoryStyle } from '@/lib/style';
+import { getAllCategoryByPosts } from '@/lib/categories';
 import { getPostsInfo } from '@/lib/posts';
-import { getCategoriesByPosts } from '@/lib/categories';
 
 type Params = Promise<{
   lang: Language;
@@ -22,70 +22,78 @@ const CategoriesPage = async ({ params }: { params: Params }) => {
   const { lang } = await params;
   const t = await getTranslations('CategoriesPage');
 
-  let categories;
   try {
     const posts = await getPostsInfo(lang);
-    categories = getCategoriesByPosts(posts);
+    const categories = getAllCategoryByPosts(posts);
+
     if (!Array.isArray(categories)) return notFound();
+
+    return (
+      <>
+        <h1 className='mb-4'>{t('title')}</h1>
+        {categories?.length ? (
+          <div className='xs:grid-cols-2 grid grid-cols-1 gap-4 xl:grid-cols-4'>
+            {categories.map(
+              ({ name, slug, color, postCount, subcategories }) => (
+                <div
+                  key={slug}
+                  className='h-full w-full'
+                  style={getCategoryStyle(color)}
+                >
+                  <div className='bg-bg-secondary transition-color flex h-full w-full flex-col rounded-lg border-2 border-[var(--category-color)] p-3 duration-300 dark:border-[var(--category-color-dark)]'>
+                    <h2 className='mb-1 flex flex-wrap items-baseline justify-between text-xl text-[var(--category-color)] dark:text-[var(--category-color-dark)]'>
+                      <Link
+                        href={`/categories/${slug}`}
+                        className='block transition-transform hover:scale-[1.02]'
+                        aria-label={`${name[lang]} (${postCount} posts)`}
+                      >
+                        {name[lang]}
+                      </Link>
+                      <span className='text-text-primary text-sm font-normal'>
+                        {t('postCount', { count: Number(postCount) })}
+                      </span>
+                    </h2>
+                    {subcategories && (
+                      <div className='flex flex-wrap gap-2 pt-2'>
+                        {Object.entries(
+                          subcategories as Record<
+                            string,
+                            CategoryInfo & { postCount: number }
+                          >
+                        ).map(([subSlug, subCategory]) => (
+                          <Link
+                            key={subSlug}
+                            href={`/categories/${slug}/${subSlug}`}
+                            className='block rounded-full bg-[var(--subcategory-color)] px-2.5 py-1 transition-transform hover:scale-[1.02]'
+                            style={
+                              {
+                                '--subcategory-color': subCategory.color.light,
+                                '--subcategory-color-dark':
+                                  subCategory.color.dark,
+                              } as React.CSSProperties
+                            }
+                            aria-label={`${subCategory.name[lang]} (${subCategory.postCount || 0} posts)`}
+                          >
+                            <h3 className='text-text-secondary text-sm font-medium'>
+                              {subCategory.name[lang]}
+                            </h3>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
+            )}
+          </div>
+        ) : (
+          <p className='text-text-gray-light text-sm'>{t('noCategories')}</p>
+        )}
+      </>
+    );
   } catch {
     return notFound();
   }
-
-  return (
-    <>
-      <h1 className='mb-4'>{t('title')}</h1>
-      {categories.length > 0 ? (
-        <div className='xs:grid-cols-2 grid grid-cols-1 gap-4 xl:grid-cols-4'>
-          {categories.map(({ name, slug, color, postCount, subcategories }) => (
-            <div
-              key={slug}
-              className='h-full w-full'
-              style={getCategoryStyle(color)}
-            >
-              <div className='bg-bg-secondary transition-color flex h-full w-full flex-col rounded-lg border-2 border-[var(--category-color)] p-3 duration-300 dark:border-[var(--category-color-dark)]'>
-                <h2 className='mb-1 flex flex-wrap items-baseline justify-between text-xl text-[var(--category-color)] dark:text-[var(--category-color-dark)]'>
-                  <Link
-                    href={`/categories/${slug}`}
-                    className='block transition-transform hover:scale-[1.02]'
-                  >
-                    {name[lang]}
-                  </Link>
-                  <span className='text-text-primary text-sm font-normal'>
-                    {t('postCount', { count: postCount })}
-                  </span>
-                </h2>
-                {subcategories && (
-                  <div className='flex flex-wrap gap-2 pt-2'>
-                    {Object.entries(
-                      subcategories as Record<string, CategoryInfo>
-                    ).map(([subSlug, subCategory]) => (
-                      <Link
-                        key={subSlug}
-                        href={`/categories/${slug}/${subSlug}`}
-                        className='block rounded-full bg-[var(--subcategory-color)] px-2.5 py-1 transition-transform hover:scale-[1.02]'
-                        style={
-                          {
-                            '--subcategory-color': subCategory.color.light,
-                            '--subcategory-color-dark': subCategory.color.dark,
-                          } as React.CSSProperties
-                        }
-                      >
-                        <h3 className='text-text-secondary text-sm font-medium'>
-                          {subCategory.name[lang]}
-                        </h3>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className='text-text-gray-light text-sm'>{t('noCategories')}</p>
-      )}
-    </>
-  );
 };
 
 export default CategoriesPage;

@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 
-import type { PostMeta } from '@/types';
-import { getCategoryInfo } from '@/lib/categories';
+import type { PostMeta, CategoryInfo } from '@/types';
+import { categoryMap } from '@/config/category';
+import { createCategoryNameToSlugMap } from '@/lib/categories';
 
 export const useCategoryInfoMap = (posts: PostMeta | PostMeta[] = []) => {
   return useMemo(() => {
@@ -14,13 +15,36 @@ export const useCategoryInfoMap = (posts: PostMeta | PostMeta[] = []) => {
       });
     });
 
-    const map: Record<
-      string,
-      NonNullable<ReturnType<typeof getCategoryInfo>>
-    > = {};
+    const nameToSlugMap = createCategoryNameToSlugMap();
+
+    const map: Record<string, CategoryInfo> = {};
+
     categoryNames.forEach((name) => {
-      const info = getCategoryInfo(name);
-      if (info) map[name] = info;
+      const slug = nameToSlugMap[name];
+      if (!slug) return;
+
+      const mainCategory = categoryMap[slug];
+      if (mainCategory) {
+        map[name] = {
+          name: mainCategory.name,
+          slug,
+          color: mainCategory.color,
+        };
+        return;
+      }
+
+      for (const [parentSlug, category] of Object.entries(categoryMap)) {
+        const sub = category.subcategories?.[slug];
+        if (sub) {
+          map[name] = {
+            name: sub.name,
+            slug,
+            color: sub.color,
+            parentSlug,
+          };
+          return;
+        }
+      }
     });
 
     return map;

@@ -6,28 +6,29 @@ import type { Language } from '@/types';
 import { LANGUAGES } from '@/config';
 
 import CategoryPosts from '@/components/features/category/CategoryPosts';
+import { getCategoryBySlug } from '@/lib/categories';
+import { getPostsInfo } from '@/lib/posts';
 
 type Params = Promise<{
   lang: Language;
   slug: string;
 }>;
 
+// 預先取得所有語系的所有 { lang, slug }
 export async function generateStaticParams() {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/categories`
-    );
-    if (!res.ok) return [];
+    const posts = await getPostsInfo();
+    const allCategories = posts.flatMap((post) => post.categories || []);
+    const names = [...new Set(allCategories)];
 
-    const { categories } = await res.json();
-    if (!Array.isArray(categories)) return [];
+    const slugs: string[] = [];
 
-    return LANGUAGES.flatMap((lang) =>
-      categories.map(({ slug }: { slug: string }) => ({
-        slug,
-        lang,
-      }))
-    );
+    for (const n of names) {
+      const category = getCategoryBySlug(n, posts, 'main');
+      if (category) slugs.push(category.slug);
+    }
+
+    return LANGUAGES.flatMap((lang) => slugs.map((slug) => ({ lang, slug })));
   } catch {
     return [];
   }
@@ -36,22 +37,16 @@ export async function generateStaticParams() {
 const CategoryPage = async ({ params }: { params: Params }) => {
   const { lang, slug } = await params;
 
-  let category;
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/categories/${slug}?lang=${lang}`
-    );
-    if (!res.ok) return notFound();
-
-    const data = await res.json();
-    category = data.category;
+    const posts = await getPostsInfo(lang);
+    const category = await getCategoryBySlug(slug, posts);
 
     if (!category) return notFound();
+
+    return <CategoryPosts category={category} slug={slug} />;
   } catch {
     return notFound();
   }
-
-  return <CategoryPosts slug={slug} category={category} />;
 };
 
 export default CategoryPage;

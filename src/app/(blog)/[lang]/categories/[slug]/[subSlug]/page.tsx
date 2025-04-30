@@ -6,6 +6,8 @@ import type { Language } from '@/types';
 import { LANGUAGES } from '@/config';
 
 import CategoryPosts from '@/components/features/category/CategoryPosts';
+import { getCategoryBySlug } from '@/lib/categories';
+import { getPostsInfo } from '@/lib/posts';
 
 type Params = Promise<{
   lang: Language;
@@ -13,33 +15,23 @@ type Params = Promise<{
   subSlug: string;
 }>;
 
+// 預先取得所有語系的所有 { lang, subSlug }
 export async function generateStaticParams() {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/categories`
-    );
-    if (!res.ok) return [];
+    const posts = await getPostsInfo();
 
-    const { categories } = await res.json();
-    if (!Array.isArray(categories)) return [];
+    const allCategories = posts.flatMap((post) => post.categories || []);
+    const names = [...new Set(allCategories)];
 
-    const subCategoryParams = categories.flatMap(
-      (category: { slug: string; subCategories?: { slug: string }[] }) => {
-        if (!Array.isArray(category.subCategories)) return [];
+    const slugs: string[] = [];
 
-        return category.subCategories.map((sub) => ({
-          slug: category.slug,
-          subSlug: sub.slug,
-        }));
-      }
-    );
+    for (const n of names) {
+      const category = getCategoryBySlug(n, posts, 'sub');
+      if (category) slugs.push(category.slug);
+    }
 
     return LANGUAGES.flatMap((lang) =>
-      subCategoryParams.map(({ slug, subSlug }) => ({
-        lang,
-        slug,
-        subSlug,
-      }))
+      slugs.map((slug) => ({ lang, subSlug: slug }))
     );
   } catch {
     return [];
@@ -47,24 +39,18 @@ export async function generateStaticParams() {
 }
 
 const SubCategoryPage = async ({ params }: { params: Params }) => {
-  const { lang, slug, subSlug } = await params;
+  const { lang, subSlug } = await params;
 
-  let categoryData;
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/categories/${slug}/${subSlug}?lang=${lang}`
-    );
-    if (!res.ok) return notFound();
+    const posts = await getPostsInfo(lang);
+    const category = await getCategoryBySlug(subSlug, posts, 'sub');
 
-    const data = await res.json();
-    categoryData = data.category;
+    if (!category) return notFound();
 
-    if (!categoryData) return notFound();
+    return <CategoryPosts category={category} slug={subSlug} />;
   } catch {
     return notFound();
   }
-
-  return <CategoryPosts slug={subSlug} category={categoryData} />;
 };
 
 export default SubCategoryPage;
