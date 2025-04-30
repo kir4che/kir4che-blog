@@ -18,16 +18,6 @@ import ScrollRestorer from '@/components/features/ScrollRestorer';
 
 import '@/app/globals.css';
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { lang: Language };
-}): Promise<Metadata> {
-  const { lang } = await params;
-  console.log('lang', lang);
-  return getSeoConfig(lang);
-}
-
 const notoSansTC = Noto_Sans_TC({
   weight: ['400', '500', '600', '700'],
   subsets: ['latin'],
@@ -48,10 +38,26 @@ interface RootLayoutProps {
 }
 
 // 在正式環境中禁用 console，避免顯示不必要的日誌。
-if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'development') {
+if (
+  typeof window !== 'undefined' &&
+  process.env.NEXT_PUBLIC_NODE_ENV !== 'development'
+) {
   console.log = () => {};
   console.warn = () => {};
   console.error = () => {};
+}
+
+export function generateStaticParams() {
+  return routing.locales.map((lang) => ({ lang }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { lang: Language };
+}): Promise<Metadata> {
+  const { lang } = await params;
+  return getSeoConfig(lang);
 }
 
 const RootLayout = async ({ children, params }: RootLayoutProps) => {

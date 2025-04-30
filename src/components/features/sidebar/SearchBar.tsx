@@ -73,7 +73,7 @@ const SearchBar: React.FC = () => {
       )}
       {searchQuery && (
         <ul className='bg-bg-secondary absolute top-9 z-10 max-h-60 w-full overflow-auto rounded-md text-sm shadow-md'>
-          {searchResults.length > 0 ? (
+          {searchResults?.length ? (
             searchResults.map(({ slug, title }) => (
               <li key={slug} className='p-2'>
                 <Link

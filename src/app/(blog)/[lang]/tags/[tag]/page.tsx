@@ -14,6 +14,7 @@ type Params = Promise<{
   tag: string;
 }>;
 
+// 預先取得所有語系的所有 { lang, tag }
 export async function generateStaticParams() {
   try {
     const posts = await getPostsInfo();

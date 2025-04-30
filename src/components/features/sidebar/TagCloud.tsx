@@ -27,7 +27,7 @@ const TagCloud = ({ tags }: TagCloudProps) => {
           <Link
             key={slug}
             href={`/tags/${slug}`}
-            className='group transition-color relative overflow-hidden rounded bg-pink-300 px-1.5 py-0.5 text-sm font-medium text-white duration-300 dark:bg-pink-800/35 dark:text-pink-50'
+            className='group transition-color relative overflow-hidden rounded bg-pink-500/80 px-1.5 py-0.5 text-sm font-medium text-white duration-300 dark:bg-pink-800/35 dark:text-pink-50'
           >
             <span className='relative z-10'># {name}</span>
             <span className='absolute top-0 left-[-75%] h-full w-1/2 skew-x-[-20deg] transform bg-white/10 transition-all duration-700 group-hover:left-[125%]' />

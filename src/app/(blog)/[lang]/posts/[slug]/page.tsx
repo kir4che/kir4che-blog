@@ -20,15 +20,10 @@ type Params = Promise<{
   slug: string;
 }>;
 
-// 預先生成所以文章（所有語系）的靜態路由
+// 預先取得所有語系的所有 { lang, slug }
 export async function generateStaticParams() {
   const posts = await getPostsMeta();
-  return LANGUAGES.flatMap((lang) =>
-    posts.map(({ slug }) => ({
-      slug,
-      lang,
-    }))
-  );
+  return LANGUAGES.flatMap((lang) => posts.map(({ slug }) => ({ lang, slug })));
 }
 
 export async function generateMetadata({ params }: { params: Params }) {
