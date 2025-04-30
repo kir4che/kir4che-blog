@@ -47,6 +47,13 @@ interface RootLayoutProps {
   params: { lang: Language };
 }
 
+// 在正式環境中禁用 console，避免顯示不必要的日誌。
+if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'development') {
+  console.log = () => {};
+  console.warn = () => {};
+  console.error = () => {};
+}
+
 const RootLayout = async ({ children, params }: RootLayoutProps) => {
   const { lang } = await params;
 
