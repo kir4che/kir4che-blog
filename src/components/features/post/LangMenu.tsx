@@ -2,24 +2,18 @@ import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { Languages } from 'lucide-react';
 
-import type { Language, AvailableLang } from '@/types';
+import type { Language } from '@/types';
 import { cn } from '@/lib/style';
 
 interface LangMenuProps {
   t: (key: string) => string;
-  currentLang: Language;
-  availableLangs: AvailableLang[];
+  curLang: Language;
+  langs: Language[];
   slug: string;
   className?: string;
 }
 
-const LangMenu = ({
-  t,
-  currentLang,
-  availableLangs,
-  slug,
-  className,
-}: LangMenuProps) => {
+const LangMenu = ({ t, curLang, langs, slug, className }: LangMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -60,12 +54,12 @@ const LangMenu = ({
     >
       <button
         className='flex items-center gap-x-1 text-pink-700 hover:opacity-85 dark:text-pink-300'
-        aria-label={`${t('language.current')}：${t(`language.${currentLang}`)}`}
+        aria-label={`${t('language.current')}：${t(`language.${curLang}`)}`}
         aria-expanded={showMenu}
         aria-controls='lang-menu'
       >
         <Languages className='h-3.5 w-3.5' aria-hidden='true' />
-        <span>{t(`language.short.${currentLang}`)}</span>
+        <span>{t(`language.short.${curLang}`)}</span>
       </button>
       <div
         id='lang-menu'
@@ -77,24 +71,22 @@ const LangMenu = ({
             : 'pointer-events-none invisible scale-95 opacity-0'
         )}
       >
-        {availableLangs
-          .filter((lang) => lang.exist)
-          .map((langOption) => (
-            <Link
-              key={langOption.code}
-              href={`/${langOption.code}/posts/${slug}`}
-              className='text-text-primary block w-full rounded px-4 py-2 hover:bg-pink-50 hover:font-medium hover:text-pink-600 dark:hover:bg-pink-900/5'
-              onClick={() => {
-                clearTimeoutSafely();
-                setShowMenu(false);
-              }}
-              role='menuitem'
-              tabIndex={showMenu ? 0 : -1}
-              aria-label={langOption.label}
-            >
-              {langOption.label}
-            </Link>
-          ))}
+        {langs.map((lang) => (
+          <Link
+            key={lang}
+            href={`/${lang}/posts/${slug}`}
+            className='text-text-primary block w-full rounded px-4 py-2 hover:bg-pink-50 hover:font-medium hover:text-pink-600 dark:hover:bg-pink-900/5'
+            onClick={() => {
+              clearTimeoutSafely();
+              setShowMenu(false);
+            }}
+            role='menuitem'
+            tabIndex={showMenu ? 0 : -1}
+            aria-label={t(`language.${lang}`)}
+          >
+            {t(`language.short.${lang}`)}
+          </Link>
+        ))}
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useTranslations, useFormatter } from 'next-intl';
 
-import type { AvailableLang, PostMeta } from '@/types';
+import type { Language, PostMeta } from '@/types';
 import { Link } from '@/i18n/navigation';
 import { useCategoryInfoMap } from '@/hooks/useCategoryInfoMap';
 import { convertToSlug } from '@/lib/tags';
@@ -21,7 +21,7 @@ import KofiBtn from '@/components/ui/KofiBtn';
 interface PostLayoutProps {
   post: PostMeta;
   headings: { id: string; text: string; level: number }[];
-  existOtherLangs: boolean;
+  otherLangs: { exist: boolean; langs: Language[] };
   children: React.ReactNode;
 }
 
@@ -32,7 +32,7 @@ interface ImageMeta {
 const PostLayout = ({
   post,
   headings,
-  existOtherLangs,
+  otherLangs,
   children,
 }: PostLayoutProps) => {
   const t = useTranslations('PostPage');
@@ -56,14 +56,6 @@ const PostLayout = ({
     hasPassword,
     coverImage,
   } = post;
-
-  const availableLangs: AvailableLang[] = [
-    {
-      code: lang,
-      label: t_settings(`language.short.${lang}`),
-      exist: existOtherLangs,
-    },
-  ];
 
   useEffect(() => {
     if (!post.coverImage) return;
@@ -116,11 +108,11 @@ const PostLayout = ({
                 wordCount={wordCount}
                 className='text-sm dark:text-white/85'
               />
-              {availableLangs.length > 0 && (
+              {otherLangs.exist && (
                 <LangMenu
                   t={t_settings}
-                  currentLang={lang}
-                  availableLangs={availableLangs}
+                  curLang={lang}
+                  langs={otherLangs.langs}
                   slug={slug}
                 />
               )}

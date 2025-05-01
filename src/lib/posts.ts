@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import { cache } from 'react';
 
 import type { Language, PostMeta, PostInfo } from '@/types';
-import { LANGUAGES } from '@/config';
+import { LANGUAGES, DEFAULT_LANGUAGE } from '@/config';
 import { isPostInCategory, getCategoryBySlug } from '@/lib/categories';
 import { convertToSlug } from '@/lib/tags';
 
@@ -14,7 +14,7 @@ const cachedDirs = new Map<string, string[]>();
 
 // 回傳所有文章所在的資料夾路徑
 export const getPostsDirs = cache(
-  async (lang: Language = 'tw'): Promise<string[]> => {
+  async (lang: Language = DEFAULT_LANGUAGE): Promise<string[]> => {
     if (typeof window !== 'undefined') return [];
     if (cachedDirs.has(lang)) return cachedDirs.get(lang) || [];
 
@@ -36,7 +36,7 @@ export const getPostsDirs = cache(
 
 // 根據當前語系取得所有文章的 metadata，並依照日期排序（由新到舊）。
 export const getPostsInfo = cache(
-  async (lang: Language = 'tw'): Promise<PostInfo[]> => {
+  async (lang: Language = DEFAULT_LANGUAGE): Promise<PostInfo[]> => {
     if (typeof window !== 'undefined') return [];
 
     const dirs = await getPostsDirs(lang);
@@ -96,7 +96,7 @@ export const getPostsInfo = cache(
 // 根據當前語系、slug 取得特定文章的 metadata 與內容
 export const getPostData = cache(
   async (
-    lang: Language = 'tw',
+    lang: Language = DEFAULT_LANGUAGE,
     slug: string
   ): Promise<
     (PostMeta & { content: string; imageMetas: Record<string, any> }) | null
@@ -175,7 +175,7 @@ export const getPostData = cache(
 // 根據 slug 取得文章的 title、description、date、tags 等 metadata
 export const getPostInfoBySlug = cache(
   async (
-    lang: Language = 'tw',
+    lang: Language = DEFAULT_LANGUAGE,
     slug: string
   ): Promise<Partial<PostInfo> | null> => {
     const postDir = path.join(postsDirectory, slug);
@@ -209,7 +209,7 @@ export const getPostInfoBySlug = cache(
 // 根據 category name、slug 取得相應文章
 export const getPostsByCategory = async (
   categoryPath: string,
-  lang: Language = 'tw'
+  lang: Language = DEFAULT_LANGUAGE
 ): Promise<PostInfo[]> => {
   const posts = await getPostsInfo(lang);
   const category = await getCategoryBySlug(categoryPath, posts);
@@ -222,7 +222,7 @@ export const getPostsByCategory = async (
 // 根據 tag name 或 slug 取得相應文章
 export const getPostsByTag = async (
   tag: string,
-  lang: Language = 'tw'
+  lang: Language = DEFAULT_LANGUAGE
 ): Promise<PostInfo[]> => {
   const posts = await getPostsInfo(lang);
 
@@ -251,25 +251,28 @@ export const getPostsMeta = async () => {
 };
 
 export const checkPostExistence = async (
-  lang: Language,
+  curLang: Language,
   slug: string
-): Promise<boolean> => {
+): Promise<{ exist: boolean; langs: Language[] }> => {
   const postDir = path.join(postsDirectory, slug);
 
-  if (!fs.existsSync(postDir)) return false;
+  if (!fs.existsSync(postDir)) return { exist: false, langs: [] };
 
   try {
     const files = await fs.promises.readdir(postDir);
 
-    // 根據語系選擇對應的檔案
-    const mdxFile =
-      lang === 'tw'
-        ? files.find((file) => file === 'index.en.mdx')
-        : files.find((file) => file === 'index.mdx');
-    if (!mdxFile) return false;
+    // 找出哪些語系的文章存在
+    const langs = LANGUAGES.filter((lang) => {
+      const filename =
+        lang === DEFAULT_LANGUAGE ? 'index.mdx' : `index.${lang}.mdx`;
+      return files.includes(filename);
+    });
 
-    return !!mdxFile;
+    // 是否有除了 curLang 外的其他語系的文章存在
+    const exist = langs.some((lang) => lang !== curLang);
+
+    return { exist, langs };
   } catch {
-    return false;
+    return { exist: false, langs: [] };
   }
 };

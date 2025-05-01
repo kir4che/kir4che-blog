@@ -4,12 +4,6 @@ import type { LANGUAGES } from '@/config';
 
 export type Language = (typeof LANGUAGES)[number]; // 'tw' | 'en'
 
-export interface AvailableLang {
-  code: Language;
-  label: string;
-  exist: boolean;
-}
-
 export type LocalizedCategoryName = {
   [key in Language]: string;
 };
