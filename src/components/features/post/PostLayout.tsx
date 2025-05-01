@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useTranslations, useFormatter } from 'next-intl';
 
@@ -8,6 +8,7 @@ import type { AvailableLang, PostMeta } from '@/types';
 import { Link } from '@/i18n/navigation';
 import { useCategoryInfoMap } from '@/hooks/useCategoryInfoMap';
 import { convertToSlug } from '@/lib/tags';
+import { useAlert } from '@/contexts/AlertContext';
 
 import PostPasswordGate from '@/components/features/post/PostPasswordGate';
 import TOC from '@/components/features/post/Toc';
@@ -24,6 +25,10 @@ interface PostLayoutProps {
   children: React.ReactNode;
 }
 
+interface ImageMeta {
+  blurDataURL: string;
+}
+
 const PostLayout = ({
   post,
   headings,
@@ -35,7 +40,9 @@ const PostLayout = ({
   const t_settings = useTranslations('settings');
   const formatter = useFormatter();
   const categoryInfoMap = useCategoryInfoMap(post);
+  const { showError } = useAlert();
 
+  const [imageMeta, setImageMeta] = useState<ImageMeta | null>(null);
   const [unlocked, setUnlocked] = useState(false);
 
   const {
@@ -58,6 +65,18 @@ const PostLayout = ({
     },
   ];
 
+  useEffect(() => {
+    post.coverImage &&
+      fetch(`/api/image-meta?src=${post.coverImage}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.blurDataURL) setImageMeta(data);
+        })
+        .catch((err) => {
+          showError(err instanceof Error ? err.message : String(err));
+        });
+  }, [post.coverImage]);
+
   if (hasPassword && !unlocked)
     return (
       <PostPasswordGate
@@ -69,17 +88,19 @@ const PostLayout = ({
 
   return (
     <>
-      {coverImage && (
+      {coverImage && imageMeta && (
         <Image
           src={coverImage}
           alt={title || slug}
           width={800}
           height={400}
-          className='-mb-2 h-72 w-full rounded-t-md object-cover'
+          className='-mb-2 h-45 w-full rounded-t-md object-cover lg:h-72'
+          placeholder={imageMeta.blurDataURL ? 'blur' : 'empty'}
+          blurDataURL={imageMeta.blurDataURL || undefined}
           priority
         />
       )}
-      <article className='dark:bg-text-gray-dark/35 rounded-md bg-white p-4 transition-all duration-300 md:p-6'>
+      <article className='dark:bg-text-gray-dark/35 rounded-md bg-white px-4 py-6 transition-all duration-300 md:p-6'>
         <header className='space-y-4'>
           <h1>{title || slug}</h1>
           <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-1'>
