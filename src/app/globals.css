@@ -128,7 +128,7 @@
   }
 
   h1 {
-    @apply text-2.5xl/9 font-bold;
+    @apply sm:text-2.5xl/9 text-2xl font-bold;
   }
 
   h2 {
