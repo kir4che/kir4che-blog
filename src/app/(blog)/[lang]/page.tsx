@@ -1,12 +1,13 @@
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
-import { Heart, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
 import type { Language } from '@/types';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/style';
 
 import PostPreview from '@/components/features/post/PostPreview';
+import Announcement from '@/components/ui/Announcement';
 
 type Params = Promise<{
   lang: Language;
@@ -27,21 +28,7 @@ const Home = async ({ params }: { params: Params }) => {
 
   return (
     <div className='space-y-8 py-2'>
-      <div
-        role='alert'
-        className='alert gap-x-2 border border-pink-200 bg-gradient-to-r from-pink-50 to-rose-100 text-pink-800 dark:border-pink-800 dark:from-pink-50/25 dark:to-rose-100/25 dark:text-pink-50'
-        style={
-          {
-            '--alert-color': 'var(--color-pink-800)',
-          } as React.CSSProperties
-        }
-      >
-        <Heart
-          fill='currentColor'
-          className='h-5 w-5 text-pink-600 dark:text-pink-100'
-        />
-        <p className='text-sm leading-relaxed'>{t('announcement')}</p>
-      </div>
+      <Announcement text={t('announcement')} />
       {/* 最新文章 */}
       {posts.length > 0 && (
         <section id='posts'>
