@@ -13,8 +13,8 @@ const NavigationLink = ({ href, ...rest }: ComponentProps<typeof Link>) => {
     <Link
       href={href}
       className={cn(
-        'inline-block text-sm hover:text-pink-700 hover:underline hover:underline-offset-4 dark:hover:text-white',
-        isActive && 'font-medium text-pink-700 dark:text-white'
+        'inline-block text-sm hover:text-pink-600 dark:hover:text-pink-200',
+        isActive && 'font-medium text-pink-700 dark:text-pink-300'
       )}
       aria-current={isActive ? 'page' : undefined}
       {...rest}
