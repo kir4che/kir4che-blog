@@ -79,7 +79,7 @@ const PostLayout = ({
           priority
         />
       )}
-      <article className='dark:bg-text-gray-dark/35 rounded-b-md bg-white p-4 md:p-6'>
+      <article className='dark:bg-text-gray-dark/35 rounded-md bg-white p-4 transition-all duration-300 md:p-6'>
         <header className='space-y-4'>
           <h1>{title || slug}</h1>
           <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-1'>
