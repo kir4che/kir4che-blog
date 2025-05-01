@@ -3,7 +3,7 @@ import { getPostData } from '@/lib/posts';
 
 import type { Language } from '@/types';
 
-export async function POST(req: Request) {
+export const POST = async (req: Request) => {
   try {
     const body = await req.json();
     const { slug, password, lang } = body;
@@ -46,4 +46,4 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ message: 'Server error.' }, { status: 500 });
   }
-}
+};

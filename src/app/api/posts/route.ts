@@ -60,12 +60,12 @@ const getFilteredPosts = async (
   );
 };
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
+export const GET = async (req: Request) => {
+  const { searchParams } = new URL(req.url);
   const lang = searchParams.get('lang') === 'en' ? 'en' : 'tw';
 
   try {
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = new URL(req.url);
     const category = searchParams.get('category');
     const tag = searchParams.get('tag');
     const keyword = searchParams.get('keyword');
@@ -109,4 +109,4 @@ export async function GET(request: Request) {
       { status: 500 }
     );
   }
-}
+};

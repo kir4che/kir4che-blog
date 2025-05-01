@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 import path from 'path';
 
 // 處理單一圖片，讀取檔案並生成 base64 模糊縮略圖。
-async function getMediaMeta(src: string) {
+export const getMediaMeta = async (src: string) => {
   const mediaPath = path.resolve(process.cwd(), 'public', src);
   const fileExtension = path.extname(mediaPath).toLowerCase();
   const validImageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
@@ -19,7 +19,7 @@ async function getMediaMeta(src: string) {
       blurDataURL: base64,
     };
   } else return null;
-}
+};
 
 // 提取文章內容中的所有圖片，並生成 metadata（含模糊縮圖）。
 export const extractAndProcessImageMetas = async (content: string) => {

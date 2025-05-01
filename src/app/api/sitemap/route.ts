@@ -2,7 +2,7 @@
 import sitemap from '@/app/sitemap';
 import type { SitemapFile } from '@/app/sitemap';
 
-export async function GET() {
+export const GET = async () => {
   const sitemapData = (await sitemap()) as SitemapFile[];
   return new Response(
     `<?xml version="1.0" encoding="UTF-8"?>\n${generateXML(sitemapData)}`,
@@ -12,7 +12,7 @@ export async function GET() {
       },
     }
   );
-}
+};
 
 const generateXML = (sitemapData: SitemapFile[]): string => {
   return `

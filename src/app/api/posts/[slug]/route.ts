@@ -3,8 +3,8 @@ import { NextResponse } from 'next/server';
 import { checkPostExistence, getPostData } from '@/lib/posts';
 import { responseWithCache } from '@/utils/responseWithCache';
 
-export const GET = async (request: Request) => {
-  const { pathname, searchParams } = new URL(request.url);
+export const GET = async (req: Request) => {
+  const { pathname, searchParams } = new URL(req.url);
   const pathParts = pathname.split('/');
   const slug = pathParts.at(-1);
   const lang = searchParams.get('lang') === 'en' ? 'en' : 'tw';
@@ -13,7 +13,7 @@ export const GET = async (request: Request) => {
     return NextResponse.json({ message: 'Missing slug.' }, { status: 400 });
 
   try {
-    const checkExistence = request.headers.get('X-Check-Existence') === 'true';
+    const checkExistence = req.headers.get('X-Check-Existence') === 'true';
 
     if (checkExistence) {
       const exist = await checkPostExistence(lang, slug);

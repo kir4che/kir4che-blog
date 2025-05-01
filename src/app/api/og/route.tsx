@@ -12,7 +12,7 @@ const removeEmojis = (str: string) => {
   );
 };
 
-export async function GET(req: Request) {
+export const GET = async (req: Request) => {
   const { searchParams } = new URL(req.url);
   const title = removeEmojis(searchParams.get('title') || 'kir4che blog');
   const tags =
@@ -100,4 +100,4 @@ export async function GET(req: Request) {
       height: 630,
     }
   );
-}
+};
