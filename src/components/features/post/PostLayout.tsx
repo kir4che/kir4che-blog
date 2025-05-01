@@ -66,16 +66,17 @@ const PostLayout = ({
   ];
 
   useEffect(() => {
-    post.coverImage &&
-      fetch(`/api/image-meta?src=${post.coverImage}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.blurDataURL) setImageMeta(data);
-        })
-        .catch((err) => {
-          showError(err instanceof Error ? err.message : String(err));
-        });
-  }, [post.coverImage]);
+    if (!post.coverImage) return;
+
+    fetch(`/api/image-meta?src=${post.coverImage}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.blurDataURL) setImageMeta(data);
+      })
+      .catch((err) => {
+        showError(err instanceof Error ? err.message : String(err));
+      });
+  }, [post.coverImage, showError]);
 
   if (hasPassword && !unlocked)
     return (
