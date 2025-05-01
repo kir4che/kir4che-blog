@@ -31,7 +31,7 @@ const PostPreview: React.FC<PostPreviewProps> = ({
     return (
       <article
         key={post.slug}
-        className='card-body bg-bg-secondary h-25 justify-between rounded-xl p-4 shadow-[2px_2px_3px_rgba(0,0,0,0.05)]'
+        className='card-body bg-bg-secondary h-25 justify-between rounded-xl p-4 shadow-[2px_2px_3px_rgba(0,0,0,0.05)] transition-all duration-300'
       >
         <h2 className='card-title text-xl'>
           <Link

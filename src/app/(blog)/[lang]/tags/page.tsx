@@ -31,12 +31,12 @@ const TagsPage = async ({ params }: { params: Params }) => {
       <>
         <h1 className='mb-4'>{t('title')}</h1>
         {tags?.length ? (
-          <div className='flex flex-wrap items-center gap-x-4 gap-y-5'>
+          <div className='flex flex-wrap items-center gap-x-4 gap-y-5 transition-colors duration-300'>
             {tags.map(({ name, slug, postCount }) => (
               <Link
                 key={slug}
                 href={`/tags/${slug}`}
-                className='bg-bg-secondary dark:bg-text-gray-dark transition-color flex w-40 items-center justify-between rounded-full p-3 shadow-[2px_2px_3px_rgba(0,0,0,0.05)] transition-all duration-150 hover:scale-105'
+                className='bg-bg-secondary dark:bg-text-gray-dark flex w-40 items-center justify-between rounded-full p-3 shadow-[2px_2px_3px_rgba(0,0,0,0.05)] hover:scale-105'
                 aria-label={`${name} (${postCount} posts)`}
               >
                 <h2 className='text-sm text-nowrap'># {name}</h2>
@@ -53,8 +53,7 @@ const TagsPage = async ({ params }: { params: Params }) => {
         )}
       </>
     );
-  } catch (error) {
-    console.error('Error in TagsPage:', error);
+  } catch {
     return notFound();
   }
 };

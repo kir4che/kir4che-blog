@@ -23,7 +23,7 @@ const CategoryTabs = ({
   if (!subcategories || Object.keys(subcategories).length === 0) return null;
 
   return (
-    <div className='bg-bg-secondary mb-6 flex gap-x-2 rounded-t-xl'>
+    <div className='bg-bg-secondary mb-6 flex gap-x-2 rounded-t-xl transition-colors duration-300'>
       <button
         onClick={() => onTabChange('all')}
         className={cn(
