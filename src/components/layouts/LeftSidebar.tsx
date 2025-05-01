@@ -59,7 +59,7 @@ const LeftSidebar: React.FC = () => {
   const t = useTranslations('profile');
 
   return (
-    <aside className='flex flex-col justify-between pt-4 pb-0 md:sticky md:top-0 md:h-screen md:w-45 md:py-8 lg:w-48'>
+    <aside className='mb-4 flex flex-col justify-between pt-4 pb-0 sm:mb-0 md:sticky md:top-0 md:h-screen md:w-45 md:py-8 lg:w-48'>
       <div className='flex items-center gap-x-3 gap-y-2 md:mb-2.5 md:flex-col md:items-start'>
         <div className='relative block h-16 w-16 md:h-26 md:w-26'>
           <Link href='/' className='avatar'>
@@ -69,7 +69,9 @@ const LeftSidebar: React.FC = () => {
               width={100}
               height={100}
               className='min-h-16 min-w-16 rounded-full shadow'
-              loading='lazy'
+              onLoadingComplete={(img) => {
+                img.style.backgroundColor = '#F9A8C2';
+              }}
               onError={(e) => {
                 e.currentTarget.onerror = null;
                 e.currentTarget.src = '/icons/no-image.svg';
