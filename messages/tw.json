@@ -70,9 +70,9 @@
     "coverImageAlt": "關於我的封面圖片",
     "personalInfo": {
       "job": "👩🏻‍💻 目前是一名前端工程師",
-      "education": "🏫 畢業於國立臺北科技大學 (NTUT) 資訊與財金管理學系",
-      "personality": "🦫 超級 I 但喜歡認識新朋友的 ISTJ",
-      "hobbies": "💖 愛好：鉤織、打電動、看實況、看 LOL 比賽、旅行、美食"
+      "mbti": "🦫 MBTI 是務實的 ISTJ（物流師）",
+      "hobby": "🎮 愛打電動，戰旗、快打、乙女遊戲...也有在看 LOL 比賽。",
+      "hobby2": "🧶 喜歡鉤織，最近的挑戰是織背心～"
     },
     "vlogIntro": "喜歡嘗試很多事情，最近開始拍 Vlog 想要紀錄生活的每一刻。",
     "title_2": "💌 如何聯繫我："
