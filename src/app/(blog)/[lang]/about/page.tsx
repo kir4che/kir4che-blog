@@ -26,9 +26,9 @@ const AboutPage = async () => {
           <h3 className='heading mb-4 -ml-8'>{t('intro')}</h3>
           <ul className='list-inside list-disc leading-7'>
             <li>{t('personalInfo.job')}</li>
-            <li>{t('personalInfo.education')}</li>
-            <li>{t('personalInfo.personality')}</li>
-            <li>{t('personalInfo.hobbies')}</li>
+            <li>{t('personalInfo.mbti')}</li>
+            <li>{t('personalInfo.hobby')}</li>
+            <li>{t('personalInfo.hobby2')}</li>
           </ul>
           <br />
           <p>{t('vlogIntro')}</p>
