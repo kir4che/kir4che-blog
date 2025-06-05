@@ -53,7 +53,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.17.30",
-    "@types/react": "^19.1.2",
+    "@types/react": "19.1.6",
     "@types/react-dom": "^19",
     "daisyui": "^5.0.28",
     "eslint": "^9.24.0",
