@@ -90,7 +90,9 @@
     "thanks": "如果你覺得這篇文章對你有幫助，可以請我喝杯奶茶 (◍•ᴗ•◍)❤",
     "relatedPosts": "相關文章",
     "enterPassword": "輸入密碼",
-    "wrongPassword": "密碼錯誤，請再試一次！"
+    "incorrectPassword": "密碼錯誤，請再試一次！",
+    "tooManyAttempts": "嘗試次數過多，請在 1 分鐘後再試。",
+    "backToPosts": "返回文章列表"
   },
   "CategoriesPage": {
     "title": "文章分類",
