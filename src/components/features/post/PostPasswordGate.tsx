@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { LockKeyhole, Eye, EyeOff } from 'lucide-react';
+
 import { useAlert } from '@/contexts/AlertContext';
 
 interface PostPasswordGateProps {
