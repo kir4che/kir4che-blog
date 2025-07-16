@@ -56,7 +56,7 @@ const PostsPage = ({ params }: { params: Params }) => {
         .sort(([a], [b]) => Number(b) - Number(a))
         .map(([year, yearPosts]) => (
           <section key={year}>
-            <p className='mb-3 font-bold text-pink-800/50 dark:text-pink-200'>
+            <p className='mb-2.5 font-bold text-pink-800/50 dark:text-pink-200'>
               {year}
             </p>
             <section className='card space-y-4'>

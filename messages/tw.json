@@ -8,6 +8,11 @@
       "words": "字"
     },
     "button": {
+      "publish": "發佈",
+      "publishing": "發佈中...",
+      "saveDraft": "儲存為草稿",
+      "saving": "儲存中...",
+      "cancel": "取消",
       "retry": "重試",
       "submit": "送出",
       "verifying": "驗證中..."
@@ -81,9 +86,41 @@
     "title": "文章列表",
     "search": "搜尋文章",
     "latestPosts": "最新文章",
+    "addNewPost": "新增文章",
     "morePosts": "更多文章",
     "noPosts": "尚無文章",
     "loadFailed": "無法載入文章，請稍後再試。"
+  },
+  "EditorPage": {
+    "title": "文章編輯器",
+    "form": {
+      "draft": "草稿",
+      "featured": "精選文章",
+      "title": "文章標題",
+      "titlePlaceholder": "請輸入文章標題（建議 25 字以內）",
+      "slug": "slug",
+      "slugPlaceholder": "請輸入文章 slug（用於 URL）",
+      "description": "文章描述",
+      "descriptionPlaceholder": "請輸入文章描述（建議 80 字以內）",
+      "tags": "標籤",
+      "tagsPlaceholder": "標籤1, 標籤2, 標籤3",
+      "categories": "分類",
+      "password": "密碼鎖",
+      "passwordPlaceholder": "若需要密碼才能查看文章，請在此輸入密碼。",
+
+      "coverImage": "封面圖片"
+    },
+    "content": {
+      "title": "文章內容",
+      "edit": {
+        "placeholder": "請輸入文章內容（使用 MDX 語法）"
+      },
+      "preview": {
+        "compiling": "正在編譯預覽中...",
+        "error": "MDX 編譯失敗",
+        "empty": "尚未輸入內容"
+      }
+    }
   },
   "PostPage": {
     "lastUpdated": "文章最後更新於",

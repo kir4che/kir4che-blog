@@ -13,6 +13,11 @@ export const middleware = (request: NextRequest) => {
   if (pathname === '/')
     return NextResponse.redirect(new URL(DEFAULT_PATH, request.url));
 
+  const isEditorPage = /^\/(tw|en)\/posts\/editor(?:\/|$)?/.test(pathname);
+  const locale = pathname.split('/')[1];
+  if (isEditorPage && process.env.NEXT_PUBLIC_NODE_ENV !== 'development')
+    return NextResponse.redirect(new URL(`/${locale}/not-found`, request.url));
+
   return createMiddleware(routing)(request);
 };
 
