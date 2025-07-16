@@ -29,17 +29,18 @@ const CategoryGroup = ({
       <div className='z-10 flex flex-wrap items-center gap-x-2 text-sm'>
         {categories.map((catName) => {
           const categoryInfo = categoryInfoMap[catName];
+
+          if (!categoryInfo || !categoryInfo.name) return null;
+
           return (
             <Link
               key={catName}
-              href={`/categories${categoryInfo?.parentSlug ? `/${categoryInfo.parentSlug}` : ''}/${categoryInfo?.slug ?? ''}`}
+              href={`/categories${categoryInfo.parentSlug ? `/${categoryInfo.parentSlug}` : ''}/${categoryInfo.slug ?? ''}`}
               className={cn(
                 'flex items-center gap-x-1 text-sm text-[var(--category-color)] hover:opacity-85',
                 className
               )}
-              style={
-                categoryInfo ? getCategoryStyle(categoryInfo.color) : undefined
-              }
+              style={getCategoryStyle(categoryInfo.color)}
             >
               <Circle
                 className='h-2 w-2'

@@ -8,6 +8,11 @@
       "words": "words"
     },
     "button": {
+      "publish": "Publish",
+      "publishing": "Publishing...",
+      "saveDraft": "Save as Draft",
+      "saving": "Saving...",
+      "cancel": "Cancel",
       "retry": "Retry",
       "submit": "Submit",
       "verifying": "Verifying..."
@@ -81,9 +86,40 @@
     "title": "Posts",
     "search": "Search Posts",
     "latestPosts": "Latest Posts",
+    "addNewPost": "Add New Post",
     "morePosts": "More Posts",
     "noPosts": "No posts yet.",
     "loadFailed": "Failed to load posts. Please try again later."
+  },
+  "EditorPage": {
+    "title": "Post Editor",
+    "form": {
+      "draft": "Draft",
+      "featured": "Featured Post",
+      "title": "Post Title",
+      "titlePlaceholder": "Enter post title (suggested max 50 characters)",
+      "slug": "slug",
+      "slugPlaceholder": "Enter post slug (for URL)",
+      "description": "Post Description",
+      "descriptionPlaceholder": "Enter post description (suggested 160 characters max)",
+      "tags": "Tags",
+      "tagsPlaceholder": "tag1, tag2, tag3",
+      "categories": "Categories",
+      "password": "Password Lock",
+      "passwordPlaceholder": "Enter password if the post requires a password to view.",
+      "coverImage": "Cover Image"
+    },
+    "content": {
+      "title": "Post Content",
+      "edit": {
+        "placeholder": "Enter post content (using MDX syntax)"
+      },
+      "preview": {
+        "compiling": "Compiling preview...",
+        "error": "MDX compilation failed",
+        "empty": "No content entered yet"
+      }
+    }
   },
   "PostPage": {
     "lastUpdated": "Last updated on",

@@ -77,7 +77,7 @@ const RootLayout = async ({ children, params }: RootLayoutProps) => {
         <Providers locale={lang} messages={messages}>
           <Sidebar lang={lang}>
             <div className='w-full flex-grow'>
-              <Header />
+              <Header lang={lang} />
               <main className='h-auto min-h-[calc(100vh-9rem)]'>
                 {children}
                 <Suspense>

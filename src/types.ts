@@ -88,3 +88,10 @@ export interface Tag {
   slug: string;
   postCount?: number;
 }
+
+/* ----- MDX 編輯器 ----- */
+
+export type MDXAction = {
+  before: string;
+  after?: string;
+};

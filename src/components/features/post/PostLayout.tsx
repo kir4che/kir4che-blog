@@ -155,7 +155,7 @@ const PostLayout = ({
           )}
         </footer>
       </article>
-      <TOC headings={headings} />
+      {headings && headings.length > 0 && <TOC headings={headings} />}
       {/* <RelatedPosts lang={lang} currentSlug={slug} categories={categories} /> */}
     </>
   );
