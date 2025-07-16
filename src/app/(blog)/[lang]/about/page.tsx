@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { getTranslations } from 'next-intl/server';
+import { useTranslations } from 'next-intl';
 
 import { CONFIG } from '@/config';
 import youtubes from '@/config/youtubes';
@@ -7,8 +7,8 @@ import youtubes from '@/config/youtubes';
 import DecorativeImage from '@/components/ui/DecorativeImage';
 import ExternalLink from '@/components/ui/ExternalLink';
 
-const AboutPage = async () => {
-  const t = await getTranslations('AboutPage');
+const AboutPage = () => {
+  const t = useTranslations('AboutPage');
 
   return (
     <>
