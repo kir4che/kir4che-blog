@@ -77,6 +77,7 @@ export const getPostsInfo = cache(
             lang,
             featured: data.featured ?? false,
             coverImage: data.coverImage,
+            hasPassword: !!data.password || false,
           };
 
           return post;

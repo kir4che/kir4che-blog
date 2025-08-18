@@ -20,7 +20,7 @@ export interface PostMeta {
   wordCount: number;
   lang: Language;
   password?: string;
-  hasPassword?: boolean;
+  hasPassword: boolean;
   draft?: boolean;
   featured?: boolean;
   coverImage?: string;
@@ -43,6 +43,7 @@ export interface PostInfo {
   lang: Language;
   featured: boolean;
   coverImage: string;
+  hasPassword: boolean;
 }
 
 export interface PaginationData {
