@@ -214,10 +214,12 @@
   @apply mr-1;
 }
 
-.collapse:is([open], :focus:not(.collapse-close)) > :where(.collapse-content),
-.collapse:not(.collapse-close)
-  > :where(
-    input:is([type='checkbox'], [type='radio']):checked ~ .collapse-content
-  ) {
-  @apply pb-0;
+@layer utilities {
+  .collapse:is([open], :focus:not(.collapse-close)) > :where(.collapse-content),
+  .collapse:not(.collapse-close)
+    > :where(
+      input:is([type='checkbox'], [type='radio']):checked ~ .collapse-content
+    ) {
+    @apply pb-0;
+  }
 }
