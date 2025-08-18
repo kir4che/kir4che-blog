@@ -8,11 +8,9 @@
     "build": "npm run generate:imageMetas && npm run update:wordCount:all && next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "create:new-post": "ts-node --project scripts/tsconfig.scripts.json scripts/createPost.ts",
     "update:updatedAt": "ts-node --project scripts/tsconfig.scripts.json scripts/updateUpdatedAt.ts",
-    "update:wordCount": "ts-node --project scripts/tsconfig.scripts.json scripts/updateWordCount.ts",
     "update:wordCount:all": "ts-node --project scripts/tsconfig.scripts.json scripts/updateWordCount.ts --all",
     "generate:imageMetas": "ts-node --project scripts/tsconfig.scripts.json scripts/generateImageMetas.ts"
   },
