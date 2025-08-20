@@ -69,8 +69,9 @@ const LeftSidebar: React.FC = () => {
               width={100}
               height={100}
               className='min-h-16 min-w-16 rounded-full shadow'
-              onLoadingComplete={(img) => {
-                img.style.backgroundColor = '#F9A8C2';
+              onLoad={(e) => {
+                const imgElement = e.currentTarget as HTMLImageElement;
+                imgElement.style.backgroundColor = '#F9A8C2';
               }}
               onError={(e) => {
                 e.currentTarget.onerror = null;
