@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "test": "echo \"No tests specified\" && exit 0",
-    "build": "npm run generate:imageMetas && npm run update:wordCount:all && next build",
+    "build": "pnpm generate:imageMetas && pnpm update:wordCount:all && next build",
     "start": "next start",
     "lint": "next lint",
     "format:fix": "prettier --write .",
