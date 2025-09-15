@@ -60,8 +60,11 @@
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "remark-mark-highlight": "^0.1.1",
+    "remark-mdx": "^3.1.1",
+    "remark-parse": "^11.0.0",
     "tailwindcss": "^4.1.4",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "unified": "^11.0.5"
   }
 }
