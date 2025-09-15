@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
-import { getPlaiceholder } from 'plaiceholder';
 
 import { responseWithCache } from '@/utils/responseWithCache';
 
@@ -9,19 +8,26 @@ export const GET = async (req: Request) => {
   const src = searchParams.get('src');
 
   try {
-    if (!src) {
+    if (!src)
       return NextResponse.json(
         { message: 'Missing src parameter.' },
         { status: 400 }
       );
-    }
 
     const imagePath = process.cwd() + '/public' + src;
 
     // 讀取圖片檔案成 buffer
     const buffer = await fs.promises.readFile(imagePath);
-    // 使用 plaiceholder 生成 base64 格式的模糊縮圖
-    const { base64 } = await getPlaiceholder(buffer);
+    let base64 = '';
+    try {
+      const mod = await import('plaiceholder');
+      const { getPlaiceholder } = mod as typeof import('plaiceholder');
+      // 使用 plaiceholder 生成 base64 格式的模糊縮圖
+      const res = await getPlaiceholder(buffer);
+      base64 = res.base64;
+    } catch {
+      base64 = '';
+    }
 
     return responseWithCache({ blurDataURL: base64 });
   } catch {

@@ -62,7 +62,7 @@ export const getPostsInfo = cache(
           // 沒有日期、草稿也跳過
           if (
             !data.date ||
-            (data.draft && process.env.NEXT_PUBLIC_NODE_ENV !== 'development')
+            (data.draft && process.env.NODE_ENV === 'production')
           )
             return null;
 
@@ -120,7 +120,7 @@ export const getPostData = cache(
       // 驗證必要欄位
       if (!data.title && !data.date) return null;
       // 防止顯示 draft 文章
-      if (data.draft && process.env.NEXT_PUBLIC_NODE_ENV !== 'development') {
+      if (data.draft && process.env.NODE_ENV === 'production') {
         const err = new Error('This post is a draft.');
         (err as any).code = 'DRAFT_POST';
         throw err;

@@ -32,12 +32,13 @@ const dmSans = DM_Sans({
   variable: '--font-dm-sans',
 });
 
+type Params = Promise<{ lang: Language }>;
+
 interface RootLayoutProps {
   children: React.ReactNode;
-  params: { lang: Language };
+  params: Params;
 }
 
-// 在正式環境中禁用 console，避免顯示不必要的日誌。
 if (
   typeof window !== 'undefined' &&
   process.env.NEXT_PUBLIC_NODE_ENV !== 'development'
@@ -54,7 +55,7 @@ export function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { lang: Language };
+  params: Params;
 }): Promise<Metadata> {
   const { lang } = await params;
   return getSeoConfig(lang);
