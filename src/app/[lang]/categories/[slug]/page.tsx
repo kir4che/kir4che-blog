@@ -6,7 +6,7 @@ import type { Language } from '@/types';
 import { LANGUAGES } from '@/config';
 
 import CategoryPosts from '@/components/features/category/CategoryPosts';
-import { getCategoryBySlug } from '@/lib/categories';
+import { getAllCategoryByPosts, getCategoryBySlug } from '@/lib/categories';
 import { getPostsInfo } from '@/lib/posts';
 
 type Params = Promise<{
@@ -17,18 +17,15 @@ type Params = Promise<{
 // 預先取得所有語系的所有 { lang, slug }
 export async function generateStaticParams() {
   try {
-    const posts = await getPostsInfo();
-    const allCategories = posts.flatMap((post) => post.categories || []);
-    const names = [...new Set(allCategories)];
+    const params: { lang: Language; slug: string }[] = [];
 
-    const slugs: string[] = [];
-
-    for (const n of names) {
-      const category = getCategoryBySlug(n, posts, 'main');
-      if (category) slugs.push(category.slug);
+    for (const lang of LANGUAGES) {
+      const posts = await getPostsInfo(lang);
+      const categories = getAllCategoryByPosts(posts);
+      for (const cat of categories) params.push({ lang, slug: cat.slug });
     }
 
-    return LANGUAGES.flatMap((lang) => slugs.map((slug) => ({ lang, slug })));
+    return params;
   } catch {
     return [];
   }

@@ -17,15 +17,21 @@ type Params = Promise<{
 // 預先取得所有語系的所有 { lang, tag }
 export async function generateStaticParams() {
   try {
-    const posts = await getPostsInfo();
-    const tags = getTagsByPosts(posts);
+    const params: { lang: Language; tag: string }[] = [];
 
-    return LANGUAGES.flatMap((lang) =>
-      tags.map(({ name }) => ({
-        tag: convertToSlug(name),
-        lang,
-      }))
-    );
+    for (const lang of LANGUAGES) {
+      const posts = await getPostsInfo(lang);
+      const tags = getTagsByPosts(posts);
+      const seen = new Set<string>();
+      for (const { name } of tags) {
+        const slug = convertToSlug(name);
+        if (seen.has(slug)) continue;
+        seen.add(slug);
+        params.push({ lang, tag: slug });
+      }
+    }
+
+    return params;
   } catch {
     return [];
   }

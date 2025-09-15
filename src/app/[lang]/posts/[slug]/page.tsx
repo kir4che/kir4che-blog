@@ -3,8 +3,13 @@ export const dynamic = 'force-static';
 import { notFound } from 'next/navigation';
 
 import type { Language } from '@/types';
-import { LANGUAGES, LANGUAGE_TO_LOCALE_MAP } from '@/config';
-import { getPostsMeta, getPostInfoBySlug, getPostData } from '@/lib/posts';
+import { LANGUAGE_TO_LOCALE_MAP } from '@/config';
+import {
+  getPostsMeta,
+  getPostInfoBySlug,
+  getPostData,
+  checkPostExistence,
+} from '@/lib/posts';
 import { parseMDX } from '@/lib/mdx';
 
 import PostLayout from '@/components/features/post/PostLayout';
@@ -18,7 +23,7 @@ type Params = Promise<{
 // 預先取得所有語系的所有 { lang, slug }
 export async function generateStaticParams() {
   const posts = await getPostsMeta();
-  return LANGUAGES.flatMap((lang) => posts.map(({ slug }) => ({ lang, slug })));
+  return posts.map(({ lang, slug }) => ({ lang, slug }));
 }
 
 export async function generateMetadata({ params }: { params: Params }) {
