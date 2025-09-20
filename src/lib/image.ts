@@ -12,11 +12,13 @@ export const getMediaMeta = async (src: string) => {
   if (validImageExtensions.includes(fileExtension)) {
     // 讀取圖片檔案成 buffer
     const buffer = await fs.readFile(mediaPath);
-    // 使用 plaiceholder 生成 base64 格式的模糊縮圖
-    const { base64 } = await getPlaiceholder(buffer);
+    // 使用 plaiceholder 生成 base64 格式的模糊縮圖與原始尺寸
+    const { base64, img, metadata }: any = await getPlaiceholder(buffer);
     return {
       src: '/' + src.replace(/^\/+/, ''),
       blurDataURL: base64,
+      originalWidth: img?.width ?? metadata?.width ?? undefined,
+      originalHeight: img?.height ?? metadata?.height ?? undefined,
     };
   } else return null;
 };

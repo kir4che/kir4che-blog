@@ -25,6 +25,9 @@ interface CustomImageProps {
   blurDataURL?: string;
   noProvider?: boolean;
   priority?: boolean;
+  sizes?: string;
+  originalWidth?: number;
+  originalHeight?: number;
   className?: string;
   [key: string]: any;
 }
@@ -39,6 +42,10 @@ const CustomImage: React.FC<CustomImageProps> = ({
   objPos = 'center',
   blurDataURL,
   noProvider = false,
+  priority = false,
+  sizes,
+  originalWidth,
+  originalHeight,
   className,
   ...props
 }) => {
@@ -54,15 +61,44 @@ const CustomImage: React.FC<CustomImageProps> = ({
     bottom: 'object-bottom',
   }[objPos];
 
-  const useFill = !width && !height;
+  // 當傳入的是數字寬高才視為固定尺寸；字串（如 '100%'）僅作為容器樣式使用
+  const hasNumericDims =
+    typeof width === 'number' &&
+    typeof height === 'number' &&
+    width > 0 &&
+    height > 0;
+  const useFill = !hasNumericDims;
+
+  const renderWidth = hasNumericDims
+    ? (width as number)
+    : originalWidth || undefined;
+  const renderHeight = hasNumericDims
+    ? (height as number)
+    : originalHeight || undefined;
+
+  // 預設 sizes：手機 100vw，桌面約內容寬度（配合文章版心）
+  const computedSizes =
+    sizes ||
+    (useFill
+      ? '(max-width: 768px) 100vw, (max-width: 1280px) 80vw, 800px'
+      : renderWidth
+        ? `(max-width: ${renderWidth}px) 100vw, ${renderWidth}px`
+        : '100vw');
 
   const imageContent = (
     <div
       className={cn(
-        'relative h-full w-full overflow-hidden rounded-md',
+        'relative size-full overflow-hidden rounded-md',
         useFill && 'aspect-[3/2]',
         className
       )}
+      style={
+        useFill && originalWidth && originalHeight
+          ? ({
+              aspectRatio: `${originalWidth}/${originalHeight}`,
+            } as React.CSSProperties)
+          : undefined
+      }
     >
       {useFill ? (
         <Image
@@ -71,8 +107,12 @@ const CustomImage: React.FC<CustomImageProps> = ({
           placeholder={blurDataURL ? 'blur' : 'empty'}
           blurDataURL={blurDataURL}
           fill
+          priority={priority}
+          loading={priority ? 'eager' : 'lazy'}
+          decoding='async'
+          sizes={computedSizes}
           className={cn(
-            'h-full w-full object-cover transition-transform duration-300 hover:scale-105',
+            'size-full object-cover transition-transform duration-300 hover:scale-105',
             objectPosition
           )}
           {...props}
@@ -83,10 +123,14 @@ const CustomImage: React.FC<CustomImageProps> = ({
           alt={alt}
           placeholder={blurDataURL ? 'blur' : 'empty'}
           blurDataURL={blurDataURL}
-          width={800}
-          height={600}
+          width={renderWidth || 800}
+          height={renderHeight || 600}
+          priority={priority}
+          loading={priority ? 'eager' : 'lazy'}
+          decoding='async'
+          sizes={computedSizes}
           className={cn(
-            'h-full w-full object-cover transition-transform duration-300 hover:scale-105',
+            'size-full object-cover transition-transform duration-300 hover:scale-105',
             objectPosition
           )}
           {...props}
@@ -99,7 +143,9 @@ const CustomImage: React.FC<CustomImageProps> = ({
     <figure
       className={cn(
         'xs:[max-height:var(--img-max-height)] flex max-h-80 w-full flex-col gap-y-2',
-        width ? 'sm:[max-width:var(--img-width)]' : 'md:max-w-5/6',
+        typeof width !== 'undefined' && typeof width !== 'number'
+          ? 'sm:[max-width:var(--img-width)]'
+          : 'md:max-w-5/6',
         alignment,
         className
       )}
@@ -112,6 +158,10 @@ const CustomImage: React.FC<CustomImageProps> = ({
                 typeof height === 'number' ? `${height}px` : height
               }, 400px)`
             : '400px',
+          aspectRatio:
+            useFill && originalWidth && originalHeight
+              ? `${originalWidth}/${originalHeight}`
+              : undefined,
         } as React.CSSProperties
       }
     >
