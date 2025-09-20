@@ -15,36 +15,47 @@ const RelatedPosts = ({ lang, currentSlug, categories }: RelatedPostsProps) => {
   const t = useTranslations('PostPage');
   const { showError } = useAlert();
   const [relatedPosts, setRelatedPosts] = useState<PostMeta[]>([]);
-
-  const categoryParam = useMemo(() => categories.join(','), [categories]);
+  const categoryParam = useMemo(() => {
+    const uniqueCategories = Array.from(new Set(categories));
+    return uniqueCategories.join(',');
+  }, [categories]);
 
   useEffect(() => {
-    if (categories.length === 0) return;
+    if (!categoryParam) return;
 
-    const fetchRelatedPosts = () => {
-      const params = new URLSearchParams({
-        filter: 'related',
-        currentSlug,
-        categories: categoryParam,
-      });
+    const controller = new AbortController();
 
-      fetch(`/api/posts?${params}&lang=${lang}`)
-        .then((res) => {
-          if (!res.ok) throw new Error('Fetch failed.');
-          return res.json();
-        })
-        .then(({ posts }) => {
-          if (!posts || !Array.isArray(posts))
-            throw new Error('Invalid response format.');
-          setRelatedPosts(posts);
-        })
-        .catch((err) => {
-          showError(err instanceof Error ? err.message : err);
+    const fetchRelatedPosts = async () => {
+      try {
+        const params = new URLSearchParams({
+          filter: 'related',
+          currentSlug,
+          categories: categoryParam,
         });
+
+        const res = await fetch(`/api/posts?${params}&lang=${lang}`, {
+          signal: controller.signal,
+          cache: 'no-store',
+        });
+
+        if (!res.ok) throw new Error('Failed to load related posts.');
+
+        const data = await res.json();
+
+        if (!data?.posts || !Array.isArray(data.posts))
+          throw new Error('Invalid related posts response.');
+
+        setRelatedPosts(data.posts);
+      } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        showError(err instanceof Error ? err.message : String(err));
+      }
     };
 
     fetchRelatedPosts();
-  }, [lang, currentSlug, categories, categoryParam, showError]);
+
+    return () => controller.abort();
+  }, [lang, currentSlug, categoryParam, showError]);
 
   if (!relatedPosts.length) return null;
 
