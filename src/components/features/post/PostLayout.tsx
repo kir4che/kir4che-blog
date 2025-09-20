@@ -15,7 +15,7 @@ import TOC from '@/components/features/post/Toc';
 import LangMenu from '@/components/features/post/LangMenu';
 import CategoryGroup from '@/components/features/post/CategoryGroup';
 import PostMetaInfo from '@/components/features/post/PostMetaInfo';
-// import RelatedPosts from '@/components/features/post/RelatedPosts';
+import RelatedPosts from '@/components/features/post/RelatedPosts';
 import KofiBtn from '@/components/ui/KofiBtn';
 
 interface PostLayoutProps {
@@ -156,7 +156,7 @@ const PostLayout = ({
         </footer>
       </article>
       {headings && headings.length > 0 && <TOC headings={headings} />}
-      {/* <RelatedPosts lang={lang} currentSlug={slug} categories={categories} /> */}
+      <RelatedPosts lang={lang} currentSlug={slug} categories={categories} />
     </>
   );
 };
