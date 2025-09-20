@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "rm -rf .next && next dev",
     "test": "echo \"No tests specified\" && exit 0",
     "build": "pnpm generate:imageMetas && pnpm update:wordCount:all && next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "format:fix": "prettier --write .",
     "create:new-post": "ts-node --project scripts/tsconfig.scripts.json scripts/createPost.ts",
     "update:updatedAt": "ts-node --project scripts/tsconfig.scripts.json scripts/updateUpdatedAt.ts",
@@ -50,6 +50,9 @@
     "vfile": "^6.0.3"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.36.0",
+    "@next/eslint-plugin-next": "^15.5.3",
     "@types/node": "^20.17.30",
     "@types/react": "19.1.6",
     "@types/react-dom": "^19",
