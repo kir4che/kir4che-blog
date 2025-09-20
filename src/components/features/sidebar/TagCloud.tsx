@@ -20,7 +20,7 @@ const TagCloud = ({ tags }: TagCloudProps) => {
           className='size-4 text-pink-700 dark:text-pink-500'
           aria-hidden='true'
         />
-        {t('tags')}
+        <Link href='/tags'>{t('tags')}</Link>
       </h3>
       <div className='flex flex-wrap gap-2'>
         {tags.map(({ name, slug }) => (

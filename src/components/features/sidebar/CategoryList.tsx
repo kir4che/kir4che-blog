@@ -18,7 +18,7 @@ const CategoryList: React.FC<{ categories: Category[] }> = ({ categories }) => {
           className='size-4 text-pink-700 dark:text-pink-500'
           aria-hidden='true'
         />
-        {t('categories')}
+        <Link href='/categories'>{t('categories')}</Link>
       </h3>
       <ul className='flex flex-wrap items-center gap-2'>
         {categories.map(({ slug, name, color, postCount }) => (
