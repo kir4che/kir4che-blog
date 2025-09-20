@@ -9,17 +9,19 @@ const outputPath = path.join(process.cwd(), 'public', 'imageMetas.json');
 // 定義有效的圖片副檔名
 const validImageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
 
-// 取得媒體檔案的 meta（包含 blur 效果的 base64）
+// 取得媒體檔案的 meta（包含 blur base64 與原始寬高）
 const getMediaMeta = async (src: string) => {
   const mediaPath = path.join(process.cwd(), 'public', src);
   const fileExtension = path.extname(mediaPath).toLowerCase();
 
   if (validImageExtensions.includes(fileExtension)) {
     const buffer = await fs.readFile(mediaPath);
-    const { base64 } = await getPlaiceholder(buffer);
+    const { base64, img, metadata }: any = await getPlaiceholder(buffer);
     return {
       src: '/' + src.replace(/^\/+/, ''),
       blurDataURL: base64,
+      originalWidth: img?.width ?? metadata?.width ?? undefined,
+      originalHeight: img?.height ?? metadata?.height ?? undefined,
     };
   }
 
