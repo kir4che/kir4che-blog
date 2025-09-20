@@ -129,7 +129,13 @@
     "enterPassword": "輸入密碼",
     "incorrectPassword": "密碼錯誤，請再試一次！",
     "tooManyAttempts": "嘗試次數過多，請在 1 分鐘後再試。",
-    "backToPosts": "返回文章列表"
+    "backToPosts": "返回文章列表",
+    "share": {
+      "copyLink": "複製連結",
+      "copySuccess": "已複製文章連結",
+      "copyUnavailable": "此瀏覽器不支援自動複製。",
+      "native": "分享至..."
+    }
   },
   "CategoriesPage": {
     "title": "文章分類",

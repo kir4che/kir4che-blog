@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { useTranslations, useFormatter } from 'next-intl';
+import { Share2, Copy } from 'lucide-react';
 
 import type { Language, PostMeta } from '@/types';
 import { Link } from '@/i18n/navigation';
@@ -40,7 +41,7 @@ const PostLayout = ({
   const t_settings = useTranslations('settings');
   const formatter = useFormatter();
   const categoryInfoMap = useCategoryInfoMap(post);
-  const { showError } = useAlert();
+  const { showError, showSuccess } = useAlert();
 
   const [imageMeta, setImageMeta] = useState<ImageMeta | null>(null);
   const [unlocked, setUnlocked] = useState(false);
@@ -69,6 +70,46 @@ const PostLayout = ({
         showError(err instanceof Error ? err.message : String(err));
       });
   }, [post.coverImage, showError]);
+
+  const resolveShareUrl = useCallback(() => {
+    if (typeof window !== 'undefined')
+      return `${window.location.origin}/posts/${slug}`;
+    return `/posts/${slug}`;
+  }, [slug]);
+
+  const handleCopyLink = useCallback(async () => {
+    const url = resolveShareUrl();
+
+    try {
+      if (typeof navigator === 'undefined' || !navigator.clipboard)
+        throw new Error(t('share.copyUnavailable'));
+
+      await navigator.clipboard.writeText(url);
+      showSuccess(t('share.copySuccess'));
+    } catch (err) {
+      showError(err instanceof Error ? err.message : String(err));
+    }
+  }, [resolveShareUrl, showError, showSuccess, t]);
+
+  const handleNativeShare = useCallback(async () => {
+    const url = resolveShareUrl();
+    const shareData = {
+      title: title || slug,
+      url,
+    };
+
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        showError(err instanceof Error ? err.message : String(err));
+      }
+      return;
+    }
+
+    await handleCopyLink();
+  }, [handleCopyLink, resolveShareUrl, showError, slug, title]);
 
   if (hasPassword && !unlocked)
     return (
@@ -140,19 +181,39 @@ const PostLayout = ({
             <p>{t('thanks')}</p>
             <KofiBtn />
           </div>
-          {tags && tags.length > 0 && (
-            <div className='mt-4 flex gap-x-2'>
-              {tags.map((tag) => (
-                <Link
-                  key={convertToSlug(tag)}
-                  href={`/tags/${convertToSlug(tag)}`}
-                  className='text-sm text-nowrap text-pink-700 dark:text-pink-200'
-                >
-                  # {tag}
-                </Link>
-              ))}
+          <div className='flex flex-col gap-6 md:flex-row md:items-end md:justify-between md:gap-4'>
+            {tags && tags.length > 0 && (
+              <div className='flex flex-wrap gap-x-2'>
+                {tags.map((tag) => (
+                  <Link
+                    key={convertToSlug(tag)}
+                    href={`/tags/${convertToSlug(tag)}`}
+                    className='text-sm text-nowrap text-pink-700 dark:text-pink-200'
+                  >
+                    # {tag}
+                  </Link>
+                ))}
+              </div>
+            )}
+            <div className='flex flex-wrap items-center gap-2 text-sm text-pink-700 dark:text-pink-200'>
+              <button
+                type='button'
+                onClick={handleCopyLink}
+                className='flex items-center gap-x-1 rounded-md border border-pink-200 px-3 py-1 text-sm transition-colors hover:border-pink-400 hover:text-pink-600 dark:border-pink-300/40 dark:hover:border-pink-200/70'
+              >
+                <Copy className='size-4' aria-hidden='true' />
+                {t('share.copyLink')}
+              </button>
+              <button
+                type='button'
+                onClick={handleNativeShare}
+                className='flex items-center gap-x-1 rounded-md border border-pink-200 px-3 py-1 text-sm transition-colors hover:border-pink-400 hover:text-pink-600 dark:border-pink-300/40 dark:hover:border-pink-200/70'
+              >
+                <Share2 className='size-4' aria-hidden='true' />
+                {t('share.native')}
+              </button>
             </div>
-          )}
+          </div>
         </footer>
       </article>
       {headings && headings.length > 0 && <TOC headings={headings} />}

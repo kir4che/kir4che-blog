@@ -128,7 +128,13 @@
     "enterPassword": "Enter password",
     "incorrectPassword": "Incorrect password, please try again!",
     "tooManyAttempts": "Too many attempts, please try again in 1 minute.",
-    "backToPosts": "Back to Post List"
+    "backToPosts": "Back to Post List",
+    "share": {
+      "copyLink": "Copy link",
+      "copySuccess": "Link copied to clipboard",
+      "copyUnavailable": "Clipboard is not available in this browser.",
+      "native": "Share to…"
+    }
   },
   "CategoriesPage": {
     "title": "Categories",
