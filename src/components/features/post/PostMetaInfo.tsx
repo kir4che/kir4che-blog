@@ -27,7 +27,7 @@ const PostMetaInfo: React.FC<PostMetaInfoProps> = ({
     >
       {date && !isNaN(new Date(date).getTime()) ? (
         <time dateTime={date} className='flex items-center gap-x-1'>
-          <CalendarDays className='h-3.5 w-3.5' aria-hidden='true' />
+          <CalendarDays className='size-3.5' aria-hidden='true' />
           <span>
             {formatter
               .dateTime(new Date(date), {
@@ -41,9 +41,9 @@ const PostMetaInfo: React.FC<PostMetaInfoProps> = ({
       ) : null}
       {wordCount && wordCount > 0 && (
         <p className='flex items-center gap-x-1'>
-          <Pencil className='h-3.5 w-3.5' aria-hidden='true' />
+          <Pencil className='size-3.5' aria-hidden='true' />
           <span>
-            {wordCount.toLocaleString()} {t('unit.words')}
+            {formatter.number(wordCount)} {t('unit.words')}
           </span>
         </p>
       )}

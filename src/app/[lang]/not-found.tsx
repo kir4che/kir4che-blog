@@ -21,7 +21,7 @@ const NotFound = () => {
           tabIndex={0}
           aria-label={t('backHome')}
         >
-          <ArrowLeft className='h-5 w-5' />
+          <ArrowLeft className='size-5' />
           {t('backHome')}
         </Link>
       </div>

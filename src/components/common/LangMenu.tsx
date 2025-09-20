@@ -38,9 +38,9 @@ const LangMenu: React.FC<LangMenuProps> = ({
         role='button'
         className='flex cursor-pointer items-center gap-x-1.5 hover:bg-inherit'
       >
-        {showIcon && <Languages className='h-4 w-4' aria-hidden='true' />}
+        {showIcon && <Languages className='size-4' aria-hidden='true' />}
         <span>{t(`language.${locale}`)}</span>
-        <ChevronDown className='h-4 w-4' aria-hidden='true' />
+        <ChevronDown className='size-4' aria-hidden='true' />
       </div>
       <ul
         tabIndex={0}

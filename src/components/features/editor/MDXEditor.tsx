@@ -262,7 +262,7 @@ const MDXEditor = ({ t, content, slug, onChange }: MDXEditorProps) => {
             value={content}
             onChange={(e) => onChange(e.target.value)}
             placeholder={t('content.edit.placeholder')}
-            className='text-text-primary h-full w-full resize-none p-4 outline-none'
+            className='text-text-primary size-full resize-none p-4 outline-none'
           />
         ) : (
           // 預覽模式

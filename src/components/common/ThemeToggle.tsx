@@ -26,9 +26,9 @@ const ThemeToggle: React.FC = () => {
       aria-label={t(`settings.theme.${nextTheme}`)}
     >
       {theme === 'dark' ? (
-        <MoonStar className='h-4 w-4' />
+        <MoonStar className='size-4' />
       ) : (
-        <Sun className='h-4 w-4' />
+        <Sun className='size-4' />
       )}
       <span className='hidden md:block'>
         {t(`settings.theme.${nextTheme}`)}

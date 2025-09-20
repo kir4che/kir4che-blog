@@ -217,7 +217,7 @@ const EditorPage = ({ params }: { params: Params }) => {
             className='disabled:bg-text-gray-light flex items-center gap-2 rounded-md bg-pink-600 px-4 py-1 text-white hover:bg-pink-700 disabled:cursor-not-allowed'
           >
             {isSaving && (
-              <div className='h-4 w-4 animate-spin rounded-full border-b-2 border-white'></div>
+              <div className='size-4 animate-spin rounded-full border-b-2 border-white'></div>
             )}
             {isSaving
               ? isDraft
@@ -337,7 +337,7 @@ const EditorPage = ({ params }: { params: Params }) => {
                         onChange={() => handleCategoryChange(category.slug)}
                       />
                       <span
-                        className='h-3 w-3 rounded-full'
+                        className='size-3 rounded-full'
                         style={{ backgroundColor: category.color }}
                       />
                       <span
@@ -374,7 +374,7 @@ const EditorPage = ({ params }: { params: Params }) => {
               <button
                 type='button'
                 onClick={removeCoverImage}
-                className='absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-black/40 hover:bg-black/50'
+                className='absolute top-2 right-2 flex size-6 items-center justify-center rounded-full bg-black/40 hover:bg-black/50'
               >
                 <X size={14} color='white' />
               </button>

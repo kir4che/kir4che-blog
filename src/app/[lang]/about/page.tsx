@@ -55,7 +55,7 @@ const AboutPage = () => {
                     title={video.title}
                     allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
                     allowFullScreen
-                    className='h-full w-full rounded'
+                    className='size-full rounded'
                   ></iframe>
                 </div>
                 <h4 className='text-text-primary dark:text-text-gray-light line-clamp-1 w-full truncate text-sm font-medium'>

@@ -51,10 +51,7 @@ const SearchBar: React.FC = () => {
 
   return (
     <div className='relative'>
-      <Search
-        className='absolute top-2.5 left-2.5 h-4 w-4'
-        aria-hidden='true'
-      />
+      <Search className='absolute top-2.5 left-2.5 size-4' aria-hidden='true' />
       <input
         value={searchQuery}
         placeholder={t('placeholder')}
@@ -68,7 +65,7 @@ const SearchBar: React.FC = () => {
           onClick={() => setSearchQuery('')}
           className='absolute top-2.5 right-2.5'
         >
-          <X className='h-4 w-4' aria-hidden='true' />
+          <X className='size-4' aria-hidden='true' />
         </button>
       )}
       {searchQuery && (

@@ -17,7 +17,7 @@ const TagCloud = ({ tags }: TagCloudProps) => {
     <>
       <h3 className='mb-2 flex items-center gap-x-2 uppercase'>
         <Hash
-          className='h-4 w-4 text-pink-700 dark:text-pink-500'
+          className='size-4 text-pink-700 dark:text-pink-500'
           aria-hidden='true'
         />
         {t('tags')}
