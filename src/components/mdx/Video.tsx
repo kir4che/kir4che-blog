@@ -69,7 +69,7 @@ const CustomVideo: React.FC<CustomVideoProps> = ({
         } as React.CSSProperties
       }
     >
-      <div className='relative h-full w-full overflow-hidden'>
+      <div className='relative size-full overflow-hidden'>
         <video
           ref={videoRef}
           src={src}
@@ -80,7 +80,7 @@ const CustomVideo: React.FC<CustomVideoProps> = ({
           playsInline
           preload='auto'
           poster={poster}
-          className='h-full w-full object-cover transition-opacity duration-300'
+          className='size-full object-cover transition-opacity duration-300'
           {...props}
         />
       </div>

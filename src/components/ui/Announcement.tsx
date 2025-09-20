@@ -16,7 +16,7 @@ const Announcement: React.FC<AnnouncementProps> = ({ text }) => (
   >
     <Heart
       fill='currentColor'
-      className='h-5 w-5 text-pink-600 dark:text-pink-100'
+      className='size-5 text-pink-600 dark:text-pink-100'
     />
     <p className='text-sm leading-relaxed'>{text}</p>
   </div>

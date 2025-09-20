@@ -33,9 +33,9 @@ const Pagination: React.FC<PaginationProps> = ({
         tabIndex={0}
       >
         {isPrev ? (
-          <ChevronLeft className='h-4.5 w-4.5' />
+          <ChevronLeft className='size-4.5' />
         ) : (
-          <ChevronRight className='h-4.5 w-4.5' />
+          <ChevronRight className='size-4.5' />
         )}
       </button>
     );
@@ -47,7 +47,7 @@ const Pagination: React.FC<PaginationProps> = ({
         key={pageNum}
         onClick={() => onPageChange(pageNum)}
         className={cn(
-          'h-6 w-6 rounded-full',
+          'size-6 rounded-full',
           isActive
             ? 'text-text-secondary bg-pink-400 font-medium dark:bg-pink-300'
             : 'hover:bg-pink-600/20 dark:hover:bg-pink-500/20'

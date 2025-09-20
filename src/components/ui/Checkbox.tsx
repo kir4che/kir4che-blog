@@ -16,7 +16,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
     id={id}
     checked={checked}
     onChange={(e) => onChange(e.target.checked)}
-    className={`mb-0.5 h-3.5 w-3.5 ${className}`}
+    className={`mb-0.5 size-3.5 ${className}`}
   />
 );
 

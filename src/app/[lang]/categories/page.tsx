@@ -37,10 +37,10 @@ const CategoriesPage = async ({ params }: { params: Params }) => {
               ({ name, slug, color, postCount, subcategories }) => (
                 <div
                   key={slug}
-                  className='h-full w-full'
+                  className='size-full'
                   style={getCategoryStyle(color)}
                 >
-                  <div className='bg-bg-secondary transition-color flex h-full w-full flex-col rounded-lg border-2 border-[var(--category-color)] p-3 duration-300 dark:border-[var(--category-color-dark)]'>
+                  <div className='bg-bg-secondary transition-color flex size-full flex-col rounded-lg border-2 border-[var(--category-color)] p-3 duration-300 dark:border-[var(--category-color-dark)]'>
                     <h2 className='mb-1 flex flex-wrap items-baseline justify-between text-xl text-[var(--category-color)] dark:text-[var(--category-color-dark)]'>
                       <Link
                         href={`/categories/${slug}`}

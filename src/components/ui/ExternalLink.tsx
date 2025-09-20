@@ -29,7 +29,7 @@ const ExternalLink = ({
     aria-label={title}
   >
     {children ?? title}
-    {showIcon && <ExternalLinkIcon className='ml-1 inline-block h-4 w-4' />}
+    {showIcon && <ExternalLinkIcon className='ml-1 inline-block size-4' />}
   </Link>
 );
 

@@ -58,7 +58,7 @@ const LangMenu = ({ t, curLang, langs, slug, className }: LangMenuProps) => {
         aria-expanded={showMenu}
         aria-controls='lang-menu'
       >
-        <Languages className='h-3.5 w-3.5' aria-hidden='true' />
+        <Languages className='size-3.5' aria-hidden='true' />
         <span>{t(`language.short.${curLang}`)}</span>
       </button>
       <div

@@ -36,7 +36,7 @@ const PopularPosts: React.FC = () => {
     <>
       <h3 className='mb-3 flex items-center gap-x-2 font-medium uppercase'>
         <Sparkles
-          className='h-4 w-4 text-pink-700 dark:text-pink-500'
+          className='size-4 text-pink-700 dark:text-pink-500'
           aria-hidden='true'
         />
         {t('popularPosts')}

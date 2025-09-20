@@ -52,13 +52,13 @@ const Home = async ({ params }: { params: Params }) => {
                   </span>
                 </div>
               </span>
-              <div className='relative flex h-4 w-4 items-center justify-center overflow-hidden'>
+              <div className='relative flex size-4 items-center justify-center overflow-hidden'>
                 <ChevronRight
-                  className='absolute h-4 w-4 transition-transform duration-400 ease-in-out group-hover:translate-x-[40px]'
+                  className='absolute size-4 transition-transform duration-400 ease-in-out group-hover:translate-x-[40px]'
                   aria-hidden='true'
                 />
                 <ChevronRight
-                  className='absolute h-4 w-4 -translate-x-[40px] transition-transform duration-400 ease-in-out group-hover:translate-x-0'
+                  className='absolute size-4 -translate-x-[40px] transition-transform duration-400 ease-in-out group-hover:translate-x-0'
                   aria-hidden='true'
                 />
               </div>

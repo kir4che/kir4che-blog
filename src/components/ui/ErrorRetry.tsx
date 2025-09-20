@@ -24,7 +24,7 @@ const ErrorRetry = ({
     )}
   >
     <AlertTriangle
-      className='h-12 w-12 text-red-500 dark:text-red-700'
+      className='size-12 text-red-500 dark:text-red-700'
       aria-hidden='true'
     />
     <p className='text-base font-medium text-red-700 dark:text-red-300'>

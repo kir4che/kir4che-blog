@@ -23,21 +23,21 @@ const socialLinks: SocialLink[] = [
     label: 'GitHub',
     href: 'https://github.com/kir4che',
     icon: () => (
-      <Github className='h-4.5 w-4.5 text-pink-600 dark:text-pink-400' />
+      <Github className='size-4.5 text-pink-600 dark:text-pink-400' />
     ),
   },
   {
     label: 'Instagram',
     href: 'https://www.instagram.com/kir4che',
     icon: () => (
-      <Instagram className='h-4.5 w-4.5 text-pink-600 dark:text-pink-400' />
+      <Instagram className='size-4.5 text-pink-600 dark:text-pink-400' />
     ),
   },
   {
     label: 'YouTube',
     href: 'https://www.youtube.com/@kir4che',
     icon: () => (
-      <Youtube className='h-4.5 w-4.5 text-pink-600 dark:text-pink-400' />
+      <Youtube className='size-4.5 text-pink-600 dark:text-pink-400' />
     ),
   },
 ];
@@ -79,7 +79,7 @@ const LeftSidebar: React.FC = () => {
               }}
             />
           </Link>
-          <span className='bg-bg-secondary absolute right-0 bottom-0 flex h-6 w-6 items-center justify-center rounded-full text-sm shadow md:h-8 md:w-8 md:text-xl'>
+          <span className='bg-bg-secondary absolute right-0 bottom-0 flex size-6 items-center justify-center rounded-full text-sm shadow md:h-8 md:w-8 md:text-xl'>
             🦫
           </span>
         </div>
