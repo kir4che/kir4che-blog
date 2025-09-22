@@ -18,6 +18,7 @@ import CategoryGroup from '@/components/features/post/CategoryGroup';
 import PostMetaInfo from '@/components/features/post/PostMetaInfo';
 import RelatedPosts from '@/components/features/post/RelatedPosts';
 import KofiBtn from '@/components/ui/KofiBtn';
+import PostComments from '@/components/features/post/PostComments';
 
 interface PostLayoutProps {
   post: PostMeta;
@@ -176,11 +177,12 @@ const PostLayout = ({
         </header>
         <section className='article-content'>{children}</section>
         <hr className='text-text-gray-lighter dark:text-text-gray mx-auto my-8 w-20' />
-        <footer className='space-y-10'>
+        <footer className='space-y-4'>
           <div className='space-y-4'>
             <p>{t('thanks')}</p>
             <KofiBtn />
           </div>
+          <PostComments slug={slug} />
           <div className='flex flex-col gap-6 md:flex-row md:items-end md:justify-between md:gap-4'>
             {tags && tags.length > 0 && (
               <div className='flex flex-wrap gap-x-2'>
@@ -216,8 +218,8 @@ const PostLayout = ({
           </div>
         </footer>
       </article>
-      {headings && headings.length > 0 && <TOC headings={headings} />}
       <RelatedPosts lang={lang} currentSlug={slug} categories={categories} />
+      {headings && headings.length > 0 && <TOC headings={headings} />}
     </>
   );
 };
