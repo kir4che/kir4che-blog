@@ -125,6 +125,7 @@
     "lastUpdated": "Last updated on",
     "thanks": "If you found this post helpful, consider buying me a milktea (◍•ᴗ•◍)❤",
     "relatedPosts": "Related Posts",
+    "relatedPostsFallback": "No cover image",
     "enterPassword": "Enter password",
     "incorrectPassword": "Incorrect password, please try again!",
     "tooManyAttempts": "Too many attempts, please try again in 1 minute.",
