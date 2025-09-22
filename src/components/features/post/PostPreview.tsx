@@ -49,6 +49,7 @@ const PostPreview: React.FC<PostPreviewProps> = ({
               showHr
               categories={post.categories}
               categoryInfoMap={categoryInfoMap}
+              disableLink
             />
             <PostMetaInfo t={t} date={post.date} wordCount={post.wordCount} />
           </div>
@@ -57,7 +58,6 @@ const PostPreview: React.FC<PostPreviewProps> = ({
     );
   }
 
-  // card 版型（預設）
   return (
     <Link href={href} className='block h-full'>
       <article className='group relative h-full cursor-pointer rounded-lg border border-pink-200 bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:shadow-pink-900/10 dark:border-pink-400/20 dark:bg-pink-500/5 dark:hover:shadow-pink-200/10'>
@@ -72,7 +72,7 @@ const PostPreview: React.FC<PostPreviewProps> = ({
             {post.title || post.slug}
           </h3>
           {post.description && (
-            <p className='text-text-primary/65 mb-2 line-clamp-3 text-xs/5 sm:text-sm/6 md:mb-0'>
+            <p className='text-text-primary/65 mb-2 line-clamp-3 text-xs/4.5 sm:text-sm/5.5 md:mb-0'>
               {post.description}
             </p>
           )}
@@ -81,6 +81,7 @@ const PostPreview: React.FC<PostPreviewProps> = ({
               categories={post.categories}
               categoryInfoMap={categoryInfoMap}
               className='text-xs sm:text-sm'
+              disableLink
             />
             <PostMetaInfo
               t={t}

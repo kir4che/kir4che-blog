@@ -1,6 +1,7 @@
 'use client';
 
 import { useLocale } from 'next-intl';
+import { useRouter } from '@/i18n/navigation';
 import { Circle } from 'lucide-react';
 
 import type { Language, CategoryInfo } from '@/types';
@@ -13,6 +14,7 @@ interface CategoryGroupProps {
   categories: string[];
   categoryInfoMap: Record<string, CategoryInfo>;
   className?: string;
+  disableLink?: boolean;
 }
 
 const CategoryGroup = ({
@@ -20,8 +22,10 @@ const CategoryGroup = ({
   categories,
   categoryInfoMap,
   className,
+  disableLink = false,
 }: CategoryGroupProps) => {
   const lang = useLocale() as Language;
+  const router = useRouter();
   if (!categories || categories.length === 0) return null;
 
   return (
@@ -32,10 +36,37 @@ const CategoryGroup = ({
 
           if (!categoryInfo || !categoryInfo.name) return null;
 
+          const href = `/categories${categoryInfo.parentSlug ? `/${categoryInfo.parentSlug}` : ''}/${categoryInfo.slug ?? ''}`;
+
+          if (disableLink)
+            return (
+              <button
+                key={catName}
+                type='button'
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  router.push(href);
+                }}
+                className={cn(
+                  'flex items-center gap-x-1 text-sm text-[var(--category-color)] hover:opacity-85',
+                  className
+                )}
+                style={getCategoryStyle(categoryInfo.color)}
+              >
+                <Circle
+                  className='h-2 w-2'
+                  fill='currentColor'
+                  aria-hidden='true'
+                />
+                <span>{categoryInfo.name[lang]}</span>
+              </button>
+            );
+
           return (
             <Link
               key={catName}
-              href={`/categories${categoryInfo.parentSlug ? `/${categoryInfo.parentSlug}` : ''}/${categoryInfo.slug ?? ''}`}
+              href={href}
               className={cn(
                 'flex items-center gap-x-1 text-sm text-[var(--category-color)] hover:opacity-85',
                 className
