@@ -13,7 +13,8 @@ import Rating from '@/components/mdx/Rating';
 import CustomVideo from '@/components/mdx/Video';
 
 export const useMDXComponents = (
-  imageMetas: Record<string, any> = {}
+  imageMetas: Record<string, any> = {},
+  extraComponents: Partial<MDXComponents> = {}
 ): MDXComponents =>
   useMemo(
     () => ({
@@ -109,6 +110,7 @@ export const useMDXComponents = (
         // ---
         <hr className='text-text-gray-lighter dark:text-text-gray mx-auto my-8 w-20' />
       ),
+      ...extraComponents,
     }),
-    [imageMetas]
+    [imageMetas, extraComponents]
   );

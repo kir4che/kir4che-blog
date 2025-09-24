@@ -14,6 +14,7 @@ import { parseMDX } from '@/lib/mdx';
 
 import PostLayout from '@/components/features/post/PostLayout';
 import MDXContent from '@/components/mdx/MDXContent';
+import PokemonCard from '@/posts/css-only-pokemon-3d-card/PokemonCard';
 
 type Params = Promise<{
   lang: Language;
@@ -94,7 +95,13 @@ const PostPage = async ({ params }: { params: Params }) => {
 
   return (
     <PostLayout post={post} headings={headings} otherLangs={otherLangs}>
-      <MDXContent content={mdxSource} imageMetas={post.imageMetas} />
+      <MDXContent
+        content={mdxSource}
+        imageMetas={post.imageMetas}
+        components={
+          post.slug === 'css-only-pokemon-3d-card' ? { PokemonCard } : undefined
+        }
+      />
     </PostLayout>
   );
 };
