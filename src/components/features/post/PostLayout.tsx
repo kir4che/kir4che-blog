@@ -125,19 +125,21 @@ const PostLayout = ({
 
   return (
     <>
-      {coverImage && imageMeta && (
-        <Image
-          src={coverImage}
-          alt={title || slug}
-          width={800}
-          height={400}
-          className='-mb-2 h-45 w-full rounded-t-md object-cover lg:h-72'
-          placeholder={imageMeta.blurDataURL ? 'blur' : 'empty'}
-          blurDataURL={imageMeta.blurDataURL || undefined}
-          priority
-        />
+      {coverImage && (
+        <div className='overflow-hidden rounded-t-md'>
+          <Image
+            src={coverImage}
+            alt={title || slug}
+            width={1200}
+            height={630}
+            className='-mb-2 h-45 w-full object-cover lg:h-64'
+            placeholder={imageMeta?.blurDataURL ? 'blur' : undefined}
+            blurDataURL={imageMeta?.blurDataURL}
+            priority
+          />
+        </div>
       )}
-      <article className='dark:bg-text-gray-dark/35 rounded-md bg-white px-4 py-6 transition-all duration-300 md:p-6'>
+      <article className='dark:bg-text-gray-dark/35 rounded-b-md bg-white px-4 py-6 transition-all duration-300 md:p-6'>
         <header className='space-y-4'>
           <h1>{title || slug}</h1>
           <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-1'>
