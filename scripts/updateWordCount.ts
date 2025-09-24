@@ -83,7 +83,7 @@ const updateWordCount = async (filePath: string) => {
       console.log(`ℹ️ 文章字數無變更：${filePath}`);
     }
   } catch (err) {
-    console.error(`❌ 更新文章字數時發生錯誤 ${filePath}：`, err);
+    console.error(`❌ 更新文章字數時發生錯誤：${filePath}。`, err);
   }
 };
 

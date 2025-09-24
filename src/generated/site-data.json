@@ -6,13 +6,8 @@
         "title": "只使用 CSS！拆解寶可夢 3D 閃卡特效",
         "description": "學習只使用 CSS 製作寶可夢 3D 閃卡特效",
         "date": "2025-09-22T00:00:00.000Z",
-        "categories": [
-          "Frontend"
-        ],
-        "tags": [
-          "CSS",
-          "Pokémon"
-        ],
+        "categories": ["Frontend"],
+        "tags": ["CSS", "Pokémon"],
         "wordCount": 405,
         "lang": "tw",
         "featured": false,
@@ -34,13 +29,8 @@
         "title": "2025 日本名古屋畢旅 🇯🇵",
         "description": "記錄一下今年 1 月跟國中麻吉去名古屋五天四夜的行程及心得。",
         "date": "2025-02-09",
-        "categories": [
-          "Life"
-        ],
-        "tags": [
-          "Trip",
-          "Japan"
-        ],
+        "categories": ["Life"],
+        "tags": ["Trip", "Japan"],
         "wordCount": 234,
         "lang": "tw",
         "featured": false,
@@ -51,16 +41,8 @@
         "title": "如何將 Express + TypeScript 部署到 Vercel",
         "description": "最近在重構一個專案，更新後發現 Vercel 部署那邊壞掉，後端一直 404 或 500 無法正常運作，找了好久，嘗試很多方法，最後終於解決了，這邊記錄一下。",
         "date": "2025-02-07T00:00:00.000Z",
-        "categories": [
-          "Backend",
-          "NodeJS"
-        ],
-        "tags": [
-          "Express",
-          "Vercel",
-          "NodeJS",
-          "Deployment"
-        ],
+        "categories": ["Backend", "NodeJS"],
+        "tags": ["Express", "Vercel", "NodeJS", "Deployment"],
         "wordCount": 393,
         "lang": "tw",
         "featured": false,
@@ -71,9 +53,7 @@
         "title": "Cookie vs LocalStorage vs SessionStorage",
         "description": "深入探討瀏覽器儲存機制：Cookie、LocalStorage 和 SessionStorage 的差異與使用場景，以及如何選擇適合的儲存方式。",
         "date": "2024-12-23T00:00:00.000Z",
-        "categories": [
-          "Frontend"
-        ],
+        "categories": ["Frontend"],
         "tags": [],
         "wordCount": 1383,
         "lang": "tw",
@@ -85,13 +65,8 @@
         "title": "2024 日本福岡 & 熊本之旅 🇯🇵",
         "description": "記錄今年 12 月五天四夜的福岡 & 熊本之旅，分享我的行程及心得。",
         "date": "2024-12-21T00:00:00.000Z",
-        "categories": [
-          "Life"
-        ],
-        "tags": [
-          "Trip",
-          "Japan"
-        ],
+        "categories": ["Life"],
+        "tags": ["Trip", "Japan"],
         "wordCount": 4932,
         "lang": "tw",
         "featured": true,
@@ -102,14 +77,8 @@
         "slug": "frontend-bundlers-webpack-vs-vite",
         "title": "前端打包工具 Webpack v.s. Vite",
         "date": "2024-12-16T00:00:00.000Z",
-        "categories": [
-          "Frontend"
-        ],
-        "tags": [
-          "Bundler",
-          "Webpack",
-          "Vite"
-        ],
+        "categories": ["Frontend"],
+        "tags": ["Bundler", "Webpack", "Vite"],
         "wordCount": 519,
         "lang": "tw",
         "featured": false,
@@ -120,14 +89,8 @@
         "title": "2024 首次韓國之旅 🇰🇷 ",
         "description": "記錄一下今年 11 月五天四夜的韓國之旅，分享我的行程及心得。",
         "date": "2024-11-15T00:00:00.000Z",
-        "categories": [
-          "Life"
-        ],
-        "tags": [
-          "Trip",
-          "Korea",
-          "T1"
-        ],
+        "categories": ["Life"],
+        "tags": ["Trip", "Korea", "T1"],
         "wordCount": 3674,
         "lang": "tw",
         "featured": true,
@@ -137,13 +100,8 @@
         "slug": "gitlab-pages-add-custom-domain",
         "title": "Gitlab Pages 加上自訂域名 Custom Domain",
         "date": "2024-05-23T00:00:00.000Z",
-        "categories": [
-          "Tool",
-          "Gitlab"
-        ],
-        "tags": [
-          "Gitlab"
-        ],
+        "categories": ["Tool", "Gitlab"],
+        "tags": ["Gitlab"],
         "wordCount": 298,
         "lang": "tw",
         "featured": false,
@@ -154,13 +112,8 @@
         "title": "將多個 Commit 合併成一個 (Squash Commits)",
         "description": "使用 git rebase -i 將多個 Commit 合併成一個，讓專案具有整潔的提交歷史記錄。",
         "date": "2024-05-22T00:00:00.000Z",
-        "categories": [
-          "Tool",
-          "Git"
-        ],
-        "tags": [
-          "Git"
-        ],
+        "categories": ["Tool", "Git"],
+        "tags": ["Git"],
         "wordCount": 566,
         "lang": "tw",
         "featured": false,
@@ -357,13 +310,8 @@
         "title": "2025 Japan Nagoya Trip 🇯🇵",
         "description": "Sharing my 5-day, 4-night trip to Nagoya in Nov. 2024 with my besties from junior high school, including our itinerary and what we experienced.",
         "date": "2025-02-09",
-        "categories": [
-          "Life"
-        ],
-        "tags": [
-          "Trip",
-          "Japan"
-        ],
+        "categories": ["Life"],
+        "tags": ["Trip", "Japan"],
         "wordCount": 120,
         "lang": "en",
         "featured": false,
@@ -374,16 +322,8 @@
         "title": "How to Deploy TypeScript Express App to Vercel",
         "description": "I recently refactored a project, which caused Vercel deployment to break. After extensive debugging, I fixed the issues and am documenting the solution for future reference.",
         "date": "2025-02-07T00:00:00.000Z",
-        "categories": [
-          "Backend",
-          "NodeJS"
-        ],
-        "tags": [
-          "Express",
-          "Vercel",
-          "NodeJS",
-          "Deployment"
-        ],
+        "categories": ["Backend", "NodeJS"],
+        "tags": ["Express", "Vercel", "NodeJS", "Deployment"],
         "wordCount": 239,
         "lang": "en",
         "featured": false,
@@ -394,13 +334,8 @@
         "title": "2024 Fukuoka & Kumamoto Trip 🇯🇵",
         "description": "Sharing the itinerary and my takeaways from a 5-day, 4-night trip to Fukuoka & Kumamoto.",
         "date": "2024-12-21T00:00:00.000Z",
-        "categories": [
-          "Life"
-        ],
-        "tags": [
-          "Trip",
-          "Japan"
-        ],
+        "categories": ["Life"],
+        "tags": ["Trip", "Japan"],
         "wordCount": 4217,
         "lang": "en",
         "featured": true,
@@ -412,14 +347,8 @@
         "title": "My First Trip to Korea in 2024 🇰🇷",
         "description": "Sharing my 5-day, 4-night trip to Seoul, Korea in Nov. 2024 with my bestie, including our itinerary and what we experienced.",
         "date": "2024-11-15T00:00:00.000Z",
-        "categories": [
-          "Life"
-        ],
-        "tags": [
-          "Trip",
-          "Korea",
-          "T1"
-        ],
+        "categories": ["Life"],
+        "tags": ["Trip", "Korea", "T1"],
         "wordCount": 3269,
         "lang": "en",
         "featured": true,
