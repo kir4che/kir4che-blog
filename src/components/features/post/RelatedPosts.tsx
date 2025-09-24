@@ -84,10 +84,10 @@ const RelatedPosts = ({ lang, currentSlug, categories }: RelatedPostsProps) => {
               key={post.slug}
               href={`/posts/${post.slug}`}
               role='listitem'
-              className='group dark:bg-text-gray-dark/60 relative flex max-w-[18rem] min-w-[18rem] snap-start flex-col overflow-hidden rounded-2xl border border-pink-200/40 bg-white/85 p-4 hover:border-pink-400/60 dark:border-pink-200/15 dark:hover:border-pink-200/40'
+              className='group dark:bg-text-gray-dark/60 relative flex max-w-[18rem] min-w-[18rem] snap-start flex-col overflow-hidden rounded-md border border-pink-200/40 bg-white/85 p-4 hover:border-pink-400/60 dark:border-pink-200/15 dark:hover:border-pink-200/40'
             >
               {post.coverImage ? (
-                <div className='relative mb-3 h-36 overflow-hidden rounded-xl bg-pink-100/40 dark:bg-white/10'>
+                <div className='relative mb-3 h-36 overflow-hidden rounded-md bg-pink-100/40 dark:bg-white/10'>
                   <Image
                     src={post.coverImage}
                     alt={post.title || post.slug}
@@ -97,7 +97,7 @@ const RelatedPosts = ({ lang, currentSlug, categories }: RelatedPostsProps) => {
                   />
                 </div>
               ) : (
-                <div className='flex-center mb-3 h-36 rounded-xl border border-dashed border-pink-200/60 bg-pink-50/40 text-pink-300 dark:border-white/20 dark:bg-white/10 dark:text-white/50'>
+                <div className='flex-center mb-3 h-36 rounded-md border border-dashed border-pink-200/60 bg-pink-50/40 text-pink-300 dark:border-white/20 dark:bg-white/10 dark:text-white/50'>
                   <ImageOff size={24} aria-hidden='true' />
                   <span className='ml-2 text-xs font-medium tracking-wide'>
                     {t('relatedPostsFallback', {

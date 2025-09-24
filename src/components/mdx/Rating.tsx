@@ -25,7 +25,7 @@ const Rating = ({
   }[size];
 
   return (
-    <div className={cn('rating rating-half', sizeClass)}>
+    <div className={cn('rating rating-half mt-1 mb-2', sizeClass)}>
       {Array.from({ length: 10 }, (_, index) => {
         const value = (index + 1) * 0.5;
         const isHalf = index % 2 === 0;
