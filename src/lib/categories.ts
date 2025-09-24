@@ -2,7 +2,7 @@ import { cache } from 'react';
 
 import type { PostMeta, PostInfo, Category, CategoryInfo } from '@/types';
 import { CONFIG } from '@/config';
-import { categoryMap } from '@/config/category';
+import { categoryMap } from '@/config/taxonomy';
 
 type NameToSlugMap = Record<string, string>;
 type PostCountMap = Record<string, number>;

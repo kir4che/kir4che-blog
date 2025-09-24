@@ -1,7 +1,6 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-
 import type { PostInfo, PostMeta } from '@/types';
 import { Link } from '@/i18n/navigation';
 import { useCategoryInfoMap } from '@/hooks/useCategoryInfoMap';
@@ -24,30 +23,29 @@ const PostPreview: React.FC<PostPreviewProps> = ({
 }) => {
   const t = useTranslations('common');
   const categoryInfoMap = useCategoryInfoMap(post);
-
   const href = `/posts/${post.slug}`;
 
-  if (variant === 'list') {
+  if (variant === 'list')
     return (
-      <Link key={post.slug} href={href} className='group block h-full'>
-        <article className='bg-bg-secondary relative flex h-25 flex-col justify-between rounded-lg p-4 shadow-[2px_2px_3px_rgba(0,0,0,0.05)] transition-all duration-300'>
+      <Link href={href} className='group block h-full'>
+        <article
+          className={cn(
+            'bg-bg-secondary relative flex h-full flex-col gap-2 rounded-lg p-4 shadow-[2px_2px_3px_rgba(0,0,0,0.05)] transition-all duration-300',
+            post.hasPassword && 'opacity-50'
+          )}
+        >
           <LockOverlay hasPassword={post.hasPassword} />
-          <h2
-            className={cn(
-              'text-xl transition-colors',
-              post.hasPassword && 'opacity-50'
-            )}
-          >
+          <h2 className='text-xl transition-colors'>
             <span className='line-clamp-1 group-hover:text-pink-700 dark:group-hover:text-pink-400'>
               {post.title}
             </span>
           </h2>
-          <div
-            className={cn(
-              'flex flex-wrap items-center gap-x-3 gap-y-1 text-sm',
-              post.hasPassword && 'opacity-50'
-            )}
-          >
+          {post.description && (
+            <p className='text-text-primary/65 mb-2 line-clamp-2 text-sm/6'>
+              {post.description}
+            </p>
+          )}
+          <div className='mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 text-sm'>
             <CategoryGroup
               showHr
               categories={post.categories}
@@ -59,7 +57,6 @@ const PostPreview: React.FC<PostPreviewProps> = ({
         </article>
       </Link>
     );
-  }
 
   return (
     <Link href={href} className='block h-full'>
@@ -67,7 +64,7 @@ const PostPreview: React.FC<PostPreviewProps> = ({
         <LockOverlay hasPassword={post.hasPassword} />
         <div
           className={cn(
-            'flex h-full flex-col justify-between px-4 pt-4 pb-3 md:px-5',
+            'flex h-full flex-col px-4 pt-4 pb-3 md:px-5',
             post.hasPassword && 'opacity-50'
           )}
         >
@@ -75,11 +72,12 @@ const PostPreview: React.FC<PostPreviewProps> = ({
             {post.title || post.slug}
           </h3>
           {post.description && (
-            <p className='text-text-primary/65 mb-2 line-clamp-3 text-xs/4.5 sm:text-sm/5.5 md:mb-0'>
+            <p className='text-text-primary/65 mb-2 line-clamp-3 text-xs/4.5 sm:text-sm/5.5'>
               {post.description}
             </p>
           )}
-          <div className='mt-auto flex flex-wrap items-center justify-between gap-y-1 md:mt-4'>
+          <div className='flex-1' />
+          <div className='flex flex-wrap items-center justify-between gap-y-1 pt-2 md:pt-3'>
             <CategoryGroup
               categories={post.categories}
               categoryInfoMap={categoryInfoMap}

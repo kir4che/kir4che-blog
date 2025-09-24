@@ -16,7 +16,7 @@ export const GET = async (req: Request) => {
 
     const posts = await getPostsInfo(lang);
     const categories = getAllCategoryByPosts(posts, limit);
-    const tags = getTagsByPosts(posts, limit);
+    const tags = getTagsByPosts(posts, limit, lang);
 
     return responseWithCache({ categories, tags });
   } catch {

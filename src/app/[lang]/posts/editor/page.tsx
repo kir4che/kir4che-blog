@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { X } from 'lucide-react';
 
 import type { Language } from '@/types';
-import { categoryMap } from '@/config/category';
+import { categoryMap } from '@/config/taxonomy';
 import { useAlert } from '@/contexts/AlertContext';
 
 import Checkbox from '@/components/ui/Checkbox';

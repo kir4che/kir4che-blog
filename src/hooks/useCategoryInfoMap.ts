@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import type { PostMeta, CategoryInfo, PostInfo } from '@/types';
-import { categoryMap } from '@/config/category';
+import { categoryMap } from '@/config/taxonomy';
 import { createCategoryNameToSlugMap } from '@/lib/categories';
 
 type SupportedPost = PostMeta | PostInfo;
