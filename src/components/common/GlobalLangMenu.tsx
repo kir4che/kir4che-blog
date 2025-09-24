@@ -9,12 +9,12 @@ import { useRouter, usePathname } from '@/i18n/navigation';
 import routing from '@/i18n/routing';
 import { cn } from '@/lib/style';
 
-interface LangMenuProps {
+interface GlobalLangMenuProps {
   showIcon?: boolean;
   className?: string;
 }
 
-const LangMenu: React.FC<LangMenuProps> = ({
+const GlobalLangMenu: React.FC<GlobalLangMenuProps> = ({
   showIcon = true,
   className = 'dropdown-bottom dropdown-end',
 }) => {
@@ -66,4 +66,4 @@ const LangMenu: React.FC<LangMenuProps> = ({
   );
 };
 
-export default LangMenu;
+export default GlobalLangMenu;

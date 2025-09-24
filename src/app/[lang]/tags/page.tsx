@@ -40,7 +40,7 @@ const TagsPage = async ({ params }: { params: Params }) => {
                 aria-label={`${name} (${postCount} posts)`}
               >
                 <h2 className='text-sm text-nowrap'># {name}</h2>
-                <span className='flex size-4 items-center justify-center rounded-full border border-pink-500 text-[10px] font-semibold text-pink-600 dark:border-pink-400 dark:text-pink-500'>
+                <span className='flex-center size-4 rounded-full border border-pink-500 text-[10px] font-semibold text-pink-600 dark:border-pink-400 dark:text-pink-500'>
                   {postCount}
                 </span>
               </Link>

@@ -1,13 +1,11 @@
 'use client';
 
-import { useLocale } from 'next-intl';
-import { useRouter } from '@/i18n/navigation';
 import { Circle } from 'lucide-react';
+import { useLocale } from 'next-intl';
 
-import type { Language, CategoryInfo } from '@/types';
-import { Link } from '@/i18n/navigation';
-import { getCategoryStyle } from '@/lib/style';
-import { cn } from '@/lib/style';
+import type { CategoryInfo, Language } from '@/types';
+import { Link, useRouter } from '@/i18n/navigation';
+import { cn, getCategoryStyle } from '@/lib/style';
 
 interface CategoryGroupProps {
   showHr?: boolean;

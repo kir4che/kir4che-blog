@@ -19,7 +19,7 @@ const ErrorRetry = ({
   <div
     role='alert'
     className={cn(
-      'flex flex-col items-center justify-center gap-y-3 rounded-2xl border border-red-200/60 bg-red-50/90 p-6 text-center dark:border-red-500/20 dark:bg-red-950/30',
+      'flex-center flex-col gap-y-3 rounded-2xl border border-red-200/60 bg-red-50/90 p-6 text-center dark:border-red-500/20 dark:bg-red-950/30',
       className
     )}
   >

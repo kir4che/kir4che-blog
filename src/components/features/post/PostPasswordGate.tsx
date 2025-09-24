@@ -118,7 +118,7 @@ const PostPasswordGate = ({ slug, lang, onSuccess }: PostPasswordGateProps) => {
               onChange={(e) => setPassword(e.target.value)}
               disabled={isLoading || isLocked}
               placeholder={t('enterPassword')}
-              className='border-text-gray-lighter bg-bg-secondary text-text-priamry placeholder-text-gray-light dark:border-text-gray/80 w-full rounded-md border px-4 py-3 pr-12 focus:outline-none disabled:opacity-60'
+              className='border-text-gray-lighter bg-bg-secondary text-text-primary placeholder-text-gray-light dark:border-text-gray/80 w-full rounded-md border px-4 py-3 pr-12 focus:outline-none disabled:opacity-60'
             />
             <button
               type='button'

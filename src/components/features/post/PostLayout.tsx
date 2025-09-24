@@ -20,6 +20,8 @@ import RelatedPosts from '@/components/features/post/RelatedPosts';
 import KofiBtn from '@/components/ui/KofiBtn';
 import PostComments from '@/components/features/post/PostComments';
 
+import styles from './PostLayout.module.css';
+
 interface PostLayoutProps {
   post: PostMeta;
   headings: { id: string; text: string; level: number }[];
@@ -161,7 +163,7 @@ const PostLayout = ({
             </div>
           </div>
           {post.updatedAt && (
-            <p className='text-right text-xs text-pink-400 dark:text-white/50'>
+            <p className='-mt-1 text-right text-xs text-pink-500 dark:text-white/50'>
               {t('lastUpdated')}{' '}
               <time dateTime={post.updatedAt}>
                 {formatter
@@ -175,7 +177,7 @@ const PostLayout = ({
             </p>
           )}
         </header>
-        <section className='article-content'>{children}</section>
+        <section className={styles.articleContent}>{children}</section>
         <hr className='text-text-gray-lighter dark:text-text-gray mx-auto my-8 w-20' />
         <footer className='space-y-4'>
           <div className='space-y-4'>

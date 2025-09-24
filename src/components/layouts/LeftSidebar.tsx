@@ -9,7 +9,7 @@ import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/style';
 
 import ThemeToggle from '@/components/common/ThemeToggle';
-import LangMenu from '@/components/common/LangMenu';
+import LangMenu from '@/components/common/GlobalLangMenu';
 import ExternalLink from '@/components/ui/ExternalLink';
 
 interface SocialLink {
@@ -79,7 +79,7 @@ const LeftSidebar: React.FC = () => {
               }}
             />
           </Link>
-          <span className='bg-bg-secondary absolute right-0 bottom-0 flex size-6 items-center justify-center rounded-full text-sm shadow md:h-8 md:w-8 md:text-xl'>
+          <span className='bg-bg-secondary flex-center absolute right-0 bottom-0 size-6 rounded-full text-sm shadow md:h-8 md:w-8 md:text-xl'>
             🦫
           </span>
         </div>

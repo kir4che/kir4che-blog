@@ -52,7 +52,7 @@ const Home = async ({ params }: { params: Params }) => {
                   </span>
                 </div>
               </span>
-              <div className='relative flex size-4 items-center justify-center overflow-hidden'>
+              <div className='flex-center relative size-4 overflow-hidden'>
                 <ChevronRight
                   className='absolute size-4 transition-transform duration-400 ease-in-out group-hover:translate-x-[40px]'
                   aria-hidden='true'

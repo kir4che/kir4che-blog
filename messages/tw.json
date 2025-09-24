@@ -123,7 +123,7 @@
     }
   },
   "PostPage": {
-    "lastUpdated": "文章最後更新於",
+    "lastUpdated": "最後更新於",
     "thanks": "如果你覺得這篇文章對你有幫助，可以請我喝杯奶茶 (◍•ᴗ•◍)❤",
     "relatedPosts": "相關文章",
     "relatedPostsFallback": "沒有封面圖",
