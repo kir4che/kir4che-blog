@@ -5,7 +5,7 @@ import { getPostsInfo, getPostsByCategory, getPostsByTag } from '@/lib/posts';
 
 import { responseWithCache } from '@/utils/responseWithCache';
 
-const DEFAULT_POSTS_PER_PAGE = 6;
+const DEFAULT_POSTS_PER_PAGE = 8;
 
 // 分頁處理
 const paginate = (posts: PostInfo[], page: number, postsPerPage: number) => {
@@ -85,12 +85,11 @@ export const GET = async (req: Request) => {
       const currentSlug = searchParams.get('currentSlug');
       const categories = searchParams.get('categories')?.split(',') || [];
 
-      if (!currentSlug || categories.length === 0) {
+      if (!currentSlug || categories.length === 0)
         return NextResponse.json(
           { message: 'Missing required parameters for related posts.' },
           { status: 400 }
         );
-      }
 
       posts = posts
         .filter(

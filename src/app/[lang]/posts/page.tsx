@@ -31,7 +31,7 @@ const PostsPage = ({ params }: { params: Params }) => {
     return acc;
   }, {});
 
-  if (error) {
+  if (error)
     return (
       <ErrorRetry
         message={t('loadFailed')}
@@ -39,16 +39,14 @@ const PostsPage = ({ params }: { params: Params }) => {
         onRetry={retry}
       />
     );
-  }
 
-  if (isLoading) {
+  if (isLoading)
     return (
       <div className='space-y-3'>
         <Skeleton />
         <Skeleton variant='post' count={3} />
       </div>
     );
-  }
 
   return (
     <div className='space-y-8'>

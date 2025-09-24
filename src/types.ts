@@ -84,6 +84,15 @@ export interface CategoryResponse {
 
 /* ----- 標籤 ----- */
 
+export type LocalizedTagName = LocalizedCategoryName;
+
+export interface TagDefinition {
+  name: LocalizedTagName;
+  slug: string;
+}
+
+export type TagMap = Record<string, TagDefinition>;
+
 export interface Tag {
   name: string;
   slug: string;

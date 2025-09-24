@@ -23,7 +23,7 @@ const TagsPage = async ({ params }: { params: Params }) => {
 
   try {
     const posts = await getPostsInfo(lang);
-    const tags = getTagsByPosts(posts);
+    const tags = getTagsByPosts(posts, undefined, lang);
 
     if (!Array.isArray(tags)) return notFound();
 

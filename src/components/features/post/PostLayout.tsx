@@ -8,7 +8,7 @@ import { Share2, Copy } from 'lucide-react';
 import type { Language, PostMeta } from '@/types';
 import { Link } from '@/i18n/navigation';
 import { useCategoryInfoMap } from '@/hooks/useCategoryInfoMap';
-import { convertToSlug } from '@/lib/tags';
+import { getLocalizedTag } from '@/lib/tags';
 import { useAlert } from '@/contexts/AlertContext';
 
 import PostPasswordGate from '@/components/features/post/PostPasswordGate';
@@ -188,15 +188,19 @@ const PostLayout = ({
           <div className='flex flex-col gap-6 md:flex-row md:items-end md:justify-between md:gap-4'>
             {tags && tags.length > 0 && (
               <div className='flex flex-wrap gap-x-2'>
-                {tags.map((tag) => (
-                  <Link
-                    key={convertToSlug(tag)}
-                    href={`/tags/${convertToSlug(tag)}`}
-                    className='text-sm text-nowrap text-pink-700 dark:text-pink-200'
-                  >
-                    # {tag}
-                  </Link>
-                ))}
+                {tags.map((tag) => {
+                  const localized = getLocalizedTag(tag, lang);
+
+                  return (
+                    <Link
+                      key={localized.slug}
+                      href={`/tags/${localized.slug}`}
+                      className='text-sm text-nowrap text-pink-700 dark:text-pink-200'
+                    >
+                      # {localized.name}
+                    </Link>
+                  );
+                })}
               </div>
             )}
             <div className='flex flex-wrap items-center gap-2 text-sm text-pink-700 dark:text-pink-200'>

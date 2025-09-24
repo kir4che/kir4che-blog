@@ -7,7 +7,7 @@ import { LANGUAGES } from '@/config';
 
 import TagPosts from '@/components/features/tag/TagPosts';
 import { getPostsByTag, getPostsInfo } from '@/lib/posts';
-import { getTagsByPosts, convertToSlug } from '@/lib/tags';
+import { getTagsByPosts, getLocalizedTag } from '@/lib/tags';
 
 type Params = Promise<{
   lang: Language;
@@ -23,8 +23,7 @@ export async function generateStaticParams() {
       const posts = await getPostsInfo(lang);
       const tags = getTagsByPosts(posts);
       const seen = new Set<string>();
-      for (const { name } of tags) {
-        const slug = convertToSlug(name);
+      for (const { slug } of tags) {
         if (seen.has(slug)) continue;
         seen.add(slug);
         params.push({ lang, tag: slug });
@@ -44,9 +43,9 @@ const TagPage = async ({ params }: { params: Params }) => {
     const posts = await getPostsByTag(tag, lang);
     if (!posts.length) return notFound();
 
+    const localizedTag = getLocalizedTag(tag, lang);
     const tagData = {
-      name: tag,
-      slug: convertToSlug(tag),
+      ...localizedTag,
       postCount: posts.length,
     };
 
