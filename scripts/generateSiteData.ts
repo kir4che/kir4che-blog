@@ -25,7 +25,7 @@ async function ensureDirectory(dir: string) {
   try {
     await fs.mkdir(dir, { recursive: true });
   } catch (error) {
-    console.error('Failed to create directory:', dir);
+    console.error('❌ 建立資料夾失敗：', dir);
     throw error;
   }
 }
@@ -37,11 +37,13 @@ async function main() {
   for (const lang of languages) {
     const posts = await getPostsInfo(lang);
     const categories = getAllCategoryByPosts(posts);
-    const tags = getTagsByPosts(posts).map(({ name, slug, postCount }) => ({
-      name,
-      slug,
-      postCount,
-    }));
+    const tags = getTagsByPosts(posts, undefined, lang).map(
+      ({ name, slug, postCount }) => ({
+        name,
+        slug,
+        postCount,
+      })
+    );
     const popularPosts = posts
       .filter((post) => post.featured)
       .slice(0, 5)
@@ -57,10 +59,10 @@ async function main() {
 
   await ensureDirectory(OUTPUT_DIR);
   await fs.writeFile(OUTPUT_PATH, `${JSON.stringify(data, null, 2)}\n`, 'utf8');
-  console.log(`Site data generated at ${OUTPUT_PATH}`);
+  console.log(`✅ 站台資料已更新：${OUTPUT_PATH}`);
 }
 
 main().catch((error) => {
-  console.error('Failed to generate site data:', error);
+  console.error('❌ 產出站台資料時發生錯誤：', error);
   process.exitCode = 1;
 });
