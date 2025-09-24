@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 
-import type { PostMeta } from '@/types';
+import type { PostInfo, PostMeta } from '@/types';
 import { Link } from '@/i18n/navigation';
 import { useCategoryInfoMap } from '@/hooks/useCategoryInfoMap';
 import { cn } from '@/lib/style';
@@ -11,8 +11,10 @@ import CategoryGroup from '@/components/features/post/CategoryGroup';
 import PostMetaInfo from '@/components/features/post/PostMetaInfo';
 import LockOverlay from '@/components/features/post/LockOverlay';
 
+type PreviewPost = PostMeta | PostInfo;
+
 interface PostPreviewProps {
-  post: PostMeta;
+  post: PreviewPost;
   variant?: 'card' | 'list';
 }
 

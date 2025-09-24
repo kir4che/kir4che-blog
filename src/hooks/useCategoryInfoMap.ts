@@ -1,10 +1,14 @@
 import { useMemo } from 'react';
 
-import type { PostMeta, CategoryInfo } from '@/types';
+import type { PostMeta, CategoryInfo, PostInfo } from '@/types';
 import { categoryMap } from '@/config/category';
 import { createCategoryNameToSlugMap } from '@/lib/categories';
 
-export const useCategoryInfoMap = (posts: PostMeta | PostMeta[] = []) => {
+type SupportedPost = PostMeta | PostInfo;
+
+export const useCategoryInfoMap = (
+  posts: SupportedPost | SupportedPost[] = []
+) => {
   return useMemo(() => {
     const postArray = Array.isArray(posts) ? posts : [posts];
     const categoryNames = new Set<string>();

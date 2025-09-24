@@ -1,10 +1,12 @@
-import { notFound } from 'next/navigation';
+export const revalidate = 3600;
+
 import { getTranslations } from 'next-intl/server';
 import { ChevronRight } from 'lucide-react';
 
 import type { Language } from '@/types';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/style';
+import { getSiteData } from '@/lib/siteData';
 
 import PostPreview from '@/components/features/post/PostPreview';
 import Announcement from '@/components/ui/Announcement';
@@ -16,21 +18,14 @@ type Params = Promise<{
 const Home = async ({ params }: { params: Params }) => {
   const { lang } = await params;
   const t = await getTranslations('HomePage');
-
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/posts?postsPerPage=4&lang=${lang}`,
-    { cache: 'force-cache' }
-  );
-
-  if (!res.ok) return notFound();
-
-  const { posts } = await res.json();
+  const { posts } = getSiteData(lang);
+  const latestPosts = posts.slice(0, 4);
 
   return (
     <div className='space-y-8 py-2'>
       <Announcement text={t('announcement')} />
       {/* 最新文章 */}
-      {posts.length > 0 && (
+      {latestPosts.length > 0 && (
         <section id='posts'>
           <div className='flex items-baseline justify-between'>
             <h2 className='mb-3 text-lg font-bold tracking-wider text-pink-600 dark:text-pink-400'>
@@ -67,11 +62,13 @@ const Home = async ({ params }: { params: Params }) => {
           <div
             className={cn(
               'grid gap-3 md:gap-4 xl:gap-6',
-              posts?.length === 1 ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'
+              latestPosts.length === 1
+                ? 'grid-cols-1'
+                : 'grid-cols-1 md:grid-cols-2'
             )}
           >
-            {posts?.length ? (
-              posts.map((post) => (
+            {latestPosts.length ? (
+              latestPosts.map((post) => (
                 <PostPreview key={post.slug} post={post} variant='card' />
               ))
             ) : (
