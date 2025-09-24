@@ -48,8 +48,8 @@ const main = () => {
     ]);
 
     console.log('✅ 內容準備完成。');
-  } catch (error) {
-    console.error('❌ 準備內容時發生錯誤：', error);
+  } catch (err) {
+    console.error('❌ 準備內容時發生錯誤：', err);
     process.exitCode = 1;
   }
 };

@@ -24,9 +24,9 @@ const OUTPUT_PATH = path.join(OUTPUT_DIR, 'site-data.json');
 async function ensureDirectory(dir: string) {
   try {
     await fs.mkdir(dir, { recursive: true });
-  } catch (error) {
+  } catch (err) {
     console.error('❌ 建立資料夾失敗：', dir);
-    throw error;
+    throw err;
   }
 }
 
