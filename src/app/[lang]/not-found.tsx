@@ -6,7 +6,7 @@ const NotFound = () => {
   const t = useTranslations('NotFoundPage');
 
   return (
-    <main className='flex min-h-[calc(100vh-9rem)] flex-col items-center justify-center text-center'>
+    <main className='flex-center min-h-[calc(100vh-9rem)] flex-col text-center'>
       <div className='animate-[fadeInUp_0.5s_ease-out]'>
         <h1 className='mb-4 text-8xl text-pink-400'>404</h1>
         <h2 className='text-text-gray dark:text-text-gray-light mb-4'>

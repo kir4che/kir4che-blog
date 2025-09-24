@@ -97,7 +97,7 @@ const RelatedPosts = ({ lang, currentSlug, categories }: RelatedPostsProps) => {
                   />
                 </div>
               ) : (
-                <div className='mb-3 flex h-36 items-center justify-center rounded-xl border border-dashed border-pink-200/60 bg-pink-50/40 text-pink-300 dark:border-white/20 dark:bg-white/10 dark:text-white/50'>
+                <div className='flex-center mb-3 h-36 rounded-xl border border-dashed border-pink-200/60 bg-pink-50/40 text-pink-300 dark:border-white/20 dark:bg-white/10 dark:text-white/50'>
                   <ImageOff size={24} aria-hidden='true' />
                   <span className='ml-2 text-xs font-medium tracking-wide'>
                     {t('relatedPostsFallback', {

@@ -186,7 +186,7 @@ const EditorPage = ({ params }: { params: Params }) => {
   return (
     <div className='relative mx-auto max-w-5xl space-y-6 py-4'>
       {isSaving && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/80'>
+        <div className='flex-center fixed inset-0 z-50 bg-black/80'>
           <div className='bg-bg-secondary rounded-lg p-6'>
             <LoadingSpin
               text={
@@ -374,7 +374,7 @@ const EditorPage = ({ params }: { params: Params }) => {
               <button
                 type='button'
                 onClick={removeCoverImage}
-                className='absolute top-2 right-2 flex size-6 items-center justify-center rounded-full bg-black/40 hover:bg-black/50'
+                className='flex-center absolute top-2 right-2 size-6 rounded-full bg-black/40 hover:bg-black/50'
               >
                 <X size={14} color='white' />
               </button>

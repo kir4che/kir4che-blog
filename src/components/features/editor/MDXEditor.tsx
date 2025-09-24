@@ -267,7 +267,7 @@ const MDXEditor = ({ t, content, slug, onChange }: MDXEditorProps) => {
         ) : (
           // 預覽模式
           <div
-            className={`text-text-gray dark:text-text-gray-light h-full ${!isLoading && mdxSource ? 'overflow-auto px-4' : 'flex items-center justify-center'}`}
+            className={`text-text-gray dark:text-text-gray-light h-full ${!isLoading && mdxSource ? 'overflow-auto px-4' : 'flex-center'}`}
           >
             {isLoading ? (
               <p>{t('content.preview.compiling')}</p>

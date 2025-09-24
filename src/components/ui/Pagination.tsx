@@ -99,10 +99,7 @@ const Pagination: React.FC<PaginationProps> = ({
 
   return (
     <nav
-      className={cn(
-        'mt-12 flex items-center justify-center gap-x-3 text-sm',
-        className
-      )}
+      className={cn('flex-center mt-12 gap-x-3 text-sm', className)}
       aria-label={t('title')}
     >
       {renderBtn('prev')}

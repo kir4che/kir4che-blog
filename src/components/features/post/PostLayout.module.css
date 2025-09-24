@@ -1,0 +1,37 @@
+.articleContent {
+  & blockquote p {
+    @apply my-4;
+  }
+
+  & a {
+    @apply hover:underline hover:underline-offset-2;
+  }
+
+  & ul ul {
+    list-style-type: circle; /* 第二層：空心 */
+
+    & ul {
+      list-style-type: square; /* 第三層：方塊 */
+    }
+  }
+
+  & code {
+    @apply font-mono text-sm;
+
+    &:not(pre code) {
+      @apply dark:bg-text-gray-lighter/20 bg-gray-100/80 px-1 py-0.5 font-mono text-pink-900 dark:text-pink-300;
+    }
+  }
+}
+
+.articleContent :global(.expressive-code) {
+  @apply my-4;
+}
+
+.articleContent :global(.expressive-code .header .title) {
+  @apply text-xs opacity-80;
+}
+
+.articleContent :global(.rating .mask-half-2) {
+  @apply mr-1;
+}

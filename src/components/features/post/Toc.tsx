@@ -20,7 +20,7 @@ const TOC: React.FC<TOCProps> = ({ headings }) => {
         aria-label='Toggle Table of Contents'
         aria-expanded={showTOC}
       >
-        <div className='chat-bubble flex h-14 w-16 items-center justify-center rounded-full bg-pink-500 text-white'>
+        <div className='chat-bubble flex-center h-14 w-16 rounded-full bg-pink-500 text-white'>
           {showTOC ? <X size={24} /> : <AlignJustify size={24} />}
         </div>
       </button>
