@@ -7,7 +7,7 @@ import { LANGUAGES } from '@/config';
 
 import CategoryPosts from '@/components/features/category/CategoryPosts';
 import { getAllCategoryByPosts, getCategoryBySlug } from '@/lib/categories';
-import { getPostsInfo } from '@/lib/posts';
+import { getPaginatedPosts, getPostsInfo } from '@/lib/posts';
 
 type Params = Promise<{
   lang: Language;
@@ -40,7 +40,19 @@ const CategoryPage = async ({ params }: { params: Params }) => {
 
     if (!category) return notFound();
 
-    return <CategoryPosts category={category} slug={slug} />;
+    const { posts: initialPosts, pagination } = await getPaginatedPosts({
+      lang,
+      category: slug,
+    });
+
+    return (
+      <CategoryPosts
+        category={category}
+        slug={slug}
+        initialPosts={initialPosts}
+        initialPagination={pagination}
+      />
+    );
   } catch {
     return notFound();
   }
