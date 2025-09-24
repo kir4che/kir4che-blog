@@ -1,0 +1,463 @@
+{
+  "tw": {
+    "posts": [
+      {
+        "slug": "css-only-pokemon-3d-card",
+        "title": "只使用 CSS！拆解寶可夢 3D 閃卡特效",
+        "description": "學習只使用 CSS 製作寶可夢 3D 閃卡特效",
+        "date": "2025-09-22T00:00:00.000Z",
+        "categories": ["Frontend"],
+        "tags": ["CSS", "Pokémon"],
+        "wordCount": 405,
+        "lang": "tw",
+        "featured": false,
+        "hasPassword": false
+      },
+      {
+        "slug": "mdx-usage",
+        "title": "MDX 使用指南",
+        "date": "2025-04-15T00:00:00.000Z",
+        "categories": [],
+        "tags": [],
+        "wordCount": 138,
+        "lang": "tw",
+        "featured": false,
+        "hasPassword": false
+      },
+      {
+        "slug": "japan-nagoya-2025-trip",
+        "title": "2025 日本名古屋畢旅 🇯🇵",
+        "description": "記錄一下今年 1 月跟國中麻吉去名古屋五天四夜的行程及心得。",
+        "date": "2025-02-09",
+        "categories": ["Life"],
+        "tags": ["Trip", "Japan"],
+        "wordCount": 234,
+        "lang": "tw",
+        "featured": false,
+        "hasPassword": true
+      },
+      {
+        "slug": "deploy-express-typescript-to-vercel",
+        "title": "如何將 Express + TypeScript 部署到 Vercel",
+        "description": "最近在重構一個專案，更新後發現 Vercel 部署那邊壞掉，後端一直 404 或 500 無法正常運作，找了好久，嘗試很多方法，最後終於解決了，這邊記錄一下。",
+        "date": "2025-02-07T00:00:00.000Z",
+        "categories": ["後端", "NodeJS"],
+        "tags": ["Express", "Vercel", "NodeJS", "部署"],
+        "wordCount": 393,
+        "lang": "tw",
+        "featured": false,
+        "hasPassword": false
+      },
+      {
+        "slug": "cookie-vs-web-storage",
+        "title": "Cookie vs LocalStorage vs SessionStorage",
+        "description": "深入探討瀏覽器儲存機制：Cookie、LocalStorage 和 SessionStorage 的差異與使用場景，以及如何選擇適合的儲存方式。",
+        "date": "2024-12-23T00:00:00.000Z",
+        "categories": ["前端"],
+        "tags": ["Frontend", "Web Storage"],
+        "wordCount": 1383,
+        "lang": "tw",
+        "featured": false,
+        "hasPassword": false
+      },
+      {
+        "slug": "japan-kyushu-2024-trip",
+        "title": "2024 日本福岡 & 熊本之旅 🇯🇵",
+        "description": "記錄今年 12 月五天四夜的福岡 & 熊本之旅，分享我的行程及心得。",
+        "date": "2024-12-21T00:00:00.000Z",
+        "categories": ["Life"],
+        "tags": ["Trip", "Japan"],
+        "wordCount": 4932,
+        "lang": "tw",
+        "featured": true,
+        "coverImage": "/posts/japan-kyushu-2024-trip/IMG_1307.webp",
+        "hasPassword": false
+      },
+      {
+        "slug": "frontend-bundlers-webpack-vs-vite",
+        "title": "前端打包工具 Webpack v.s. Vite",
+        "date": "2024-12-16T00:00:00.000Z",
+        "categories": ["前端"],
+        "tags": ["Frontend", "Bundler", "Webpack", "Vite"],
+        "wordCount": 519,
+        "lang": "tw",
+        "featured": false,
+        "hasPassword": false
+      },
+      {
+        "slug": "korea-seoul-2024-trip",
+        "title": "2024 首次韓國之旅 🇰🇷 ",
+        "description": "記錄一下今年 11 月五天四夜的韓國之旅，分享我的行程及心得。",
+        "date": "2024-11-15T00:00:00.000Z",
+        "categories": ["Life"],
+        "tags": ["Trip", "Korea", "T1"],
+        "wordCount": 3674,
+        "lang": "tw",
+        "featured": true,
+        "hasPassword": false
+      },
+      {
+        "slug": "gitlab-pages-add-custom-domain",
+        "title": "Gitlab Pages 加上自訂域名 Custom Domain",
+        "date": "2024-05-23T00:00:00.000Z",
+        "categories": ["工具", "Gitlab"],
+        "tags": ["Gitlab"],
+        "wordCount": 298,
+        "lang": "tw",
+        "featured": false,
+        "hasPassword": false
+      },
+      {
+        "slug": "squash-commits-into-one",
+        "title": "將多個 Commit 合併成一個 (Squash Commits)",
+        "description": "使用 git rebase -i 將多個 Commit 合併成一個，讓專案具有整潔的提交歷史記錄。",
+        "date": "2024-05-22T00:00:00.000Z",
+        "categories": ["工具", "Git"],
+        "tags": ["Git"],
+        "wordCount": 566,
+        "lang": "tw",
+        "featured": false,
+        "hasPassword": false
+      }
+    ],
+    "categories": [
+      {
+        "name": {
+          "tw": "工具",
+          "en": "Tools"
+        },
+        "slug": "tools",
+        "color": {
+          "light": "#666666",
+          "dark": "#CCCCCC"
+        },
+        "subcategories": {
+          "git": {
+            "name": {
+              "tw": "Git",
+              "en": "Git"
+            },
+            "slug": "git",
+            "color": {
+              "light": "#E53621",
+              "dark": "#E95B4A"
+            },
+            "parentSlug": "tools",
+            "postCount": 1
+          },
+          "gitlab": {
+            "name": {
+              "tw": "Gitlab",
+              "en": "Gitlab"
+            },
+            "slug": "gitlab",
+            "color": {
+              "light": "#F45419",
+              "dark": "#F77F52"
+            },
+            "parentSlug": "tools",
+            "postCount": 1
+          }
+        },
+        "postCount": 2
+      },
+      {
+        "name": {
+          "tw": "前端",
+          "en": "Frontend"
+        },
+        "slug": "frontend",
+        "color": {
+          "light": "#42B5F9",
+          "dark": "#6AC5FB"
+        },
+        "subcategories": {},
+        "postCount": 3
+      },
+      {
+        "name": {
+          "tw": "生活",
+          "en": "Life"
+        },
+        "slug": "life",
+        "color": {
+          "light": "#F77E9D",
+          "dark": "#FB9CB4"
+        },
+        "postCount": 3,
+        "subcategories": {}
+      },
+      {
+        "name": {
+          "tw": "後端",
+          "en": "Backend"
+        },
+        "slug": "backend",
+        "color": {
+          "light": "#132951",
+          "dark": "#5C7CCC"
+        },
+        "subcategories": {
+          "nodejs": {
+            "name": {
+              "tw": "NodeJS",
+              "en": "NodeJS"
+            },
+            "slug": "nodejs",
+            "color": {
+              "light": "#78b42d",
+              "dark": "#78b42d"
+            },
+            "parentSlug": "backend",
+            "postCount": 1
+          }
+        },
+        "postCount": 1
+      }
+    ],
+    "tags": [
+      {
+        "name": "Trip",
+        "slug": "trip",
+        "postCount": 3
+      },
+      {
+        "name": "Japan",
+        "slug": "japan",
+        "postCount": 2
+      },
+      {
+        "name": "Frontend",
+        "slug": "frontend",
+        "postCount": 2
+      },
+      {
+        "name": "CSS",
+        "slug": "css",
+        "postCount": 1
+      },
+      {
+        "name": "Pokémon",
+        "slug": "pokmon",
+        "postCount": 1
+      },
+      {
+        "name": "Express",
+        "slug": "express",
+        "postCount": 1
+      },
+      {
+        "name": "Vercel",
+        "slug": "vercel",
+        "postCount": 1
+      },
+      {
+        "name": "NodeJS",
+        "slug": "nodejs",
+        "postCount": 1
+      },
+      {
+        "name": "部署",
+        "slug": "部署",
+        "postCount": 1
+      },
+      {
+        "name": "Web Storage",
+        "slug": "web-storage",
+        "postCount": 1
+      },
+      {
+        "name": "Bundler",
+        "slug": "bundler",
+        "postCount": 1
+      },
+      {
+        "name": "Webpack",
+        "slug": "webpack",
+        "postCount": 1
+      },
+      {
+        "name": "Vite",
+        "slug": "vite",
+        "postCount": 1
+      },
+      {
+        "name": "Korea",
+        "slug": "korea",
+        "postCount": 1
+      },
+      {
+        "name": "T1",
+        "slug": "t1",
+        "postCount": 1
+      },
+      {
+        "name": "Gitlab",
+        "slug": "gitlab",
+        "postCount": 1
+      },
+      {
+        "name": "Git",
+        "slug": "git",
+        "postCount": 1
+      }
+    ],
+    "popularPosts": [
+      {
+        "slug": "japan-kyushu-2024-trip",
+        "title": "2024 日本福岡 & 熊本之旅 🇯🇵"
+      },
+      {
+        "slug": "korea-seoul-2024-trip",
+        "title": "2024 首次韓國之旅 🇰🇷 "
+      }
+    ]
+  },
+  "en": {
+    "posts": [
+      {
+        "slug": "japan-nagoya-2025-trip",
+        "title": "2025 Japan Nagoya Trip 🇯🇵",
+        "description": "Sharing my 5-day, 4-night trip to Nagoya in Nov. 2024 with my besties from junior high school, including our itinerary and what we experienced.",
+        "date": "2025-02-09",
+        "categories": ["Life"],
+        "tags": ["Trip", "Japan"],
+        "wordCount": 120,
+        "lang": "en",
+        "featured": false,
+        "hasPassword": true
+      },
+      {
+        "slug": "deploy-express-typescript-to-vercel",
+        "title": "How to Deploy TypeScript Express App to Vercel",
+        "description": "I recently refactored a project, which caused Vercel deployment to break. After extensive debugging, I fixed the issues and am documenting the solution for future reference.",
+        "date": "2025-02-07T00:00:00.000Z",
+        "categories": ["Backend", "NodeJS"],
+        "tags": ["Express", "Vercel", "NodeJS", "部署"],
+        "wordCount": 239,
+        "lang": "en",
+        "featured": false,
+        "hasPassword": false
+      },
+      {
+        "slug": "japan-kyushu-2024-trip",
+        "title": "2024 Fukuoka & Kumamoto Trip 🇯🇵",
+        "description": "Sharing the itinerary and my takeaways from a 5-day, 4-night trip to Fukuoka & Kumamoto.",
+        "date": "2024-12-21T00:00:00.000Z",
+        "categories": ["Life"],
+        "tags": ["Trip", "Japan"],
+        "wordCount": 4217,
+        "lang": "en",
+        "featured": true,
+        "coverImage": "/posts/japan-kyushu-2024-trip/IMG_1307.webp",
+        "hasPassword": false
+      },
+      {
+        "slug": "korea-seoul-2024-trip",
+        "title": "My First Trip to Korea in 2024 🇰🇷",
+        "description": "Sharing my 5-day, 4-night trip to Seoul, Korea in Nov. 2024 with my bestie, including our itinerary and what we experienced.",
+        "date": "2024-11-15T00:00:00.000Z",
+        "categories": ["Life"],
+        "tags": ["Trip", "Korea", "T1"],
+        "wordCount": 3269,
+        "lang": "en",
+        "featured": true,
+        "hasPassword": false
+      }
+    ],
+    "categories": [
+      {
+        "name": {
+          "tw": "生活",
+          "en": "Life"
+        },
+        "slug": "life",
+        "color": {
+          "light": "#F77E9D",
+          "dark": "#FB9CB4"
+        },
+        "postCount": 3,
+        "subcategories": {}
+      },
+      {
+        "name": {
+          "tw": "後端",
+          "en": "Backend"
+        },
+        "slug": "backend",
+        "color": {
+          "light": "#132951",
+          "dark": "#5C7CCC"
+        },
+        "subcategories": {
+          "nodejs": {
+            "name": {
+              "tw": "NodeJS",
+              "en": "NodeJS"
+            },
+            "slug": "nodejs",
+            "color": {
+              "light": "#78b42d",
+              "dark": "#78b42d"
+            },
+            "parentSlug": "backend",
+            "postCount": 1
+          }
+        },
+        "postCount": 1
+      }
+    ],
+    "tags": [
+      {
+        "name": "Trip",
+        "slug": "trip",
+        "postCount": 3
+      },
+      {
+        "name": "Japan",
+        "slug": "japan",
+        "postCount": 2
+      },
+      {
+        "name": "Express",
+        "slug": "express",
+        "postCount": 1
+      },
+      {
+        "name": "Vercel",
+        "slug": "vercel",
+        "postCount": 1
+      },
+      {
+        "name": "NodeJS",
+        "slug": "nodejs",
+        "postCount": 1
+      },
+      {
+        "name": "部署",
+        "slug": "部署",
+        "postCount": 1
+      },
+      {
+        "name": "Korea",
+        "slug": "korea",
+        "postCount": 1
+      },
+      {
+        "name": "T1",
+        "slug": "t1",
+        "postCount": 1
+      }
+    ],
+    "popularPosts": [
+      {
+        "slug": "japan-kyushu-2024-trip",
+        "title": "2024 Fukuoka & Kumamoto Trip 🇯🇵"
+      },
+      {
+        "slug": "korea-seoul-2024-trip",
+        "title": "My First Trip to Korea in 2024 🇰🇷"
+      }
+    ]
+  }
+}

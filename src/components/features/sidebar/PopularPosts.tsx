@@ -1,36 +1,23 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Sparkles } from 'lucide-react';
 
-import type { Language, PostMeta } from '@/types';
 import { Link } from '@/i18n/navigation';
-import { useAlert } from '@/contexts/AlertContext';
 
-type Post = Pick<PostMeta, 'slug' | 'title'>;
+type PopularPost = {
+  slug: string;
+  title: string;
+};
 
-const PopularPosts: React.FC = () => {
-  const lang = useLocale() as Language;
+interface PopularPostsProps {
+  posts: PopularPost[];
+}
+
+const PopularPosts: React.FC<PopularPostsProps> = ({ posts }) => {
   const t = useTranslations('sidebar');
-  const { showError } = useAlert();
 
-  const [popularPosts, setPopularPosts] = useState<Post[]>([]);
-
-  useEffect(() => {
-    fetch(`/api/posts?filter=popular&limit=5&lang=${lang}`)
-      .then((res) => {
-        if (!res.ok) throw new Error('Fetch failed.');
-        return res.json();
-      })
-      .then((data) => setPopularPosts(data.posts ?? []))
-      .catch((err) => {
-        showError(err instanceof Error ? err.message : err);
-        setPopularPosts([]);
-      });
-  }, [lang, showError]);
-
-  if (!popularPosts || popularPosts.length === 0) return null;
+  if (!posts || posts.length === 0) return null;
 
   return (
     <>
@@ -42,7 +29,7 @@ const PopularPosts: React.FC = () => {
         {t('popularPosts')}
       </h3>
       <ul className='space-y-2.5'>
-        {popularPosts.map(({ slug, title }) => (
+        {posts.map(({ slug, title }) => (
           <li key={slug}>
             <Link
               href={`/posts/${slug}`}

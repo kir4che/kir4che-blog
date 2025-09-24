@@ -1,3 +1,5 @@
+export const revalidate = 3600;
+
 import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { Noto_Sans_TC, DM_Sans } from 'next/font/google';
