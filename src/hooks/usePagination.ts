@@ -1,6 +1,6 @@
 export const dynamic = 'force-static';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 import type { PostMeta, PaginationData } from '@/types';
 import { useAlert } from '@/contexts/AlertContext';
@@ -9,23 +9,38 @@ interface UsePaginationParams {
   type?: 'category' | 'tag';
   slug?: string;
   lang: string;
+  initialPosts?: PostMeta[];
+  initialPagination?: PaginationData;
+  initialPage?: number;
 }
 
 const initialPagination: PaginationData = {
   currentPage: 1,
   totalPages: 1,
   totalPosts: 0,
+  postsPerPage: 0,
+  nextPage: null,
+  prevPage: null,
 };
 
-export const usePagination = ({ type, slug, lang }: UsePaginationParams) => {
+export const usePagination = ({
+  type,
+  slug,
+  lang,
+  initialPosts,
+  initialPagination: initialPaginationProp,
+  initialPage = 1,
+}: UsePaginationParams) => {
   const { showError } = useAlert();
 
-  const [posts, setPosts] = useState<PostMeta[]>([]);
-  const [pagination, setPagination] =
-    useState<PaginationData>(initialPagination);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [posts, setPosts] = useState<PostMeta[]>(initialPosts ?? []);
+  const [pagination, setPagination] = useState<PaginationData>(
+    initialPaginationProp ?? initialPagination
+  );
+  const [isLoading, setIsLoading] = useState<boolean>(!initialPosts);
   const [error, setError] = useState<Error | null>(null);
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [currentPage, setCurrentPage] = useState<number>(initialPage);
+  const skipInitialFetch = useRef<boolean>(Boolean(initialPosts));
 
   const fetchPosts = useCallback(() => {
     setIsLoading(true);
@@ -54,12 +69,23 @@ export const usePagination = ({ type, slug, lang }: UsePaginationParams) => {
   }, [lang, type, slug, currentPage, showError]);
 
   useEffect(() => {
+    if (skipInitialFetch.current) {
+      skipInitialFetch.current = false;
+      return;
+    }
+
     fetchPosts();
   }, [lang, type, slug, currentPage, fetchPosts]);
 
   useEffect(() => {
-    setCurrentPage(1);
-  }, [lang, type, slug]);
+    setCurrentPage(initialPage);
+    if (initialPosts) {
+      setPosts(initialPosts);
+      setPagination(initialPaginationProp ?? initialPagination);
+      setIsLoading(false);
+      skipInitialFetch.current = true;
+    }
+  }, [lang, type, slug, initialPage, initialPosts, initialPaginationProp]);
 
   const handlePageChange = useCallback(
     (page: number) => {

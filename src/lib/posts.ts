@@ -277,3 +277,114 @@ export const checkPostExistence = async (
     return { exist: false, langs: [] };
   }
 };
+
+export const DEFAULT_POSTS_PER_PAGE = 8;
+
+type PostFilterType = 'popular' | 'related';
+
+interface FilteredPostParams {
+  lang?: Language;
+  category?: string | null;
+  tag?: string | null;
+  keyword?: string | null;
+}
+
+interface PaginatedPostParams extends FilteredPostParams {
+  filter?: PostFilterType | null;
+  currentSlug?: string | null;
+  categories?: string[] | null;
+  page?: number;
+  postsPerPage?: number;
+}
+
+// 分頁處理
+const paginatePosts = (
+  posts: PostInfo[],
+  page: number,
+  postsPerPage: number
+) => {
+  const totalPosts = posts.length;
+  const totalPages = Math.ceil(totalPosts / postsPerPage);
+  const start = (page - 1) * postsPerPage;
+  const end = start + postsPerPage;
+  const paginated = posts.slice(start, end);
+
+  return {
+    posts: paginated,
+    pagination: {
+      currentPage: page,
+      totalPages,
+      totalPosts,
+      postsPerPage,
+      nextPage: page < totalPages ? page + 1 : null,
+      prevPage: page > 1 ? page - 1 : null,
+    },
+  };
+};
+
+export const getFilteredPosts = async ({
+  lang = DEFAULT_LANGUAGE,
+  category,
+  tag,
+  keyword,
+}: FilteredPostParams): Promise<PostInfo[]> => {
+  let posts: PostInfo[] = [];
+
+  // 根據分類或標籤來取得文章
+  if (category) posts = await getPostsByCategory(category, lang);
+  else if (tag) posts = await getPostsByTag(tag, lang);
+  else posts = await getPostsInfo(lang);
+
+  // 如果有關鍵字，進行標題、分類、標籤與敘述的搜尋。
+  if (keyword) {
+    const lowerKeyword = keyword.toLowerCase();
+    posts = posts.filter(
+      ({ title, categories = [], tags = [], description = '' }) => {
+        const haystacks = [title, description, ...categories, ...tags];
+        return haystacks.some((field) =>
+          field?.toLowerCase().includes(lowerKeyword)
+        );
+      }
+    );
+  }
+
+  // 所有文章依照日期排序（由新到舊）
+  return posts.sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+};
+
+export const getPaginatedPosts = async ({
+  lang = DEFAULT_LANGUAGE,
+  category,
+  tag,
+  keyword,
+  filter,
+  currentSlug,
+  categories,
+  page = 1,
+  postsPerPage = DEFAULT_POSTS_PER_PAGE,
+}: PaginatedPostParams) => {
+  let posts = await getFilteredPosts({ lang, category, tag, keyword });
+
+  // 處理不同的篩選文章的條件
+  if (filter === 'popular') {
+    posts = posts.filter((post) => post.featured);
+    // .sort((a, b) => (b.views ?? 0) - (a.views ?? 0)); // 暫時以精選代替熱門，未來再調整。
+  } else if (filter === 'related') {
+    if (!currentSlug || !categories?.length)
+      throw new Error('Missing required parameters for related posts.');
+
+    posts = posts
+      .filter(
+        (post) =>
+          post.slug !== currentSlug &&
+          post.categories.some((categoryName) =>
+            categories.includes(categoryName)
+          )
+      )
+      .slice(0, 3); // 限制相關文章數量為 3
+  }
+
+  return paginatePosts(posts, page, postsPerPage);
+};

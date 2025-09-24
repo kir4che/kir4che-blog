@@ -6,7 +6,7 @@ import type { Language } from '@/types';
 import { LANGUAGES } from '@/config';
 
 import TagPosts from '@/components/features/tag/TagPosts';
-import { getPostsByTag, getPostsInfo } from '@/lib/posts';
+import { getPaginatedPosts, getPostsInfo } from '@/lib/posts';
 import { getTagsByPosts, getLocalizedTag } from '@/lib/tags';
 
 type Params = Promise<{
@@ -40,16 +40,22 @@ const TagPage = async ({ params }: { params: Params }) => {
   const { lang, tag } = await params;
 
   try {
-    const posts = await getPostsByTag(tag, lang);
-    if (!posts.length) return notFound();
+    const { posts, pagination } = await getPaginatedPosts({ lang, tag });
+    if (pagination.totalPosts === 0) return notFound();
 
     const localizedTag = getLocalizedTag(tag, lang);
     const tagData = {
       ...localizedTag,
-      postCount: posts.length,
+      postCount: pagination.totalPosts,
     };
 
-    return <TagPosts tag={tagData} />;
+    return (
+      <TagPosts
+        tag={tagData}
+        initialPosts={posts}
+        initialPagination={pagination}
+      />
+    );
   } catch {
     return notFound();
   }

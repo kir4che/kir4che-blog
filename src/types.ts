@@ -50,6 +50,9 @@ export interface PaginationData {
   currentPage: number;
   totalPages: number;
   totalPosts: number;
+  postsPerPage?: number;
+  nextPage?: number | null;
+  prevPage?: number | null;
 }
 
 /* ----- 分類 ----- */

@@ -2,7 +2,13 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 
-import type { Language, Tag } from '@/types';
+import type {
+  Language,
+  PaginationData,
+  PostInfo,
+  PostMeta,
+  Tag,
+} from '@/types';
 import { usePagination } from '@/hooks/usePagination';
 
 import PostPreview from '@/components/features/post/PostPreview';
@@ -12,9 +18,11 @@ import Skeleton from '@/components/ui/Skeleton';
 
 interface TagPostsProps {
   tag: Tag;
+  initialPosts: (PostMeta | PostInfo)[];
+  initialPagination: PaginationData;
 }
 
-const TagPosts = ({ tag }: TagPostsProps) => {
+const TagPosts = ({ tag, initialPosts, initialPagination }: TagPostsProps) => {
   const lang = useLocale() as Language;
   const t = useTranslations('TagsPage');
   const t_common = useTranslations('common');
@@ -24,6 +32,8 @@ const TagPosts = ({ tag }: TagPostsProps) => {
       type: 'tag',
       slug: tag.slug,
       lang,
+      initialPosts,
+      initialPagination,
     });
 
   return (

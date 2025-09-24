@@ -1,9 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import type { Language, Category } from '@/types';
+import type {
+  Language,
+  Category,
+  PaginationData,
+  PostInfo,
+  PostMeta,
+} from '@/types';
 import { getCategoryStyle } from '@/lib/style';
 import { usePagination } from '@/hooks/usePagination';
 
@@ -16,23 +22,36 @@ import Skeleton from '@/components/ui/Skeleton';
 interface CategoryPostsProps {
   category: Category;
   slug: string;
+  initialPosts: (PostMeta | PostInfo)[];
+  initialPagination: PaginationData;
 }
 
-const CategoryPosts = ({ category, slug }: CategoryPostsProps) => {
+const CategoryPosts = ({
+  category,
+  slug,
+  initialPosts,
+  initialPagination,
+}: CategoryPostsProps) => {
   const lang = useLocale() as Language;
   const t = useTranslations('CategoriesPage');
   const t_common = useTranslations('common');
 
   const [activeTab, setActiveTab] = useState<string>('all');
 
+  const selectedSlug = useMemo(() => {
+    if (activeTab === 'all') return slug;
+    return category.subcategories?.[activeTab]?.slug || slug;
+  }, [activeTab, category.subcategories, slug]);
+
+  const shouldUseInitialData = selectedSlug === slug;
+
   const { posts, pagination, isLoading, error, retry, handlePageChange } =
     usePagination({
       type: 'category',
-      slug:
-        activeTab === 'all'
-          ? slug
-          : category.subcategories?.[activeTab]?.slug || slug,
+      slug: selectedSlug,
       lang,
+      initialPosts: shouldUseInitialData ? initialPosts : undefined,
+      initialPagination: shouldUseInitialData ? initialPagination : undefined,
     });
 
   const handleTabChange = (tab: string) => {
