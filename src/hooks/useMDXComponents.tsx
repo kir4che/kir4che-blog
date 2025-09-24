@@ -56,10 +56,29 @@ export const useMDXComponents = (
       blockquote: (
         { children } // > Text
       ) => (
-        <blockquote className='my-6 border-l-[5px] border-pink-500 bg-pink-50 px-5 py-2 dark:border-pink-500 dark:bg-pink-700/15'>
+        <blockquote className='border-l-[5px] border-pink-500 bg-pink-50 px-5 py-4 dark:border-pink-500 dark:bg-pink-700/15 [&_p]:my-0'>
           {children}
         </blockquote>
       ),
+      code: ({ children, className, ...rest }) => {
+        const isInCodeBlock = className?.includes('language-');
+
+        if (isInCodeBlock)
+          return (
+            <code className={className} {...rest}>
+              {children}
+            </code>
+          );
+
+        return (
+          <code
+            className='bg-pink-100/80 px-1.5 py-0.5 font-mono text-sm text-pink-800 dark:bg-pink-800/30 dark:text-pink-200'
+            {...rest}
+          >
+            {children}
+          </code>
+        );
+      },
       mark: (
         { children } // ==Text==
       ) => (
