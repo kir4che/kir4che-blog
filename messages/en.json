@@ -130,6 +130,8 @@
     "incorrectPassword": "Incorrect password, please try again!",
     "tooManyAttempts": "Too many attempts, please try again in 1 minute.",
     "backToPosts": "Back to Post List",
+    "tocTitle": "Table of contents",
+    "tocToggleLabel": "Toggle table of contents",
     "share": {
       "copyLink": "Copy link",
       "copySuccess": "Link copied to clipboard",
