@@ -36,7 +36,7 @@ const Rating = ({
             className={cn(
               'mask',
               maskType,
-              isHalf ? 'mask-half-1' : 'mask-half-2',
+              isHalf ? 'mask-half-1' : 'mask-half-2 mr-1',
               className
             )}
             aria-current={rating === value}

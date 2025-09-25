@@ -39,7 +39,9 @@ export const useMDXComponents = (
         <kbd className='kbd border-neutral-400 bg-neutral-200'>{children}</kbd>
       ), // <Kbd>Enter</Kbd>
       p: ({ children }) => (
-        <p className='text-text-primary my-6 block text-base/7'>{children}</p>
+        <p className='text-text-primary my-6 block text-base/7 first:mt-0 last:mb-0'>
+          {children}
+        </p>
       ),
       a: CustomLink, // [Text](url)
       img: (props) => {
