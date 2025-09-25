@@ -20,12 +20,11 @@ const accordionStyles = {
     },
   },
   title: {
-    base: 'collapse-title font-semibold',
+    base: 'collapse-title font-semibold text-base/4',
     variants: {
-      default:
-        'border-b border-b-text-primary/20 px-0 text-text-primary dark:border-b-text-gray',
+      default: 'px-0 text-text-primary',
       primary:
-        'border-b border-pink-300 px-3 text-pink-700 dark:border-pink-400/50 dark:text-pink-200',
+        'peer-checked:border-b border-pink-300 px-3 text-pink-700 dark:border-pink-400/50 dark:text-pink-200',
       secondary:
         'rounded-md border border-pink-300 bg-pink-50 py-2.5 text-sm text-pink-700 peer-checked:rounded-b-none peer-checked:border-b-0 dark:border-pink-400/50 dark:bg-pink-900/10 dark:text-pink-100',
     },
@@ -33,16 +32,16 @@ const accordionStyles = {
   content: {
     base: 'collapse-content',
     variants: {
-      default: 'px-0',
-      primary: 'px-3',
+      default: 'px-0 peer-checked:py-3',
+      primary: 'px-3 peer-checked:py-3',
       secondary:
-        'rounded-b-md border-x border-b border-pink-300 bg-pink-50 pt-1 pb-3 text-pink-700 dark:border-pink-400/50 dark:bg-pink-900/10 dark:text-pink-100',
+        'rounded-b-md border-x border-b border-pink-300 bg-pink-50 py-3 text-pink-700 dark:border-pink-400/50 dark:bg-pink-900/10 dark:text-pink-100',
     },
   },
 };
 
 const Accordion: React.FC<AccordionProps> = ({
-  variant = 'default',
+  variant = 'primary',
   title,
   children,
   className,
