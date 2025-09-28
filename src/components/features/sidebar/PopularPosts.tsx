@@ -21,19 +21,19 @@ const PopularPosts: React.FC<PopularPostsProps> = ({ posts }) => {
 
   return (
     <>
-      <h3 className='mb-3 flex items-center gap-x-2 font-medium uppercase'>
+      <h3 className='mb-2 flex items-center gap-x-2 font-medium uppercase'>
         <Sparkles
           className='size-4 text-pink-700 dark:text-pink-500'
           aria-hidden='true'
         />
         {t('popularPosts')}
       </h3>
-      <ul className='space-y-2.5'>
+      <ul className='space-y-2'>
         {posts.map(({ slug, title }) => (
           <li key={slug}>
             <Link
               href={`/posts/${slug}`}
-              className='line-clamp-1 text-sm hover:text-pink-700 hover:underline hover:underline-offset-2'
+              className='text-sm hover:text-pink-700 hover:underline hover:underline-offset-2'
             >
               {title}
             </Link>

@@ -92,6 +92,19 @@ export const categoryMap: CategoryMap = {
       light: '#F77E9D',
       dark: '#FB9CB4',
     },
+    subcategories: {
+      trip: {
+        name: {
+          tw: '旅遊',
+          en: 'Trip',
+        },
+        slug: 'trip',
+        color: {
+          light: '#70e000',
+          dark: '#a6ff4d',
+        },
+      },
+    },
   },
   resource: {
     name: {
