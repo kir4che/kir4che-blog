@@ -79,9 +79,9 @@ const RootLayout = async ({ children, params }: RootLayoutProps) => {
         <Toaster position='top-center' toastOptions={{ duration: 3000 }} />
         <Providers locale={lang} messages={messages}>
           <Sidebar lang={lang}>
-            <div className='w-full flex-grow'>
+            <div className='flex w-full flex-grow flex-col'>
               <Header lang={lang} />
-              <main className='h-auto min-h-[calc(100vh-9rem)]'>
+              <main className='flex-1'>
                 {children}
                 <Suspense>
                   <ScrollRestorer />

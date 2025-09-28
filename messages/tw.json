@@ -59,7 +59,12 @@
     "popularPosts": "熱門文章",
     "categories": "文章分類",
     "tags": "標籤雲",
-    "latestVideo": "最新影片"
+    "latestVideo": "最新影片",
+    "recommendedWebsites": "推薦網站"
+  },
+  "websites": {
+    "kaomojiLab": "顏文字實驗室",
+    "picQuads": "PicQuads"
   },
   "HomePage": {
     "title": "文章列表",

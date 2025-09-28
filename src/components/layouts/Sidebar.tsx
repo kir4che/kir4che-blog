@@ -17,7 +17,7 @@ const Sidebar = ({ lang, children }: SidebarProps) => {
   return (
     <div className='mx-auto flex max-w-screen-2xl flex-col px-4 md:flex-row md:px-2'>
       <LeftSidebar />
-      <div className='flex flex-1 gap-x-8 overflow-hidden md:pt-8'>
+      <div className='flex flex-1 items-stretch gap-x-8 overflow-hidden md:pt-8'>
         {children}
         <RightSidebar
           categories={categories}
