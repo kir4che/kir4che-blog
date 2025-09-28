@@ -13,7 +13,7 @@
   },
   "/posts/gitlab-pages-add-custom-domain/add-new-domain.webp": {
     "src": "/posts/gitlab-pages-add-custom-domain/add-new-domain.webp",
-    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAABCAIAAAB2XpiaAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAFUlEQVR4nGPQVdeZNGVOoF/Upzc/AR4PBhPdyOT9AAAAAElFTkSuQmCC",
+    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAABCAIAAAB2XpiaAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAFUlEQVR4nGPQVdeZNGWOt2fgpzc/AR2uBf9KxtueAAAAAElFTkSuQmCC",
     "originalWidth": 2644,
     "originalHeight": 704
   },
@@ -845,6 +845,60 @@
     "originalWidth": 800,
     "originalHeight": 450
   },
+  "/posts/japan-nagoya-2025-trip/IMG_5765.webp": {
+    "src": "/posts/japan-nagoya-2025-trip/IMG_5765.webp",
+    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAIAAAA7ljmRAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAMElEQVR4nGOYGquhzcDwdHWZJgMDw7ZJRbnBBkc6cl8c6GDwNlU2lGT4//HY/5NNAA3AD/XyV/0lAAAAAElFTkSuQmCC",
+    "originalWidth": 762,
+    "originalHeight": 570
+  },
+  "/posts/japan-nagoya-2025-trip/IMG_5766.webp": {
+    "src": "/posts/japan-nagoya-2025-trip/IMG_5766.webp",
+    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAIAAAA7ljmRAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAMklEQVR4nAEnANj/ALV4R+/WwKGKb9CQVAD01r9AGQBvVDLIkocAk31tIQAATzsq/+3Fe7kSAxyGDG4AAAAASUVORK5CYII=",
+    "originalWidth": 799,
+    "originalHeight": 569
+  },
+  "/posts/japan-nagoya-2025-trip/IMG_5763.webp": {
+    "src": "/posts/japan-nagoya-2025-trip/IMG_5763.webp",
+    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAP0lEQVR4nAE0AMv/AMCDUMGUcbuPYXdqWQAzAACXfWYjCADkzLQAtG9N3YyYVCkT/8+VANWxqpxSVf/Yrv/ssFKZGXI+K+mdAAAAAElFTkSuQmCC",
+    "originalWidth": 599,
+    "originalHeight": 599
+  },
+  "/posts/japan-nagoya-2025-trip/IMG_4380.webp": {
+    "src": "/posts/japan-nagoya-2025-trip/IMG_4380.webp",
+    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAP0lEQVR4nAE0AMv/APb//7/Gyd7k35VYNwD69Pb/9/fezruyh20A3tTW0tDKn4dqlmQ8AHJpVkUpGBcAACcAAJuwHJU6ZZvkAAAAAElFTkSuQmCC",
+    "originalWidth": 600,
+    "originalHeight": 600
+  },
+  "/posts/japan-nagoya-2025-trip/IMG_6987.webp": {
+    "src": "/posts/japan-nagoya-2025-trip/IMG_6987.webp",
+    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAP0lEQVR4nAE0AMv/AB4AACsPAC0QACMBAACjh3yTZU2je2OqhncA/fPsfX19nJqZ//nuAOnd3IaEh5yZnP/58c+YGMLJdiX6AAAAAElFTkSuQmCC",
+    "originalWidth": 600,
+    "originalHeight": 600
+  },
+  "/posts/japan-nagoya-2025-trip/IMG_6988.webp": {
+    "src": "/posts/japan-nagoya-2025-trip/IMG_6988.webp",
+    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAACCAIAAADwyuo0AAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAI0lEQVR4nGPwFGP/v7H58ZRCCwYGhu9vns6ICjw1bdr/d7cBl5gNg2xIfZoAAAAASUVORK5CYII=",
+    "originalWidth": 798,
+    "originalHeight": 479
+  },
+  "/posts/japan-nagoya-2025-trip/IMG_6992.webp": {
+    "src": "/posts/japan-nagoya-2025-trip/IMG_6992.webp",
+    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAP0lEQVR4nAE0AMv/AE0mHEgWAJiNef/6mwB1UkWcWS6+l3K5nHMArI54l1Ed4JFY1LafACUAAKiAZJFuUi4/PS1rFTNH9axCAAAAAElFTkSuQmCC",
+    "originalWidth": 600,
+    "originalHeight": 600
+  },
+  "/posts/japan-nagoya-2025-trip/IMG_7127.webp": {
+    "src": "/posts/japan-nagoya-2025-trip/IMG_7127.webp",
+    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAIAAAA7ljmRAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAMklEQVR4nAEnANj/AEU6RpSBhZiGjGxhbQDV1NKaj4r/+/fe184ABAIAzr6v+urljH9xhn0VbOVNGYsAAAAASUVORK5CYII=",
+    "originalWidth": 600,
+    "originalHeight": 478
+  },
+  "/posts/japan-nagoya-2025-trip/IMG_71282.webp": {
+    "src": "/posts/japan-nagoya-2025-trip/IMG_71282.webp",
+    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAAECAIAAADETxJQAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAM0lEQVR4nAEoANf/AJBaSScAAPfk4ACDbF+9jTb/9t8ALhsMtpUCo4VVAMWqmat5GYtdKVo+ES0kTCg1AAAAAElFTkSuQmCC",
+    "originalWidth": 600,
+    "originalHeight": 739
+  },
   "/posts/korea-seoul-2024-trip/IMG_5053.webp": {
     "src": "/posts/korea-seoul-2024-trip/IMG_5053.webp",
     "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAP0lEQVR4nAE0AMv/AG9sZdrSwK2hjwAEBAD/0ar/+8/x2btTZ2wAuXls27KH0LWfExUUAN+vmJyMl+zm1M2tdeIkHQxap1+uAAAAAElFTkSuQmCC",
@@ -949,7 +1003,7 @@
   },
   "/posts/korea-seoul-2024-trip/IMG_8617.webp": {
     "src": "/posts/korea-seoul-2024-trip/IMG_8617.webp",
-    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAP0lEQVR4nAE0AMv/AIJ8dnpmV869r3FdVAATAQD927n/+eb67dwAvjcx/+nYWCcUuWRVABsAAGk+ObRGPfhqWp2WGCenaZcEAAAAAElFTkSuQmCC",
+    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAP0lEQVR4nAE0AMv/AIJ8dnpmV869r3FdVAATAQD927n/+uj67dwAvjcx/+nYVykSuWRSABsAAGk+ObFHPfhqWp2pGCTlGUTiAAAAAElFTkSuQmCC",
     "originalWidth": 3024,
     "originalHeight": 3153
   },
@@ -1033,9 +1087,9 @@
   },
   "/posts/korea-seoul-2024-trip/IMG_7003.webp": {
     "src": "/posts/korea-seoul-2024-trip/IMG_7003.webp",
-    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAIAAAA7ljmRAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAMElEQVR4nGPgZ2Pxtbf0cHByD4xmaK8tLsyIntxWv2xaP8O3d4+s1VUPrFz8//cXAPiDEPGjFbLOAAAAAElFTkSuQmCC",
-    "originalWidth": 3954,
-    "originalHeight": 3024
+    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAIAAAA7ljmRAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAMElEQVR4nGPgYWL0tDF1s3V08Q1naKkqzEuNmNBStXhKF8O3t4/MVZT2rZz///cXAPBxEJWNZxfMAAAAAElFTkSuQmCC",
+    "originalWidth": 800,
+    "originalHeight": 612
   },
   "/posts/korea-seoul-2024-trip/IMG_7004.webp": {
     "src": "/posts/korea-seoul-2024-trip/IMG_7004.webp",
@@ -1045,21 +1099,21 @@
   },
   "/posts/korea-seoul-2024-trip/IMG_7036.webp": {
     "src": "/posts/korea-seoul-2024-trip/IMG_7036.webp",
-    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAIAAAA7ljmRAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAMElEQVR4nGOY0dmoIq/Y01RSmJrA4GGrKsrNsHjJ1KjQEIb/X17M722qKM7taGoGABVBD9ZdyBaoAAAAAElFTkSuQmCC",
-    "originalWidth": 4032,
-    "originalHeight": 3024
+    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAIAAAA7ljmRAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAMElEQVR4nGOY1lUnJyndUVeYlxTP4G6tLMLJMH/hpFB/P4b/v17P7qwvyc9sqa8HAA15D3JU+W8BAAAAAElFTkSuQmCC",
+    "originalWidth": 800,
+    "originalHeight": 600
   },
   "/posts/korea-seoul-2024-trip/IMG_7037.webp": {
     "src": "/posts/korea-seoul-2024-trip/IMG_7037.webp",
-    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAECAIAAAArjXluAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAJElEQVR4nGOQ4mCI8jNh+P3j3eTKRIYAG80EFw2GsnDnhhgbAH1UCPaMDfiEAAAAAElFTkSuQmCC",
-    "originalWidth": 2340,
-    "originalHeight": 4160
+    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAECAIAAAArjXluAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAJElEQVR4nGOQ4mCI8jNh+P/30+TKRIZQB50EFw2GsnDnhhgbAH7dCQ8YYO/PAAAAAElFTkSuQmCC",
+    "originalWidth": 800,
+    "originalHeight": 1422
   },
   "/posts/korea-seoul-2024-trip/IMG_7168.webp": {
     "src": "/posts/korea-seoul-2024-trip/IMG_7168.webp",
-    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAAECAIAAADETxJQAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAM0lEQVR4nAEoANf/AND//8Dv/73q/wBywP8UACNon/YAVpXjdEqEX0qSALS7z8TM47S4yu2NF7qdr8/YAAAAAElFTkSuQmCC",
-    "originalWidth": 2899,
-    "originalHeight": 4032
+    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAAECAIAAADETxJQAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAM0lEQVR4nAEoANf/AND//8Xz/77s/wBzwv8UACNon/YAWZXidEqBX0mQALS7z8TM4LS4yu9TF8LF5YmMAAAAAElFTkSuQmCC",
+    "originalWidth": 800,
+    "originalHeight": 1113
   },
   "/posts/korea-seoul-2024-trip/615DAC47-5312-445A-A2C4-109322987ADB.webp": {
     "src": "/posts/korea-seoul-2024-trip/615DAC47-5312-445A-A2C4-109322987ADB.webp",
@@ -1069,7 +1123,7 @@
   },
   "/posts/korea-seoul-2024-trip/IMG_7227.webp": {
     "src": "/posts/korea-seoul-2024-trip/IMG_7227.webp",
-    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAIAAAA7ljmRAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAMklEQVR4nAEnANj/AIh5eN3QwLClnvn39QB2aWz98OOpm5aCjqsAAAYZbWlom4mBjpWqw1oVPk9oCAsAAAAASUVORK5CYII=",
+    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAIAAAA7ljmRAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAMklEQVR4nAEnANj/AIh5eN3QwLClnvn39QB2aWz98OOnnJaCjqsAAAYZbWlom4mBjpWqw0YVPUv3DLkAAAAASUVORK5CYII=",
     "originalWidth": 4032,
     "originalHeight": 3024
   },
@@ -1087,13 +1141,13 @@
   },
   "/posts/korea-seoul-2024-trip/IMG_7245.webp": {
     "src": "/posts/korea-seoul-2024-trip/IMG_7245.webp",
-    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAAECAIAAADETxJQAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAMUlEQVR4nGP4/+1pU15afkIsw58fXxbPnOrraMdwYOemruYaGUEuBkUhBglWBjEeFgCVIg9DrR72kAAAAABJRU5ErkJggg==",
+    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAAECAIAAADETxJQAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAMUlEQVR4nGP4/+1pU15aflIcw58fXxbPnOrraMewf8f6ruYaGUEuBkUhBglWBjEeFgCVKQ9BUnRgVwAAAABJRU5ErkJggg==",
     "originalWidth": 3024,
     "originalHeight": 3504
   },
   "/posts/korea-seoul-2024-trip/IMG_7400.webp": {
     "src": "/posts/korea-seoul-2024-trip/IMG_7400.webp",
-    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAPUlEQVR4nGPoyE8rivM305A7OrOWIdDFQUKAVZCR4f+feQyhLrbSovwbZ7Wv68plKI32cTNW3zmj4/W+pQC+bhLwyFxQkwAAAABJRU5ErkJggg==",
+    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAPUlEQVR4nGNozUkujPE1UZc6MK2SIcDJXkKAVZCR4f+v2QzBzjZSYlxrp7Ws7MhiKIr0djVS2zql5dnOhQC0rBKFQPn7igAAAABJRU5ErkJggg==",
     "originalWidth": 3024,
     "originalHeight": 2735
   },
@@ -1111,7 +1165,7 @@
   },
   "/posts/korea-seoul-2024-trip/IMG_7486.webp": {
     "src": "/posts/korea-seoul-2024-trip/IMG_7486.webp",
-    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAIAAAA7ljmRAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAMklEQVR4nAEnANj/AAAmdgAbZgAIWwAEWQDC3P/j//+03/+Fuv8AXwAdfgAwo3aTqbPIHlsRJrYOXi4AAAAASUVORK5CYII=",
+    "blurDataURL": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAIAAAA7ljmRAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAMklEQVR4nAEnANj/AAAmdgAbZgAIWwAEWQDC3P/j//+03/+Fuv8AXwAdfgAwo3aTqrXHHmERKB2rfT4AAAAASUVORK5CYII=",
     "originalWidth": 4032,
     "originalHeight": 2636
   }

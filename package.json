@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "format:fix": "prettier --write .",
     "create:new-post": "ts-node --project scripts/tsconfig.scripts.json scripts/createPost.ts",
-    "prepare:content": "ts-node --project scripts/tsconfig.scripts.json scripts/prepareContent.ts"
+    "prepare:content": "ts-node --project scripts/tsconfig.scripts.json scripts/prepareContent.ts && prettier --write ."
   },
   "dependencies": {
     "@expressive-code/core": "^0.41.2",
