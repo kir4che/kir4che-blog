@@ -220,23 +220,31 @@ export const getPostsByCategory = async (
   return posts.filter((post) => isPostInCategory(post, category.name));
 };
 
+const getTagToPostsMap = cache(async (lang: Language) => {
+  const posts = await getPostsInfo(lang);
+  const map = new Map<string, PostInfo[]>();
+
+  for (const post of posts) {
+    if (post.tags) {
+      for (const postTag of post.tags) {
+        const slug = convertToSlug(postTag);
+        if (!map.has(slug)) map.set(slug, []);
+
+        map.get(slug)!.push(post);
+      }
+    }
+  }
+  return map;
+});
+
 // 根據 tag name 或 slug 取得相應文章
 export const getPostsByTag = async (
   tag: string,
   lang: Language = DEFAULT_LANGUAGE
 ): Promise<PostInfo[]> => {
-  const posts = await getPostsInfo(lang);
-
-  return posts.filter((post) => {
-    return (
-      post.tags &&
-      post.tags.some(
-        (postTag) =>
-          postTag.toLowerCase() === tag.toLowerCase() ||
-          convertToSlug(postTag) === convertToSlug(tag)
-      )
-    );
-  });
+  const tagSlug = convertToSlug(tag);
+  const tagMap = await getTagToPostsMap(lang);
+  return tagMap.get(tagSlug) || [];
 };
 
 export const getPostsMeta = async () => {
@@ -251,32 +259,34 @@ export const getPostsMeta = async () => {
   }));
 };
 
-export const checkPostExistence = async (
-  curLang: Language,
-  slug: string
-): Promise<{ exist: boolean; langs: Language[] }> => {
-  const postDir = path.join(postsDirectory, slug);
+export const checkPostExistence = cache(
+  async (
+    curLang: Language,
+    slug: string
+  ): Promise<{ exist: boolean; langs: Language[] }> => {
+    const postDir = path.join(postsDirectory, slug);
 
-  if (!fs.existsSync(postDir)) return { exist: false, langs: [] };
+    if (!fs.existsSync(postDir)) return { exist: false, langs: [] };
 
-  try {
-    const files = await fs.promises.readdir(postDir);
+    try {
+      const files = await fs.promises.readdir(postDir);
 
-    // 找出哪些語系的文章存在
-    const langs = LANGUAGES.filter((lang) => {
-      const filename =
-        lang === DEFAULT_LANGUAGE ? 'index.mdx' : `index.${lang}.mdx`;
-      return files.includes(filename);
-    });
+      // 找出哪些語系的文章存在
+      const langs = LANGUAGES.filter((lang) => {
+        const filename =
+          lang === DEFAULT_LANGUAGE ? 'index.mdx' : `index.${lang}.mdx`;
+        return files.includes(filename);
+      });
 
-    // 是否有除了 curLang 外的其他語系的文章存在
-    const exist = langs.some((lang) => lang !== curLang);
+      // 是否有除了 curLang 外的其他語系的文章存在
+      const exist = langs.some((lang) => lang !== curLang);
 
-    return { exist, langs };
-  } catch {
-    return { exist: false, langs: [] };
+      return { exist, langs };
+    } catch {
+      return { exist: false, langs: [] };
+    }
   }
-};
+);
 
 export const DEFAULT_POSTS_PER_PAGE = 8;
 
