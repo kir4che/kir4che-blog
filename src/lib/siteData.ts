@@ -13,7 +13,39 @@ interface SiteDataEntry {
 type SiteData = Record<Language, SiteDataEntry>;
 
 const FALLBACK_LANGUAGE = CONFIG.languages.defaultLanguage;
-const siteData = rawSiteData as SiteData;
+const siteData: SiteData = Object.fromEntries(
+  Object.entries(rawSiteData as Record<string, any>).map(([lang, entry]) => {
+    const normalizedCategories: Category[] = (entry.categories || []).map(
+      (cat: any) => {
+        const sub = cat.subcategories || {};
+        const cleanedSub: Record<string, any> = {};
+        Object.entries(sub).forEach(([k, v]: [string, any]) => {
+          if (v && typeof v === 'object' && v.slug && v.name && v.color) {
+            cleanedSub[k] = v;
+          }
+        });
+        const normalized: Category = {
+          name: cat.name,
+          slug: cat.slug,
+          color: cat.color ?? { light: '#999999', dark: '#666666' },
+          postCount: cat.postCount,
+          ...(Object.keys(cleanedSub).length > 0
+            ? { subcategories: cleanedSub }
+            : {}),
+        };
+        return normalized;
+      }
+    );
+
+    const normalizedEntry: SiteDataEntry = {
+      posts: entry.posts || [],
+      categories: normalizedCategories,
+      tags: entry.tags || [],
+      popularPosts: entry.popularPosts || [],
+    };
+    return [lang, normalizedEntry];
+  })
+) as SiteData;
 
 export const getSiteData = (
   lang: Language = FALLBACK_LANGUAGE
