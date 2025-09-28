@@ -17,20 +17,22 @@ type Params = Promise<{
 // 預先取得所有語系的所有 { lang, tag }
 export async function generateStaticParams() {
   try {
-    const params: { lang: Language; tag: string }[] = [];
+    const allParams = await Promise.all(
+      LANGUAGES.map(async (lang) => {
+        const posts = await getPostsInfo(lang);
+        const tags = getTagsByPosts(posts);
+        const seen = new Set<string>();
+        const langParams: { lang: Language; tag: string }[] = [];
+        for (const { slug } of tags) {
+          if (seen.has(slug)) continue;
+          seen.add(slug);
+          langParams.push({ lang, tag: slug });
+        }
+        return langParams;
+      })
+    );
 
-    for (const lang of LANGUAGES) {
-      const posts = await getPostsInfo(lang);
-      const tags = getTagsByPosts(posts);
-      const seen = new Set<string>();
-      for (const { slug } of tags) {
-        if (seen.has(slug)) continue;
-        seen.add(slug);
-        params.push({ lang, tag: slug });
-      }
-    }
-
-    return params;
+    return allParams.flat();
   } catch {
     return [];
   }

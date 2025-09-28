@@ -86,9 +86,12 @@ export async function generateMetadata({ params }: { params: Params }) {
 
 const PostPage = async ({ params }: { params: Params }) => {
   const { lang, slug } = await params;
-  const otherLangs = await checkPostExistence(lang, slug);
 
-  const post = await getPostData(lang, slug);
+  const [otherLangs, post] = await Promise.all([
+    checkPostExistence(lang, slug),
+    getPostData(lang, slug),
+  ]);
+
   if (!post) return notFound();
 
   const { mdxSource, headings } = await parseMDX(post.content);
