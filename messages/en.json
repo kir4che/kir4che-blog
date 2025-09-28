@@ -59,7 +59,12 @@
     "popularPosts": "Popular Posts",
     "categories": "Categories",
     "tags": "Tags",
-    "latestVideo": "Latest Video"
+    "latestVideo": "Latest Video",
+    "recommendedWebsites": "My Websites"
+  },
+  "websites": {
+    "kaomojiLab": "Kaomoji Lab",
+    "picQuads": "PicQuads"
   },
   "HomePage": {
     "title": "Post List",

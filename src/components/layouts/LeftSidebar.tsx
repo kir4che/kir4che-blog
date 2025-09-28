@@ -59,7 +59,7 @@ const LeftSidebar: React.FC = () => {
   const t = useTranslations('profile');
 
   return (
-    <aside className='mb-4 flex flex-col justify-between pt-4 pb-0 sm:mb-0 md:sticky md:top-0 md:h-screen md:w-45 md:py-8 lg:w-48'>
+    <aside className='mb-4 flex flex-col justify-between py-4 sm:mb-0 md:sticky md:top-0 md:h-screen md:w-45 md:pt-6 lg:w-48'>
       <div className='flex items-center gap-x-3 gap-y-2 md:mb-2.5 md:flex-col md:items-start'>
         <div className='relative block h-16 w-16 md:h-26 md:w-26'>
           <Link href='/' className='avatar'>
@@ -94,7 +94,7 @@ const LeftSidebar: React.FC = () => {
         </div>
       </div>
       <SocialLinks className='hidden md:flex' />
-      <div className='mt-auto hidden space-y-4 text-sm md:block'>
+      <div className='-my-1 mt-auto hidden space-y-4 text-sm md:block'>
         <ThemeToggle />
         <LangMenu className='dropdown-top dropdown-start' />
       </div>

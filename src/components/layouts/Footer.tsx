@@ -4,7 +4,7 @@ import ThemeToggle from '@/components/common/ThemeToggle';
 import LangMenu from '@/components/common/GlobalLangMenu';
 
 const Footer = () => (
-  <div className='flex items-center justify-between py-4 sm:py-8'>
+  <div className='flex items-center justify-between py-4 sm:pt-6'>
     <div className='flex items-center gap-x-3 md:hidden'>
       <ThemeToggle />
       <LangMenu className='dropdown-top dropdown-start' />
