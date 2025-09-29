@@ -62,7 +62,7 @@ export const parseMDX = cache(
       return { mdxSource, headings };
     } catch (err) {
       throw new Error(
-        `MDX parsing failed: ${err instanceof Error ? err.message : 'Unknown error.'}`
+        `MDX parsing failed: ${err instanceof Error ? err.message : 'Unknown error'}`
       );
     }
   }

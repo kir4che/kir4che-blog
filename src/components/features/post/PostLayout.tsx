@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useTranslations, useFormatter } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Share2, Copy } from 'lucide-react';
 
 import type { Language, PostMeta } from '@/types';
@@ -14,7 +14,7 @@ import { useAlert } from '@/contexts/AlertContext';
 import PostPasswordGate from '@/components/features/post/PostPasswordGate';
 import TOC from '@/components/features/post/Toc';
 import LangMenu from '@/components/features/post/LangMenu';
-import CategoryGroup from '@/components/features/post/CategoryGroup';
+import CategoryBadge from '@/components/features/category/CategoryBadge';
 import PostMetaInfo from '@/components/features/post/PostMetaInfo';
 import RelatedPosts from '@/components/features/post/RelatedPosts';
 import KofiBtn from '@/components/ui/KofiBtn';
@@ -42,7 +42,6 @@ const PostLayout = ({
   const t = useTranslations('PostPage');
   const t_common = useTranslations('common');
   const t_settings = useTranslations('settings');
-  const formatter = useFormatter();
   const categoryInfoMap = useCategoryInfoMap(post);
   const { showError, showSuccess } = useAlert();
 
@@ -140,7 +139,7 @@ const PostLayout = ({
         <header className='space-y-4'>
           <h1>{title || slug}</h1>
           <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-1'>
-            <CategoryGroup
+            <CategoryBadge
               categories={categories}
               categoryInfoMap={categoryInfoMap}
             />
@@ -161,20 +160,6 @@ const PostLayout = ({
               )}
             </div>
           </div>
-          {post.updatedAt && (
-            <p className='-mt-1 text-right text-xs text-pink-500 dark:text-white/50'>
-              {t('lastUpdated')}{' '}
-              <time dateTime={post.updatedAt}>
-                {formatter
-                  .dateTime(new Date(post.updatedAt), {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                  })
-                  .replace(/\//g, '.')}
-              </time>
-            </p>
-          )}
         </header>
         <section className={styles.articleContent}>{children}</section>
         <hr className='text-text-gray-lighter dark:text-text-gray mx-auto my-8 w-20' />

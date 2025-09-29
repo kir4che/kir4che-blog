@@ -7,7 +7,7 @@ import type { CategoryInfo, Language } from '@/types';
 import { Link, useRouter } from '@/i18n/navigation';
 import { cn, getCategoryStyle } from '@/lib/style';
 
-interface CategoryGroupProps {
+interface CategoryBadgeProps {
   showHr?: boolean;
   categories: string[];
   categoryInfoMap: Record<string, CategoryInfo>;
@@ -15,13 +15,13 @@ interface CategoryGroupProps {
   disableLink?: boolean;
 }
 
-const CategoryGroup = ({
+const CategoryBadge = ({
   showHr = false,
   categories,
   categoryInfoMap,
   className,
   disableLink = false,
-}: CategoryGroupProps) => {
+}: CategoryBadgeProps) => {
   const lang = useLocale() as Language;
   const router = useRouter();
   if (!categories || categories.length === 0) return null;
@@ -88,4 +88,4 @@ const CategoryGroup = ({
   );
 };
 
-export default CategoryGroup;
+export default CategoryBadge;

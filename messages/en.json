@@ -149,7 +149,9 @@
     "postCount": "{count} posts in total",
     "noCategories": "No Categories yet.",
     "loadFailed": "Failed to load categories. Please try again later.",
-    "backToCategories": "Back to Categories"
+    "breadcrumb": {
+      "categories": "Categories"
+    }
   },
   "TagsPage": {
     "title": "Tags",

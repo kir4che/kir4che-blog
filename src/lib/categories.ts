@@ -1,6 +1,6 @@
 import { cache } from 'react';
 
-import type { PostMeta, PostInfo, Category, CategoryInfo } from '@/types';
+import type { PostInfo, Category, CategoryInfo } from '@/types';
 import { CONFIG } from '@/config';
 import { categoryMap } from '@/config/taxonomy';
 
@@ -73,9 +73,13 @@ export const isPostInCategory = (
   categoryName: { tw: string; en: string },
   slug?: string
 ): boolean => {
+  if (!Array.isArray(post.categories)) return false;
+
   const lowerSlug = slug?.toLowerCase();
 
   return post.categories.some((cat) => {
+    if (!cat || typeof cat !== 'string') return false;
+
     const lowerCat = cat.toLowerCase();
 
     // 比對所有語系名稱
@@ -96,22 +100,22 @@ const processSubcategories = (
 ): Record<string, CategoryInfo> => {
   if (!subcategories) return {};
 
-  return Object.entries(subcategories).reduce(
-    (acc, [subSlug, sub]) => {
-      const postCount = postCounts[subSlug] || 0;
-      if (postCount > 0) {
-        acc[subSlug] = {
-          name: sub.name,
-          slug: subSlug,
-          color: sub.color,
-          parentSlug,
-          postCount,
-        };
-      }
-      return acc;
-    },
-    {} as Record<string, CategoryInfo>
-  );
+  const result: Record<string, CategoryInfo> = {};
+
+  for (const [subSlug, sub] of Object.entries(subcategories)) {
+    const postCount = postCounts[subSlug] || 0;
+    if (postCount > 0) {
+      result[subSlug] = {
+        name: sub.name,
+        slug: subSlug,
+        color: sub.color,
+        parentSlug,
+        postCount,
+      };
+    }
+  }
+
+  return result;
 };
 
 // 取得所有有文章的分類（包含子分類），依文章數量排序，可限制最大數量。
@@ -129,14 +133,13 @@ export const getAllCategoryByPosts = (
         (postCounts[slug] || 0) +
         Object.values(subs).reduce((sum, s) => sum + (s.postCount ?? 0), 0);
 
-      if (total > 0) {
+      if (total > 0)
         acc.push({
           ...cat,
           slug,
           postCount: postCounts[slug] || 0,
           subcategories: subs,
         });
-      }
 
       return acc;
     }, [])

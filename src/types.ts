@@ -22,7 +22,7 @@ export interface PostMeta {
   password?: string;
   hasPassword: boolean;
   draft?: boolean;
-  featured?: boolean;
+  featured: boolean;
   coverImage?: string;
   updatedAt?: string;
 }

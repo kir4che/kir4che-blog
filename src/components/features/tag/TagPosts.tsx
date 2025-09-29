@@ -1,79 +1,44 @@
 'use client';
 
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
-import type {
-  Language,
-  PaginationData,
-  PostInfo,
-  PostMeta,
-  Tag,
-} from '@/types';
 import { usePagination } from '@/hooks/usePagination';
+
+import type { PaginationData, PostInfo, PostMeta, Tag } from '@/types';
 
 import PostPreview from '@/components/features/post/PostPreview';
 import Pagination from '@/components/ui/Pagination';
-import ErrorRetry from '@/components/ui/ErrorRetry';
-import Skeleton from '@/components/ui/Skeleton';
 
 interface TagPostsProps {
   tag: Tag;
-  initialPosts: (PostMeta | PostInfo)[];
-  initialPagination: PaginationData;
+  posts: (PostMeta | PostInfo)[];
+  pagination: PaginationData;
 }
 
-const TagPosts = ({ tag, initialPosts, initialPagination }: TagPostsProps) => {
-  const lang = useLocale() as Language;
+const TagPosts = ({ tag, posts, pagination }: TagPostsProps) => {
   const t = useTranslations('TagsPage');
-  const t_common = useTranslations('common');
-
-  const { posts, pagination, isLoading, error, retry, handlePageChange } =
-    usePagination({
-      type: 'tag',
-      slug: tag.slug,
-      lang,
-      initialPosts: initialPosts.map(
-        (post) =>
-          ({
-            ...post,
-            featured: post.featured ?? false,
-          }) as PostInfo
-      ),
-      initialPagination,
-    });
+  const { handlePageChange } = usePagination();
 
   return (
     <div className='space-y-6'>
       <h1 className='mb-4 flex items-baseline justify-between'>
         <span className='text-text-primary'># {tag.name}</span>
-        <span className='text-text-gray dark:text-text-gray-lighter text-sm font-normal'>
+        <span className='text-text-gray dark:text-text-gray-lighter font-mono text-sm font-normal'>
           {t('postCount', { count: pagination.totalPosts })}
         </span>
       </h1>
       <div className='space-y-4'>
-        {error ? (
-          <ErrorRetry
-            message={t('loadFailed')}
-            retryLabel={t_common('button.retry')}
-            onRetry={retry}
+        <section className='card space-y-4'>
+          {posts.map((post) => (
+            <PostPreview key={post.slug} post={post} variant='list' />
+          ))}
+        </section>
+        {pagination.totalPages > 1 && (
+          <Pagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            onPageChange={handlePageChange}
           />
-        ) : isLoading ? (
-          <Skeleton variant='post' />
-        ) : (
-          <>
-            <section className='card space-y-4'>
-              {posts.map((post) => (
-                <PostPreview key={post.slug} post={post} variant='list' />
-              ))}
-            </section>
-            {pagination.totalPages > 1 && (
-              <Pagination
-                currentPage={pagination.currentPage}
-                totalPages={pagination.totalPages}
-                onPageChange={handlePageChange}
-              />
-            )}
-          </>
         )}
       </div>
     </div>

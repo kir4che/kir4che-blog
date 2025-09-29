@@ -4,46 +4,62 @@ import { notFound } from 'next/navigation';
 
 import type { Language } from '@/types';
 import { LANGUAGES } from '@/config';
+import { DEFAULT_POSTS_PER_PAGE } from '@/lib/posts';
 
 import TagPosts from '@/components/features/tag/TagPosts';
-import { getPaginatedPosts, getPostsInfo } from '@/lib/posts';
-import { getTagsByPosts, getLocalizedTag } from '@/lib/tags';
+import { getAllTagsCache, getPostsByTagCache } from '@/lib/cache';
+import { getPaginatedPosts } from '@/lib/posts';
+import { getLocalizedTag } from '@/lib/tags';
 
 type Params = Promise<{
   lang: Language;
   tag: string;
 }>;
 
-// 預先取得所有語系的所有 { lang, tag }
+type SearchParams = Promise<{
+  page?: string;
+}>;
+
 export async function generateStaticParams() {
   try {
-    const allParams = await Promise.all(
-      LANGUAGES.map(async (lang) => {
-        const posts = await getPostsInfo(lang);
-        const tags = getTagsByPosts(posts);
-        const seen = new Set<string>();
-        const langParams: { lang: Language; tag: string }[] = [];
-        for (const { slug } of tags) {
-          if (seen.has(slug)) continue;
-          seen.add(slug);
-          langParams.push({ lang, tag: slug });
-        }
-        return langParams;
-      })
-    );
+    const allTags = await getAllTagsCache();
 
-    return allParams.flat();
+    return LANGUAGES.flatMap((lang) => {
+      const tags = allTags[lang] || [];
+      const seen = new Set<string>();
+
+      return tags
+        .filter(({ slug }) => {
+          if (seen.has(slug)) return false;
+          seen.add(slug);
+          return true;
+        })
+        .map(({ slug }) => ({ lang, tag: slug }));
+    });
   } catch {
     return [];
   }
 }
 
-const TagPage = async ({ params }: { params: Params }) => {
-  const { lang, tag } = await params;
-
+const TagPostsList = async ({
+  lang,
+  tag,
+  currentPage,
+}: {
+  lang: Language;
+  tag: string;
+  currentPage: number;
+}) => {
   try {
-    const { posts, pagination } = await getPaginatedPosts({ lang, tag });
-    if (pagination.totalPosts === 0) return notFound();
+    const posts = await getPostsByTagCache(tag, lang);
+
+    if (posts.length === 0) return notFound();
+
+    const { posts: paginatedPosts, pagination } = await getPaginatedPosts(
+      posts,
+      currentPage,
+      DEFAULT_POSTS_PER_PAGE
+    );
 
     const localizedTag = getLocalizedTag(tag, lang);
     const tagData = {
@@ -52,15 +68,25 @@ const TagPage = async ({ params }: { params: Params }) => {
     };
 
     return (
-      <TagPosts
-        tag={tagData}
-        initialPosts={posts}
-        initialPagination={pagination}
-      />
+      <TagPosts tag={tagData} posts={paginatedPosts} pagination={pagination} />
     );
   } catch {
     return notFound();
   }
+};
+
+const TagPage = async ({
+  params,
+  searchParams,
+}: {
+  params: Params;
+  searchParams: SearchParams;
+}) => {
+  const { lang, tag } = await params;
+  const { page } = await searchParams;
+  const currentPage = Number(page) || 1;
+
+  return <TagPostsList lang={lang} tag={tag} currentPage={currentPage} />;
 };
 
 export default TagPage;

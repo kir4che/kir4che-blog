@@ -1,27 +1,31 @@
-export const dynamic = 'force-static';
-
 import { notFound } from 'next/navigation';
 
 import type { Language } from '@/types';
 import { LANGUAGES } from '@/config';
+import { DEFAULT_POSTS_PER_PAGE } from '@/lib/posts';
 
 import CategoryPosts from '@/components/features/category/CategoryPosts';
-import { getAllCategoryByPosts, getCategoryBySlug } from '@/lib/categories';
-import { getPaginatedPosts, getPostsInfo } from '@/lib/posts';
+import { getAllCategoriesCache, getPostsByCategoryCache } from '@/lib/cache';
+import { getPaginatedPosts } from '@/lib/posts';
 
 type Params = Promise<{
   lang: Language;
   slug: string;
 }>;
 
+type SearchParams = Promise<{
+  page?: string;
+  tab?: string;
+}>;
+
 // 預先取得所有語系的所有 { lang, slug }
 export async function generateStaticParams() {
   try {
     const params: { lang: Language; slug: string }[] = [];
+    const allCategories = await getAllCategoriesCache();
 
     for (const lang of LANGUAGES) {
-      const posts = await getPostsInfo(lang);
-      const categories = getAllCategoryByPosts(posts);
+      const categories = allCategories[lang] || [];
       for (const cat of categories) params.push({ lang, slug: cat.slug });
     }
 
@@ -31,26 +35,39 @@ export async function generateStaticParams() {
   }
 }
 
-const CategoryPage = async ({ params }: { params: Params }) => {
+const CategoryPage = async ({
+  params,
+  searchParams,
+}: {
+  params: Params;
+  searchParams: SearchParams;
+}) => {
   const { lang, slug } = await params;
+  const { page, tab } = await searchParams;
+  const currentPage = Number(page) || 1;
 
   try {
-    const posts = await getPostsInfo(lang);
-    const category = await getCategoryBySlug(slug, posts);
-
-    if (!category) return notFound();
-
-    const { posts: initialPosts, pagination } = await getPaginatedPosts({
+    const { category, posts } = await getPostsByCategoryCache(
+      slug,
       lang,
-      category: slug,
-    });
+      'main'
+    );
+
+    if (!category || posts.length === 0) return notFound();
+
+    const { posts: initialPosts, pagination } = await getPaginatedPosts(
+      posts,
+      currentPage,
+      DEFAULT_POSTS_PER_PAGE
+    );
 
     return (
       <CategoryPosts
         category={category}
         slug={slug}
-        initialPosts={initialPosts}
-        initialPagination={pagination}
+        posts={initialPosts}
+        pagination={pagination}
+        defaultTab={tab}
       />
     );
   } catch {

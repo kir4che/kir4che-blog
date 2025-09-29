@@ -15,6 +15,14 @@ type SiteData = Record<Language, SiteDataEntry>;
 const FALLBACK_LANGUAGE = CONFIG.languages.defaultLanguage;
 
 const normalizeSiteDataEntry = (entry: any): SiteDataEntry => {
+  if (!entry || typeof entry !== 'object')
+    return {
+      posts: [],
+      categories: [],
+      tags: [],
+      popularPosts: [],
+    };
+
   const normalizedCategories: Category[] = Array.isArray(entry.categories)
     ? entry.categories
         .filter((cat: any) => cat && typeof cat === 'object')
