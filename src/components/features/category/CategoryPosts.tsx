@@ -1,7 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+
+import { usePagination } from '@/hooks/usePagination';
 
 import type {
   Language,
@@ -11,56 +13,56 @@ import type {
   PostMeta,
 } from '@/types';
 import { getCategoryStyle } from '@/lib/style';
-import { usePagination } from '@/hooks/usePagination';
 
 import PostPreview from '@/components/features/post/PostPreview';
 import Pagination from '@/components/ui/Pagination';
 import CategoryTabs from '@/components/features/category/CategoryTabs';
-import ErrorRetry from '@/components/ui/ErrorRetry';
-import Skeleton from '@/components/ui/Skeleton';
 
 interface CategoryPostsProps {
   category: Category;
   slug: string;
-  initialPosts: (PostMeta | PostInfo)[];
-  initialPagination: PaginationData;
+  posts: (PostMeta | PostInfo)[];
+  pagination: PaginationData;
+  defaultTab?: string;
 }
 
 const CategoryPosts = ({
   category,
-  slug,
-  initialPosts,
-  initialPagination,
+  posts,
+  pagination,
+  defaultTab = 'all',
 }: CategoryPostsProps) => {
   const lang = useLocale() as Language;
   const t = useTranslations('CategoriesPage');
-  const t_common = useTranslations('common');
+  const { handlePageChange } = usePagination();
 
-  const [activeTab, setActiveTab] = useState<string>('all');
+  const [activeTab, setActiveTab] = useState<string>(
+    defaultTab && category.subcategories?.[defaultTab] ? defaultTab : 'all'
+  );
 
-  const selectedSlug = useMemo(() => {
-    if (activeTab === 'all') return slug;
-    return category.subcategories?.[activeTab]?.slug || slug;
-  }, [activeTab, category.subcategories, slug]);
+  useEffect(() => {
+    if (defaultTab && category.subcategories?.[defaultTab])
+      setActiveTab(defaultTab);
+    else setActiveTab('all');
+  }, [defaultTab, category.subcategories]);
 
-  const shouldUseInitialData = selectedSlug === slug;
+  // 根據 activeTab 篩選文章
+  const filteredPosts = useMemo(() => {
+    if (activeTab === 'all') return posts;
 
-  const { posts, pagination, isLoading, error, retry, handlePageChange } =
-    usePagination({
-      type: 'category',
-      slug: selectedSlug,
-      lang,
-      initialPosts: shouldUseInitialData
-        ? initialPosts.map(
-            (post) =>
-              ({
-                ...post,
-                featured: post.featured ?? false,
-              }) as PostInfo
-          )
-        : undefined,
-      initialPagination: shouldUseInitialData ? initialPagination : undefined,
+    const subCategory = category.subcategories?.[activeTab];
+    if (!subCategory) return posts;
+
+    // 篩選屬於該子分類的文章
+    return posts.filter((post) => {
+      return post.categories?.some(
+        (categoryName) =>
+          categoryName === subCategory.name[lang] ||
+          categoryName === subCategory.name.tw ||
+          categoryName === subCategory.name.en
+      );
     });
+  }, [posts, activeTab, category.subcategories, lang]);
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
@@ -75,7 +77,7 @@ const CategoryPosts = ({
         >
           {category?.name?.[lang]}
         </span>
-        <span className='text-text-gray dark:text-text-gray-lighter text-sm font-normal'>
+        <span className='text-text-gray dark:text-text-gray-lighter font-mono text-sm font-normal'>
           {t('postCount', { count: Number(pagination.totalPosts) })}
         </span>
       </h1>
@@ -88,29 +90,17 @@ const CategoryPosts = ({
           />
         )}
       <div className='space-y-4'>
-        {error ? (
-          <ErrorRetry
-            message={t('loadFailed')}
-            retryLabel={t_common('button.retry')}
-            onRetry={retry}
+        <section className='card space-y-4'>
+          {filteredPosts.map((post) => (
+            <PostPreview key={post.slug} post={post} variant='list' />
+          ))}
+        </section>
+        {pagination.totalPages > 1 && (
+          <Pagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            onPageChange={handlePageChange}
           />
-        ) : isLoading ? (
-          <Skeleton variant='post' />
-        ) : (
-          <>
-            <section className='card space-y-4'>
-              {posts.map((post) => (
-                <PostPreview key={post.slug} post={post} variant='list' />
-              ))}
-            </section>
-            {pagination.totalPages > 1 && (
-              <Pagination
-                currentPage={pagination.currentPage}
-                totalPages={pagination.totalPages}
-                onPageChange={handlePageChange}
-              />
-            )}
-          </>
         )}
       </div>
     </div>

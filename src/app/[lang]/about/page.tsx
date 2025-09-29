@@ -91,7 +91,7 @@ const AboutPage = () => {
           </div>
         </div>
       </section>
-      <section className='relative space-y-2'>
+      <section className='relative space-y-2 xl:mb-36'>
         <h3 className='heading -ml-8'>{t('title_2')}</h3>
         <ExternalLink
           href={`mailto:${CONFIG.siteInfo.email}`}
@@ -113,7 +113,6 @@ const AboutPage = () => {
           </motion.div>
         </motion.div>
       </section>
-
       <DecorativeImage
         src='/images/butterfly-illustration.webp'
         desktopOnly={false}
@@ -121,11 +120,12 @@ const AboutPage = () => {
       />
       <DecorativeImage
         src='/images/butterfly-illustration-2.webp'
-        className='absolute right-2 bottom-92 max-h-32 max-w-32 lg:right-60 2xl:right-72'
+        className='absolute right-2 bottom-[420px] max-h-32 max-w-32 lg:right-60 2xl:right-72'
       />
       <DecorativeImage
         src='/images/about-illustration.webp'
-        className='absolute -right-4 -bottom-8 max-h-80 max-w-80'
+        className='absolute -right-8 -bottom-8 max-h-80 max-w-80 md:-right-4'
+        desktopOnly={false}
       />
     </div>
   );

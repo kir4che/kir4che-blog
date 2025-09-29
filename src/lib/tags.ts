@@ -27,7 +27,7 @@ const getTagName = (
   );
 };
 
-export const getLocalizedTagName = (
+const getLocalizedTagName = (
   identifier: string,
   lang: Language = DEFAULT_LANGUAGE
 ): string => {
@@ -41,6 +41,7 @@ export const getLocalizedTag = (
   lang: Language = DEFAULT_LANGUAGE
 ) => {
   const slug = convertToSlug(identifier);
+
   return {
     slug,
     name: getLocalizedTagName(identifier, lang),
@@ -56,16 +57,12 @@ export const getTagsByPosts = (
   if (!Array.isArray(posts) || posts.length === 0) return [];
 
   const tagCounts = new Map<string, number>();
-  const processedTags = new Set<string>();
 
   for (const post of posts) {
     if (Array.isArray(post.tags)) {
       for (const tag of post.tags) {
         const trimmedTag = tag?.trim();
-        if (trimmedTag && !processedTags.has(trimmedTag)) {
-          processedTags.add(trimmedTag);
-          tagCounts.set(trimmedTag, (tagCounts.get(trimmedTag) || 0) + 1);
-        } else if (trimmedTag)
+        if (trimmedTag)
           tagCounts.set(trimmedTag, (tagCounts.get(trimmedTag) || 0) + 1);
       }
     }
@@ -79,10 +76,4 @@ export const getTagsByPosts = (
     .sort((a, b) => b.postCount - a.postCount);
 
   return limit ? sortedTags.slice(0, limit) : sortedTags;
-};
-
-export const getTagDefinitionBySlug = (
-  slug: string
-): TagDefinition | undefined => {
-  return tagMap[slug];
 };

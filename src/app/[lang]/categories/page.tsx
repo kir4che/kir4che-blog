@@ -7,8 +7,7 @@ import type { Language, CategoryInfo } from '@/types';
 import { LANGUAGES } from '@/config';
 import { Link } from '@/i18n/navigation';
 import { getCategoryStyle } from '@/lib/style';
-import { getAllCategoryByPosts } from '@/lib/categories';
-import { getPostsInfo } from '@/lib/posts';
+import { getAllCategoriesCache } from '@/lib/cache';
 
 type Params = Promise<{
   lang: Language;
@@ -23,10 +22,11 @@ const CategoriesPage = async ({ params }: { params: Params }) => {
   const t = await getTranslations('CategoriesPage');
 
   try {
-    const posts = await getPostsInfo(lang);
-    const categories = getAllCategoryByPosts(posts);
+    const allCategories = await getAllCategoriesCache();
+    const categories = allCategories[lang] || [];
 
-    if (!Array.isArray(categories)) return notFound();
+    if (!Array.isArray(categories) || categories.length === 0)
+      return notFound();
 
     return (
       <>

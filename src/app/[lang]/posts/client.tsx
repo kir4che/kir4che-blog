@@ -1,63 +1,33 @@
 'use client';
 
 import { useMemo } from 'react';
-import { useTranslations } from 'next-intl';
 
 import type { Language, PaginationData, PostInfo } from '@/types';
 import { usePagination } from '@/hooks/usePagination';
 
 import PostPreview from '@/components/features/post/PostPreview';
 import Pagination from '@/components/ui/Pagination';
-import ErrorRetry from '@/components/ui/ErrorRetry';
-import Skeleton from '@/components/ui/Skeleton';
 
 interface PostsPageClientProps {
-  lang: Language;
   initialPosts: PostInfo[];
   initialPagination: PaginationData;
 }
 
 const PostsPageClient = ({
-  lang,
   initialPosts,
   initialPagination,
 }: PostsPageClientProps) => {
-  const t = useTranslations('PostsPage');
-  const tCommon = useTranslations('common');
-
-  const { posts, pagination, isLoading, error, retry, handlePageChange } =
-    usePagination({
-      lang,
-      initialPosts,
-      initialPagination,
-    });
+  const { handlePageChange } = usePagination();
 
   // 按年份分組文章
   const postsByYear = useMemo(() => {
-    return posts.reduce<Record<string, PostInfo[]>>((acc, post) => {
+    return initialPosts.reduce<Record<string, PostInfo[]>>((acc, post) => {
       const year = new Date(post.date).getFullYear().toString();
       if (!acc[year]) acc[year] = [];
       acc[year].push(post);
       return acc;
     }, {});
-  }, [posts]);
-
-  if (error)
-    return (
-      <ErrorRetry
-        message={t('loadFailed')}
-        retryLabel={tCommon('button.retry')}
-        onRetry={retry}
-      />
-    );
-
-  if (isLoading)
-    return (
-      <div className='space-y-3'>
-        <Skeleton />
-        <Skeleton variant='post' count={3} />
-      </div>
-    );
+  }, [initialPosts]);
 
   return (
     <div className='space-y-8'>
@@ -75,10 +45,10 @@ const PostsPageClient = ({
             </section>
           </section>
         ))}
-      {pagination.totalPages > 1 && (
+      {initialPagination.totalPages > 1 && (
         <Pagination
-          currentPage={pagination.currentPage}
-          totalPages={pagination.totalPages}
+          currentPage={initialPagination.currentPage}
+          totalPages={initialPagination.totalPages}
           onPageChange={handlePageChange}
         />
       )}

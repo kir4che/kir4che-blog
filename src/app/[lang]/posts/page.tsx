@@ -1,7 +1,7 @@
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 import type { Language } from '@/types';
-import { getPaginatedPosts } from '@/lib/posts';
+import { getPaginatedPostsWithFilter } from '@/lib/posts';
 
 import PostsPageClient from './client';
 
@@ -9,16 +9,28 @@ type Params = Promise<{
   lang: Language;
 }>;
 
-const PostsPage = async ({ params }: { params: Params }) => {
+type SearchParams = Promise<{
+  page?: string;
+}>;
+
+const PostsPage = async ({
+  params,
+  searchParams,
+}: {
+  params: Params;
+  searchParams: SearchParams;
+}) => {
   const { lang } = await params;
-  const { posts, pagination } = await getPaginatedPosts({ lang });
+  const { page } = await searchParams;
+  const currentPage = Number(page) || 1;
+
+  const { posts, pagination } = await getPaginatedPostsWithFilter({
+    lang,
+    page: currentPage,
+  });
 
   return (
-    <PostsPageClient
-      lang={lang}
-      initialPosts={posts}
-      initialPagination={pagination}
-    />
+    <PostsPageClient initialPosts={posts} initialPagination={pagination} />
   );
 };
 

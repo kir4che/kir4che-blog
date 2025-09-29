@@ -19,7 +19,12 @@ export const getMediaMeta = async (src: string): Promise<ImageMeta | null> => {
   const fileExtension = path.extname(mediaPath).toLowerCase();
 
   // 只處理圖片類型的檔案
-  if (!SUPPORTED_IMAGE_EXTENSIONS.includes(fileExtension as any)) return null;
+  if (
+    !SUPPORTED_IMAGE_EXTENSIONS.includes(
+      fileExtension as (typeof SUPPORTED_IMAGE_EXTENSIONS)[number]
+    )
+  )
+    return null;
 
   try {
     const buffer = await fs.readFile(mediaPath);
@@ -61,14 +66,14 @@ export const extractAndProcessImageMetas = async (
     if (src?.startsWith('/') && src.length > 1) {
       // 清理路徑，去除可能的查詢參數或片段識別碼。
       const cleanSrc = src.split(/[?#]/)[0];
-      if (
+      const isValidImage =
         cleanSrc &&
         cleanSrc !== '/' &&
         SUPPORTED_IMAGE_EXTENSIONS.some((ext) =>
           cleanSrc.toLowerCase().endsWith(ext)
-        )
-      )
-        imageSrcs.add(cleanSrc);
+        );
+
+      if (isValidImage) imageSrcs.add(cleanSrc);
     }
   }
 

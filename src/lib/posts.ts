@@ -114,7 +114,8 @@ export const getPostData = cache(
       const { data, content } = matter(fileContents);
 
       // 驗證必要欄位
-      if (!data.title && !data.date) return null;
+      if (!data.title || !data.date) return null;
+
       // 防止顯示 draft 文章
       if (data.draft && process.env.NODE_ENV === 'production') {
         const err = new Error('This post is a draft.');
@@ -123,30 +124,28 @@ export const getPostData = cache(
       }
 
       // 從預先生成的 imageMetas.json 中讀取模糊圖資料
-      const imageMetasPath = path.join(
-        process.cwd(),
-        'public',
-        'imageMetas.json'
-      );
-      let imageMetasRaw: Record<string, any> = {};
+      let imageMetas: Record<string, any> = {};
       try {
+        const imageMetasPath = path.join(
+          process.cwd(),
+          'public',
+          'imageMetas.json'
+        );
         const imageMetasFile = await fs.promises.readFile(
           imageMetasPath,
           'utf8'
         );
-        imageMetasRaw = JSON.parse(imageMetasFile);
+        const imageMetasRaw: Record<string, any> = JSON.parse(imageMetasFile);
+
+        // 篩出這篇文章實際有用到的圖片 metadata
+        for (const [src, meta] of Object.entries(imageMetasRaw))
+          if (typeof src === 'string' && content.includes(src))
+            imageMetas[src] = meta;
       } catch (err) {
         console.warn(
-          `Failed to load image metas:`,
+          'Failed to load image metas:',
           err instanceof Error ? err.message : String(err)
         );
-      }
-
-      // 過濾出這篇文章實際有用到的圖片 metadata
-      const imageMetas: Record<string, any> = {};
-      for (const [src, meta] of Object.entries(imageMetasRaw)) {
-        if (typeof src === 'string' && content.includes(src))
-          imageMetas[src] = meta;
       }
 
       return {
@@ -285,7 +284,8 @@ export const checkPostExistence = cache(
   }
 );
 
-export const DEFAULT_POSTS_PER_PAGE = 8;
+export const DEFAULT_POSTS_PER_PAGE = 6;
+const MAX_RELATED_POSTS = 3;
 
 type PostFilterType = 'popular' | 'related';
 
@@ -305,7 +305,7 @@ interface PaginatedPostParams extends FilteredPostParams {
 }
 
 // 分頁處理
-const paginatePosts = (
+export const getPaginatedPosts = (
   posts: PostInfo[],
   page: number,
   postsPerPage: number
@@ -347,9 +347,11 @@ export const getFilteredPosts = async ({
     const lowerKeyword = keyword.toLowerCase();
     posts = posts.filter(
       ({ title, categories = [], tags = [], description = '' }) => {
-        const haystacks = [title, description, ...categories, ...tags];
+        const haystacks = [title, description, ...categories, ...tags].filter(
+          Boolean
+        );
         return haystacks.some((field) =>
-          field?.toLowerCase().includes(lowerKeyword)
+          field.toLowerCase().includes(lowerKeyword)
         );
       }
     );
@@ -361,7 +363,7 @@ export const getFilteredPosts = async ({
   );
 };
 
-export const getPaginatedPosts = async ({
+export const getPaginatedPostsWithFilter = async ({
   lang = DEFAULT_LANGUAGE,
   category,
   tag,
@@ -386,14 +388,15 @@ export const getPaginatedPosts = async ({
       .filter(
         (post) =>
           post.slug !== currentSlug &&
+          Array.isArray(post.categories) &&
           post.categories.some((categoryName) =>
             categories.includes(categoryName)
           )
       )
-      .slice(0, 3); // 限制相關文章數量為 3
+      .slice(0, MAX_RELATED_POSTS);
   }
 
-  return paginatePosts(posts, page, postsPerPage);
+  return getPaginatedPosts(posts, page, postsPerPage);
 };
 
 // 動態載入指定文章的自定義元件

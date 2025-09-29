@@ -100,7 +100,7 @@ export const categoryMap: CategoryMap = {
         },
         slug: 'trip',
         color: {
-          light: '#70e000',
+          light: '#80db25',
           dark: '#a6ff4d',
         },
       },

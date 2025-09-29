@@ -26,16 +26,14 @@ const PostPageClient = ({
   otherLangs,
   mdxSource,
   extraComponents,
-}: PostPageClientProps) => {
-  return (
-    <PostLayout post={post} headings={headings} otherLangs={otherLangs}>
-      <MDXContent
-        content={mdxSource}
-        imageMetas={post.imageMetas}
-        extraComponents={extraComponents}
-      />
-    </PostLayout>
-  );
-};
+}: PostPageClientProps) => (
+  <PostLayout post={post} headings={headings} otherLangs={otherLangs}>
+    <MDXContent
+      content={mdxSource}
+      imageMetas={post.imageMetas}
+      extraComponents={extraComponents}
+    />
+  </PostLayout>
+);
 
 export default PostPageClient;

@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
 import { useFormatter, useTranslations } from 'next-intl';
@@ -75,7 +77,7 @@ const RelatedPosts = ({ lang, currentSlug, categories }: RelatedPostsProps) => {
       </div>
       <div className='relative overflow-hidden'>
         <div
-          className='flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth px-2 pb-3 [-ms-overflow-style:none] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-pink-300/60 dark:[&::-webkit-scrollbar-thumb]:bg-pink-200/40 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-pink-100/40 dark:[&::-webkit-scrollbar-track]:bg-white/10'
+          className='flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth pb-3 [-ms-overflow-style:none] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-pink-300/60 dark:[&::-webkit-scrollbar-thumb]:bg-pink-200/40 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-pink-100/40 dark:[&::-webkit-scrollbar-track]:bg-white/10'
           role='list'
           aria-label={t('relatedPosts')}
         >

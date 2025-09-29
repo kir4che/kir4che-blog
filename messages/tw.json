@@ -150,7 +150,9 @@
     "postCount": "共 {count} 篇文章",
     "noCategories": "尚無分類",
     "loadFailed": "無法載入分類，請稍後再試。",
-    "backToCategories": "返回分類列表"
+    "breadcrumb": {
+      "categories": "分類"
+    }
   },
   "TagsPage": {
     "title": "標籤",
