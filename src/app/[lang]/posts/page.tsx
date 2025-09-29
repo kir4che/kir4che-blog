@@ -1,4 +1,4 @@
-export const dynamic = 'force-static';
+export const revalidate = 3600;
 
 import type { Language } from '@/types';
 import { getPaginatedPosts } from '@/lib/posts';

@@ -1,6 +1,6 @@
-'use client';
+export const dynamic = 'force-static';
 
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { motion } from 'motion/react';
 
 import { CONFIG } from '@/config';
@@ -28,8 +28,8 @@ const ANIMATIONS = {
   },
 };
 
-const AboutPage = () => {
-  const t = useTranslations('AboutPage');
+const AboutPage = async () => {
+  const t = await getTranslations('AboutPage');
 
   return (
     <div className='bg-bg-secondary relative z-0 flex-col justify-between space-y-8 rounded-b-xl px-8 py-6 shadow'>

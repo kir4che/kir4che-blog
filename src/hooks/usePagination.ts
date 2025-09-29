@@ -1,5 +1,3 @@
-export const dynamic = 'force-static';
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 import type { PostMeta, PaginationData } from '@/types';
