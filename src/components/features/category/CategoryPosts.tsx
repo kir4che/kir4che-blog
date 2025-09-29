@@ -50,7 +50,15 @@ const CategoryPosts = ({
       type: 'category',
       slug: selectedSlug,
       lang,
-      initialPosts: shouldUseInitialData ? initialPosts : undefined,
+      initialPosts: shouldUseInitialData
+        ? initialPosts.map(
+            (post) =>
+              ({
+                ...post,
+                featured: post.featured ?? false,
+              }) as PostInfo
+          )
+        : undefined,
       initialPagination: shouldUseInitialData ? initialPagination : undefined,
     });
 

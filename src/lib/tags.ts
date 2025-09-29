@@ -52,27 +52,33 @@ export const getTagsByPosts = (
   posts: PostInfo[],
   limit?: number,
   lang: Language = DEFAULT_LANGUAGE
-) => {
-  if (!posts?.length) return [];
+): Array<{ name: string; slug: string; postCount: number }> => {
+  if (!Array.isArray(posts) || posts.length === 0) return [];
 
-  const tagCounts: Record<string, number> = {};
+  const tagCounts = new Map<string, number>();
+  const processedTags = new Set<string>();
 
-  posts.forEach((post) => {
-    post.tags?.forEach((tag) => {
-      if (tag?.trim()) {
-        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+  for (const post of posts) {
+    if (Array.isArray(post.tags)) {
+      for (const tag of post.tags) {
+        const trimmedTag = tag?.trim();
+        if (trimmedTag && !processedTags.has(trimmedTag)) {
+          processedTags.add(trimmedTag);
+          tagCounts.set(trimmedTag, (tagCounts.get(trimmedTag) || 0) + 1);
+        } else if (trimmedTag)
+          tagCounts.set(trimmedTag, (tagCounts.get(trimmedTag) || 0) + 1);
       }
-    });
-  });
+    }
+  }
 
-  // 將 tagCounts 轉為 array 並加入 slug、postCount
-  return Object.entries(tagCounts)
+  const sortedTags = Array.from(tagCounts.entries())
     .map(([tag, postCount]) => {
       const { slug, name } = getLocalizedTag(tag, lang);
       return { name, slug, postCount };
     })
-    .sort((a, b) => b.postCount - a.postCount)
-    .slice(0, limit);
+    .sort((a, b) => b.postCount - a.postCount);
+
+  return limit ? sortedTags.slice(0, limit) : sortedTags;
 };
 
 export const getTagDefinitionBySlug = (

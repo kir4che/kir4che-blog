@@ -8,49 +8,60 @@ type SupportedPost = PostMeta | PostInfo;
 
 export const useCategoryInfoMap = (
   posts: SupportedPost | SupportedPost[] = []
-) => {
+): Record<string, CategoryInfo> => {
   return useMemo(() => {
+    if (!posts) return {};
+
     const postArray = Array.isArray(posts) ? posts : [posts];
     const categoryNames = new Set<string>();
 
-    postArray.forEach((post) => {
-      post.categories?.forEach((category) => {
-        categoryNames.add(category);
-      });
-    });
+    // 收集所有分類名稱
+    for (const post of postArray) {
+      if (Array.isArray(post.categories)) {
+        for (const category of post.categories) {
+          const trimmedCategory = category?.trim();
+          if (trimmedCategory) categoryNames.add(trimmedCategory);
+        }
+      }
+    }
+
+    if (categoryNames.size === 0) return {};
 
     const nameToSlugMap = createCategoryNameToSlugMap();
+    const categoryInfoMap = new Map<string, CategoryInfo>();
 
-    const map: Record<string, CategoryInfo> = {};
+    for (const name of categoryNames) {
+      const slug = nameToSlugMap.get(name);
+      if (!slug) continue;
 
-    categoryNames.forEach((name) => {
-      const slug = nameToSlugMap[name];
-      if (!slug) return;
-
+      // 先找主分類
       const mainCategory = categoryMap[slug];
       if (mainCategory) {
-        map[name] = {
+        categoryInfoMap.set(name, {
           name: mainCategory.name,
           slug,
           color: mainCategory.color,
-        };
-        return;
+        });
+        continue;
       }
 
+      // 再找子分類
+      let found = false;
       for (const [parentSlug, category] of Object.entries(categoryMap)) {
         const sub = category.subcategories?.[slug];
         if (sub) {
-          map[name] = {
+          categoryInfoMap.set(name, {
             name: sub.name,
             slug,
             color: sub.color,
             parentSlug,
-          };
-          return;
+          });
+          found = true;
+          break;
         }
       }
-    });
+    }
 
-    return map;
+    return Object.fromEntries(categoryInfoMap);
   }, [posts]);
 };

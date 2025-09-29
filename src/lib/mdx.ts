@@ -18,33 +18,52 @@ import rehypeExpressiveCode from 'rehype-expressive-code';
 import { rehypeExpressiveCodeOptions } from '@/config/expressiveCode';
 import { rehypeHeadings } from '@/utils/rehypeHeadings';
 
-export const parseMDX = cache(async (content: string) => {
-  // 用 VFile 包起來，這樣 rehypeHeadings 才能寫入 file.data.headings。
-  const file = new VFile({ value: content });
+interface ParseMDXResult {
+  mdxSource: any;
+  headings: any[];
+}
 
-  const mdxSource = await serialize(file, {
-    parseFrontmatter: true, // 自動解析 YAML frontmatter
-    mdxOptions: {
-      rehypePlugins: [
-        [rehypeExpressiveCode, rehypeExpressiveCodeOptions],
-        rehypeUnwrapImages,
-        rehypeSlug,
-        rehypeHighlight,
-        rehypeHeadings,
-      ],
-      remarkPlugins: [
-        remarkSupersub,
-        remarkIns,
-        remarkMark,
-        remarkCustomHeaderId,
-        remarkImages,
-        remarkGfm,
-      ],
-      format: 'mdx', // 明確指定格式為 MDX
-    },
-  });
+export const parseMDX = cache(
+  async (content: string): Promise<ParseMDXResult> => {
+    if (!content || typeof content !== 'string')
+      throw new Error('Invalid content provided to parseMDX.');
 
-  const headings = Array.isArray(file.data.headings) ? file.data.headings : [];
+    try {
+      // 用 VFile 包起來，這樣 rehypeHeadings 才能寫入 file.data.headings。
+      const file = new VFile({ value: content });
 
-  return { mdxSource, headings };
-});
+      const mdxSource = await serialize(file, {
+        parseFrontmatter: true, // 自動解析 YAML frontmatter
+        mdxOptions: {
+          rehypePlugins: [
+            [rehypeExpressiveCode, rehypeExpressiveCodeOptions],
+            rehypeUnwrapImages,
+            rehypeSlug,
+            rehypeHighlight,
+            rehypeHeadings,
+          ],
+          remarkPlugins: [
+            remarkSupersub,
+            remarkIns,
+            remarkMark,
+            remarkCustomHeaderId,
+            remarkImages,
+            remarkGfm,
+          ],
+          format: 'mdx', // 明確指定格式為 MDX
+          development: process.env.NODE_ENV === 'development',
+        },
+      });
+
+      const headings = Array.isArray(file.data?.headings)
+        ? file.data.headings
+        : [];
+
+      return { mdxSource, headings };
+    } catch (err) {
+      throw new Error(
+        `MDX parsing failed: ${err instanceof Error ? err.message : 'Unknown error.'}`
+      );
+    }
+  }
+);

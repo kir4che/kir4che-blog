@@ -4,46 +4,58 @@ import type { PostMeta, PostInfo, Category, CategoryInfo } from '@/types';
 import { CONFIG } from '@/config';
 import { categoryMap } from '@/config/taxonomy';
 
-type NameToSlugMap = Record<string, string>;
 type PostCountMap = Record<string, number>;
 
 // 建立分類名稱（多語系）與 slug 的映射表
-export const createCategoryNameToSlugMap = cache((): NameToSlugMap => {
-  const langs = CONFIG.languages.supportedLanguages;
-  const map: NameToSlugMap = {};
-  Object.entries(categoryMap).forEach(([slug, category]) => {
-    langs.forEach((lang) => {
-      // 將該語系的分類名稱對應到主分類的 slug
-      if (category.name[lang]) map[category.name[lang]] = slug;
-    });
+export const createCategoryNameToSlugMap = cache(
+  (): ReadonlyMap<string, string> => {
+    const langs = CONFIG.languages.supportedLanguages;
+    const entries: [string, string][] = [];
 
-    // 處理子分類名稱對應
-    if (category.subcategories) {
-      Object.entries(category.subcategories).forEach(
-        ([subSlug, subCategory]) => {
-          langs.forEach((lang) => {
-            if (subCategory.name[lang]) map[subCategory.name[lang]] = subSlug;
-          });
+    for (const [slug, category] of Object.entries(categoryMap)) {
+      for (const lang of langs) {
+        const categoryName = category.name[lang]?.trim();
+        if (categoryName) entries.push([categoryName, slug]);
+      }
+
+      // 處理子分類名稱對應
+      if (category.subcategories) {
+        for (const [subSlug, subCategory] of Object.entries(
+          category.subcategories
+        )) {
+          for (const lang of langs) {
+            const subCategoryName = subCategory.name[lang]?.trim();
+            if (subCategoryName) entries.push([subCategoryName, subSlug]);
+          }
         }
-      );
+      }
     }
-  });
 
-  return map;
-});
+    return new Map(entries);
+  }
+);
 
 // 計算每個分類（含子分類）出現過的文章數量
 const calculatePostCounts = (
-  posts: PostMeta[],
-  nameToSlugMap: NameToSlugMap
+  posts: PostInfo[],
+  nameToSlugMap: ReadonlyMap<string, string>
 ): PostCountMap => {
-  return posts.reduce((counts, post) => {
-    post.categories?.forEach((categoryName) => {
-      const categorySlug = nameToSlugMap[categoryName]; // 根據分類名稱找對應的 slug
-      if (categorySlug) counts[categorySlug] = (counts[categorySlug] || 0) + 1;
-    });
-    return counts;
-  }, {} as PostCountMap);
+  const counts: PostCountMap = {};
+
+  for (const post of posts) {
+    if (Array.isArray(post.categories)) {
+      for (const categoryName of post.categories) {
+        const trimmedName = categoryName?.trim();
+        if (trimmedName) {
+          const categorySlug = nameToSlugMap.get(trimmedName);
+          if (categorySlug)
+            counts[categorySlug] = (counts[categorySlug] || 0) + 1;
+        }
+      }
+    }
+  }
+
+  return counts;
 };
 
 // 計算分類的總文章數，包含其所有子分類的文章數。

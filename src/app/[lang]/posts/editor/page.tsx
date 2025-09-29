@@ -1,15 +1,15 @@
+'use client';
+
 import { notFound } from 'next/navigation';
 import nextDynamic from 'next/dynamic';
 
-export const dynamic = 'force-dynamic';
+const EditorClient = nextDynamic(() => import('./client'), {
+  ssr: false,
+  loading: () => null,
+});
 
 const EditorPage = () => {
   if (process.env.NODE_ENV === 'production') notFound();
-
-  const EditorClient = nextDynamic(() => import('./client'), {
-    ssr: false,
-    loading: () => null,
-  });
 
   return <EditorClient />;
 };
