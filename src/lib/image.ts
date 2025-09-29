@@ -2,30 +2,38 @@ import { getPlaiceholder } from 'plaiceholder';
 import fs from 'fs/promises';
 import path from 'path';
 
-// 處理單一圖片，讀取檔案並生成 base64 模糊縮略圖。
-export const getMediaMeta = async (src: string) => {
+import type { ImageMeta } from '@/types';
+
+export const getMediaMeta = async (src: string): Promise<ImageMeta | null> => {
   const mediaPath = path.resolve(process.cwd(), 'public', src);
   const fileExtension = path.extname(mediaPath).toLowerCase();
-  const validImageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
 
-  // 只處理圖片類型的檔案（影片先跳過，未來處理。）
-  if (validImageExtensions.includes(fileExtension)) {
-    // 讀取圖片檔案成 buffer
+  // 只處理圖片類型的檔案
+  if (
+    !['.jpg', '.jpeg', '.png', '.gif', '.webp'].includes(fileExtension as any)
+  )
+    return null;
+
+  try {
     const buffer = await fs.readFile(mediaPath);
-    // 使用 plaiceholder 生成 base64 格式的模糊縮圖與原始尺寸
-    const { base64, img, metadata }: any = await getPlaiceholder(buffer);
+    const { base64, metadata } = await getPlaiceholder(buffer);
+
     return {
       src: '/' + src.replace(/^\/+/, ''),
       blurDataURL: base64,
-      originalWidth: img?.width ?? metadata?.width ?? undefined,
-      originalHeight: img?.height ?? metadata?.height ?? undefined,
+      originalWidth: metadata?.width,
+      originalHeight: metadata?.height,
     };
-  } else return null;
+  } catch (err) {
+    console.error(`Failed to process image ${src}:`, err);
+    return null;
+  }
 };
 
-// 提取文章內容中的所有圖片，並生成 metadata（含模糊縮圖）。
-export const extractAndProcessImageMetas = async (content: string) => {
-  const imageMetas: Record<string, any> = {};
+export const extractAndProcessImageMetas = async (
+  content: string
+): Promise<Record<string, ImageMeta>> => {
+  const imageMetas: Record<string, ImageMeta> = {};
 
   // 匹配 markdown、HTML 或程式碼裡的圖片路徑
   const imageRegex =
@@ -39,17 +47,15 @@ export const extractAndProcessImageMetas = async (content: string) => {
   while ((match = imageRegex.exec(content)) !== null) {
     // 先找 markdown 格式的圖片，找不到再找 HTML 或程式碼裡的。
     const src = match[1] || match[2] || match[3];
-    if (src?.startsWith('/')) imageSrcs.add(src); // 只處理以 / 開頭（代表本地資源）的圖片
+    // 只處理以 / 開頭（代表本地資源）的圖片
+    if (src?.startsWith('/')) imageSrcs.add(src);
   }
 
   // 把所有圖片 src 丟進 getMediaMeta() 並行處理
   const metaPromises = Array.from(imageSrcs).map(async (src) => {
-    try {
-      const meta = await getMediaMeta(src.slice(1)); // 去除開頭的 /
-      if (meta) imageMetas[src] = meta; // 成功拿到 metadata 就存起來
-    } catch (err) {
-      console.error(`Failed to load image metadata for ${src}:`, err);
-    }
+    const meta = await getMediaMeta(src.slice(1)); // 去除開頭的 /
+    // 成功拿到 metadata 就存起來
+    if (meta) imageMetas[src] = meta;
   });
 
   await Promise.all(metaPromises);

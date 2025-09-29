@@ -7,13 +7,9 @@ import { categoryMap } from '@/config/taxonomy';
 type NameToSlugMap = Record<string, string>;
 type PostCountMap = Record<string, number>;
 
-let cachedNameToSlugMap: NameToSlugMap | null = null;
-
-// 建立分類名稱（多語系）與分類 slug 的映射表
-export const createCategoryNameToSlugMap = (): NameToSlugMap => {
-  if (cachedNameToSlugMap) return cachedNameToSlugMap;
+// 建立分類名稱（多語系）與 slug 的映射表
+export const createCategoryNameToSlugMap = cache((): NameToSlugMap => {
   const langs = CONFIG.languages.supportedLanguages;
-
   const map: NameToSlugMap = {};
   Object.entries(categoryMap).forEach(([slug, category]) => {
     langs.forEach((lang) => {
@@ -33,9 +29,8 @@ export const createCategoryNameToSlugMap = (): NameToSlugMap => {
     }
   });
 
-  cachedNameToSlugMap = map;
   return map;
-};
+});
 
 // 計算每個分類（含子分類）出現過的文章數量
 const calculatePostCounts = (

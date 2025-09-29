@@ -3,7 +3,7 @@ export const dynamic = 'force-static';
 import type { Language } from '@/types';
 import { getPaginatedPosts } from '@/lib/posts';
 
-import PostsPageClient from './PostsPageClient';
+import PostsPageClient from './client';
 
 type Params = Promise<{
   lang: Language;

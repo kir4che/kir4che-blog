@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useRef, useCallback } from 'react';
-import styles from './PokemonCard.module.css';
+import { useRef, useCallback } from 'react';
+import styles from './styles.module.css';
 
 const mockCardData = {
   id: 'SV2a-001',
@@ -94,4 +94,4 @@ const PokemonCard = ({ stage = 'final' }) => {
   );
 };
 
-export default PokemonCard;
+export default { PokemonCard };

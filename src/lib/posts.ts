@@ -3,56 +3,52 @@ import matter from 'gray-matter';
 import * as fs from 'fs';
 import { cache } from 'react';
 
-import type { Language, PostMeta, PostInfo } from '@/types';
+import type { MDXComponents } from 'mdx/types';
+import type { Language, PostInfo } from '@/types';
 import { LANGUAGES, DEFAULT_LANGUAGE } from '@/config';
 import { isPostInCategory, getCategoryBySlug } from '@/lib/categories';
 import { convertToSlug } from '@/lib/tags';
 
 // 文章所在的資料夾路徑
 const postsDirectory = path.join(process.cwd(), 'src', 'posts');
-const cachedDirs = new Map<string, string[]>();
 
 // 回傳所有文章所在的資料夾路徑
-export const getPostsDirs = cache(
-  async (lang: Language = DEFAULT_LANGUAGE): Promise<string[]> => {
-    if (typeof window !== 'undefined') return [];
-    if (cachedDirs.has(lang)) return cachedDirs.get(lang) || [];
+const getPostsDirs = cache(async (): Promise<string[]> => {
+  if (typeof window !== 'undefined') return [];
 
-    // 讀取 postsDirectory 資料夾內的所有內容（資料夾、檔案）
-    const entries = await fs.promises.readdir(postsDirectory, {
-      withFileTypes: true,
-    });
+  // 讀取 postsDirectory 資料夾內的所有內容（資料夾、檔案）
+  const entries = await fs.promises.readdir(postsDirectory, {
+    withFileTypes: true,
+  });
 
-    // 篩選出資料夾並排除隱藏資料夾，並回傳資料夾的完整路徑。
-    const dirs = entries
-      .filter((entry) => entry.isDirectory() && !entry.name.startsWith('.'))
-      .map((entry) => path.join(postsDirectory, entry.name));
-
-    cachedDirs.set(lang, dirs);
-
-    return dirs;
-  }
-);
+  return entries
+    .filter((entry) => entry.isDirectory() && !entry.name.startsWith('.'))
+    .map((entry) => path.join(postsDirectory, entry.name));
+});
 
 // 根據當前語系取得所有文章的 metadata，並依照日期排序（由新到舊）。
+const MDX_FILES = {
+  default: 'index.mdx',
+  en: 'index.en.mdx',
+} as const;
+
+const getTargetFileName = (lang: Language): string => {
+  return lang === 'en' ? MDX_FILES.en : MDX_FILES.default;
+};
+
 export const getPostsInfo = cache(
   async (lang: Language = DEFAULT_LANGUAGE): Promise<PostInfo[]> => {
     if (typeof window !== 'undefined') return [];
 
-    const dirs = await getPostsDirs(lang);
+    const dirs = await getPostsDirs();
+    const targetFileName = getTargetFileName(lang);
 
     const postsData = await Promise.all(
       dirs.map(async (dirPath) => {
         try {
           const files = await fs.promises.readdir(dirPath);
+          const targetFile = files.find((f) => f === targetFileName);
 
-          // 根據語系選擇對應的檔案
-          const targetFile =
-            lang === 'en'
-              ? files.find((f) => f === 'index.en.mdx')
-              : files.find((f) => f === 'index.mdx');
-
-          // 如果找不到對應語系的檔案，跳過這篇文章。
           if (!targetFile) return null;
 
           const filePath = path.join(dirPath, targetFile);
@@ -96,18 +92,12 @@ export const getPostsInfo = cache(
 
 // 根據當前語系、slug 取得特定文章的 metadata 與內容
 export const getPostData = cache(
-  async (
-    lang: Language = DEFAULT_LANGUAGE,
-    slug: string
-  ): Promise<
-    (PostMeta & { content: string; imageMetas: Record<string, any> }) | null
-  > => {
+  async (lang: Language = DEFAULT_LANGUAGE, slug: string) => {
     try {
       const postDir = path.join(postsDirectory, slug);
       if (!fs.existsSync(postDir)) return null;
 
-      // 根據當前語系選擇對應的 mdx 檔案
-      const targetFileName = lang === 'en' ? 'index.en.mdx' : 'index.mdx';
+      const targetFileName = getTargetFileName(lang);
       const files = await fs.promises.readdir(postDir);
       const mdxFile = files.find((file) => file === targetFileName);
       if (!mdxFile) return null;
@@ -185,10 +175,8 @@ export const getPostInfoBySlug = cache(
     const files = await fs.promises.readdir(postDir);
 
     // 根據當前語系選擇對應的 mdx 檔案
-    const mdxFile = files.find((file) => {
-      if (lang === 'en') return file === 'index.en.mdx';
-      return file === 'index.mdx';
-    });
+    const targetFileName = getTargetFileName(lang);
+    const mdxFile = files.find((file) => file === targetFileName);
 
     if (!mdxFile) return null;
 
@@ -273,8 +261,7 @@ export const checkPostExistence = cache(
 
       // 找出哪些語系的文章存在
       const langs = LANGUAGES.filter((lang) => {
-        const filename =
-          lang === DEFAULT_LANGUAGE ? 'index.mdx' : `index.${lang}.mdx`;
+        const filename = getTargetFileName(lang);
         return files.includes(filename);
       });
 
@@ -397,4 +384,25 @@ export const getPaginatedPosts = async ({
   }
 
   return paginatePosts(posts, page, postsPerPage);
+};
+
+// 動態載入指定文章的自定義元件
+export const loadPostComponents = async (
+  slug: string
+): Promise<MDXComponents> => {
+  try {
+    // 檢查是否有自定義組件存在
+    const postDir = path.join(postsDirectory, slug);
+
+    const hasComponents = ['components.jsx', 'components.js'].some((filename) =>
+      fs.existsSync(path.join(postDir, filename))
+    );
+
+    if (!hasComponents) return {};
+
+    const componentsModule = await import(`@/posts/${slug}/components`);
+    return componentsModule.default || {};
+  } catch {
+    return {};
+  }
 };

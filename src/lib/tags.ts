@@ -11,31 +11,29 @@ export const convertToSlug = (tag: string): string => {
     .replace(/[^\w\u4e00-\u9fa5-]/g, '');
 };
 
-const resolveTagDefinition = (
-  identifier: string
-): TagDefinition | undefined => {
+const getTagDefinition = (identifier: string): TagDefinition | undefined => {
   const slug = convertToSlug(identifier);
   return tagMap[slug];
 };
 
-const selectTagName = (
+const getTagName = (
   definition: TagDefinition | undefined,
   lang: Language
-) => {
-  const localized = definition?.name?.[lang]?.trim();
-  if (localized) return localized;
-
-  const fallback = definition?.name?.[DEFAULT_LANGUAGE]?.trim();
-  return fallback;
+): string => {
+  return (
+    definition?.name?.[lang]?.trim() ||
+    definition?.name?.[DEFAULT_LANGUAGE]?.trim() ||
+    ''
+  );
 };
 
 export const getLocalizedTagName = (
   identifier: string,
   lang: Language = DEFAULT_LANGUAGE
-) => {
-  const definition = resolveTagDefinition(identifier);
-  const name = selectTagName(definition, lang) ?? identifier;
-  return name;
+): string => {
+  const definition = getTagDefinition(identifier);
+  const name = getTagName(definition, lang);
+  return name || identifier;
 };
 
 export const getLocalizedTag = (
@@ -55,14 +53,15 @@ export const getTagsByPosts = (
   limit?: number,
   lang: Language = DEFAULT_LANGUAGE
 ) => {
-  if (!Array.isArray(posts) || posts.length === 0) return [];
+  if (!posts?.length) return [];
 
-  // 統計 tag 出現次數
   const tagCounts: Record<string, number> = {};
 
   posts.forEach((post) => {
     post.tags?.forEach((tag) => {
-      if (tag) tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+      if (tag?.trim()) {
+        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+      }
     });
   });
 
@@ -70,11 +69,7 @@ export const getTagsByPosts = (
   return Object.entries(tagCounts)
     .map(([tag, postCount]) => {
       const { slug, name } = getLocalizedTag(tag, lang);
-      return {
-        name,
-        slug,
-        postCount,
-      };
+      return { name, slug, postCount };
     })
     .sort((a, b) => b.postCount - a.postCount)
     .slice(0, limit);
