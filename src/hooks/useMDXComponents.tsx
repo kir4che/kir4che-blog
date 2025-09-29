@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import type { MDXComponents } from 'mdx/types';
+import type { ImageMeta } from '@/types';
 
 import { H1, H2, H3, H4, H5, H6 } from '@/components/mdx/Heading';
 import Correction from '@/components/mdx/Correction';
@@ -13,10 +14,10 @@ import Rating from '@/components/mdx/Rating';
 import CustomVideo from '@/components/mdx/Video';
 
 export const useMDXComponents = (
-  imageMetas: Record<string, any> = {},
-  extraComponents: Partial<MDXComponents> = {}
-): MDXComponents =>
-  useMemo(
+  imageMetas: Record<string, ImageMeta> = {},
+  extraComponents?: MDXComponents
+): MDXComponents => {
+  return useMemo(
     () => ({
       h1: H1,
       h2: H2,
@@ -116,3 +117,4 @@ export const useMDXComponents = (
     }),
     [imageMetas, extraComponents]
   );
+};

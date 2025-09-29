@@ -11,17 +11,15 @@ import {
   checkPostExistence,
 } from '@/lib/posts';
 import { parseMDX } from '@/lib/mdx';
+import { loadPostComponents } from '@/lib/posts';
 
-import PostLayout from '@/components/features/post/PostLayout';
-import MDXContent from '@/components/mdx/MDXContent';
-import PokemonCard from '@/posts/css-only-pokemon-3d-card/PokemonCard';
+import PostPageClient from '@/components/features/post/PostPageClient';
 
-type Params = Promise<{
-  lang: Language;
-  slug: string;
-}>;
+type Params = Promise<{ lang: Language; slug: string }>;
 
-// 預先取得所有語系的所有 { lang, slug }
+const SOCIAL_HANDLE = '@kir4che';
+const SITE_NAME = 'kir4che';
+
 export async function generateStaticParams() {
   const posts = await getPostsMeta();
   return posts.map(({ lang, slug }) => ({ lang, slug }));
@@ -38,7 +36,8 @@ export async function generateMetadata({ params }: { params: Params }) {
   const { title, description, date, tags } = meta;
 
   const postUrl = `${baseUrl}/${lang}/posts/${slug}`;
-  const ogImage = `${baseUrl}/api/og?title=${encodeURIComponent(title)}&tags=${encodeURIComponent((tags ?? []).join(','))}`;
+  const tagString = tags?.join(',') || '';
+  const ogImage = `${baseUrl}/api/og?title=${encodeURIComponent(title)}&tags=${encodeURIComponent(tagString)}`;
   const locale = LANGUAGE_TO_LOCALE_MAP[lang] ?? 'zh-TW';
 
   return {
@@ -46,9 +45,9 @@ export async function generateMetadata({ params }: { params: Params }) {
     title,
     description,
     publishedTime: new Date(date).toISOString(),
-    authors: [{ name: 'kir4che', url: baseUrl }],
-    publisher: 'kir4che',
-    keywords: tags && tags.length > 0 ? tags : undefined,
+    authors: [{ name: SITE_NAME, url: baseUrl }],
+    publisher: SITE_NAME,
+    keywords: tags?.length ? tags : undefined,
     alternates: {
       canonical: postUrl,
       languages: {
@@ -61,7 +60,7 @@ export async function generateMetadata({ params }: { params: Params }) {
       title,
       description,
       url: postUrl,
-      siteName: 'kir4che',
+      siteName: SITE_NAME,
       locale,
       images: [
         {
@@ -74,8 +73,8 @@ export async function generateMetadata({ params }: { params: Params }) {
     },
     twitter: {
       card: 'summary_large_image',
-      site: '@kir4che',
-      creator: '@kir4che',
+      site: SOCIAL_HANDLE,
+      creator: SOCIAL_HANDLE,
       title,
       description,
       images: [ogImage],
@@ -96,16 +95,16 @@ const PostPage = async ({ params }: { params: Params }) => {
 
   const { mdxSource, headings } = await parseMDX(post.content);
 
+  const extraComponents = await loadPostComponents(slug);
+
   return (
-    <PostLayout post={post} headings={headings} otherLangs={otherLangs}>
-      <MDXContent
-        content={mdxSource}
-        imageMetas={post.imageMetas}
-        components={
-          post.slug === 'css-only-pokemon-3d-card' ? { PokemonCard } : undefined
-        }
-      />
-    </PostLayout>
+    <PostPageClient
+      post={{ ...post, imageMetas: post.imageMetas ?? {} }}
+      headings={headings}
+      otherLangs={otherLangs}
+      mdxSource={mdxSource}
+      extraComponents={extraComponents}
+    />
   );
 };
 

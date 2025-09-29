@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server';
 
-export const responseWithCache = (
-  data: any,
-  maxAge = 60,
-  staleWhileRevalidate = 30
+interface CacheOptions {
+  maxAge?: number;
+  staleWhileRevalidate?: number;
+}
+
+export const responseWithCache = <T>(
+  data: T,
+  { maxAge = 60, staleWhileRevalidate = 30 }: CacheOptions = {}
 ) => {
   return NextResponse.json(data, {
     headers: {

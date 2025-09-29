@@ -1,5 +1,5 @@
 import type { MDXRemoteSerializeResult } from 'next-mdx-remote';
-
+import type { MDXComponents } from 'mdx/types';
 import type { LANGUAGES } from '@/config';
 
 export type Language = (typeof LANGUAGES)[number]; // 'tw' | 'en'
@@ -103,6 +103,19 @@ export interface Tag {
 }
 
 /* ----- MDX 編輯器 ----- */
+
+export interface ImageMeta {
+  src: string;
+  blurDataURL: string;
+  originalWidth?: number;
+  originalHeight?: number;
+}
+
+export interface MdxContent {
+  content: MDXRemoteSerializeResult;
+  imageMetas: Record<string, ImageMeta>;
+  extraComponents?: MDXComponents;
+}
 
 export type MDXAction = {
   before: string;

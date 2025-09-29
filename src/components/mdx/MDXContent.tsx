@@ -1,19 +1,13 @@
 'use client';
 
-import dynamic from 'next/dynamic';
-import { MDXRemote, type MDXRemoteSerializeResult } from 'next-mdx-remote';
-import type { MDXComponents } from 'mdx/types';
+import { memo } from 'react';
+import { MDXRemote } from 'next-mdx-remote';
+import type { MdxContent } from '@/types';
 import { useMDXComponents } from '@/hooks/useMDXComponents';
 
-interface MDXProps {
-  content: MDXRemoteSerializeResult;
-  imageMetas: Record<string, any>;
-  components?: Partial<MDXComponents>;
-}
+const MDXContent = ({ content, imageMetas, extraComponents }: MdxContent) => {
+  const mergedComponents = useMDXComponents(imageMetas, extraComponents);
+  return <MDXRemote {...content} components={mergedComponents} />;
+};
 
-function InnerMDXContent({ content, imageMetas, components }: MDXProps) {
-  const merged = useMDXComponents(imageMetas, components);
-  return <MDXRemote {...content} components={merged} />;
-}
-
-export default dynamic(() => Promise.resolve(InnerMDXContent), { ssr: false });
+export default memo(MDXContent);

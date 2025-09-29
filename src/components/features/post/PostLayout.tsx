@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useTranslations, useFormatter } from 'next-intl';
 import { Share2, Copy } from 'lucide-react';
@@ -61,6 +61,11 @@ const PostLayout = ({
     coverImage,
   } = post;
 
+  const shareUrl =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/posts/${slug}`
+      : `/posts/${slug}`;
+
   useEffect(() => {
     if (!post.coverImage) return;
 
@@ -74,45 +79,37 @@ const PostLayout = ({
       });
   }, [post.coverImage, showError]);
 
-  const resolveShareUrl = useCallback(() => {
-    if (typeof window !== 'undefined')
-      return `${window.location.origin}/posts/${slug}`;
-    return `/posts/${slug}`;
-  }, [slug]);
-
-  const handleCopyLink = useCallback(async () => {
-    const url = resolveShareUrl();
-
+  const handleCopyLink = async () => {
     try {
       if (typeof navigator === 'undefined' || !navigator.clipboard)
         throw new Error(t('share.copyUnavailable'));
 
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(shareUrl);
       showSuccess(t('share.copySuccess'));
     } catch (err) {
       showError(err instanceof Error ? err.message : String(err));
     }
-  }, [resolveShareUrl, showError, showSuccess, t]);
+  };
 
-  const handleNativeShare = useCallback(async () => {
-    const url = resolveShareUrl();
+  const handleNativeShare = async () => {
     const shareData = {
       title: title || slug,
-      url,
+      url: shareUrl,
     };
 
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
         await navigator.share(shareData);
+        return;
       } catch (err) {
         if (err instanceof DOMException && err.name === 'AbortError') return;
         showError(err instanceof Error ? err.message : String(err));
+        return;
       }
-      return;
     }
 
     await handleCopyLink();
-  }, [handleCopyLink, resolveShareUrl, showError, slug, title]);
+  };
 
   if (hasPassword && !unlocked)
     return (
