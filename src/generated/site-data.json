@@ -144,10 +144,10 @@
               "dark": "#a6ff4d"
             },
             "parentSlug": "life",
-            "postCount": 2
+            "postCount": 3
           }
         },
-        "postCount": 2
+        "postCount": 3
       },
       {
         "name": {
@@ -234,6 +234,11 @@
       {
         "name": "旅遊",
         "slug": "trip",
+        "postCount": 3
+      },
+      {
+        "name": "日本",
+        "slug": "japan",
         "postCount": 2
       },
       {
@@ -264,11 +269,6 @@
       {
         "name": "部署",
         "slug": "deployment",
-        "postCount": 1
-      },
-      {
-        "name": "日本",
-        "slug": "japan",
         "postCount": 1
       },
       {
@@ -311,6 +311,10 @@
       {
         "slug": "css-only-pokemon-3d-card",
         "title": "只使用 CSS！拆解寶可夢 3D 閃卡特效"
+      },
+      {
+        "slug": "japan-nagoya-2025-trip",
+        "title": "2025 日本名古屋 🇯🇵 5天4夜自由行攻略：吉卜力公園、合掌村景點與美食記錄"
       },
       {
         "slug": "japan-kyushu-2024-trip",
