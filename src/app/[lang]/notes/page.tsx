@@ -1,7 +1,9 @@
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 
-const NotesPage = () => {
-  const t = useTranslations('NotesPage');
+export const dynamic = 'force-static';
+
+const NotesPage = async () => {
+  const t = await getTranslations('NotesPage');
 
   return (
     <div className='space-y-4'>

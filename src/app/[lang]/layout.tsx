@@ -1,4 +1,4 @@
-export const revalidate = 3600;
+export const dynamic = 'force-static';
 
 import { Suspense } from 'react';
 import { Metadata } from 'next';

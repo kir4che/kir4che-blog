@@ -18,15 +18,16 @@ type Params = Promise<{
 // 預先取得所有語系的所有 { lang, subSlug }
 export async function generateStaticParams() {
   try {
-    const params: { lang: Language; subSlug: string }[] = [];
+    const params: { lang: Language; slug: string; subSlug: string }[] = [];
 
     for (const lang of LANGUAGES) {
       const posts = await getPostsInfo(lang);
       const categories = getAllCategoryByPosts(posts);
       for (const cat of categories) {
         const subs = cat.subcategories ?? {};
-        for (const sub of Object.values(subs))
-          params.push({ lang, subSlug: sub.slug });
+        for (const sub of Object.values(subs)) {
+          params.push({ lang, slug: cat.slug, subSlug: sub.slug });
+        }
       }
     }
 
