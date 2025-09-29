@@ -43,50 +43,56 @@ export const getPostsInfo = cache(
     const dirs = await getPostsDirs();
     const targetFileName = getTargetFileName(lang);
 
-    const postsData = await Promise.all(
-      dirs.map(async (dirPath) => {
-        try {
-          const files = await fs.promises.readdir(dirPath);
-          const targetFile = files.find((f) => f === targetFileName);
+    const postsResults = await Promise.allSettled(
+      dirs.map(async (dirPath): Promise<PostInfo | null> => {
+        const files = await fs.promises.readdir(dirPath);
+        const targetFile = files.find((f) => f === targetFileName);
 
-          if (!targetFile) return null;
+        if (!targetFile) return null;
 
-          const filePath = path.join(dirPath, targetFile);
-          const fileContents = await fs.promises.readFile(filePath, 'utf8');
-          const { data } = matter(fileContents);
+        const filePath = path.join(dirPath, targetFile);
+        const fileContents = await fs.promises.readFile(filePath, 'utf8');
+        const { data } = matter(fileContents);
 
-          // 沒有日期、草稿也跳過
-          if (
-            !data.date ||
-            (data.draft && process.env.NODE_ENV === 'production')
-          )
-            return null;
+        // 驗證必要欄位
+        if (!data.title || !data.date) return null;
 
-          const post: PostInfo = {
-            slug: path.basename(dirPath),
-            title: data.title,
-            description: data.description,
-            date: data.date,
-            categories: data.categories || [],
-            tags: data.tags || [],
-            wordCount: data.wordCount || 0,
-            lang,
-            featured: data.featured ?? false,
-            coverImage: data.coverImage,
-            hasPassword: !!data.password || false,
-          };
+        // 正式環境下跳過草稿
+        if (data.draft && process.env.NODE_ENV === 'production') return null;
 
-          return post;
-        } catch {
-          return null;
-        }
+        const post: PostInfo = {
+          slug: path.basename(dirPath),
+          title: String(data.title).trim(),
+          description: data.description
+            ? String(data.description).trim()
+            : undefined,
+          date: data.date,
+          categories: Array.isArray(data.categories) ? data.categories : [],
+          tags: Array.isArray(data.tags) ? data.tags : [],
+          wordCount: typeof data.wordCount === 'number' ? data.wordCount : 0,
+          lang,
+          featured: Boolean(data.featured),
+          coverImage: data.coverImage
+            ? String(data.coverImage).trim()
+            : undefined,
+          hasPassword: Boolean(data.password),
+        };
+
+        return post;
       })
     );
 
-    // 篩掉讀取失敗的文章，並根據日期排序。
-    return postsData
-      .filter((post): post is PostInfo => post !== null)
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    // 篩選成功的結果並按日期排序
+    const validPosts = postsResults
+      .filter(
+        (result): result is PromiseFulfilledResult<PostInfo | null> =>
+          result.status === 'fulfilled' && result.value !== null
+      )
+      .map((result) => result.value!);
+
+    return validPosts.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
   }
 );
 
@@ -129,14 +135,18 @@ export const getPostData = cache(
           'utf8'
         );
         imageMetasRaw = JSON.parse(imageMetasFile);
-      } catch {
-        return null;
+      } catch (err) {
+        console.warn(
+          `Failed to load image metas:`,
+          err instanceof Error ? err.message : String(err)
+        );
       }
 
       // 過濾出這篇文章實際有用到的圖片 metadata
       const imageMetas: Record<string, any> = {};
       for (const [src, meta] of Object.entries(imageMetasRaw)) {
-        if (content.includes(src)) imageMetas[src] = meta;
+        if (typeof src === 'string' && content.includes(src))
+          imageMetas[src] = meta;
       }
 
       return {

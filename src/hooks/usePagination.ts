@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-import type { PostMeta, PaginationData } from '@/types';
+import type { PostInfo, PaginationData } from '@/types';
 import { useAlert } from '@/contexts/AlertContext';
 
 interface UsePaginationParams {
   type?: 'category' | 'tag';
   slug?: string;
   lang: string;
-  initialPosts?: PostMeta[];
+  initialPosts?: PostInfo[];
   initialPagination?: PaginationData;
   initialPage?: number;
 }
@@ -31,7 +31,7 @@ export const usePagination = ({
 }: UsePaginationParams) => {
   const { showError } = useAlert();
 
-  const [posts, setPosts] = useState<PostMeta[]>(initialPosts ?? []);
+  const [posts, setPosts] = useState<PostInfo[]>(initialPosts ?? []);
   const [pagination, setPagination] = useState<PaginationData>(
     initialPaginationProp ?? initialPagination
   );
@@ -40,30 +40,53 @@ export const usePagination = ({
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const skipInitialFetch = useRef<boolean>(Boolean(initialPosts));
 
-  const fetchPosts = useCallback(() => {
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  const fetchPosts = useCallback(async () => {
+    // 取消上一次的請求
+    if (abortControllerRef.current) abortControllerRef.current.abort();
+
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+
     setIsLoading(true);
     setError(null);
 
-    const queryParams = new URLSearchParams();
-    if (type && slug) queryParams.append(type, slug);
-    queryParams.append('page', currentPage.toString());
+    try {
+      const queryParams = new URLSearchParams();
+      if (type && slug) queryParams.append(type, slug);
+      queryParams.append('page', currentPage.toString());
 
-    fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/posts?${queryParams}&lang=${lang}`
-    )
-      .then((res) => {
-        if (!res.ok) return null;
-        return res.json();
-      })
-      .then((data) => {
-        setPosts(data.posts);
-        setPagination(data.pagination);
-      })
-      .catch((err) => {
-        setError(err as Error);
-        showError(err instanceof Error ? err.message : err);
-      })
-      .finally(() => setIsLoading(false));
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/posts?${queryParams}&lang=${lang}`,
+        {
+          signal: abortController.signal,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+      const data = await res.json();
+
+      if (!data || typeof data !== 'object')
+        throw new Error('Invalid response format.');
+
+      setPosts(Array.isArray(data.posts) ? data.posts : []);
+      setPagination(data.pagination || initialPagination);
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') return;
+
+      const errorMsg =
+        err instanceof Error ? err : new Error('Failed to fetch posts');
+      setError(errorMsg);
+      showError(errorMsg.message);
+    } finally {
+      setIsLoading(false);
+      abortControllerRef.current = null;
+    }
   }, [lang, type, slug, currentPage, showError]);
 
   useEffect(() => {
@@ -73,7 +96,11 @@ export const usePagination = ({
     }
 
     fetchPosts();
-  }, [lang, type, slug, currentPage, fetchPosts]);
+
+    return () => {
+      if (abortControllerRef.current) abortControllerRef.current.abort();
+    };
+  }, [fetchPosts]);
 
   useEffect(() => {
     setCurrentPage(initialPage);

@@ -32,7 +32,13 @@ const TagPosts = ({ tag, initialPosts, initialPagination }: TagPostsProps) => {
       type: 'tag',
       slug: tag.slug,
       lang,
-      initialPosts,
+      initialPosts: initialPosts.map(
+        (post) =>
+          ({
+            ...post,
+            featured: post.featured ?? false,
+          }) as PostInfo
+      ),
       initialPagination,
     });
 

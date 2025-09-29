@@ -35,14 +35,14 @@ export interface Post extends PostMeta {
 export interface PostInfo {
   slug: string;
   title: string;
-  description: string;
+  description?: string;
   date: string;
   tags: string[];
   categories: string[];
   wordCount: number;
   lang: Language;
   featured: boolean;
-  coverImage: string;
+  coverImage?: string;
   hasPassword: boolean;
 }
 

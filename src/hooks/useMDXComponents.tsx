@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import type { MDXComponents } from 'mdx/types';
 import type { ImageMeta } from '@/types';
 
@@ -13,10 +13,54 @@ import ImageGallery from '@/components/mdx/ImageGallery';
 import Rating from '@/components/mdx/Rating';
 import CustomVideo from '@/components/mdx/Video';
 
-export const useMDXComponents = (
-  imageMetas: Record<string, ImageMeta> = {},
-  extraComponents?: MDXComponents
-): MDXComponents => {
+interface UseMDXComponentsOptions {
+  imageMetas?: Record<string, ImageMeta>;
+  extraComponents?: MDXComponents;
+}
+
+export const useMDXComponents = ({
+  imageMetas = {},
+  extraComponents,
+}: UseMDXComponentsOptions = {}): MDXComponents => {
+  const imageMetasMap = useMemo(
+    () => new Map(Object.entries(imageMetas)),
+    [imageMetas]
+  );
+
+  const ImageComponent = useCallback(
+    (props: any) => {
+      if (!props.src || typeof props.src !== 'string') return null;
+
+      const meta = imageMetasMap.get(props.src) || {};
+      return <CustomImage {...props} {...meta} />;
+    },
+    [imageMetasMap]
+  );
+
+  const ImagesComponent = useCallback(
+    (props: any) => {
+      if (!Array.isArray(props.images)) return null;
+
+      const imagesWithMeta = props.images.map((img: any) => {
+        const meta = img.src ? imageMetasMap.get(img.src) || {} : {};
+        return { ...img, ...meta };
+      });
+      return <ImageGallery {...props} images={imagesWithMeta} />;
+    },
+    [imageMetasMap]
+  );
+
+  const ImgComponent = useCallback(
+    (props: any) => {
+      if (!props.src || typeof props.src !== 'string')
+        // eslint-disable-next-line @next/next/no-img-element
+        return <img {...props} alt={props.alt || ''} />; // fallback 到預設 img
+      const meta = imageMetasMap.get(props.src) || {};
+      return <CustomImage {...props} {...meta} />;
+    },
+    [imageMetasMap]
+  );
+
   return useMemo(
     () => ({
       h1: H1,
@@ -26,11 +70,8 @@ export const useMDXComponents = (
       h5: H5,
       h6: H6,
       Table: Table, // <Table data={{ headers: [], rows: [[], []] }} />
-      Image: (props) => {
-        const meta = imageMetas[props.src ?? ''] ?? {};
-        return <CustomImage {...meta} {...props} />;
-      },
-      Images: ImageGallery, // <Images images={[{ src: '', alt: '', width: '' }, ... ]} height='150px' />
+      Image: ImageComponent,
+      Images: ImagesComponent, // <Images images={[{ src: '', alt: '', width: '' }, ... ]} height='150px' />
       Video: CustomVideo, // <Video src="..." title="..." />
       Accordion, // <Accordion variant="primary" title="Title">{children}</Accordion>
       Correction, // <Correction wrong="A" correct="B" />
@@ -45,11 +86,7 @@ export const useMDXComponents = (
         </p>
       ),
       a: CustomLink, // [Text](url)
-      img: (props) => {
-        // \![alt](url)
-        const meta = imageMetas[props.src ?? ''] ?? {};
-        return <CustomImage {...meta} {...props} />;
-      },
+      img: ImgComponent, // \![alt](url)
       ul: ({ children }) => (
         <ul className='my-2 list-inside list-disc pl-4'>{children}</ul>
       ),
@@ -115,6 +152,6 @@ export const useMDXComponents = (
       ),
       ...extraComponents,
     }),
-    [imageMetas, extraComponents]
+    [extraComponents, ImageComponent, ImagesComponent, ImgComponent]
   );
 };

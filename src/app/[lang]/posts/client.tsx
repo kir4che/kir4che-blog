@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
-import type { Language, PaginationData, PostMeta } from '@/types';
+import type { Language, PaginationData, PostInfo } from '@/types';
 import { usePagination } from '@/hooks/usePagination';
 
 import PostPreview from '@/components/features/post/PostPreview';
@@ -13,7 +13,7 @@ import Skeleton from '@/components/ui/Skeleton';
 
 interface PostsPageClientProps {
   lang: Language;
-  initialPosts: PostMeta[];
+  initialPosts: PostInfo[];
   initialPagination: PaginationData;
 }
 
@@ -34,7 +34,7 @@ const PostsPageClient = ({
 
   // 按年份分組文章
   const postsByYear = useMemo(() => {
-    return posts.reduce<Record<string, PostMeta[]>>((acc, post) => {
+    return posts.reduce<Record<string, PostInfo[]>>((acc, post) => {
       const year = new Date(post.date).getFullYear().toString();
       if (!acc[year]) acc[year] = [];
       acc[year].push(post);
