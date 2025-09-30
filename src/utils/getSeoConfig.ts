@@ -41,6 +41,8 @@ export const getSeoConfig = (lang: string): Metadata => {
           width: 1200,
           height: 630,
           alt: title,
+          type: 'image/jpeg',
+          secureUrl: `${url}/images/default-og.jpg`,
         },
       ],
     },
@@ -50,10 +52,17 @@ export const getSeoConfig = (lang: string): Metadata => {
       creator: '@kir4che',
       title,
       description,
-      images: [`${url}/images/default-og.jpg`],
+      images: {
+        url: `${url}/images/default-og.jpg`,
+        alt: title,
+        width: 1200,
+        height: 630,
+      },
     },
     icons: {
-      icon: '/favicon.ico',
+      icon: [{ url: '/favicon.ico', sizes: '32x32' }],
+      shortcut: '/favicon.ico',
+      apple: '/favicon.ico',
     },
   };
 };
