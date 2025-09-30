@@ -15,10 +15,12 @@ const CategoryList: React.FC<{ categories: Category[] }> = ({ categories }) => {
     <div>
       <h3 className='mb-2 flex items-center gap-x-2 uppercase'>
         <Folder
-          className='size-4 text-pink-700 dark:text-pink-500'
+          className='size-4 text-pink-700 dark:text-pink-300'
           aria-hidden='true'
         />
-        <Link href='/categories'>{t('categories')}</Link>
+        <Link href='/categories' className='text-gradient'>
+          {t('categories')}
+        </Link>
       </h3>
       <ul className='flex flex-wrap items-center gap-2'>
         {categories.map(({ slug, name, color, postCount }) => (
@@ -28,7 +30,7 @@ const CategoryList: React.FC<{ categories: Category[] }> = ({ categories }) => {
               className='category text-text-primary transition-color flex items-center gap-x-0.5 text-sm hover:text-[var(--category-color)] dark:hover:text-[var(--category-color-dark)]'
             >
               <span>{name[lang]}</span>
-              <span className='text-xs tracking-widest text-pink-600 dark:text-pink-200'>
+              <span className='text-xs tracking-widest text-pink-700 dark:text-pink-200'>
                 ({postCount})
               </span>
             </Link>

@@ -14,7 +14,7 @@ const Navbar: React.FC = () => {
   ] as const;
 
   return (
-    <nav className='flex items-center gap-x-4'>
+    <nav className='ml-auto flex items-center gap-x-4'>
       <NavigationLink href='/'>{t('home')}</NavigationLink>
       {navItems.map(({ href, label }) => (
         <NavigationLink key={href} href={href}>

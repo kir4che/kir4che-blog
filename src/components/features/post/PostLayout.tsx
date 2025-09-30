@@ -128,7 +128,7 @@ const PostLayout = ({
             alt={title || slug}
             width={1200}
             height={630}
-            className='-mb-2 h-45 w-full object-cover lg:h-64'
+            className='h-45 w-full object-cover lg:h-64'
             placeholder={imageMeta?.blurDataURL ? 'blur' : undefined}
             blurDataURL={imageMeta?.blurDataURL}
             priority
@@ -136,7 +136,7 @@ const PostLayout = ({
         </div>
       )}
       <article className='dark:bg-text-gray-dark/35 rounded-b-md bg-white px-4 py-6 transition-all duration-300 md:p-6'>
-        <header className='space-y-4'>
+        <header className='-mt-2 mb-6 space-y-4'>
           <h1>{title || slug}</h1>
           <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-1'>
             <CategoryBadge
