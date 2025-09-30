@@ -7,7 +7,7 @@
         "description": "學習只使用 CSS 製作寶可夢 3D 閃卡特效",
         "date": "2025-09-22T00:00:00.000Z",
         "categories": ["Frontend"],
-        "tags": ["CSS", "Pokémon"],
+        "tags": ["CSS", "Pokemon"],
         "wordCount": 405,
         "lang": "tw",
         "featured": true,
@@ -247,8 +247,8 @@
         "postCount": 1
       },
       {
-        "name": "寶可夢",
-        "slug": "pokmon",
+        "name": "Pokemon",
+        "slug": "pokemon",
         "postCount": 1
       },
       {

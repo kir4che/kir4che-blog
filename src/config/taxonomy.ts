@@ -221,7 +221,7 @@ export const tagMap: TagMap = {
   pokmon: {
     name: {
       tw: '寶可夢',
-      en: 'Pokémon',
+      en: 'Pokemon',
     },
     slug: 'pokmon',
   },
@@ -259,5 +259,12 @@ export const tagMap: TagMap = {
       en: 'Webpack',
     },
     slug: 'webpack',
+  },
+  pokemon: {
+    name: {
+      tw: 'Pokemon',
+      en: 'Pokemon',
+    },
+    slug: 'pokemon',
   },
 };
