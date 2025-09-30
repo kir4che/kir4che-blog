@@ -2,6 +2,7 @@ import 'tsconfig-paths/register';
 
 import fs from 'fs/promises';
 import path from 'path';
+import YAML from 'yaml';
 
 import { CONFIG } from '@/config';
 import {
@@ -23,6 +24,18 @@ const TAXONOMY_CONFIG_PATH = path.join(
   'src',
   'config',
   'taxonomy.ts'
+);
+const SITE_DATA_PATH = path.join(
+  process.cwd(),
+  'src',
+  'generated',
+  'site-data.json'
+);
+const TAGS_CONTENT_PATH = path.join(
+  process.cwd(),
+  'content',
+  'taxonomy',
+  'tags.yaml'
 );
 
 const DEFAULT_COLOR = {
@@ -151,33 +164,62 @@ const formatTaxonomyFile = (categories: CategoryMap, tags: TagMap): string => {
   return sections.join('\n');
 };
 
-const ensureLocalizedNames = <T extends { name: Record<Language, string> }>(
+const ensureLocalizedNames = <
+  T extends { name: Record<Language, string | undefined> },
+>(
   target: T,
-  namesByLang: Partial<Record<Language, string>>,
-  fallback: string
+  namesByLang: Partial<Record<Language, string>>
 ) => {
   let updated = false;
+
   languages.forEach((lang) => {
-    const existing = target.name?.[lang];
-    const provided = namesByLang[lang];
-    const fallbackValue =
-      namesByLang[CONFIG.languages.defaultLanguage] ??
-      namesByLang.en ??
-      namesByLang.tw ??
-      fallback;
-
-    if (!existing) {
-      target.name[lang] = provided ?? fallbackValue;
-      updated = true;
-      return;
-    }
-
-    if (provided && provided !== existing && existing === fallbackValue) {
-      target.name[lang] = provided;
+    const current: string | undefined = target.name[lang];
+    if (!current || current.trim() === '') {
+      target.name[lang] = namesByLang[lang] ?? namesByLang.en ?? 'fallback';
       updated = true;
     }
   });
+
   return updated;
+};
+
+const loadTagNamesFromContent = async () => {
+  try {
+    const content = await fs.readFile(TAGS_CONTENT_PATH, 'utf8');
+    const parsed = YAML.parse(content) as {
+      tags?: Array<{
+        slug?: string;
+        name?: Partial<Record<Language, string>>;
+      }>;
+    };
+
+    const map = new Map<string, Partial<Record<Language, string>>>();
+    if (!parsed?.tags || !Array.isArray(parsed.tags)) return map;
+
+    parsed.tags.forEach((tag) => {
+      const slug = typeof tag?.slug === 'string' ? tag.slug.trim() : '';
+      if (!slug) return;
+
+      const names = tag?.name ?? {};
+      const localized: Partial<Record<Language, string>> = {};
+
+      languages.forEach((lang) => {
+        const value = names?.[lang];
+        if (typeof value === 'string' && value.trim())
+          localized[lang] = value.trim();
+      });
+
+      if (Object.keys(localized).length > 0) map.set(slug, localized);
+    });
+
+    return map;
+  } catch (error) {
+    console.warn(
+      '⚠️ 無法載入 tags.yaml：',
+      error instanceof Error ? error.message : String(error)
+    );
+    return new Map<string, Partial<Record<Language, string>>>();
+  }
 };
 
 const main = async () => {
@@ -285,15 +327,7 @@ const main = async () => {
       hasCategoryChanges = true;
     }
 
-    const fallbackMainName =
-      mainNames[CONFIG.languages.defaultLanguage] ??
-      mainNames.en ??
-      Object.values(mainNames)[0] ??
-      category.slug;
-
-    if (ensureLocalizedNames(category, mainNames, fallbackMainName)) {
-      hasCategoryChanges = true;
-    }
+    if (ensureLocalizedNames(category, mainNames)) hasCategoryChanges = true;
 
     languages.forEach((lang) => {
       const name = category.name[lang];
@@ -337,9 +371,7 @@ const main = async () => {
         Object.values(names)[0] ??
         subCategory.slug;
 
-      if (ensureLocalizedNames(subCategory, names, fallbackName)) {
-        hasCategoryChanges = true;
-      }
+      if (ensureLocalizedNames(subCategory, names)) hasCategoryChanges = true;
 
       languages.forEach((lang) => {
         const name = subCategory!.name[lang];
@@ -362,6 +394,12 @@ const main = async () => {
     }
   }
 
+  const tagNamesFromContent = await loadTagNamesFromContent();
+  tagNamesFromContent.forEach((names, slug) => {
+    const current = tagNamesBySlug.get(slug) ?? {};
+    tagNamesBySlug.set(slug, { ...current, ...names });
+  });
+
   tagNamesBySlug.forEach((namesByLang, slug) => {
     let tag = tagMap[slug];
     if (!tag) {
@@ -369,7 +407,19 @@ const main = async () => {
         slug,
         name: {} as Record<Language, string>,
       };
+      languages.forEach((lang) => {
+        const candidate =
+          namesByLang[lang] ??
+          namesByLang[CONFIG.languages.defaultLanguage] ??
+          namesByLang.en ??
+          Object.values(namesByLang)[0] ??
+          slug;
+        tag.name[lang] = candidate ?? slug;
+      });
       tagMap[slug] = tag;
+      hasTagChanges = true;
+    } else if (tag.slug !== slug) {
+      tag.slug = slug;
       hasTagChanges = true;
     }
 
@@ -390,9 +440,18 @@ const main = async () => {
 
     languages.forEach((lang) => {
       if (lang === 'en') return;
-      if (tag.name[lang] === undefined) {
-        tag.name[lang] = '';
+      const provided = namesByLang[lang];
+      if (provided && tag.name[lang] !== provided) {
+        tag.name[lang] = provided;
         hasTagChanges = true;
+        return;
+      }
+      if (!tag.name[lang] || tag.name[lang].trim().length === 0) {
+        const next = fallbackName || slug;
+        if (tag.name[lang] !== next) {
+          tag.name[lang] = next;
+          hasTagChanges = true;
+        }
       }
     });
   });
@@ -404,7 +463,18 @@ const main = async () => {
 
   const content = formatTaxonomyFile(categoryMap, tagMap);
   await fs.writeFile(TAXONOMY_CONFIG_PATH, `${content}\n`, 'utf8');
-  console.log('✅ 已更新分類與標籤設定。');
+
+  await fs.mkdir(path.dirname(SITE_DATA_PATH), { recursive: true });
+
+  // 更新 site-data.json
+  const siteDataJson = {
+    categories: Object.keys(categoryMap),
+    tags: Object.keys(tagMap),
+  };
+  const siteDataContent = JSON.stringify(siteDataJson, null, 2);
+  await fs.writeFile(SITE_DATA_PATH, `${siteDataContent}\n`, 'utf8');
+
+  console.log('✅ 已更新分類、標籤設定與 site-data');
 };
 
 main().catch((error) => {

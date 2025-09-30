@@ -58,7 +58,8 @@ async function main() {
   }
 
   await ensureDirectory(OUTPUT_DIR);
-  await fs.writeFile(OUTPUT_PATH, `${JSON.stringify(data, null, 2)}\n`, 'utf8');
+  const content = JSON.stringify(data, null, 2);
+  await fs.writeFile(OUTPUT_PATH, `${content}\n`, 'utf8');
   console.log(`✅ 站台資料已更新：${OUTPUT_PATH}`);
 }
 

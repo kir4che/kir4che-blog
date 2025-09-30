@@ -64,7 +64,7 @@ const CategoriesPage = async ({ params }: { params: Params }) => {
                           <Link
                             key={subSlug}
                             href={`/categories/${slug}/${subSlug}`}
-                            className='block rounded-full bg-[var(--subcategory-color)] px-2.5 py-1 transition-transform hover:scale-[1.02]'
+                            className='block rounded-full bg-[var(--subcategory-color)] px-2.5 py-1 transition-transform hover:scale-[1.02] dark:bg-[var(--subcategory-color-dark)]'
                             style={
                               {
                                 '--subcategory-color': subCategory.color.light,
