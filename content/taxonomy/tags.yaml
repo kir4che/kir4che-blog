@@ -1,61 +1,65 @@
 tags:
   - slug: bundler
     name:
-      tw: '打包工具'
-      en: 'Bundler'
+      tw: 打包工具
+      en: Bundler
   - slug: css
     name:
-      tw: 'CSS'
-      en: 'CSS'
+      tw: CSS
+      en: CSS
   - slug: deployment
     name:
-      tw: '部署'
-      en: 'Deployment'
+      tw: 部署
+      en: Deployment
   - slug: express
     name:
-      tw: 'Express'
-      en: 'Express'
+      tw: Express
+      en: Express
   - slug: git
     name:
-      tw: 'Git'
-      en: 'Git'
+      tw: Git
+      en: Git
   - slug: gitlab
     name:
-      tw: 'Gitlab'
-      en: 'Gitlab'
+      tw: Gitlab
+      en: Gitlab
   - slug: japan
     name:
-      tw: '日本'
-      en: 'Japan'
+      tw: 日本
+      en: Japan
   - slug: korea
     name:
-      tw: '韓國'
-      en: 'Korea'
+      tw: 韓國
+      en: Korea
   - slug: nodejs
     name:
-      tw: 'NodeJS'
-      en: 'NodeJS'
+      tw: NodeJS
+      en: NodeJS
   - slug: pokmon
     name:
-      tw: '寶可夢'
-      en: 'Pokémon'
+      tw: 寶可夢
+      en: Pokemon
   - slug: t1
     name:
-      tw: 'T1'
-      en: 'T1'
+      tw: T1
+      en: T1
   - slug: trip
     name:
-      tw: '旅遊'
-      en: 'Trip'
+      tw: 旅遊
+      en: Trip
   - slug: vercel
     name:
-      tw: 'Vercel'
-      en: 'Vercel'
+      tw: Vercel
+      en: Vercel
   - slug: vite
     name:
-      tw: 'Vite'
-      en: 'Vite'
+      tw: Vite
+      en: Vite
   - slug: webpack
     name:
-      tw: 'Webpack'
-      en: 'Webpack'
+      tw: Webpack
+      en: Webpack
+  - slug: pokemon
+    name:
+      tw: Pokemon
+      en: Pokemon
