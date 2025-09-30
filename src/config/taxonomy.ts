@@ -100,8 +100,8 @@ export const categoryMap: CategoryMap = {
         },
         slug: 'trip',
         color: {
-          light: '#80db25',
-          dark: '#a6ff4d',
+          light: '#32cd32',
+          dark: '#6cd867',
         },
       },
     },
@@ -136,7 +136,7 @@ export const categoryMap: CategoryMap = {
         slug: 'git',
         color: {
           light: '#E53621',
-          dark: '#E95B4A',
+          dark: '#fc5d49',
         },
       },
       gitlab: {
@@ -147,7 +147,7 @@ export const categoryMap: CategoryMap = {
         slug: 'gitlab',
         color: {
           light: '#F45419',
-          dark: '#F77F52',
+          dark: '#f76834',
         },
       },
     },

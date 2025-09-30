@@ -10,6 +10,7 @@
     "lint": "eslint .",
     "format:fix": "prettier --write .",
     "create:new-post": "ts-node --project scripts/tsconfig.scripts.json scripts/createPost.ts",
+    "sync:taxonomy": "ts-node --project scripts/tsconfig.scripts.json scripts/syncTaxonomy.ts && ts-node --project scripts/tsconfig.scripts.json scripts/generateSiteData.ts",
     "prepare:content": "ts-node --project scripts/tsconfig.scripts.json scripts/prepareContent.ts && prettier --write ."
   },
   "dependencies": {
@@ -46,7 +47,8 @@
     "remark-supersub": "^1.0.0",
     "tailwind-merge": "^3.2.0",
     "unist-util-visit": "^5.0.0",
-    "vfile": "^6.0.3"
+    "vfile": "^6.0.3",
+    "yaml": "^2.8.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
