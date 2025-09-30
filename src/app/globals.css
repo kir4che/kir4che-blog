@@ -181,4 +181,8 @@
   .flex-center {
     @apply flex items-center justify-center;
   }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-pink-700 to-pink-500 bg-clip-text text-transparent dark:from-pink-200 dark:to-pink-100;
+  }
 }

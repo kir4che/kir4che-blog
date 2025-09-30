@@ -17,10 +17,12 @@ const TagCloud = ({ tags }: TagCloudProps) => {
     <>
       <h3 className='mb-2 flex items-center gap-x-2 uppercase'>
         <Hash
-          className='size-4 text-pink-700 dark:text-pink-500'
+          className='size-4 text-pink-700 dark:text-pink-300'
           aria-hidden='true'
         />
-        <Link href='/tags'>{t('tags')}</Link>
+        <Link href='/tags' className='text-gradient'>
+          {t('tags')}
+        </Link>
       </h3>
       <div className='flex flex-wrap gap-2'>
         {tags.map(({ name, slug }) => (

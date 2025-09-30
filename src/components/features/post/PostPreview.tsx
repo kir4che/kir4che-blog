@@ -58,7 +58,7 @@ const PostPreview: React.FC<PostPreviewProps> = memo(
 
     return (
       <Link href={`/posts/${post.slug}`} className='block h-full'>
-        <article className='group relative h-full cursor-pointer rounded-lg border border-pink-200 bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:shadow-pink-900/10 dark:border-pink-400/20 dark:bg-pink-500/5 dark:hover:shadow-pink-200/10'>
+        <article className='group relative h-full cursor-pointer rounded-lg border border-pink-200 bg-white hover:-translate-y-1 hover:shadow-md hover:shadow-pink-900/10 dark:border-pink-400/20 dark:bg-pink-500/5 dark:hover:shadow-pink-200/10'>
           <LockOverlay hasPassword={post.hasPassword} />
           <div
             className={cn(

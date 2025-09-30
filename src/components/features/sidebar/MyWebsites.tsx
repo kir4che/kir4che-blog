@@ -26,13 +26,13 @@ const MyWebsites: React.FC = () => {
   ];
 
   return (
-    <section className=''>
+    <section>
       <h3 className='mb-2 flex items-center gap-x-2 uppercase'>
         <LinkIcon
-          className='size-4 text-pink-700 dark:text-pink-500'
+          className='size-4 text-pink-700 dark:text-pink-300'
           aria-hidden='true'
         />
-        {t('recommendedWebsites')}
+        <span className='text-gradient'>{t('recommendedWebsites')}</span>
       </h3>
       <ul className='list-disc space-y-1 pl-4'>
         {websites.map((website) => (
