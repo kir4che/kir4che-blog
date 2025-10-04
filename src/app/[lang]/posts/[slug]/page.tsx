@@ -2,14 +2,9 @@ export const dynamic = 'force-static';
 
 import { notFound } from 'next/navigation';
 
-import type { Language } from '@/types';
+import type { Language, PostInfo } from '@/types';
 import { LANGUAGE_TO_LOCALE_MAP } from '@/config';
-import {
-  getPostsMeta,
-  getPostInfoBySlug,
-  getPostData,
-  checkPostExistence,
-} from '@/lib/posts';
+import { getPostData, checkPostExistence, getPostsInfo } from '@/lib/posts';
 import { parseMDX } from '@/lib/mdx';
 import { loadPostComponents } from '@/lib/posts';
 
@@ -21,14 +16,19 @@ const SOCIAL_HANDLE = '@kir4che';
 const SITE_NAME = 'kir4che';
 
 export async function generateStaticParams() {
-  const posts = await getPostsMeta();
-  return posts.map(({ lang, slug }) => ({ lang, slug }));
+  const posts = (await getPostsInfo()) as PostInfo[];
+  return posts
+    .filter(
+      (post): post is PostInfo =>
+        post !== null && post.slug !== undefined && post.lang !== undefined
+    )
+    .map(({ lang, slug }) => ({ lang, slug }));
 }
 
 export async function generateMetadata({ params }: { params: Params }) {
   const { lang, slug } = await params;
 
-  const meta = await getPostInfoBySlug(lang, slug);
+  const meta = (await getPostsInfo(lang, slug)) as Partial<PostInfo> | null;
   const baseUrl = process.env.NEXT_PUBLIC_API_URL!;
 
   if (!meta?.title || !meta?.date) return {};

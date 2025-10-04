@@ -47,6 +47,17 @@ export const categoryMap: CategoryMap = {
       dark: '#6AC5FB',
     },
     subcategories: {
+      css: {
+        name: {
+          tw: 'CSS',
+          en: 'CSS',
+        },
+        slug: 'css',
+        color: {
+          light: '#264de4',
+          dark: '#3572b5',
+        },
+      },
       javascript: {
         name: {
           tw: 'JavaScript',
@@ -218,6 +229,13 @@ export const tagMap: TagMap = {
     },
     slug: 'nodejs',
   },
+  pokemon: {
+    name: {
+      tw: 'Pokemon',
+      en: 'Pokemon',
+    },
+    slug: 'pokemon',
+  },
   pokmon: {
     name: {
       tw: '寶可夢',
@@ -259,12 +277,5 @@ export const tagMap: TagMap = {
       en: 'Webpack',
     },
     slug: 'webpack',
-  },
-  pokemon: {
-    name: {
-      tw: 'Pokemon',
-      en: 'Pokemon',
-    },
-    slug: 'pokemon',
   },
 };

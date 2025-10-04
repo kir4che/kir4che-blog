@@ -2,53 +2,37 @@ import type { Language, PostInfo, TagDefinition } from '@/types';
 import { DEFAULT_LANGUAGE } from '@/config';
 import { tagMap } from '@/config/taxonomy';
 
-// 將 tag name 轉換為 slug 格式
+// 將標籤名稱轉換為 slug 格式
 export const convertToSlug = (tag: string): string => {
   return tag
     .toLowerCase()
     .trim()
-    .replace(/\s+/g, '-')
-    .replace(/[^\w\u4e00-\u9fa5-]/g, '');
+    .replace(/\s+/g, '-') // 空白替換為連字符
+    .replace(/[^\w\u4e00-\u9fa5-]/g, ''); // 移除非英數中文字元
 };
 
-const getTagDefinition = (identifier: string): TagDefinition | undefined => {
-  const slug = convertToSlug(identifier);
-  return tagMap[slug];
-};
-
-const getTagName = (
-  definition: TagDefinition | undefined,
-  lang: Language
-): string => {
-  return (
-    definition?.name?.[lang]?.trim() ||
-    definition?.name?.[DEFAULT_LANGUAGE]?.trim() ||
-    ''
-  );
-};
-
-const getLocalizedTagName = (
-  identifier: string,
-  lang: Language = DEFAULT_LANGUAGE
-): string => {
-  const definition = getTagDefinition(identifier);
-  const name = getTagName(definition, lang);
-  return name || identifier;
-};
-
+// 取得當前語系 Tag 的 slug、name
 export const getLocalizedTag = (
-  identifier: string,
+  tagName: string,
   lang: Language = DEFAULT_LANGUAGE
 ) => {
-  const slug = convertToSlug(identifier);
+  const slug = convertToSlug(tagName);
+
+  const tagConfig = tagMap[slug];
+
+  // 取得當前語系名稱
+  const localizedName =
+    tagConfig?.name?.[lang]?.trim() ||
+    tagConfig?.name?.[DEFAULT_LANGUAGE]?.trim() ||
+    tagName;
 
   return {
     slug,
-    name: getLocalizedTagName(identifier, lang),
+    name: localizedName,
   };
 };
 
-// 取得所有文章的 tag 及其出現次數，且可選擇限制回傳的 tag 數量。
+// 計算並取得所有文章的 Tag 使用頻率，依使用次數排序。
 export const getTagsByPosts = (
   posts: PostInfo[],
   limit?: number,
@@ -58,6 +42,7 @@ export const getTagsByPosts = (
 
   const tagCounts = new Map<string, number>();
 
+  // 計算每個標籤的使用次數
   for (const post of posts) {
     if (Array.isArray(post.tags)) {
       for (const tag of post.tags) {
@@ -68,6 +53,7 @@ export const getTagsByPosts = (
     }
   }
 
+  // 轉換為當前語系標籤並排序
   const sortedTags = Array.from(tagCounts.entries())
     .map(([tag, postCount]) => {
       const { slug, name } = getLocalizedTag(tag, lang);

@@ -9,7 +9,8 @@ export const getAllPostsCache = cache(
   async (): Promise<Record<Language, PostInfo[]>> => {
     const results = await Promise.allSettled(
       LANGUAGES.map(async (lang) => {
-        const posts = await getPostsInfo(lang);
+        const postsResult = await getPostsInfo(lang);
+        const posts = Array.isArray(postsResult) ? postsResult : [];
         return { lang, posts };
       })
     );
@@ -53,35 +54,22 @@ export const getAllTagsCache = cache(
   }
 );
 
-// 快取標籤到文章的映射
-export const getTagToPostsMapCache = cache(
-  async (lang: Language): Promise<Map<string, PostInfo[]>> => {
-    const allPosts = await getAllPostsCache();
-    const posts = allPosts[lang] || [];
-    const map = new Map<string, PostInfo[]>();
-
-    for (const post of posts) {
-      if (post.tags) {
-        for (const postTag of post.tags) {
-          const slug = convertToSlug(postTag);
-          if (!map.has(slug)) map.set(slug, []);
-          map.get(slug)!.push(post);
-        }
-      }
-    }
-    return map;
-  }
-);
-
 // 快取特定標籤的文章
 export const getPostsByTagCache = cache(
   async (
     tag: string,
     lang: Language = DEFAULT_LANGUAGE
   ): Promise<PostInfo[]> => {
+    const allPosts = await getAllPostsCache();
+    const posts = allPosts[lang] || [];
     const tagSlug = convertToSlug(tag);
-    const tagMap = await getTagToPostsMapCache(lang);
-    return tagMap.get(tagSlug) || [];
+
+    return posts.filter((post) => {
+      return (
+        Array.isArray(post.tags) &&
+        post.tags.some((postTag) => convertToSlug(postTag) === tagSlug)
+      );
+    });
   }
 );
 
@@ -109,25 +97,36 @@ export const getPostsByCategoryCache = cache(
     lang: Language,
     type: 'main' | 'sub' | 'all' = 'all'
   ): Promise<{ category: any; posts: PostInfo[] }> => {
-    const { getCategoryBySlug } = await import('@/lib/categories');
+    const { getCategoryBySlug, isPostInCategory } = await import(
+      '@/lib/categories'
+    );
     const allPosts = await getAllPostsCache();
     const posts = allPosts[lang] || [];
 
     const category = getCategoryBySlug(categorySlug, posts, type);
 
+    if (!category)
+      return {
+        category,
+        posts: [],
+      };
+
+    const filteredPosts = posts.filter((post) => {
+      if (!post.categories || post.categories.length === 0) return false;
+
+      if (isPostInCategory(post, category.name, category.slug)) return true;
+
+      if (type !== 'sub' && category.subcategories)
+        return Object.entries(category.subcategories).some(([subSlug, sub]) =>
+          isPostInCategory(post, sub.name, subSlug)
+        );
+
+      return false;
+    });
+
     return {
       category,
-      posts: posts.filter((post) =>
-        post.categories?.some(
-          (cat) =>
-            cat.toLowerCase() === categorySlug.toLowerCase() ||
-            (category &&
-              category.name &&
-              Object.values(category.name).some(
-                (name) => cat.toLowerCase() === name.toLowerCase()
-              ))
-        )
-      ),
+      posts: filteredPosts,
     };
   }
 );
