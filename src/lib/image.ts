@@ -62,6 +62,7 @@ export const extractAndProcessImageMetas = async (
   while ((match = imageRegex.exec(content)) !== null) {
     // 先找 markdown 格式的圖片，找不到再找 HTML 或程式碼裡的。
     const src = match[1] || match[2] || match[3];
+
     // 只處理以 / 開頭的本地圖片路徑
     if (src?.startsWith('/') && src.length > 1) {
       // 清理路徑，去除可能的查詢參數或片段識別碼。

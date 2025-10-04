@@ -1,9 +1,12 @@
 'use client';
 
+import { useMemo } from 'react';
+
 import { Circle } from 'lucide-react';
 import { useLocale } from 'next-intl';
 
 import type { CategoryInfo, Language } from '@/types';
+import { categoryMap } from '@/config/taxonomy';
 import { Link, useRouter } from '@/i18n/navigation';
 import { cn, getCategoryStyle } from '@/lib/style';
 
@@ -17,27 +20,59 @@ interface CategoryBadgeProps {
 
 const CategoryBadge = ({
   showHr = false,
-  categories,
+  categories = [],
   categoryInfoMap,
   className,
   disableLink = false,
 }: CategoryBadgeProps) => {
   const lang = useLocale() as Language;
   const router = useRouter();
-  if (!categories || categories.length === 0) return null;
+
+  const resolvedCategories = useMemo(() => {
+    if (categories.length === 0) return [];
+
+    const result: CategoryInfo[] = [];
+    const appended = new Set<string>();
+
+    const addCategory = (info: CategoryInfo | null | undefined) => {
+      if (!info) return;
+      if (appended.has(info.slug)) return;
+      appended.add(info.slug);
+      result.push(info);
+    };
+
+    for (const catName of categories) {
+      const info = categoryInfoMap[catName];
+      if (!info) continue;
+
+      if (info.parentSlug) {
+        const parent = categoryMap[info.parentSlug];
+        if (parent)
+          addCategory({
+            name: parent.name,
+            slug: parent.slug,
+            color: parent.color,
+          });
+      }
+
+      addCategory(info);
+    }
+
+    return result;
+  }, [categories, categoryInfoMap]);
+
+  if (resolvedCategories.length === 0) return null;
 
   return (
     <>
       <div className='z-10 flex flex-wrap items-center gap-x-2 text-sm'>
-        {categories.map((catName) => {
-          const categoryInfo = categoryInfoMap[catName];
-
+        {resolvedCategories.map((categoryInfo) => {
           if (!categoryInfo || !categoryInfo.name) return null;
 
           if (disableLink)
             return (
               <button
-                key={catName}
+                key={categoryInfo.slug}
                 type='button'
                 onClick={(e) => {
                   e.preventDefault();
@@ -63,7 +98,7 @@ const CategoryBadge = ({
 
           return (
             <Link
-              key={catName}
+              key={categoryInfo.slug}
               href={`/categories${categoryInfo.parentSlug ? `/${categoryInfo.parentSlug}/${categoryInfo.slug}` : `/${categoryInfo.slug}`}`}
               className={cn(
                 'flex items-center gap-x-1 text-sm text-[var(--category-color)] hover:opacity-85',

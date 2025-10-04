@@ -2,11 +2,22 @@
   "tw": {
     "posts": [
       {
+        "slug": "what-is-git-rebase",
+        "title": "什麼是 Rebase？重新定義分支基底！",
+        "date": "2025-10-04T00:00:00.000Z",
+        "categories": ["Git"],
+        "tags": ["Git"],
+        "wordCount": 0,
+        "lang": "tw",
+        "featured": false,
+        "hasPassword": false
+      },
+      {
         "slug": "css-only-pokemon-3d-card",
         "title": "只使用 CSS！拆解寶可夢 3D 閃卡特效",
         "description": "學習只使用 CSS 製作寶可夢 3D 閃卡特效",
         "date": "2025-09-22T00:00:00.000Z",
-        "categories": ["Frontend"],
+        "categories": ["CSS"],
         "tags": ["CSS", "Pokemon"],
         "wordCount": 405,
         "lang": "tw",
@@ -29,7 +40,7 @@
         "title": "2025 日本名古屋 🇯🇵 5天4夜自由行攻略：吉卜力公園、合掌村景點與美食記錄",
         "description": "計畫去名古屋自由行嗎？這篇分享我 5 天 4 夜的畢業旅行行程，包含吉卜力公園、高山老街、白川鄉合掌村等景點，還有麵家獅子丸、味噌炸豬排等必吃美食心得與花費分析。",
         "date": "2025-02-09",
-        "categories": ["Life", "Trip"],
+        "categories": ["Trip"],
         "tags": ["Trip", "Japan"],
         "wordCount": 1860,
         "lang": "tw",
@@ -41,7 +52,7 @@
         "title": "如何將 Express + TypeScript 部署到 Vercel",
         "description": "最近在重構一個專案，更新後發現 Vercel 部署那邊壞掉，後端一直 404 或 500 無法正常運作，找了好久，嘗試很多方法，最後終於解決了，這邊記錄一下。",
         "date": "2025-02-07T00:00:00.000Z",
-        "categories": ["Backend", "NodeJS"],
+        "categories": ["NodeJS"],
         "tags": ["Express", "Vercel", "NodeJS", "Deployment"],
         "wordCount": 393,
         "lang": "tw",
@@ -65,7 +76,7 @@
         "title": "2024 日本福岡、熊本 🇯🇵 5天4夜行程規劃、景點與美食全紀錄",
         "description": "計畫去日本福岡、熊本自由行嗎？這篇分享我 5 天 4 夜的詳細行程規劃，包含相島貓島、太宰府、海之中道水族館、阿蘇農場樂園等必去景點，以及 ShinShin 拉麵、蜂樂饅頭等美食心得與總花費分析。",
         "date": "2024-12-21T00:00:00.000Z",
-        "categories": ["Life", "Trip"],
+        "categories": ["Trip"],
         "tags": ["Trip", "Japan"],
         "wordCount": 5036,
         "lang": "tw",
@@ -89,7 +100,7 @@
         "title": "2024 韓國首爾 🇰🇷 5天4夜行程規劃 | T1 朝聖 & 弘大景點美食全紀錄",
         "description": "首次來韓國，想體驗韓服、朝聖 T1 嗎？這篇分享我 5 天 4 夜的首爾自由行行程，包含景福宮、T1 Base Camp 等景點，以及湯飯、馬鈴薯排骨湯等必吃美食心得與花費分析。",
         "date": "2024-11-15T00:00:00.000Z",
-        "categories": ["Life", "Trip"],
+        "categories": ["Trip"],
         "tags": ["Trip", "Korea", "T1"],
         "wordCount": 3673,
         "lang": "tw",
@@ -101,7 +112,7 @@
         "slug": "gitlab-pages-add-custom-domain",
         "title": "Gitlab Pages 加上自訂域名 Custom Domain",
         "date": "2024-05-23T00:00:00.000Z",
-        "categories": ["Tool", "Gitlab"],
+        "categories": ["Gitlab"],
         "tags": ["Gitlab"],
         "wordCount": 298,
         "lang": "tw",
@@ -113,7 +124,7 @@
         "title": "將多個 Commit 合併成一個 (Squash Commits)",
         "description": "使用 git rebase -i 將多個 Commit 合併成一個，讓專案具有整潔的提交歷史記錄。",
         "date": "2024-05-22T00:00:00.000Z",
-        "categories": ["Tool", "Git"],
+        "categories": ["Git"],
         "tags": ["Git"],
         "wordCount": 566,
         "lang": "tw",
@@ -122,6 +133,33 @@
       }
     ],
     "categories": [
+      {
+        "name": {
+          "tw": "前端",
+          "en": "Frontend"
+        },
+        "slug": "frontend",
+        "color": {
+          "light": "#42B5F9",
+          "dark": "#6AC5FB"
+        },
+        "subcategories": {
+          "css": {
+            "name": {
+              "tw": "CSS",
+              "en": "CSS"
+            },
+            "slug": "css",
+            "color": {
+              "light": "#264de4",
+              "dark": "#3572b5"
+            },
+            "parentSlug": "frontend",
+            "postCount": 1
+          }
+        },
+        "postCount": 3
+      },
       {
         "name": {
           "tw": "生活",
@@ -171,7 +209,7 @@
               "dark": "#fc5d49"
             },
             "parentSlug": "tools",
-            "postCount": 1
+            "postCount": 2
           },
           "gitlab": {
             "name": {
@@ -187,19 +225,6 @@
             "postCount": 1
           }
         },
-        "postCount": 2
-      },
-      {
-        "name": {
-          "tw": "前端",
-          "en": "Frontend"
-        },
-        "slug": "frontend",
-        "color": {
-          "light": "#42B5F9",
-          "dark": "#6AC5FB"
-        },
-        "subcategories": {},
         "postCount": 3
       },
       {
@@ -235,6 +260,11 @@
         "name": "旅遊",
         "slug": "trip",
         "postCount": 3
+      },
+      {
+        "name": "Git",
+        "slug": "git",
+        "postCount": 2
       },
       {
         "name": "日本",
@@ -300,11 +330,6 @@
         "name": "Gitlab",
         "slug": "gitlab",
         "postCount": 1
-      },
-      {
-        "name": "Git",
-        "slug": "git",
-        "postCount": 1
       }
     ],
     "popularPosts": [
@@ -333,7 +358,7 @@
         "title": "Nagoya & Shirakawa-go 5-Day Trip Itinerary 🇯🇵 (2025 Travel Guide)",
         "description": "Planning a 5-day trip to Nagoya? This guide covers a complete itinerary with must-visit spots like Ghibli Park and Shirakawa-go, food reviews for Menya Shishimaru and Miso Tonkatsu, and a full cost breakdown.",
         "date": "2025-02-09",
-        "categories": ["Life", "Trip"],
+        "categories": ["Trip"],
         "tags": ["Trip", "Japan"],
         "wordCount": 1327,
         "lang": "en",
@@ -345,7 +370,7 @@
         "title": "How to Deploy TypeScript Express App to Vercel",
         "description": "I recently refactored a project, which caused Vercel deployment to break. After extensive debugging, I fixed the issues and am documenting the solution for future reference.",
         "date": "2025-02-07T00:00:00.000Z",
-        "categories": ["Backend", "NodeJS"],
+        "categories": ["NodeJS"],
         "tags": ["Express", "Vercel", "NodeJS", "Deployment"],
         "wordCount": 239,
         "lang": "en",
@@ -357,7 +382,7 @@
         "title": "Fukuoka & Kumamoto 5-Day Trip Itinerary 🇯🇵 (2024 Travel Guide)",
         "description": "Planning a 5-day trip to Fukuoka and Kumamoto? Here's a complete itinerary and travel guide covering must-visit spots like Ainoshima Cat Island, local food like ShinShin Ramen, and a full cost breakdown.",
         "date": "2024-12-21T00:00:00.000Z",
-        "categories": ["Life", "Trip"],
+        "categories": ["Trip"],
         "tags": ["Trip", "Japan"],
         "wordCount": 4276,
         "lang": "en",
@@ -370,7 +395,7 @@
         "title": "Seoul 5-Day Trip Itinerary 🇰🇷 (2024 Travel Guide)",
         "description": "First time in Korea and a T1 fan? This 5-day Seoul itinerary covers a T1 pilgrimage, Hongdae highlights, a Hanbok experience at Gyeongbokgung Palace, must-try food reviews, and a full cost breakdown.",
         "date": "2024-11-15T00:00:00.000Z",
-        "categories": ["Life", "Trip"],
+        "categories": ["Trip"],
         "tags": ["Trip", "Korea", "T1"],
         "wordCount": 3269,
         "lang": "en",

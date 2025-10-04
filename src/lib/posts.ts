@@ -36,67 +36,97 @@ const getTargetFileName = (lang: Language): string => {
   return lang === 'en' ? MDX_FILES.en : MDX_FILES.default;
 };
 
+// 取得單篇或多篇文章的 metadata
 export const getPostsInfo = cache(
-  async (lang: Language = DEFAULT_LANGUAGE): Promise<PostInfo[]> => {
-    if (typeof window !== 'undefined') return [];
+  async (
+    lang: Language = DEFAULT_LANGUAGE,
+    slug?: string
+  ): Promise<PostInfo[] | Partial<PostInfo> | null> => {
+    if (typeof window !== 'undefined') return slug ? null : [];
 
-    const dirs = await getPostsDirs();
-    const targetFileName = getTargetFileName(lang);
+    if (slug) {
+      // 單篇文章
+      const postDir = path.join(postsDirectory, slug);
+      if (!fs.existsSync(postDir)) return null;
 
-    const postsResults = await Promise.allSettled(
-      dirs.map(async (dirPath): Promise<PostInfo | null> => {
-        const files = await fs.promises.readdir(dirPath);
-        const targetFile = files.find((f) => f === targetFileName);
+      const files = await fs.promises.readdir(postDir);
+      const targetFileName = getTargetFileName(lang);
+      const mdxFile = files.find((file) => file === targetFileName);
+      if (!mdxFile) return null;
 
-        if (!targetFile) return null;
+      const filePath = path.join(postDir, mdxFile);
+      const fileContents = await fs.promises.readFile(filePath, 'utf8');
+      const { data } = matter(fileContents);
 
-        const filePath = path.join(dirPath, targetFile);
-        const fileContents = await fs.promises.readFile(filePath, 'utf8');
-        const { data } = matter(fileContents);
+      // 驗證必要欄位
+      if (!data.title || !data.date) return null;
 
-        // 驗證必要欄位
-        if (!data.title || !data.date) return null;
+      return {
+        title: data.title,
+        description: data.description || '',
+        date: data.date,
+        tags: data.tags || [],
+      };
+    } else {
+      // 多篇文章
+      const dirs = await getPostsDirs();
+      const targetFileName = getTargetFileName(lang);
 
-        // 正式環境下跳過草稿
-        if (data.draft && process.env.NODE_ENV === 'production') return null;
+      const postsResults = await Promise.allSettled(
+        dirs.map(async (dirPath): Promise<PostInfo | null> => {
+          const files = await fs.promises.readdir(dirPath);
+          const targetFile = files.find((f) => f === targetFileName);
 
-        const post: PostInfo = {
-          slug: path.basename(dirPath),
-          title: String(data.title).trim(),
-          description: data.description
-            ? String(data.description).trim()
-            : undefined,
-          date: data.date,
-          categories: Array.isArray(data.categories) ? data.categories : [],
-          tags: Array.isArray(data.tags) ? data.tags : [],
-          wordCount: typeof data.wordCount === 'number' ? data.wordCount : 0,
-          lang,
-          featured: Boolean(data.featured),
-          coverImage: data.coverImage
-            ? String(data.coverImage).trim()
-            : undefined,
-          hasPassword: Boolean(data.password),
-        };
+          if (!targetFile) return null;
 
-        return post;
-      })
-    );
+          const filePath = path.join(dirPath, targetFile);
+          const fileContents = await fs.promises.readFile(filePath, 'utf8');
+          const { data } = matter(fileContents);
 
-    // 篩選成功的結果並按日期排序
-    const validPosts = postsResults
-      .filter(
-        (result): result is PromiseFulfilledResult<PostInfo | null> =>
-          result.status === 'fulfilled' && result.value !== null
-      )
-      .map((result) => result.value!);
+          // 驗證必要欄位
+          if (!data.title || !data.date) return null;
 
-    return validPosts.sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
+          // 正式環境下跳過草稿
+          if (data.draft && process.env.NODE_ENV === 'production') return null;
+
+          const post: PostInfo = {
+            slug: path.basename(dirPath),
+            title: String(data.title).trim(),
+            description: data.description
+              ? String(data.description).trim()
+              : undefined,
+            date: data.date,
+            categories: Array.isArray(data.categories) ? data.categories : [],
+            tags: Array.isArray(data.tags) ? data.tags : [],
+            wordCount: typeof data.wordCount === 'number' ? data.wordCount : 0,
+            lang,
+            featured: Boolean(data.featured),
+            coverImage: data.coverImage
+              ? String(data.coverImage).trim()
+              : undefined,
+            hasPassword: Boolean(data.password),
+          };
+
+          return post;
+        })
+      );
+
+      // 篩選成功的結果並按日期排序
+      const validPosts = postsResults
+        .filter(
+          (result): result is PromiseFulfilledResult<PostInfo | null> =>
+            result.status === 'fulfilled' && result.value !== null
+        )
+        .map((result) => result.value!);
+
+      return validPosts.sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      );
+    }
   }
 );
 
-// 根據當前語系、slug 取得特定文章的 metadata 與內容
+// 根據語系和 slug 取得特定文章的完整資料（包括內容）
 export const getPostData = cache(
   async (lang: Language = DEFAULT_LANGUAGE, slug: string) => {
     try {
@@ -116,7 +146,7 @@ export const getPostData = cache(
       // 驗證必要欄位
       if (!data.title || !data.date) return null;
 
-      // 防止顯示 draft 文章
+      // 正式環境下禁止顯示草稿
       if (data.draft && process.env.NODE_ENV === 'production') {
         const err = new Error('This post is a draft.');
         (err as any).code = 'DRAFT_POST';
@@ -137,10 +167,11 @@ export const getPostData = cache(
         );
         const imageMetasRaw: Record<string, any> = JSON.parse(imageMetasFile);
 
-        // 篩出這篇文章實際有用到的圖片 metadata
-        for (const [src, meta] of Object.entries(imageMetasRaw))
+        // 篩出此文章實際使用的圖片 metadata
+        for (const [src, meta] of Object.entries(imageMetasRaw)) {
           if (typeof src === 'string' && content.includes(src))
             imageMetas[src] = meta;
+        }
       } catch (err) {
         console.warn(
           'Failed to load image metas:',
@@ -172,61 +203,33 @@ export const getPostData = cache(
   }
 );
 
-// 根據 slug 取得文章的 title、description、date、tags 等 metadata
-export const getPostInfoBySlug = cache(
-  async (
-    lang: Language = DEFAULT_LANGUAGE,
-    slug: string
-  ): Promise<Partial<PostInfo> | null> => {
-    const postDir = path.join(postsDirectory, slug);
-
-    if (!fs.existsSync(postDir)) return null;
-    const files = await fs.promises.readdir(postDir);
-
-    // 根據當前語系選擇對應的 mdx 檔案
-    const targetFileName = getTargetFileName(lang);
-    const mdxFile = files.find((file) => file === targetFileName);
-
-    if (!mdxFile) return null;
-
-    const filePath = path.join(postDir, mdxFile);
-    const fileContents = await fs.promises.readFile(filePath, 'utf8');
-    const { data } = matter(fileContents);
-
-    if (!data.title || !data.date) return null;
-
-    return {
-      title: data.title,
-      description: data.description || '',
-      date: data.date,
-      tags: data.tags || [],
-    };
-  }
-);
-
-// 根據 category name、slug 取得相應文章
+// 根據分類路徑取得相應文章列表
 export const getPostsByCategory = async (
   categoryPath: string,
   lang: Language = DEFAULT_LANGUAGE
 ): Promise<PostInfo[]> => {
-  const posts = await getPostsInfo(lang);
-  const category = await getCategoryBySlug(categoryPath, posts);
+  const postsResult = await getPostsInfo(lang);
+  const posts = Array.isArray(postsResult) ? postsResult : [];
 
+  if (posts.length === 0) return [];
+
+  const category = await getCategoryBySlug(categoryPath, posts);
   if (!category) return [];
 
   return posts.filter((post) => isPostInCategory(post, category.name));
 };
 
+// 建立一個標籤 slug → 文章列表的映射表
 const getTagToPostsMap = cache(async (lang: Language) => {
-  const posts = await getPostsInfo(lang);
+  const postsResult = await getPostsInfo(lang);
+  const posts = Array.isArray(postsResult) ? postsResult : [];
   const map = new Map<string, PostInfo[]>();
 
   for (const post of posts) {
-    if (post.tags) {
+    if (post?.tags && Array.isArray(post.tags)) {
       for (const postTag of post.tags) {
         const slug = convertToSlug(postTag);
         if (!map.has(slug)) map.set(slug, []);
-
         map.get(slug)!.push(post);
       }
     }
@@ -234,7 +237,7 @@ const getTagToPostsMap = cache(async (lang: Language) => {
   return map;
 });
 
-// 根據 tag name 或 slug 取得相應文章
+// 根據 tag name 或 slug 查 Map 取得相應文章列表
 export const getPostsByTag = async (
   tag: string,
   lang: Language = DEFAULT_LANGUAGE
@@ -244,18 +247,7 @@ export const getPostsByTag = async (
   return tagMap.get(tagSlug) || [];
 };
 
-export const getPostsMeta = async () => {
-  const allPosts = await Promise.all(
-    LANGUAGES.map((lang) => getPostsInfo(lang))
-  );
-  return allPosts.flat().map((post) => ({
-    slug: post.slug,
-    lang: post.lang,
-    title: post.title,
-    date: post.date,
-  }));
-};
-
+// 檢查特定文章是否存在，並回傳存在的語系。
 export const checkPostExistence = cache(
   async (
     curLang: Language,
@@ -329,6 +321,7 @@ export const getPaginatedPosts = (
   };
 };
 
+// 根據篩選條件取得文章列表
 export const getFilteredPosts = async ({
   lang = DEFAULT_LANGUAGE,
   category,
@@ -340,19 +333,21 @@ export const getFilteredPosts = async ({
   // 根據分類或標籤來取得文章
   if (category) posts = await getPostsByCategory(category, lang);
   else if (tag) posts = await getPostsByTag(tag, lang);
-  else posts = await getPostsInfo(lang);
+  else {
+    const postsResult = await getPostsInfo(lang);
+    posts = Array.isArray(postsResult) ? postsResult : [];
+  }
 
-  // 如果有關鍵字，進行標題、分類、標籤與敘述的搜尋。
-  if (keyword) {
-    const lowerKeyword = keyword.toLowerCase();
+  // 關鍵字搜尋：在標題、描述、分類、標籤中搜尋
+  if (keyword && keyword.trim()) {
+    const lowerKeyword = keyword.toLowerCase().trim();
     posts = posts.filter(
       ({ title, categories = [], tags = [], description = '' }) => {
-        const haystacks = [title, description, ...categories, ...tags].filter(
-          Boolean
-        );
-        return haystacks.some((field) =>
-          field.toLowerCase().includes(lowerKeyword)
-        );
+        const searchFields = [title, description, ...categories, ...tags]
+          .filter(Boolean)
+          .map((field) => field.toLowerCase());
+
+        return searchFields.some((field) => field.includes(lowerKeyword));
       }
     );
   }
@@ -363,6 +358,7 @@ export const getFilteredPosts = async ({
   );
 };
 
+// 根據篩選條件與分頁參數取得文章列表
 export const getPaginatedPostsWithFilter = async ({
   lang = DEFAULT_LANGUAGE,
   category,
@@ -376,23 +372,24 @@ export const getPaginatedPostsWithFilter = async ({
 }: PaginatedPostParams) => {
   let posts = await getFilteredPosts({ lang, category, tag, keyword });
 
-  // 處理不同的篩選文章的條件
+  // 根據篩選類型處理文章
   if (filter === 'popular') {
     posts = posts.filter((post) => post.featured);
-    // .sort((a, b) => (b.views ?? 0) - (a.views ?? 0)); // 暫時以精選代替熱門，未來再調整。
   } else if (filter === 'related') {
+    // 相關文章：同分類且非目前文章
     if (!currentSlug || !categories?.length)
       throw new Error('Missing required parameters for related posts.');
 
     posts = posts
-      .filter(
-        (post) =>
+      .filter((post) => {
+        return (
           post.slug !== currentSlug &&
           Array.isArray(post.categories) &&
           post.categories.some((categoryName) =>
             categories.includes(categoryName)
           )
-      )
+        );
+      })
       .slice(0, MAX_RELATED_POSTS);
   }
 
@@ -407,7 +404,9 @@ export const loadPostComponents = async (
     // 檢查是否有自定義組件存在
     const postDir = path.join(postsDirectory, slug);
 
-    const hasComponents = ['components.jsx', 'components.js'].some((filename) =>
+    // 檢查是否存在自定義元件檔案
+    const componentFiles = ['components.jsx', 'components.js'];
+    const hasComponents = componentFiles.some((filename) =>
       fs.existsSync(path.join(postDir, filename))
     );
 
@@ -415,7 +414,8 @@ export const loadPostComponents = async (
 
     const componentsModule = await import(`@/posts/${slug}/components`);
     return componentsModule.default || {};
-  } catch {
+  } catch (err) {
+    console.warn(`Failed to load components for post: ${slug}`, err);
     return {};
   }
 };

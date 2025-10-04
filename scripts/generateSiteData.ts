@@ -35,7 +35,9 @@ async function main() {
   const data = {} as SiteData;
 
   for (const lang of languages) {
-    const posts = await getPostsInfo(lang);
+    const postsResult = await getPostsInfo(lang);
+    const posts: PostInfo[] = Array.isArray(postsResult) ? postsResult : [];
+
     const categories = getAllCategoryByPosts(posts);
     const tags = getTagsByPosts(posts, undefined, lang).map(
       ({ name, slug, postCount }) => ({

@@ -10,6 +10,7 @@ import {
   tagMap as originalTagMap,
 } from '@/config/taxonomy';
 import type {
+  Category,
   CategoryInfo,
   CategoryMap,
   Language,
@@ -24,6 +25,12 @@ const TAXONOMY_CONFIG_PATH = path.join(
   'src',
   'config',
   'taxonomy.ts'
+);
+const CATEGORIES_CONTENT_PATH = path.join(
+  process.cwd(),
+  'content',
+  'taxonomy',
+  'categories.yaml'
 );
 const SITE_DATA_PATH = path.join(
   process.cwd(),
@@ -43,41 +50,105 @@ const DEFAULT_COLOR = {
   dark: '#4c4c4c',
 };
 
-const languages = [...CONFIG.languages.supportedLanguages];
+const languages: Language[] = [...CONFIG.languages.supportedLanguages];
 
-const cloneCategoryMap = (): CategoryMap =>
-  structuredClone(originalTaxonomyMap);
+type LocalizedNames = Partial<Record<Language, string>>;
+
+const cleanLocalizedNames = (names?: LocalizedNames): LocalizedNames => {
+  const cleaned: LocalizedNames = {};
+  languages.forEach((lang) => {
+    const raw = names?.[lang];
+    if (typeof raw !== 'string') return;
+    const trimmed = raw.trim();
+    if (trimmed) cleaned[lang] = trimmed;
+  });
+  return cleaned;
+};
+
+const pickName = (names: LocalizedNames, fallback?: string) => {
+  const trimmedFallback =
+    typeof fallback === 'string' && fallback.trim().length > 0
+      ? fallback.trim()
+      : undefined;
+  return (
+    names[CONFIG.languages.defaultLanguage] ??
+    names.en ??
+    Object.values(names).find(Boolean) ??
+    trimmedFallback ??
+    'fallback'
+  );
+};
+
+const createNameRecord = (value: string): Record<Language, string> =>
+  languages.reduce(
+    (acc, lang) => {
+      acc[lang] = value;
+      return acc;
+    },
+    {} as Record<Language, string>
+  );
+
+const ensureLocalizedNames = <T extends { name: Record<Language, string> }>(
+  target: T,
+  names: LocalizedNames,
+  fallbackHint: string
+) => {
+  const cleaned = cleanLocalizedNames(names);
+  const fallback = pickName(cleaned, fallbackHint);
+  let updated = false;
+
+  languages.forEach((lang) => {
+    const provided = cleaned[lang];
+    if (provided && target.name[lang] !== provided) {
+      target.name[lang] = provided;
+      updated = true;
+      return;
+    }
+
+    const current = target.name[lang];
+    if (!current || current.trim().length === 0) {
+      if (current !== fallback) {
+        target.name[lang] = fallback;
+        updated = true;
+      }
+    }
+  });
+
+  return updated;
+};
+
+const ensureColor = (
+  current: { light: string; dark: string } | undefined,
+  next?: Partial<{ light: string; dark: string }>
+) => {
+  const pick = (value?: string, fallback?: string) => {
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (trimmed) return trimmed;
+    }
+    return fallback;
+  };
+
+  return {
+    light: pick(next?.light, current?.light) ?? DEFAULT_COLOR.light,
+    dark: pick(next?.dark, current?.dark) ?? DEFAULT_COLOR.dark,
+  };
+};
+
+const sortKeys = (input: unknown): unknown => {
+  if (Array.isArray(input)) return input.map(sortKeys);
+  if (input && typeof input === 'object') {
+    return Object.keys(input as Record<string, unknown>)
+      .sort()
+      .reduce<Record<string, unknown>>((acc, key) => {
+        acc[key] = sortKeys((input as Record<string, unknown>)[key]);
+        return acc;
+      }, {});
+  }
+  return input;
+};
+
 const cloneTagMap = (): TagMap => structuredClone(originalTagMap);
-
-const toKey = (value: string) => value.trim().toLowerCase();
-
-const buildMainNameMap = (map: CategoryMap) => {
-  const result: Record<string, string> = {};
-  Object.entries(map).forEach(([slug, category]) => {
-    languages.forEach((lang) => {
-      const name = category.name?.[lang];
-      if (name) result[toKey(name)] = slug;
-    });
-    result[toKey(slug)] = slug;
-  });
-  return result;
-};
-
-const buildSubNameMap = (map: CategoryMap) => {
-  const result: Record<string, Record<string, string>> = {};
-  Object.entries(map).forEach(([parentSlug, category]) => {
-    if (!category.subcategories) return;
-    result[parentSlug] = result[parentSlug] ?? {};
-    Object.entries(category.subcategories).forEach(([slug, sub]) => {
-      languages.forEach((lang) => {
-        const name = sub.name?.[lang];
-        if (name) result[parentSlug][toKey(name)] = slug;
-      });
-      result[parentSlug][toKey(slug)] = slug;
-    });
-  });
-  return result;
-};
 
 const quote = (value: string) =>
   `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
@@ -164,51 +235,24 @@ const formatTaxonomyFile = (categories: CategoryMap, tags: TagMap): string => {
   return sections.join('\n');
 };
 
-const ensureLocalizedNames = <
-  T extends { name: Record<Language, string | undefined> },
->(
-  target: T,
-  namesByLang: Partial<Record<Language, string>>
-) => {
-  let updated = false;
-
-  languages.forEach((lang) => {
-    const current: string | undefined = target.name[lang];
-    if (!current || current.trim() === '') {
-      target.name[lang] = namesByLang[lang] ?? namesByLang.en ?? 'fallback';
-      updated = true;
-    }
-  });
-
-  return updated;
-};
-
 const loadTagNamesFromContent = async () => {
   try {
     const content = await fs.readFile(TAGS_CONTENT_PATH, 'utf8');
     const parsed = YAML.parse(content) as {
       tags?: Array<{
         slug?: string;
-        name?: Partial<Record<Language, string>>;
+        name?: LocalizedNames;
       }>;
     };
 
-    const map = new Map<string, Partial<Record<Language, string>>>();
+    const map = new Map<string, LocalizedNames>();
     if (!parsed?.tags || !Array.isArray(parsed.tags)) return map;
 
     parsed.tags.forEach((tag) => {
       const slug = typeof tag?.slug === 'string' ? tag.slug.trim() : '';
       if (!slug) return;
 
-      const names = tag?.name ?? {};
-      const localized: Partial<Record<Language, string>> = {};
-
-      languages.forEach((lang) => {
-        const value = names?.[lang];
-        if (typeof value === 'string' && value.trim())
-          localized[lang] = value.trim();
-      });
-
+      const localized = cleanLocalizedNames(tag?.name);
       if (Object.keys(localized).length > 0) map.set(slug, localized);
     });
 
@@ -218,177 +262,127 @@ const loadTagNamesFromContent = async () => {
       '⚠️ 無法載入 tags.yaml：',
       error instanceof Error ? error.message : String(error)
     );
-    return new Map<string, Partial<Record<Language, string>>>();
+    return new Map<string, LocalizedNames>();
   }
 };
 
+type CategoryDefinition = {
+  slug?: string;
+  name?: LocalizedNames;
+  color?: Partial<{ light: string; dark: string }>;
+  subcategories?: Array<{
+    slug?: string;
+    name?: LocalizedNames;
+    color?: Partial<{ light: string; dark: string }>;
+  }>;
+};
+
+const loadCategoryDefinitions = async (): Promise<CategoryDefinition[]> => {
+  try {
+    const content = await fs.readFile(CATEGORIES_CONTENT_PATH, 'utf8');
+    const parsed = YAML.parse(content) as { categories?: CategoryDefinition[] };
+    if (!parsed?.categories || !Array.isArray(parsed.categories)) return [];
+    return parsed.categories;
+  } catch (error) {
+    console.warn(
+      '⚠️ 無法載入 categories.yaml：',
+      error instanceof Error ? error.message : String(error)
+    );
+    return [];
+  }
+};
+
+const buildCategoryMapFromDefinitions = (
+  definitions: CategoryDefinition[]
+): CategoryMap => {
+  const sortedDefinitions = [...definitions].sort((a, b) => {
+    const aSlug = a.slug?.trim() ?? '';
+    const bSlug = b.slug?.trim() ?? '';
+    return aSlug.localeCompare(bSlug);
+  });
+
+  const map: CategoryMap = {};
+
+  sortedDefinitions.forEach((definition) => {
+    const slug = definition.slug?.trim();
+    if (!slug) return;
+
+    const categoryNames = cleanLocalizedNames(definition.name);
+    const fallbackCategoryName = pickName(categoryNames, slug);
+
+    const category: Category = {
+      name: createNameRecord(fallbackCategoryName),
+      slug,
+      color: ensureColor(undefined, definition.color),
+    };
+
+    ensureLocalizedNames(category, definition.name ?? {}, fallbackCategoryName);
+
+    const sortedSubcategories = [...(definition.subcategories ?? [])].sort(
+      (a, b) => (a.slug?.trim() ?? '').localeCompare(b.slug?.trim() ?? '')
+    );
+
+    if (sortedSubcategories.length > 0) {
+      category.subcategories = {};
+
+      sortedSubcategories.forEach((subDefinition) => {
+        const subSlug = subDefinition.slug?.trim();
+        if (!subSlug) return;
+
+        const subNames = cleanLocalizedNames(subDefinition.name);
+        const fallbackSubName = pickName(subNames, subSlug);
+
+        const subCategory: CategoryInfo = {
+          name: createNameRecord(fallbackSubName),
+          slug: subSlug,
+          color: ensureColor(undefined, subDefinition.color),
+        };
+
+        ensureLocalizedNames(
+          subCategory,
+          subDefinition.name ?? {},
+          fallbackSubName
+        );
+
+        category.subcategories![subSlug] = subCategory;
+      });
+    }
+
+    map[slug] = category;
+  });
+
+  return map;
+};
+
 const main = async () => {
-  const categoryMap = cloneCategoryMap();
+  const categoryDefinitions = await loadCategoryDefinitions();
+  const categoryMap = buildCategoryMapFromDefinitions(categoryDefinitions);
   const tagMap = cloneTagMap();
 
-  const mainNameMap = buildMainNameMap(categoryMap);
-  const subNameMap = buildSubNameMap(categoryMap);
+  const hasCategoryChanges =
+    JSON.stringify(sortKeys(categoryMap)) !==
+    JSON.stringify(sortKeys(originalTaxonomyMap));
 
   const postsByLang: Record<Language, PostInfo[]> = {} as Record<
     Language,
     PostInfo[]
   >;
   for (const lang of languages) {
-    postsByLang[lang] = await getPostsInfo(lang);
+    const postsResult = await getPostsInfo(lang);
+    postsByLang[lang] = Array.isArray(postsResult) ? postsResult : [];
   }
-
-  const postsBySlug = new Map<string, Partial<Record<Language, PostInfo>>>();
-  for (const lang of languages) {
-    for (const post of postsByLang[lang]) {
-      const entry = postsBySlug.get(post.slug) ?? {};
-      entry[lang] = post;
-      postsBySlug.set(post.slug, entry);
-    }
-  }
-
-  let hasCategoryChanges = false;
   let hasTagChanges = false;
 
-  const addMainName = (name: string, slug: string) => {
-    mainNameMap[toKey(name)] = slug;
-  };
-
-  const addSubName = (parentSlug: string, name: string, slug: string) => {
-    subNameMap[parentSlug] = subNameMap[parentSlug] ?? {};
-    subNameMap[parentSlug][toKey(name)] = slug;
-  };
-
-  const resolveMainSlug = (namesByLang: Partial<Record<Language, string>>) => {
-    for (const name of Object.values(namesByLang)) {
-      if (!name) continue;
-      const match = mainNameMap[toKey(name)];
-      if (match) return match;
-    }
-    const preferred =
-      namesByLang.en ??
-      namesByLang[CONFIG.languages.defaultLanguage] ??
-      Object.values(namesByLang)[0];
-    return convertToSlug(preferred ?? 'uncategorized');
-  };
-
-  const resolveSubSlug = (
-    parentSlug: string,
-    namesByLang: Partial<Record<Language, string>>
-  ) => {
-    const map = subNameMap[parentSlug];
-    if (map) {
-      for (const name of Object.values(namesByLang)) {
-        if (!name) continue;
-        const match = map[toKey(name)];
-        if (match) return match;
-      }
-    }
-    const preferred =
-      namesByLang.en ??
-      namesByLang[CONFIG.languages.defaultLanguage] ??
-      Object.values(namesByLang)[0];
-    return convertToSlug(preferred ?? 'subcategory');
-  };
-
-  postsBySlug.forEach((variants) => {
-    const namesByIndex: Array<Partial<Record<Language, string>>> = [];
-
-    languages.forEach((lang) => {
-      const categories = variants[lang]?.categories ?? [];
-      categories.forEach((name, index) => {
-        if (!name) return;
-        namesByIndex[index] = namesByIndex[index] ?? {};
-        namesByIndex[index]![lang] = name;
-      });
-    });
-
-    if (namesByIndex.length === 0) return;
-
-    const mainNames = namesByIndex[0]!;
-    const mainSlug = resolveMainSlug(mainNames);
-
-    let category = categoryMap[mainSlug];
-    if (!category) {
-      const fallbackName =
-        mainNames[CONFIG.languages.defaultLanguage] ??
-        mainNames.en ??
-        Object.values(mainNames)[0] ??
-        mainSlug;
-
-      category = {
-        name: {
-          tw: fallbackName,
-          en: fallbackName,
-        },
-        slug: mainSlug,
-        color: { ...DEFAULT_COLOR },
-      };
-      categoryMap[mainSlug] = category;
-      hasCategoryChanges = true;
-    }
-
-    if (ensureLocalizedNames(category, mainNames)) hasCategoryChanges = true;
-
-    languages.forEach((lang) => {
-      const name = category.name[lang];
-      if (name) addMainName(name, mainSlug);
-    });
-
-    const subCategories = namesByIndex.slice(1);
-    if (subCategories.length === 0) return;
-
-    category.subcategories = category.subcategories ?? {};
-
-    subCategories.forEach((names) => {
-      if (!names) return;
-      const subSlug = resolveSubSlug(mainSlug, names);
-      let subCategory = category.subcategories![subSlug] as
-        | CategoryInfo
-        | undefined;
-
-      if (!subCategory) {
-        const fallbackName =
-          names[CONFIG.languages.defaultLanguage] ??
-          names.en ??
-          Object.values(names)[0] ??
-          subSlug;
-
-        subCategory = {
-          name: {
-            tw: fallbackName,
-            en: fallbackName,
-          },
-          slug: subSlug,
-          color: { ...DEFAULT_COLOR },
-        };
-        category.subcategories![subSlug] = subCategory;
-        hasCategoryChanges = true;
-      }
-
-      const fallbackName =
-        names[CONFIG.languages.defaultLanguage] ??
-        names.en ??
-        Object.values(names)[0] ??
-        subCategory.slug;
-
-      if (ensureLocalizedNames(subCategory, names)) hasCategoryChanges = true;
-
-      languages.forEach((lang) => {
-        const name = subCategory!.name[lang];
-        if (name) addSubName(mainSlug, name, subSlug);
-      });
-    });
-  });
-
-  const tagNamesBySlug = new Map<string, Partial<Record<Language, string>>>();
+  const tagNamesBySlug = new Map<string, LocalizedNames>();
 
   for (const lang of languages) {
     for (const post of postsByLang[lang]) {
       post.tags?.forEach((tagName) => {
-        if (!tagName) return;
-        const slug = convertToSlug(tagName);
+        const trimmed = typeof tagName === 'string' ? tagName.trim() : '';
+        if (!trimmed) return;
+        const slug = convertToSlug(trimmed);
         const entry = tagNamesBySlug.get(slug) ?? {};
-        entry[lang] = tagName;
+        entry[lang] = trimmed;
         tagNamesBySlug.set(slug, entry);
       });
     }
@@ -397,25 +391,22 @@ const main = async () => {
   const tagNamesFromContent = await loadTagNamesFromContent();
   tagNamesFromContent.forEach((names, slug) => {
     const current = tagNamesBySlug.get(slug) ?? {};
-    tagNamesBySlug.set(slug, { ...current, ...names });
+    const merged: LocalizedNames = {
+      ...current,
+      ...cleanLocalizedNames(names),
+    };
+    tagNamesBySlug.set(slug, merged);
   });
 
   tagNamesBySlug.forEach((namesByLang, slug) => {
+    const cleanedNames = cleanLocalizedNames(namesByLang);
     let tag = tagMap[slug];
     if (!tag) {
+      const fallbackName = pickName(cleanedNames, slug);
       tag = {
         slug,
-        name: {} as Record<Language, string>,
+        name: createNameRecord(fallbackName),
       };
-      languages.forEach((lang) => {
-        const candidate =
-          namesByLang[lang] ??
-          namesByLang[CONFIG.languages.defaultLanguage] ??
-          namesByLang.en ??
-          Object.values(namesByLang)[0] ??
-          slug;
-        tag.name[lang] = candidate ?? slug;
-      });
       tagMap[slug] = tag;
       hasTagChanges = true;
     } else if (tag.slug !== slug) {
@@ -423,37 +414,10 @@ const main = async () => {
       hasTagChanges = true;
     }
 
-    const fallbackName =
-      namesByLang.en ??
-      namesByLang[CONFIG.languages.defaultLanguage] ??
-      Object.values(namesByLang)[0] ??
-      tag.name.en ??
-      slug;
+    const fallbackName = pickName(cleanedNames, tag.name.en ?? slug);
 
-    if (!tag.name.en || tag.name.en.trim().length === 0) {
-      const next = fallbackName || slug;
-      if (tag.name.en !== next) {
-        tag.name.en = next;
-        hasTagChanges = true;
-      }
-    }
-
-    languages.forEach((lang) => {
-      if (lang === 'en') return;
-      const provided = namesByLang[lang];
-      if (provided && tag.name[lang] !== provided) {
-        tag.name[lang] = provided;
-        hasTagChanges = true;
-        return;
-      }
-      if (!tag.name[lang] || tag.name[lang].trim().length === 0) {
-        const next = fallbackName || slug;
-        if (tag.name[lang] !== next) {
-          tag.name[lang] = next;
-          hasTagChanges = true;
-        }
-      }
-    });
+    if (ensureLocalizedNames(tag, cleanedNames, fallbackName))
+      hasTagChanges = true;
   });
 
   if (!hasCategoryChanges && !hasTagChanges) {

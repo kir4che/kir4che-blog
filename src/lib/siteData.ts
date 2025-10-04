@@ -91,10 +91,6 @@ export const getSiteData = (
   );
 };
 
-export const getPostsFromSiteData = (lang: Language): PostInfo[] => {
-  return getSiteData(lang).posts;
-};
-
 export const getSidebarData = (lang: Language) => {
   const { categories, tags, popularPosts } = getSiteData(lang);
   return { categories, tags, popularPosts };
