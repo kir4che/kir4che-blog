@@ -82,7 +82,10 @@ const CategoryBadge = ({
                   );
                 }}
                 className={cn(
-                  'flex items-center gap-x-1 text-sm text-[var(--category-color)] hover:opacity-85',
+                  'flex items-center gap-x-1 text-sm hover:opacity-85',
+                  className?.includes('force-dark-category')
+                    ? 'text-[var(--category-color-dark)]'
+                    : 'text-[var(--category-color)]',
                   className
                 )}
                 style={getCategoryStyle(categoryInfo.color)}
@@ -101,7 +104,10 @@ const CategoryBadge = ({
               key={categoryInfo.slug}
               href={`/categories${categoryInfo.parentSlug ? `/${categoryInfo.parentSlug}/${categoryInfo.slug}` : `/${categoryInfo.slug}`}`}
               className={cn(
-                'flex items-center gap-x-1 text-sm text-[var(--category-color)] hover:opacity-85',
+                'flex items-center gap-x-1 text-sm hover:opacity-85',
+                className?.includes('force-dark-category')
+                  ? 'text-[var(--category-color-dark)]'
+                  : 'text-[var(--category-color)]',
                 className
               )}
               style={getCategoryStyle(categoryInfo.color)}

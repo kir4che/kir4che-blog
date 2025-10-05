@@ -5,7 +5,6 @@ import { ChevronRight } from 'lucide-react';
 
 import type { Language } from '@/types';
 import { Link } from '@/i18n/navigation';
-import { cn } from '@/lib/style';
 import { getSiteData } from '@/lib/siteData';
 
 import PostPreview from '@/components/features/post/PostPreview';
@@ -59,23 +58,34 @@ const Home = async ({ params }: { params: Params }) => {
               </div>
             </Link>
           </div>
-          <div
-            className={cn(
-              'grid gap-3 md:gap-4 xl:gap-6',
-              latestPosts.length === 1
-                ? 'grid-cols-1'
-                : 'grid-cols-1 md:grid-cols-2'
+          <div className='grid grid-cols-1 gap-4 md:hidden'>
+            {latestPosts.map((post) => (
+              <PostPreview
+                key={post.slug}
+                post={post}
+                variant='card'
+                className={post.coverImage ? 'h-60' : 'h-auto'}
+              />
+            ))}
+          </div>
+          <div className='hidden md:grid md:grid-cols-[5fr_4fr] md:gap-4'>
+            {latestPosts.length > 0 && (
+              <PostPreview
+                key={latestPosts[0].slug}
+                post={latestPosts[0]}
+                variant='card'
+              />
             )}
-          >
-            {latestPosts.length ? (
-              latestPosts.map((post) => (
-                <PostPreview key={post.slug} post={post} variant='card' />
-              ))
-            ) : (
-              <p className='text-text-gray-dark dark:text-text-gray-light col-span-full py-8 text-center'>
-                {t('PostsPage.noPosts')}
-              </p>
-            )}
+            <div className='grid grid-cols-1 gap-4'>
+              {latestPosts.slice(1).map((post) => (
+                <PostPreview
+                  key={post.slug}
+                  post={post}
+                  variant='card'
+                  className={post.coverImage ? 'h-56' : 'h-auto'}
+                />
+              ))}
+            </div>
           </div>
         </section>
       )}

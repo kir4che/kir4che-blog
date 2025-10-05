@@ -20,17 +20,17 @@ const TOC: React.FC<TOCProps> = ({ headings }) => {
       {/* 手機版 TOC Toggle Btn */}
       <button
         onClick={() => setShowTOC(!showTOC)}
-        className='fixed right-4 bottom-4 z-50 block lg:hidden'
+        className='fixed right-3 bottom-3 z-50 block lg:hidden'
         aria-label={toggleLabel}
         aria-expanded={showTOC}
       >
-        <div className='chat-bubble flex-center h-14 w-16 rounded-full bg-pink-500 text-white'>
-          {showTOC ? <X size={24} /> : <AlignJustify size={24} />}
+        <div className='chat-bubble flex-center h-13.5 w-15 rounded-full bg-pink-500 text-white'>
+          {showTOC ? <X size={25} /> : <AlignJustify size={25} />}
         </div>
       </button>
       {/* 手機版 TOC */}
       {showTOC && (
-        <div className='fixed right-4 bottom-22 z-50 block lg:hidden'>
+        <div className='fixed right-4 bottom-20 z-50 block lg:hidden'>
           <TOCContent
             headings={headings}
             title={tocTitle}
@@ -58,12 +58,12 @@ const TOCContent = ({
   onLinkClick?: () => void;
 }) => (
   <div
-    className='relative max-w-72 min-w-60 overflow-hidden rounded-xl bg-white/60 p-4 shadow-md backdrop-blur-xl transition-all duration-300 before:pointer-events-none before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/25 before:to-white/10 dark:bg-neutral-900/30 dark:before:from-white/10 dark:before:to-white/5'
+    className='relative flex max-h-88 max-w-72 min-w-64 flex-col overflow-hidden rounded-xl bg-white/75 pt-4 pb-4 pl-4 shadow-md backdrop-blur-xl transition-all duration-300 before:pointer-events-none before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/25 before:to-white/10 dark:bg-neutral-900/30 dark:before:from-white/10 dark:before:to-white/5'
     role='navigation'
     aria-label={ariaLabel}
   >
     <div className='mb-2 text-lg font-bold'>{title}</div>
-    <ul className='max-h-88 space-y-2.5 overflow-y-auto pr-2 2xl:pr-4'>
+    <ul className='custom-scrollbar flex-1 space-y-3 overflow-y-scroll pr-2 2xl:pr-4'>
       {headings.map((h) => (
         <li
           key={h.id}

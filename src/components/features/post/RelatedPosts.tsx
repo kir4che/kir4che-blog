@@ -95,7 +95,7 @@ const RelatedPosts = ({ lang, currentSlug, categories }: RelatedPostsProps) => {
                     alt={post.title || post.slug}
                     fill
                     sizes='(min-width: 1024px) 280px, (min-width: 768px) 240px, 70vw'
-                    className='object-cover'
+                    className='object-cover object-[center_75%]'
                   />
                 </div>
               ) : (
