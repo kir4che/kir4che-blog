@@ -3,6 +3,7 @@ import type { MDXComponents } from 'mdx/types';
 import type { ImageMeta } from '@/types';
 
 import { H1, H2, H3, H4, H5, H6 } from '@/components/mdx/Heading';
+import SmallText from '@/components/mdx/SmallText';
 import Correction from '@/components/mdx/Correction';
 import Highlight from '@/components/mdx/Highlight';
 import Table from '@/components/mdx/Table';
@@ -69,6 +70,7 @@ export const useMDXComponents = ({
       h4: H4,
       h5: H5,
       h6: H6,
+      SmallText: ({ children }) => <SmallText>{children}</SmallText>, // <SmallText>...</SmallText>
       Table: Table, // <Table data={{ headers: [], rows: [[], []] }} />
       Image: ImageComponent,
       Images: ImagesComponent, // <Images images={[{ src: '', alt: '', width: '' }, ... ]} height='150px' />
@@ -81,19 +83,23 @@ export const useMDXComponents = ({
         <kbd className='kbd border-neutral-400 bg-neutral-200'>{children}</kbd>
       ), // <Kbd>Enter</Kbd>
       p: ({ children }) => (
-        <p className='text-text-primary my-6 block text-base/7 first:mt-0 last:mb-0'>
+        <p className='text-text-primary my-4 text-base/7 first:mt-0 last:mb-0'>
           {children}
         </p>
       ),
       a: CustomLink, // [Text](url)
       img: ImgComponent, // \![alt](url)
       ul: ({ children }) => (
-        <ul className='my-2 list-inside list-disc pl-4'>{children}</ul>
+        <ul className='my-6 list-outside list-disc space-y-3 pl-5 marker:text-pink-700 dark:marker:text-pink-400 [&_li>div>ol]:my-0 [&_li>div>ul]:my-0'>
+          {children}
+        </ul>
       ),
       ol: ({ children }) => (
-        <ol className='my-2 list-inside list-decimal pl-4'>{children}</ol>
+        <ol className='my-6 list-outside list-decimal space-y-3 pl-5 [&_li>div>ol]:my-0 [&_li>div>ul]:my-0'>
+          {children}
+        </ol>
       ),
-      li: ({ children }) => <li className='leading-[1.85]'>{children}</li>,
+      li: ({ children }) => <li>{children}</li>,
       blockquote: (
         { children } // > Text
       ) => (

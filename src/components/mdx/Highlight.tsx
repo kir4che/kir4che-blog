@@ -6,13 +6,27 @@ interface HighlightProps {
   className?: string;
 }
 
-const colorMap: Record<string, string> = {
-  yellow:
-    '[background:linear-gradient(100deg,_#ffda8b00_1%,_#ffda8b_2.5%,_#ffda8b80_5.7%,_#ffda8b1a_93%,_#ffda8bb4_95%,_#ffda8b00_98%),linear-gradient(182deg,_#ffda8b00,_#ffda8b4d_8%,_#ffda8b00_15%)]',
-  green:
-    '[background:linear-gradient(100deg,_#b8ffaf00_1%,_#b8ffaf_2.5%,_#b8ffaf80_5.7%,_#b8ffaf1a_93%,_#b8ffafb4_95%,_#b8ffaf00_98%),linear-gradient(182deg,_#b8ffaf00,_#b8ffaf4d_8%,_#b8ffaf00_15%)]',
-  pink: '[background:linear-gradient(100deg,_#ffb2c500_1%,_#ffb2c5_2.5%,_#ffb2c580_5.7%,_#ffb2c51a_93%,_#ffb2c5b4_95%,_#ffb2c500_98%),linear-gradient(182deg,_#ffb2c500,_#ffb2c54d_8%,_#ffb2c500_15%)]',
-  blue: '[background:linear-gradient(100deg,_#afd7ff00_1%,_#afd7ff_2.5%,_#afd7ff80_5.7%,_#afd7ff1a_93%,_#afd7ffb4_95%,_#afd7ff00_98%),linear-gradient(182deg,_#afd7ff00,_#afd7ff4d_8%,_#afd7ff00_15%)]',
+const colorMap: Record<
+  NonNullable<HighlightProps['color']>,
+  React.CSSProperties
+> = {
+  yellow: {
+    background:
+      'linear-gradient(100deg, #ffda8b00 1%, #ffda8b 2.5%, #ffda8b80 5.7%, #ffda8b1a 93%, #ffda8bb4 95%, #ffda8b00 98%), linear-gradient(182deg, #ffda8b00, #ffda8b4d 8%, #ffda8b00 15%)',
+  },
+  green: {
+    background:
+      'linear-gradient(100deg, #b8ffaf00 1%, #b8ffaf 2.5%, #b8ffaf80 5.7%, #b8ffaf1a 93%, #b8ffafb4 95%, #b8ffaf00 98%), linear-gradient(182deg, #b8ffaf00, #b8ffaf4d 8%, #b8ffaf00 15%)',
+  },
+  pink: {
+    background:
+      'linear-gradient(100deg, #ffb2c500 1%, #ffb2c5 2.5%, #ffb2c580 5.7%, #ffb2c51a 93%, #ffb2c5b4 95%, #ffb2c500 98%), linear-gradient(182deg, #ffb2c500, #ffb2c54d 8%, #ffb2c500 15%)',
+  },
+  blue: {
+    background:
+      'linear-gradient(100deg, #afd7ff00 1%, #afd7ff 2.5%, #afd7ff80 5.7%, #afd7ff1a 93%, #afd7ffb4 95%, #afd7ff00 98%), linear-gradient(182deg, #afd7ff00, #afd7ff4d 8%, #afd7ff00 15%)',
+  },
+  custom: {},
 };
 
 const Highlight = ({
@@ -20,7 +34,10 @@ const Highlight = ({
   children,
   className = '',
 }: HighlightProps) => (
-  <mark className={cn('text-text-primary px-0.5', colorMap[color], className)}>
+  <mark
+    className={cn('text-text-primary px-0.5', className)}
+    style={colorMap[color]}
+  >
     {children}
   </mark>
 );
