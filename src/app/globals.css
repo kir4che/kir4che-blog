@@ -159,6 +159,11 @@
   h6 {
     @apply text-sm font-medium;
   }
+
+  mark p {
+    margin: 0 !important;
+    display: inline !important;
+  }
 }
 
 @layer components {
@@ -175,6 +180,18 @@
   .heading {
     @apply border-l-4 border-pink-700 pl-3 md:pl-5 dark:border-pink-500;
   }
+
+  .expressive-code {
+    @apply my-4;
+
+    & .header .title {
+      @apply text-sm opacity-90;
+    }
+  }
+
+  .rating .mask-half-2 {
+    @apply mr-1;
+  }
 }
 
 @layer utilities {
@@ -184,5 +201,14 @@
 
   .text-gradient {
     @apply bg-gradient-to-r from-pink-700 to-pink-500 bg-clip-text text-transparent dark:from-pink-200 dark:to-pink-100;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    opacity: 0;
+  }
+
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scroll-thumb) transparent;
   }
 }
