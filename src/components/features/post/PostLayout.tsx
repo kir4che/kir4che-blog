@@ -127,8 +127,8 @@ const PostLayout = ({
             src={coverImage}
             alt={title || slug}
             width={1200}
-            height={630}
-            className='h-45 w-full object-cover lg:h-64'
+            height={640}
+            className='h-45 w-full object-cover object-[center_70%] sm:h-56 xl:h-68'
             placeholder={imageMeta?.blurDataURL ? 'blur' : undefined}
             blurDataURL={imageMeta?.blurDataURL}
             priority

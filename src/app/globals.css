@@ -181,6 +181,10 @@
     @apply border-l-4 border-pink-700 pl-3 md:pl-5 dark:border-pink-500;
   }
 
+  .utterances {
+    @apply m-0! max-w-full!;
+  }
+
   .expressive-code {
     @apply my-4;
 

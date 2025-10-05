@@ -23,15 +23,3 @@
     }
   }
 }
-
-.articleContent :global(.expressive-code) {
-  @apply my-4;
-}
-
-.articleContent :global(.expressive-code .header .title) {
-  @apply text-xs opacity-80;
-}
-
-.articleContent :global(.rating .mask-half-2) {
-  @apply mr-1;
-}
