@@ -14,14 +14,15 @@ const removeEmojis = (str: string) => {
 
 export const GET = async (req: Request) => {
   const { searchParams } = new URL(req.url);
-  const title = removeEmojis(searchParams.get('title') || 'kir4che blog');
+  const title = removeEmojis(
+    searchParams.get('title') || CONFIG.siteInfo.blog.title
+  );
   const tags =
     searchParams
       .get('tags')
       ?.split(',')
       .map((tag) => tag.trim())
       .filter(Boolean) || [];
-  const url = 'kir4che.com';
 
   return new ImageResponse(
     (
@@ -205,7 +206,7 @@ export const GET = async (req: Request) => {
                 boxShadow: '0 0 8px rgba(233, 30, 99, 0.5)',
               }}
             />
-            {url}
+            kir4che.com
           </div>
         </div>
       </div>

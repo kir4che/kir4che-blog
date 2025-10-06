@@ -1,5 +1,6 @@
 'use client';
 
+import { CONFIG } from '@/config';
 import ThemeToggle from '@/components/common/ThemeToggle';
 import LangMenu from '@/components/common/GlobalLangMenu';
 
@@ -10,7 +11,7 @@ const Footer = () => (
       <LangMenu className='dropdown-top dropdown-start' />
     </div>
     <p className='dark:text-text-gray-lighter text-center text-xs'>
-      © 2025 by kir4che
+      © 2025 by {CONFIG.siteInfo.name}
     </p>
   </div>
 );
