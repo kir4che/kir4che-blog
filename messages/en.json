@@ -26,7 +26,8 @@
       "previous": "Previous",
       "next": "Next",
       "goToPage": "Go to page {page}"
-    }
+    },
+    "kofiButton": "Buy me a milktea"
   },
   "profile": {
     "name": "Molly",
