@@ -1,11 +1,409 @@
 ---
-title: 什麼是 Rebase？重新定義分支基底！
+title: 什麼是 Git rebase？重新定義分支基底！
 date: 2025-10-04T00:00:00.000Z
-description: null
+description: >-
+  完整學會 Git rebase！從基礎概念到進階操作，包含 merge vs rebase 比較、互動模式 -i 使用、衝突處理流程、復原方法，以及 6
+  個實務場景範例。適合前端開發者與 Git 初學者，讓你的 commit 歷史乾淨又專業。
+coverImage: 'https://cdni.fancaps.net/file/fancaps-animeimages/17947731.jpg'
 categories:
   - Git
 tags:
   - Git
 updatedAt: 2025-10-04T05:54:11.293Z
-wordCount: 0
+wordCount: 1653
 ---
+
+## Git rebase 是什麼？
+
+Git rebase 是指<Highlight>把目前分支上的所有 commit 重新建立在另一分支的最新 commit 上</Highlight>，不會產生一條新的 merge commit，而是讓歷史看起來更線性乾淨。
+
+ex. feature 分支 rebase 到 main 分支
+
+把 feature 分支的所有 commit 重新搬到 main 分支最新的 commit 上
+
+```
+main:    A --- B --- C --- F
+               \
+feature:        D --- E
+    ↓ git rebase main
+main:    A --- B --- C --- F
+                            \
+                             D' --- E'
+```
+
+<br />
+
+> 就像是你原本在排隊，但突然有人開了一條更新的隊伍，你和你的朋友們（commit）一起移過去那個最新隊伍後面重新排好。
+
+---
+
+## 什麼時候該用 Rebase？
+
+### 優點
+
+- 歷史乾淨、線性，沒有多餘 merge commit。
+- commit 順序可控，誰 rebase 誰就是接在誰後面。
+
+### 缺點
+
+- 一旦操作不當，重寫歷史容易造成混亂且回復較複雜。
+- 發生衝突時流程中斷，可能卡住需花時間解決。
+
+### 常見使用時機
+
+- 整理提交歷史：在推送前合併多個零碎的 commit，讓歷史記錄更簡潔易讀。
+- 同步主分支：將功能分支 rebase 到最新的 main 分支，確保開發基於最新程式碼並提早發現衝突。
+- 修改歷史記錄：使用互動模式 `git rebase -i` 來編輯、合併、刪除或重新排序 commit。
+
+### 注意事項
+
+> 絕對不要 rebase 共享分支！
+
+Rebase 會改寫 Git 歷史，導致其他人的倉庫出現衝突。它只適合用在個人分支或尚未推送到遠端的分支。
+
+<Accordion
+  variant='basic'
+  title='不小心 rebase 並推送了怎麼辦？'
+>
+立即通知團隊成員，確保沒有人正在該分支上工作，並根據情況選擇處理方式：
+
+- 方法 1：直接重置（推薦）
+  讓本地分支完全對齊遠端新歷史，但會遺失所有本地未推送的變更。
+
+```bash
+git fetch origin
+git reset --hard origin/branch-name
+```
+
+- 方法 2：保留本地變更
+  如果有未推送的變更想保留，用 rebase 重新套用到新歷史上。
+
+```bash
+git fetch origin
+git rebase origin/branch-name
+```
+
+</Accordion>
+
+---
+
+## merge vs rebase
+
+<Table
+  data={{
+    headers: ['特性', 'merge（合併）', 'rebase（變基）'],
+    rows: [
+      ['歷史結構', '保留完整分支結構 🌳', '紀錄線性化 ➖（重寫 commit hash）'],
+      ['Commit 類型', '會產生一條新的 merge commit', '沒有 merge commit'],
+      [
+        '安全性',
+        '安全（不可改寫共用歷史）',
+        '風險高，會改寫 commit hash，避免用於共用分支。',
+      ],
+      [
+        '適用場景',
+        '多人協作的大專案、需要完整歷史追蹤 bug',
+        '整理自己的 commit、準備 PR 給 reviewer',
+      ],
+    ],
+  }}
+/>
+
+⭐️ 自己的 feature 分支，多用 rebase；已公開/多人共用主分支，請用 merge！
+
+---
+
+## Rebase 實務操作
+
+### 把 feature 分支變基到 main
+
+```bash
+git checkout feature
+git fetch origin # 抓取最新 main
+git rebase origin/main
+
+git push --force-with-lease origin feature # 完成後強制推送（如果之前推過）
+```
+
+完成後，feature 分支所有 commit 就像直接基於 main 最新 commit 誕生，整條歷史整合為一條直線。
+
+⚠️ 如果 feature 分支已 push 且有其他人使用，不要用 rebase 改用 merge 避免造成協作問題。
+
+### 工作中常見場景
+
+1.  **開發完準備 PR 前，發現 main 有新更新。**<br/>
+    功能開發完了，準備送 PR，但發現 main 分支有新 commit，為了避免 PR 合併時產生衝突，也讓歷史保持乾淨直線，先把 main 的更新同步進來：
+
+    ```bash
+    # 確保 main 是最新的
+    git checkout main
+    git pull origin main
+
+    # 切回 feature 分支，rebase 到最新的 main。
+
+    git checkout feature/new-ui
+    git rebase main
+
+    # 如果有衝突，解決後繼續
+    git add .
+    git rebase --continue
+
+    # 完成後推送（第一次 push 或已經 push 過都適用）
+    git push --force-with-lease origin feature/new-ui
+    ```
+
+2.  **commit 歷史太亂，PR 前整理一下。**<br/>
+    開發時習慣頻繁 commit（fix typo、調整格式、測試功能等），導致歷史很亂，想在送 PR 前整理一下：
+
+    ```bash
+    git log --oneline # 查看最近的 commit
+    git rebase -i HEAD~3 # 假設要整理最近 3 個 commit
+    ```
+
+    ```bash
+    pick abc123 功能A
+    pick def456 修正 typo
+    pick ghi789 功能B
+    ```
+
+    ```bash
+    pick abc123 功能A
+    fixup def456 修正 typo
+    reword ghi789 功能B
+    ```
+
+    結果： 功能 A 和 typo 修正合併成一個 commit，功能 B 可以重寫訊息。
+
+3.  **改錯分支了，想把 commit 移到正確的分支。**<br/>
+    不小心在 main 分支做開發，想把 commit 移到 feature 分支：
+
+    ```bash
+    # 在 main 分支上
+    git log --oneline # 記下要移動的 commit hash (例如 abc123)
+
+    git checkout feature/correct-branch # 切到正確的分支
+    git cherry-pick abc123 # 把 commit 複製過來
+
+    git checkout main
+    git reset --hard HEAD~1 # 移除最後一個 commit
+    ```
+
+4.  **PR Review 後要修改，但不想新增一堆 "fix review" commit。**<br/>
+    Reviewer 提了建議，修改後想直接併入原本的 commit 而不是新增一堆零碎的修正 commit：
+
+    ```bash
+    # 修改程式碼後
+    git add .
+    git commit --fixup=<原始commit的hash>
+
+    # 送出前自動整理
+    git rebase -i --autosquash origin/main
+    ```
+
+    或直接修改最後一個 commit：
+
+    ```bash
+    git add .
+    git commit --amend --no-edit # 不改訊息直接併入
+    git push --force-with-lease origin feature
+    ```
+
+5.  **長期開發的 feature，想拆成多個小 PR。**<br/>
+    功能開發很久，想拆成多個小 PR 方便 review：
+
+    ```bash
+    # 基於 main 建立第一個小功能分支
+    git checkout -b feature/step-1 origin/main
+    git cherry-pick <commit1> <commit2> # 挑選相關的 commit
+
+    # 建立第二個小功能分支
+    git checkout -b feature/step-2 origin/main
+    git cherry-pick <commit3> <commit4>
+    ```
+
+6.  **多人協作時的安全做法**<br/>
+    在團隊協作中，rebase 前先確認：
+
+    ```bash
+    git branch backup-feature # 備份當前分支
+
+    git checkout main
+    git pull origin main # 確保 main 最新
+
+    git checkout feature
+    git rebase main
+
+    git push --force-with-lease origin feature
+    ```
+
+---
+
+## 進階 Rebase 指令
+
+### 互動模式 `-i`
+
+```bash
+git rebase -i HEAD~{n} # 編輯最近 n 個 commit
+```
+
+開啟編輯器後，可以：
+
+- pick (p)：保留該 commit
+- reword (r)：只修改 commit 訊息，不改內容，會暫停讓你改訊息
+- edit (e)：保留 commit，rebase 途中暫停讓你修改 commit 內容（可以增刪檔案或改程式碼）
+- squash (s)：把該 commit 合併到前一個 commit，會讓你合併 commit 訊息
+- fixup (f)：像 squash，但捨棄該 commit 訊息，合併成更乾淨的歷史
+- drop (d)：刪除該 commit
+
+以上是常用選項，善用這些指令可以讓你輕鬆整理 commit 歷史。
+
+實際範例
+
+```bash
+git rebase -i HEAD~3
+```
+
+會列出最近 3 個 commit，編輯器中可以這樣操作：
+
+```
+pick abc123 功能A
+fixup def456 修正 typo
+reword ghi789 功能B
+```
+
+結果會是：功能 A 和 typo 修正合併成一個 commit，功能 B 可以重寫訊息。
+
+### 精確控制範圍 `--onto`
+
+當需要更精確地控制 rebase 的起點和終點時使用：`git rebase --onto <新基底> <舊基底> [結束點]`
+
+`--onto` 的關鍵是指定三個位置：
+
+- 新基底：想要把 commit 接到哪裡
+
+- 舊基底：原本分支的起點（branch out point）
+
+- 結束點（選填）：要移動到哪個 commit 為止（預設是當前 HEAD）
+
+<SmallText>使用場景</SmallText>
+
+```bash
+# feature 分支原本基於 develop，想改為基於 main。
+git checkout feature
+git rebase --onto main develop
+
+# 刪除 commit B ～ D 之間的內容
+git rebase --onto B D
+
+# 把 feature 分支的 commit E ～ H 移到 main
+git rebase --onto main E H
+```
+
+### 確保品質 `--exec`
+
+在每個 commit 套用後自動執行指令，確保歷史中每一步都能通過測試。
+
+```bash
+git rebase -i --exec "command" <base>
+# 或簡寫
+git rebase -ix "command" <base>
+```
+
+<SmallText>**使用場景**</SmallText>
+
+```bash
+# 確保每個 commit 都通過測試
+git rebase -i --exec "npm test" main
+
+# 同時跑多個檢查
+git rebase -i -x "npm run lint" -x "npm test" main
+
+# 前端專案常見組合
+git rebase main --exec "npm run build && npm test"
+```
+
+若測試失敗，rebase 會暫停讓你修復：
+
+```bash
+# 修復後
+git add .
+git commit --amend
+git rebase --continue
+```
+
+### 輔助指令
+
+#### 重新編輯待辦清單
+
+`git rebase --edit-todo`
+
+用於執行到一半發現後續的 commit 處理順序不對，想調整接下來的動作。
+
+#### 查看當前 patch 內容
+
+`git rebase --show-current-patch`
+
+當衝突複雜到不知道該保留哪邊的程式碼時，先看看這個 commit 原本要做什麼變更。
+
+---
+
+## Rebase 遇到衝突怎麼辦？
+
+> 操作前，先備份分支 `git branch backup_branch`，有問題隨時能救回。
+
+正確處理流程如下：
+
+1. 遇到衝突時，Git 會暫停並提示哪些檔案有衝突。
+2. 打開衝突檔案，手動編輯去除衝突標記區，選擇要保留的版本或合併內容。
+3. 編輯完成並儲存後，使用 `git add <file>` 標記衝突已解決。
+4. 執行 `git rebase --continue` 繼續剩餘流程（衝突解決時不能用 `git commit`）
+
+📌 可用 `git rebase --skip` 跳過有問題的 commit，但該 commit 的所有變更都不會被保留，使用需謹慎。
+
+這些步驟會反覆進行，直到所有衝突都處理完，rebase 才會結束。
+
+---
+
+## 如何取消 / 復原 Rebase？
+
+### 取消 Rebase 的方法
+
+- 執行中退出 (–abort)：`git rebase --abort`，回到 rebase 前狀態。
+- 離開但保留進度 (–quit)：`git rebase --quit`，停止 rebase，但保留已完成的部分。
+
+### 復原已完成的 Rebase
+
+<Table
+  data={{
+    headers: ['指令', '行為', '改寫歷史', '適用情境'],
+    rows: [
+      [
+        '`git reset --hard <commit>`',
+        '把 HEAD/branch 指回去',
+        '✅',
+        '自己本地調整，還沒 push。',
+      ],
+      [
+        '`git reset --hard ORIG_HEAD`',
+        '快速回到上一步',
+        '✅',
+        '剛 rebase/pull/merge 後想回去',
+      ],
+      ['`git reset --hard HEAD@{n}`', '回到第 n 步', '✅', '本地時光機'],
+      [
+        '`git revert <commit>`',
+        '產生一個「反向 commit」',
+        '❌',
+        '已經 push 出去，要安全撤銷。',
+      ],
+    ],
+  }}
+/>
+
+---
+
+## 結論
+
+實習時我也是從零開始學 rebase，一開始超怕弄壞 commit 歷史，每次送出都要瘋狂確認。建議先從簡單的開始練習，像是送 PR 前用 `git rebase -i` 合併零碎 commit，或用 `git rebase main` 同步主分支。
+
+用久了就不會怕，會發現 rebase 真的是整理歷史、保持乾淨的好工具，當你送出的 PR 只有幾個清楚的 commit 時，Reviewer 也會感謝你！
