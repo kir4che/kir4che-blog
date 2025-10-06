@@ -55,7 +55,7 @@ const AboutPage = () => {
           <div
             className='my-2 flex flex-wrap gap-x-4 gap-y-2'
             role='region'
-            aria-label="kir4che's youtube"
+            aria-label={`${CONFIG.siteInfo.name}'s youtube videos`}
           >
             {Object.entries(youtubes).map(([key, video]) => (
               <motion.div

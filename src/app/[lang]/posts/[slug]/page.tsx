@@ -3,7 +3,7 @@ export const dynamic = 'force-static';
 import { notFound } from 'next/navigation';
 
 import type { Language, PostInfo } from '@/types';
-import { LANGUAGE_TO_LOCALE_MAP } from '@/config';
+import { CONFIG, LANGUAGE_TO_LOCALE_MAP } from '@/config';
 import { getPostData, checkPostExistence, getPostsInfo } from '@/lib/posts';
 import { parseMDX } from '@/lib/mdx';
 import { loadPostComponents } from '@/lib/posts';
@@ -11,9 +11,6 @@ import { loadPostComponents } from '@/lib/posts';
 import PostPageClient from '@/components/features/post/PostPageClient';
 
 type Params = Promise<{ lang: Language; slug: string }>;
-
-const SOCIAL_HANDLE = '@kir4che';
-const SITE_NAME = 'kir4che';
 
 export async function generateStaticParams() {
   const posts = (await getPostsInfo()) as PostInfo[];
@@ -45,8 +42,8 @@ export async function generateMetadata({ params }: { params: Params }) {
     title,
     description,
     publishedTime: new Date(date).toISOString(),
-    authors: [{ name: SITE_NAME, url: baseUrl }],
-    publisher: SITE_NAME,
+    authors: [{ name: CONFIG.siteInfo.name, url: baseUrl }],
+    publisher: CONFIG.siteInfo.name,
     keywords: tags?.length ? tags : undefined,
     alternates: {
       canonical: postUrl,
@@ -60,7 +57,7 @@ export async function generateMetadata({ params }: { params: Params }) {
       title,
       description,
       url: postUrl,
-      siteName: SITE_NAME,
+      siteName: CONFIG.siteInfo.name,
       locale,
       images: [
         {
@@ -73,8 +70,6 @@ export async function generateMetadata({ params }: { params: Params }) {
     },
     twitter: {
       card: 'summary_large_image',
-      site: SOCIAL_HANDLE,
-      creator: SOCIAL_HANDLE,
       title,
       description,
       images: [ogImage],

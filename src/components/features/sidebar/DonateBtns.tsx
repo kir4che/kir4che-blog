@@ -1,3 +1,4 @@
+import { CONFIG } from '@/config';
 import ExternalLink from '@/components/ui/ExternalLink';
 
 const DonateBtns: React.FC = () => (
@@ -16,7 +17,7 @@ const DonateBtns: React.FC = () => (
         ˚:✧｡･
       </ExternalLink>
       <ExternalLink
-        href='https://ko-fi.com/kir4che'
+        href={`https://ko-fi.com/${CONFIG.siteInfo.name}`}
         title='Support me on Ko-fi'
         className='text-right text-sm text-[#FB7364] hover:text-[#F74C37] hover:no-underline dark:text-[#FB7364]'
       >

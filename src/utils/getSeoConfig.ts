@@ -1,12 +1,10 @@
 import { Metadata } from 'next';
 
-import { CONFIG } from '@/config';
-import { LANGUAGE_TO_LOCALE_MAP } from '@/config';
+import { CONFIG, LANGUAGE_TO_LOCALE_MAP } from '@/config';
 
 export const getSeoConfig = (lang: string): Metadata => {
   const url = process.env.NEXT_PUBLIC_API_URL || 'https://kir4che.com';
-  const title = CONFIG.siteInfo.blog.title;
-  const description = CONFIG.siteInfo.blog.description;
+  const { title, description } = CONFIG.siteInfo.blog;
   const locale = LANGUAGE_TO_LOCALE_MAP[lang] ?? 'zh-TW';
 
   return {
@@ -16,17 +14,14 @@ export const getSeoConfig = (lang: string): Metadata => {
       template: `%s | ${title}`,
     },
     description,
-    authors: [{ name: 'kir4che', url }],
-    publisher: 'kir4che',
+    authors: [{ name: CONFIG.siteInfo.name, url }],
+    publisher: CONFIG.siteInfo.name,
     applicationName: title,
     generator: 'Next.js',
     keywords: ['kir4che', 'blog', '部落格', 'frontend', '前端開發', '前端技術分享', '生活紀錄'],
     alternates: {
       canonical: `${url}/${lang}`,
-      languages: {
-        'zh-TW': `${url}/tw`,
-        en: `${url}/en`,
-      },
+      languages: CONFIG.paths.languagePaths,
     },
     openGraph: {
       type: 'website',
@@ -48,8 +43,6 @@ export const getSeoConfig = (lang: string): Metadata => {
     },
     twitter: {
       card: 'summary_large_image',
-      site: '@kir4che',
-      creator: '@kir4che',
       title,
       description,
       images: {
