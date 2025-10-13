@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 
-import type { Language, PaginationData, PostInfo } from '@/types';
+import type { PaginationData, PostInfo } from '@/types';
 import { usePagination } from '@/hooks/usePagination';
 
 import PostPreview from '@/components/features/post/PostPreview';

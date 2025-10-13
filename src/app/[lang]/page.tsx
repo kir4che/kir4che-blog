@@ -1,9 +1,11 @@
+export const dynamic = 'force-static';
 export const revalidate = 3600;
 
 import { getTranslations } from 'next-intl/server';
 import { ChevronRight } from 'lucide-react';
 
 import type { Language } from '@/types';
+import { LANGUAGES } from '@/config';
 import { Link } from '@/i18n/navigation';
 import { getSiteData } from '@/lib/siteData';
 
@@ -13,6 +15,10 @@ import Announcement from '@/components/ui/Announcement';
 type Params = Promise<{
   lang: Language;
 }>;
+
+export async function generateStaticParams() {
+  return LANGUAGES.map((lang) => ({ lang }));
+}
 
 const Home = async ({ params }: { params: Params }) => {
   const { lang } = await params;

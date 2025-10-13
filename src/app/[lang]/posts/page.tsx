@@ -1,7 +1,8 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
 import type { Language } from '@/types';
-import { getPaginatedPostsWithFilter } from '@/lib/posts';
+import { LANGUAGES } from '@/config';
+import { getPaginatedPostsWithFilter, getPostsInfo } from '@/lib/posts';
 
 import PostsPageClient from './client';
 
@@ -12,6 +13,26 @@ type Params = Promise<{
 type SearchParams = Promise<{
   page?: string;
 }>;
+
+export async function generateStaticParams() {
+  const allParams: Array<{ lang: Language; page: string }> = [];
+
+  for (const lang of LANGUAGES) {
+    const posts = await getPostsInfo(lang);
+    const postsArray = Array.isArray(posts) ? posts : [];
+    const totalPages = Math.ceil(postsArray.length / 10); // 假設每頁 10 篇
+
+    // 生成所有分頁
+    for (let page = 1; page <= totalPages; page++) {
+      allParams.push({
+        lang,
+        page: page.toString(),
+      });
+    }
+  }
+
+  return allParams;
+}
 
 const PostsPage = async ({
   params,

@@ -3,8 +3,18 @@ export const CONFIG = {
     name: 'kir4che',
     email: 'mollydcxxiii@gmail.com',
     blog: {
-      title: 'kir4che blog',
-      description: "kir4che's blog",
+      title: {
+        tw: 'kir4che 部落格',
+        en: 'kir4che Blog',
+      },
+      description: {
+        tw: '記錄在學習、前端開發、工作與生活中的所見所想。',
+        en: 'A space for sharing thoughts and experiences from learning, front-end development, work, and life.',
+      },
+      siteName: {
+        tw: 'kir4che 部落格',
+        en: 'kir4che Blog',
+      },
     },
     socialLinks: {
       youtube: 'https://www.youtube.com/@kir4che',

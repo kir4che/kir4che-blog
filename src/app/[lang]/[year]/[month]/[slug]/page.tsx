@@ -72,7 +72,7 @@ export async function generateMetadata({ params }: { params: Params }) {
     availableLangs.length > 0 ? availableLangs : [lang];
 
   const ogImage = new URL(
-    `api/og?title=${encodeURIComponent(title)}&tags=${encodeURIComponent(
+    `api/og?lang=${lang}&title=${encodeURIComponent(title)}&tags=${encodeURIComponent(
       tags?.join(',') || ''
     )}`,
     metadataBase
@@ -147,8 +147,12 @@ export async function generateMetadata({ params }: { params: Params }) {
       url: canonicalUrl,
       title,
       description,
-      siteName: baseMetadata.openGraph?.siteName ?? CONFIG.siteInfo.blog.title,
+      siteName:
+        baseMetadata.openGraph?.siteName ??
+        CONFIG.siteInfo.blog.siteName?.[lang] ??
+        CONFIG.siteInfo.blog.siteName?.[DEFAULT_LANGUAGE],
       locale: LANGUAGE_TO_LOCALE_MAP[lang] ?? 'zh-TW',
+      authors: [CONFIG.siteInfo.name],
       ...(openGraphLocaleAlternates.length
         ? { localeAlternate: openGraphLocaleAlternates }
         : {}),
@@ -166,6 +170,7 @@ export async function generateMetadata({ params }: { params: Params }) {
       ...baseMetadata.twitter,
       title,
       description,
+      creator: baseMetadata.creator ?? CONFIG.siteInfo.name,
       images: [
         {
           url: ogImage,
