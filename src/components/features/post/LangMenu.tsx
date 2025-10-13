@@ -4,16 +4,27 @@ import { Languages } from 'lucide-react';
 
 import type { Language } from '@/types';
 import { cn } from '@/lib/style';
+import { getLocalizedPostPath } from '@/utils/postPaths';
 
 interface LangMenuProps {
   t: (key: string) => string;
   curLang: Language;
   langs: Language[];
   slug: string;
+  date?: string;
+  metadata?: Partial<Record<Language, { date?: string }>>;
   className?: string;
 }
 
-const LangMenu = ({ t, curLang, langs, slug, className }: LangMenuProps) => {
+const LangMenu = ({
+  t,
+  curLang,
+  langs,
+  slug,
+  date,
+  metadata = {},
+  className,
+}: LangMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -74,7 +85,11 @@ const LangMenu = ({ t, curLang, langs, slug, className }: LangMenuProps) => {
         {langs.map((lang) => (
           <Link
             key={lang}
-            href={`/${lang}/posts/${slug}`}
+            href={getLocalizedPostPath({
+              lang,
+              date: metadata[lang]?.date ?? date,
+              slug,
+            })}
             className='text-text-primary block w-full rounded px-4 py-2 hover:bg-pink-50 hover:font-medium hover:text-pink-600 dark:hover:bg-pink-900/5'
             onClick={() => {
               clearTimeoutSafely();

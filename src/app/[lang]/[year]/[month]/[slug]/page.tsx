@@ -1,26 +1,57 @@
 export const dynamic = 'force-static';
 
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 import type { Language, PostInfo } from '@/types';
-import { CONFIG, LANGUAGE_TO_LOCALE_MAP, DEFAULT_LANGUAGE } from '@/config';
+import {
+  CONFIG,
+  LANGUAGE_TO_LOCALE_MAP,
+  DEFAULT_LANGUAGE,
+  LANGUAGES,
+} from '@/config';
 import { getSeoConfig } from '@/utils/getSeoConfig';
 import { getPostData, checkPostExistence, getPostsInfo } from '@/lib/posts';
 import { parseMDX } from '@/lib/mdx';
 import { loadPostComponents } from '@/lib/posts';
+import {
+  getAbsolutePostUrl,
+  getLocalizedPostPath,
+  getPostDateSegments,
+} from '@/utils/postPaths';
 
-import PostPageClient from '@/components/features/post/PostPageClient';
+import PostLayout from '@/components/features/post/PostLayout';
 
-type Params = Promise<{ lang: Language; slug: string }>;
+type Params = Promise<{
+  lang: Language;
+  year: string;
+  month: string;
+  slug: string;
+}>;
 
 export async function generateStaticParams() {
-  const posts = (await getPostsInfo()) as PostInfo[];
-  return posts
-    .filter(
-      (post): post is PostInfo =>
-        post !== null && post.slug !== undefined && post.lang !== undefined
-    )
-    .map(({ lang, slug }) => ({ lang, slug }));
+  const postsByLang = await Promise.all(
+    LANGUAGES.map(async (lang) => {
+      const posts = await getPostsInfo(lang);
+      return Array.isArray(posts) ? posts : [];
+    })
+  );
+
+  return postsByLang.flatMap((posts) =>
+    posts.flatMap((post) => {
+      if (!post?.slug || !post?.date) return [];
+      const segments = getPostDateSegments(post.date);
+      if (!segments) return [];
+
+      return [
+        {
+          lang: post.lang,
+          slug: post.slug,
+          year: segments.year,
+          month: segments.month,
+        },
+      ];
+    })
+  );
 }
 
 export async function generateMetadata({ params }: { params: Params }) {
@@ -34,42 +65,36 @@ export async function generateMetadata({ params }: { params: Params }) {
   if (!meta?.title || !meta?.date) return baseMetadata;
   const { title, description, date, tags } = meta;
 
-  const { langs: availableLangs } = await checkPostExistence(lang, slug);
+  const { langs: availableLangs, metadata: languageMetadata } =
+    await checkPostExistence(lang, slug);
+
   const languagesForAlternates =
     availableLangs.length > 0 ? availableLangs : [lang];
 
-  const languagePath =
-    CONFIG.paths.languagePaths[
-      lang as keyof typeof CONFIG.paths.languagePaths
-    ] ?? `/${lang}`;
   const ogImage = new URL(
     `api/og?title=${encodeURIComponent(title)}&tags=${encodeURIComponent(
       tags?.join(',') || ''
     )}`,
     metadataBase
   ).toString();
-  const languageAlternates = languagesForAlternates.reduce<
-    Record<string, string>
-  >((acc, languageKey) => {
-    const languagePath =
-      CONFIG.paths.languagePaths[
-        languageKey as keyof typeof CONFIG.paths.languagePaths
-      ];
-    if (languagePath)
-      acc[languageKey] = new URL(
-        `${languagePath.replace(/^\//, '')}/posts/${slug}`,
-        metadataBase
-      ).toString();
-    return acc;
-  }, {});
+
+  const languageAlternates = Object.fromEntries(
+    languagesForAlternates.map((languageKey) => {
+      const alternateUrl = getAbsolutePostUrl({
+        metadataBase,
+        lang: languageKey,
+        date: languageMetadata[languageKey]?.date ?? date,
+        slug,
+      });
+
+      return [languageKey, alternateUrl];
+    })
+  );
 
   const defaultLangUrl =
     languageAlternates[DEFAULT_LANGUAGE] ??
     languageAlternates[lang] ??
-    new URL(
-      `${languagePath.replace(/^\//, '')}/posts/${slug}`,
-      metadataBase
-    ).toString();
+    getAbsolutePostUrl({ metadataBase, lang, date, slug });
 
   const openGraphLocaleAlternates = Array.from(
     new Set(
@@ -93,6 +118,13 @@ export async function generateMetadata({ params }: { params: Params }) {
     new Set([...baseKeywords, ...normalizedTags])
   ).slice(0, 10);
 
+  const canonicalUrl = getAbsolutePostUrl({
+    metadataBase,
+    lang,
+    date,
+    slug,
+  });
+
   return {
     ...baseMetadata,
     metadataBase,
@@ -103,10 +135,7 @@ export async function generateMetadata({ params }: { params: Params }) {
       : baseMetadata.keywords,
     alternates: {
       ...baseMetadata.alternates,
-      canonical: new URL(
-        `${languagePath.replace(/^\//, '')}/posts/${slug}`,
-        metadataBase
-      ).toString(),
+      canonical: canonicalUrl,
       languages: {
         ...languageAlternates,
         'x-default': defaultLangUrl,
@@ -115,10 +144,7 @@ export async function generateMetadata({ params }: { params: Params }) {
     openGraph: {
       ...baseMetadata.openGraph,
       type: 'article',
-      url: new URL(
-        `${languagePath.replace(/^\//, '')}/posts/${slug}`,
-        metadataBase
-      ).toString(),
+      url: canonicalUrl,
       title,
       description,
       siteName: baseMetadata.openGraph?.siteName ?? CONFIG.siteInfo.blog.title,
@@ -158,7 +184,7 @@ export async function generateMetadata({ params }: { params: Params }) {
 }
 
 const PostPage = async ({ params }: { params: Params }) => {
-  const { lang, slug } = await params;
+  const { lang, slug, year, month } = await params;
 
   const [otherLangs, post] = await Promise.all([
     checkPostExistence(lang, slug),
@@ -167,12 +193,23 @@ const PostPage = async ({ params }: { params: Params }) => {
 
   if (!post) return notFound();
 
+  const segments = getPostDateSegments(post.date);
+  if (segments && (segments.year !== year || segments.month !== month)) {
+    const targetPath = getLocalizedPostPath({
+      lang,
+      date: post.date,
+      slug: post.slug,
+    });
+
+    redirect(targetPath);
+  }
+
   const { mdxSource, headings } = await parseMDX(post.content);
 
   const extraComponents = await loadPostComponents(slug);
 
   return (
-    <PostPageClient
+    <PostLayout
       post={{ ...post, imageMetas: post.imageMetas ?? {} }}
       headings={headings}
       otherLangs={otherLangs}

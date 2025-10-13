@@ -7,6 +7,7 @@ import type { PostInfo, PostMeta } from '@/types';
 import { Link } from '@/i18n/navigation';
 import { useCategoryInfoMap } from '@/hooks/useCategoryInfoMap';
 import { cn } from '@/lib/style';
+import { getPostPath } from '@/utils/postPaths';
 
 import CategoryBadge from '@/components/features/category/CategoryBadge';
 import PostMetaInfo from '@/components/features/post/PostMetaInfo';
@@ -28,7 +29,7 @@ const PostPreview: React.FC<PostPreviewProps> = memo(
     if (variant === 'list')
       return (
         <Link
-          href={`/posts/${post.slug}`}
+          href={getPostPath({ date: post.date, slug: post.slug })}
           className={cn('group relative block h-full', className)}
         >
           <LockOverlay hasPassword={post.hasPassword} />
@@ -63,7 +64,7 @@ const PostPreview: React.FC<PostPreviewProps> = memo(
 
     return (
       <Link
-        href={`/posts/${post.slug}`}
+        href={getPostPath({ date: post.date, slug: post.slug })}
         className={cn('block h-full overflow-hidden rounded-lg', className)}
       >
         <article className='group relative h-full cursor-pointer'>

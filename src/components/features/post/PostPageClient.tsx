@@ -15,7 +15,11 @@ const MDXContent = dynamic(() => import('@/components/mdx/MDXContent'), {
 interface PostPageClientProps {
   post: PostMeta & { imageMetas: MdxContent['imageMetas'] };
   headings: { id: string; text: string; level: number }[];
-  otherLangs: { exist: boolean; langs: Language[] };
+  otherLangs: {
+    exist: boolean;
+    langs: Language[];
+    metadata: Partial<Record<Language, { date?: string }>>;
+  };
   mdxSource: MdxContent['content'];
   extraComponents?: MdxContent['extraComponents'];
 }

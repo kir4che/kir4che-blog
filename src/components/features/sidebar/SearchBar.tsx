@@ -8,8 +8,9 @@ import { debounce } from '@/utils/debounce';
 import type { Language, PostMeta } from '@/types';
 import { Link } from '@/i18n/navigation';
 import { useAlert } from '@/contexts/AlertContext';
+import { getPostPath } from '@/utils/postPaths';
 
-type Post = Pick<PostMeta, 'slug' | 'title'>;
+type Post = Pick<PostMeta, 'slug' | 'title' | 'date'>;
 
 const SearchBar: React.FC = () => {
   const lang = useLocale() as Language;
@@ -71,10 +72,10 @@ const SearchBar: React.FC = () => {
       {searchQuery && (
         <ul className='bg-bg-secondary absolute top-9 z-10 max-h-60 w-full overflow-auto rounded-md text-sm shadow-md'>
           {searchResults?.length ? (
-            searchResults.map(({ slug, title }) => (
+            searchResults.map(({ slug, title, date }) => (
               <li key={slug} className='p-2'>
                 <Link
-                  href={`/posts/${slug}`}
+                  href={getPostPath({ date, slug })}
                   className='line-clamp-1 block rounded-md px-2 py-1 transition-colors hover:bg-pink-50 hover:text-pink-800 dark:hover:bg-pink-600/15 dark:hover:text-white'
                   onClick={() => setSearchQuery('')}
                 >

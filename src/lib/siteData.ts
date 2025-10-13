@@ -7,7 +7,7 @@ interface SiteDataEntry {
   posts: PostInfo[];
   categories: Category[];
   tags: Array<Pick<Tag, 'name' | 'slug' | 'postCount'>>;
-  popularPosts: Array<{ slug: string; title: string }>;
+  popularPosts: Array<{ slug: string; title: string; date?: string }>;
 }
 
 type SiteData = Record<Language, SiteDataEntry>;
@@ -57,7 +57,21 @@ const normalizeSiteDataEntry = (entry: any): SiteDataEntry => {
     posts: Array.isArray(entry.posts) ? entry.posts : [],
     categories: normalizedCategories,
     tags: Array.isArray(entry.tags) ? entry.tags : [],
-    popularPosts: Array.isArray(entry.popularPosts) ? entry.popularPosts : [],
+    popularPosts: Array.isArray(entry.popularPosts)
+      ? entry.popularPosts
+          .filter(
+            (item: any) =>
+              item &&
+              typeof item === 'object' &&
+              typeof item.slug === 'string' &&
+              typeof item.title === 'string'
+          )
+          .map((item: any) => ({
+            slug: String(item.slug),
+            title: String(item.title),
+            ...(item.date ? { date: String(item.date) } : {}),
+          }))
+      : [],
   };
 };
 
@@ -92,6 +106,21 @@ export const getSiteData = (
 };
 
 export const getSidebarData = (lang: Language) => {
-  const { categories, tags, popularPosts } = getSiteData(lang);
-  return { categories, tags, popularPosts };
+  const { categories, tags, popularPosts, posts } = getSiteData(lang);
+
+  const postDateMap = new Map(posts.map(({ slug, date }) => [slug, date]));
+
+  const popularPostsWithDate = popularPosts
+    .map(({ slug, title, date }) => {
+      const resolvedDate = date ?? postDateMap.get(slug);
+      if (!resolvedDate) return null;
+
+      return { slug, title, date: resolvedDate };
+    })
+    .filter(
+      (item): item is { slug: string; title: string; date: string } =>
+        item !== null
+    );
+
+  return { categories, tags, popularPosts: popularPostsWithDate };
 };

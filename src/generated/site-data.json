@@ -8,7 +8,7 @@
         "date": "2025-10-04T00:00:00.000Z",
         "categories": ["Git"],
         "tags": ["Git"],
-        "wordCount": 1653,
+        "wordCount": 1647,
         "lang": "tw",
         "featured": false,
         "coverImage": "https://cdni.fancaps.net/file/fancaps-animeimages/17947731.jpg",
@@ -38,7 +38,7 @@
         "hasPassword": false
       },
       {
-        "slug": "japan-nagoya-2025-trip",
+        "slug": "japan-nagoya-5-day-trip",
         "title": "2025 日本名古屋 🇯🇵 5天4夜自由行攻略：吉卜力公園、合掌村景點與美食記錄",
         "description": "計畫去名古屋自由行嗎？這篇分享我 5 天 4 夜的畢業旅行行程，包含吉卜力公園、高山老街、白川鄉合掌村等景點，還有麵家獅子丸、味噌炸豬排等必吃美食心得與花費分析。",
         "date": "2025-02-09",
@@ -74,7 +74,7 @@
         "hasPassword": false
       },
       {
-        "slug": "japan-kyushu-2024-trip",
+        "slug": "japan-kyushu-5-day-trip",
         "title": "2024 日本福岡、熊本 🇯🇵 5天4夜行程規劃、景點與美食全紀錄",
         "description": "計畫去日本福岡、熊本自由行嗎？這篇分享我 5 天 4 夜的詳細行程規劃，包含相島貓島、太宰府、海之中道水族館、阿蘇農場樂園等必去景點，以及 ShinShin 拉麵、蜂樂饅頭等美食心得與總花費分析。",
         "date": "2024-12-21T00:00:00.000Z",
@@ -98,7 +98,7 @@
         "hasPassword": false
       },
       {
-        "slug": "korea-seoul-2024-trip",
+        "slug": "korea-seoul-5-day-trip",
         "title": "2024 韓國首爾 🇰🇷 5天4夜行程規劃 | T1 朝聖 & 弘大景點美食全紀錄",
         "description": "首次來韓國，想體驗韓服、朝聖 T1 嗎？這篇分享我 5 天 4 夜的首爾自由行行程，包含景福宮、T1 Base Camp 等景點，以及湯飯、馬鈴薯排骨湯等必吃美食心得與花費分析。",
         "date": "2024-11-15T00:00:00.000Z",
@@ -340,15 +340,15 @@
         "title": "只使用 CSS！拆解寶可夢 3D 閃卡特效"
       },
       {
-        "slug": "japan-nagoya-2025-trip",
+        "slug": "japan-nagoya-5-day-trip",
         "title": "2025 日本名古屋 🇯🇵 5天4夜自由行攻略：吉卜力公園、合掌村景點與美食記錄"
       },
       {
-        "slug": "japan-kyushu-2024-trip",
+        "slug": "japan-kyushu-5-day-trip",
         "title": "2024 日本福岡、熊本 🇯🇵 5天4夜行程規劃、景點與美食全紀錄"
       },
       {
-        "slug": "korea-seoul-2024-trip",
+        "slug": "korea-seoul-5-day-trip",
         "title": "2024 韓國首爾 🇰🇷 5天4夜行程規劃 | T1 朝聖 & 弘大景點美食全紀錄"
       }
     ]
@@ -356,7 +356,7 @@
   "en": {
     "posts": [
       {
-        "slug": "japan-nagoya-2025-trip",
+        "slug": "japan-nagoya-5-day-trip",
         "title": "Nagoya & Shirakawa-go 5-Day Trip Itinerary 🇯🇵 (2025 Travel Guide)",
         "description": "Planning a 5-day trip to Nagoya? This guide covers a complete itinerary with must-visit spots like Ghibli Park and Shirakawa-go, food reviews for Menya Shishimaru and Miso Tonkatsu, and a full cost breakdown.",
         "date": "2025-02-09",
@@ -380,7 +380,7 @@
         "hasPassword": false
       },
       {
-        "slug": "japan-kyushu-2024-trip",
+        "slug": "japan-kyushu-5-day-trip",
         "title": "Fukuoka & Kumamoto 5-Day Trip Itinerary 🇯🇵 (2024 Travel Guide)",
         "description": "Planning a 5-day trip to Fukuoka and Kumamoto? Here's a complete itinerary and travel guide covering must-visit spots like Ainoshima Cat Island, local food like ShinShin Ramen, and a full cost breakdown.",
         "date": "2024-12-21T00:00:00.000Z",
@@ -393,7 +393,7 @@
         "hasPassword": false
       },
       {
-        "slug": "korea-seoul-2024-trip",
+        "slug": "korea-seoul-5-day-trip",
         "title": "Seoul 5-Day Trip Itinerary 🇰🇷 (2024 Travel Guide)",
         "description": "First time in Korea and a T1 fan? This 5-day Seoul itinerary covers a T1 pilgrimage, Hongdae highlights, a Hanbok experience at Gyeongbokgung Palace, must-try food reviews, and a full cost breakdown.",
         "date": "2024-11-15T00:00:00.000Z",
@@ -506,15 +506,15 @@
     ],
     "popularPosts": [
       {
-        "slug": "japan-nagoya-2025-trip",
+        "slug": "japan-nagoya-5-day-trip",
         "title": "Nagoya & Shirakawa-go 5-Day Trip Itinerary 🇯🇵 (2025 Travel Guide)"
       },
       {
-        "slug": "japan-kyushu-2024-trip",
+        "slug": "japan-kyushu-5-day-trip",
         "title": "Fukuoka & Kumamoto 5-Day Trip Itinerary 🇯🇵 (2024 Travel Guide)"
       },
       {
-        "slug": "korea-seoul-2024-trip",
+        "slug": "korea-seoul-5-day-trip",
         "title": "Seoul 5-Day Trip Itinerary 🇰🇷 (2024 Travel Guide)"
       }
     ]

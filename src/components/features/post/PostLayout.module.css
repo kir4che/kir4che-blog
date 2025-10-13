@@ -1,10 +1,16 @@
 .articleContent {
   & blockquote p {
-    @apply my-4;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
   }
 
   & a {
-    @apply hover:underline hover:underline-offset-2;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
   }
 
   & ul ul {
@@ -16,10 +22,22 @@
   }
 
   & code {
-    @apply font-mono text-sm;
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+      'Courier New', monospace;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
 
     &:not(pre code) {
-      @apply dark:bg-text-gray-lighter/20 bg-gray-100/80 px-1 py-0.5 font-mono text-pink-900 dark:text-pink-300;
+      background-color: rgba(243, 244, 246, 0.8);
+      padding: 0.125rem 0.25rem;
+      font-family: inherit;
+      color: #881337; /* pink-900 */
     }
   }
+}
+
+:global(.dark) .articleContent code:not(pre code) {
+  background-color: rgba(204, 204, 204, 0.2);
+  color: #fec4d1; /* pink-300 */
 }
