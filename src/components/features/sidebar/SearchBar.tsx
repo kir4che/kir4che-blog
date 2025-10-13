@@ -8,7 +8,7 @@ import { debounce } from '@/utils/debounce';
 import type { Language, PostMeta } from '@/types';
 import { Link } from '@/i18n/navigation';
 import { useAlert } from '@/contexts/AlertContext';
-import { getPostPath } from '@/utils/postPaths';
+import { getPostPath } from '@/lib/paths';
 
 type Post = Pick<PostMeta, 'slug' | 'title' | 'date'>;
 

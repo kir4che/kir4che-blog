@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { Sparkles } from 'lucide-react';
 
 import { Link } from '@/i18n/navigation';
-import { getPostPath } from '@/utils/postPaths';
+import { getPostPath } from '@/lib/paths';
 
 type PopularPost = {
   slug: string;

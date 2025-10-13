@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 
 import type { Language } from '@/types';
 import { LANGUAGES, CONFIG } from '@/config';
-import { getSeoConfig } from '@/utils/getSeoConfig';
+import { getSeoConfig } from '@/lib/seo';
 
 import AboutPageClient from './client';
 

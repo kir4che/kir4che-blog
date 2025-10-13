@@ -7,7 +7,7 @@ import type { PostInfo, PostMeta } from '@/types';
 import { Link } from '@/i18n/navigation';
 import { useCategoryInfoMap } from '@/hooks/useCategoryInfoMap';
 import { cn } from '@/lib/style';
-import { getPostPath } from '@/utils/postPaths';
+import { getPostPath } from '@/lib/paths';
 
 import CategoryBadge from '@/components/features/category/CategoryBadge';
 import PostMetaInfo from '@/components/features/post/PostMetaInfo';

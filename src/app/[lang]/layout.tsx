@@ -14,7 +14,7 @@ import { Analytics } from '@vercel/analytics/next';
 import type { Language } from '@/types';
 import routing from '@/i18n/routing';
 import Providers from '@/contexts/Providers';
-import { getSeoConfig } from '@/utils/getSeoConfig';
+import { getSeoConfig } from '@/lib/seo';
 
 import Header from '@/components/layouts/Header';
 import Footer from '@/components/layouts/Footer';
