@@ -1,6 +1,14 @@
 import { ImageResponse } from '@vercel/og';
 
-import { CONFIG } from '@/config';
+import { CONFIG, LANGUAGES, DEFAULT_LANGUAGE } from '@/config';
+
+const getLocalizedValue = (map: Record<string, string>, lang: string) =>
+  map[lang] ?? map[DEFAULT_LANGUAGE];
+
+const isSupportedLanguage = (
+  value: string | null
+): value is (typeof LANGUAGES)[number] =>
+  value !== null && (LANGUAGES as readonly string[]).includes(value);
 
 // @vercel/og 只支援在 Edge Runtime 上運行
 export const runtime = 'edge';
@@ -14,9 +22,11 @@ const removeEmojis = (str: string) => {
 
 export const GET = async (req: Request) => {
   const { searchParams } = new URL(req.url);
-  const title = removeEmojis(
-    searchParams.get('title') || CONFIG.siteInfo.blog.title
-  );
+  const langParam = searchParams.get('lang');
+  const lang = isSupportedLanguage(langParam) ? langParam : DEFAULT_LANGUAGE;
+  const defaultTitle = getLocalizedValue(CONFIG.siteInfo.blog.title, lang);
+  const siteName = getLocalizedValue(CONFIG.siteInfo.blog.siteName, lang);
+  const title = removeEmojis(searchParams.get('title') || defaultTitle);
   const tags =
     searchParams
       .get('tags')
@@ -117,7 +127,7 @@ export const GET = async (req: Request) => {
               letterSpacing: '1px',
             }}
           >
-            {CONFIG.siteInfo.name}
+            {siteName}
           </div>
         </div>
         <div
@@ -206,7 +216,7 @@ export const GET = async (req: Request) => {
                 boxShadow: '0 0 8px rgba(233, 30, 99, 0.5)',
               }}
             />
-            kir4che.com
+            {CONFIG.siteInfo.name}
           </div>
         </div>
       </div>

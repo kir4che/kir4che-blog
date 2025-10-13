@@ -2,6 +2,9 @@ import { Metadata } from 'next';
 
 import { CONFIG, LANGUAGE_TO_LOCALE_MAP, DEFAULT_LANGUAGE } from '@/config';
 
+const getLocalizedValue = (map: Record<string, string>, lang: string) =>
+  map[lang] ?? map[DEFAULT_LANGUAGE];
+
 const KEYWORDS_BY_LANG: Record<string, string[]> = {
   tw: [
     'kir4che',
@@ -9,7 +12,6 @@ const KEYWORDS_BY_LANG: Record<string, string[]> = {
     '前端開發',
     'React 教學',
     'JavaScript 教學',
-    '生活紀錄',
   ],
   en: [
     'kir4che',
@@ -17,21 +19,29 @@ const KEYWORDS_BY_LANG: Record<string, string[]> = {
     'frontend development',
     'React tutorials',
     'JavaScript tutorials',
-    'personal blog',
   ],
 };
 
 export const getSeoConfig = (lang: string): Metadata => {
-  const { title, description } = CONFIG.siteInfo.blog;
+  const blogTitle = getLocalizedValue(CONFIG.siteInfo.blog.title, lang);
+  const blogDescription = getLocalizedValue(
+    CONFIG.siteInfo.blog.description,
+    lang
+  );
+  const blogSiteName = getLocalizedValue(CONFIG.siteInfo.blog.siteName, lang);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL!;
 
+  const localeToUrl = Object.fromEntries(
+    Object.entries(CONFIG.paths.languagePaths).map(([languageKey, path]) => [
+      LANGUAGE_TO_LOCALE_MAP[
+        languageKey as keyof typeof LANGUAGE_TO_LOCALE_MAP
+      ] || languageKey,
+      `${siteUrl}${path}`,
+    ])
+  ) as Record<string, string>;
+
   const languageAlternates = {
-    ...Object.fromEntries(
-      Object.entries(CONFIG.paths.languagePaths).map(([languageKey, path]) => [
-        languageKey,
-        `${siteUrl}${path}`,
-      ])
-    ),
+    ...localeToUrl,
     'x-default': siteUrl,
   } satisfies Record<string, string>;
 
@@ -43,7 +53,7 @@ export const getSeoConfig = (lang: string): Metadata => {
   const isSecureContext = defaultOgImage.startsWith('https://');
   const baseImage = {
     url: defaultOgImage,
-    alt: title,
+    alt: blogTitle,
     width: 1200,
     height: 630,
   } as const;
@@ -53,32 +63,58 @@ export const getSeoConfig = (lang: string): Metadata => {
     ...(isSecureContext ? { secureUrl: defaultOgImage } : {}),
   };
 
-  const rawKeywords =
-    KEYWORDS_BY_LANG[lang] ?? KEYWORDS_BY_LANG[DEFAULT_LANGUAGE] ?? [];
-  const keywords = Array.from(new Set(rawKeywords)).slice(0, 10);
-
   return {
     metadataBase: new URL(siteUrl),
     title: {
-      default: title,
-      template: `%s | ${title}`,
+      default: blogTitle,
+      template: `%s | ${blogTitle}`,
     },
-    description,
+    description: blogDescription,
     authors: [{ name: CONFIG.siteInfo.name, url: siteUrl }],
+    creator: CONFIG.siteInfo.name,
     publisher: CONFIG.siteInfo.name,
-    applicationName: title,
-    generator: 'Next.js',
-    keywords: ['kir4che', 'blog', '部落格', 'frontend', '前端開發', '前端技術分享', '生活紀錄'],
+    applicationName: blogTitle,
+    generator: 'Next.js 15.3.1',
+    referrer: 'origin-when-cross-origin',
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+    formatDetection: {
+      email: false,
+      address: false,
+      telephone: false,
+    },
+    verification: {
+      google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+    },
+    keywords:
+      KEYWORDS_BY_LANG[lang] ?? KEYWORDS_BY_LANG[DEFAULT_LANGUAGE] ?? [],
     alternates: {
-      canonical: languageAlternates[lang] ?? `${siteUrl}/${lang}`,
+      canonical:
+        localeToUrl[
+          LANGUAGE_TO_LOCALE_MAP[lang as keyof typeof LANGUAGE_TO_LOCALE_MAP] ||
+            lang
+        ] ?? `${siteUrl}/${lang}`,
       languages: languageAlternates,
     },
     openGraph: {
       type: 'website',
-      url: languageAlternates[lang] ?? `${siteUrl}/${lang}`,
-      title,
-      description,
-      siteName: title,
+      url:
+        localeToUrl[
+          LANGUAGE_TO_LOCALE_MAP[lang as keyof typeof LANGUAGE_TO_LOCALE_MAP] ||
+            lang
+        ] ?? `${siteUrl}/${lang}`,
+      title: blogTitle,
+      description: blogDescription,
+      siteName: blogSiteName,
       locale:
         LANGUAGE_TO_LOCALE_MAP[lang as keyof typeof LANGUAGE_TO_LOCALE_MAP] ??
         'zh-TW',
@@ -89,8 +125,8 @@ export const getSeoConfig = (lang: string): Metadata => {
     },
     twitter: {
       card: 'summary_large_image',
-      title,
-      description,
+      title: blogTitle,
+      description: blogDescription,
       images: [baseImage],
     },
     icons: {
