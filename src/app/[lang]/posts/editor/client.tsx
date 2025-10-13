@@ -10,6 +10,7 @@ import { X } from 'lucide-react';
 import type { Language } from '@/types';
 import { categoryMap } from '@/config/taxonomy';
 import { useAlert } from '@/contexts/AlertContext';
+import { getLocalizedPostPath } from '@/utils/postPaths';
 
 import Checkbox from '@/components/ui/Checkbox';
 import InputField from '@/components/ui/InputField';
@@ -93,9 +94,12 @@ const EditorClient = ({ params }: EditorClientProps) => {
       });
 
       if (res.ok) {
-        const { slug } = await res.json();
+        const { slug, date } = await res.json();
         if (isDraft) router.push(`/${lang}/posts`);
-        else router.push(`/${lang}/posts/${slug}`);
+        else
+          router.push(
+            getLocalizedPostPath({ lang, date: date ?? undefined, slug })
+          );
       }
     } catch (err) {
       showError(err instanceof Error ? err.message : 'Unknown error.');

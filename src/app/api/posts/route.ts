@@ -65,6 +65,7 @@ export const GET = async (req: Request) => {
       slug: post.slug,
       title: post.title,
       description: post.description,
+      date: post.date,
     }));
 
     return responseWithCache({ posts: searchResults });

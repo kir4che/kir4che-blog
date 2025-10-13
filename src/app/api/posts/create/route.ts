@@ -8,14 +8,14 @@ import type { Language, Post } from '@/types';
 type CreatePostRequest = Omit<
   Post,
   'date' | 'wordCount' | 'updatedAt' | 'hasPassword' | 'mdxSource'
->;
+> & { date?: string };
 
 // 產生 .mdx 文章內容，包含 yaml 配置區。
 const createMDXContent = (data: CreatePostRequest): string => {
   const frontmatter: any = {
     title: data.title,
     description: data.description,
-    date: new Date().toISOString(),
+    date: data.date ?? new Date().toISOString(),
     tags: data.tags,
     categories: data.categories,
     draft: data.draft || false,
@@ -135,6 +135,8 @@ export const POST = async (req: Request) => {
     const filename = lang === 'en' ? 'index.en.mdx' : 'index.mdx';
     const filePath = path.join(postDir, filename);
 
+    const now = new Date().toISOString();
+
     const mdxContent = createMDXContent({
       title,
       slug,
@@ -147,6 +149,7 @@ export const POST = async (req: Request) => {
       featured,
       password: password?.trim() || undefined,
       coverImage: coverImagePath || undefined,
+      date: now,
     });
 
     // 寫入 mdx 檔案
@@ -156,6 +159,7 @@ export const POST = async (req: Request) => {
       {
         message: draft ? 'Post saved as draft.' : 'Post created successfully!',
         slug,
+        date: now,
       },
       { status: 201 }
     );

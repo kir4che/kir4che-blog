@@ -8,6 +8,7 @@ import { Calendar, ImageOff } from 'lucide-react';
 import type { PostMeta } from '@/types';
 import { Link } from '@/i18n/navigation';
 import { useAlert } from '@/contexts/AlertContext';
+import { getPostPath } from '@/utils/postPaths';
 
 interface RelatedPostsProps {
   lang: string;
@@ -84,7 +85,7 @@ const RelatedPosts = ({ lang, currentSlug, categories }: RelatedPostsProps) => {
           {relatedPosts.map((post) => (
             <Link
               key={post.slug}
-              href={`/posts/${post.slug}`}
+              href={getPostPath({ date: post.date, slug: post.slug })}
               role='listitem'
               className='group dark:bg-text-gray-dark/60 relative flex max-w-[18rem] min-w-[18rem] snap-start flex-col overflow-hidden rounded-md border border-pink-200/40 bg-white/85 p-4 hover:border-pink-400/60 dark:border-pink-200/15 dark:hover:border-pink-200/40'
             >

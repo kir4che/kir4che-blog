@@ -10,7 +10,7 @@ import DonateBtns from '@/components/features/sidebar/DonateBtns';
 interface RightSidebarProps {
   categories: Category[];
   tags: Pick<Tag, 'name' | 'slug'>[];
-  popularPosts: Array<Pick<PostInfo, 'slug' | 'title'>>;
+  popularPosts: Array<Pick<PostInfo, 'slug' | 'title' | 'date'>>;
 }
 
 const RightSidebar: React.FC<RightSidebarProps> = ({

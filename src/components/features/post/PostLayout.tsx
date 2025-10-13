@@ -1,15 +1,17 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Share2, Copy } from 'lucide-react';
 
-import type { Language, PostMeta } from '@/types';
+import type { Language, PostMeta, MdxContent } from '@/types';
 import { Link } from '@/i18n/navigation';
 import { useCategoryInfoMap } from '@/hooks/useCategoryInfoMap';
 import { getLocalizedTag } from '@/lib/tags';
 import { useAlert } from '@/contexts/AlertContext';
+import { getLocalizedPostPath } from '@/utils/postPaths';
 
 import PostPasswordGate from '@/components/features/post/PostPasswordGate';
 import TOC from '@/components/features/post/Toc';
@@ -19,14 +21,25 @@ import PostMetaInfo from '@/components/features/post/PostMetaInfo';
 import RelatedPosts from '@/components/features/post/RelatedPosts';
 import KofiBtn from '@/components/ui/KofiBtn';
 import PostComments from '@/components/features/post/PostComments';
+import PostSkeleton from '@/components/features/post/PostSkeleton';
 
 import styles from './PostLayout.module.css';
 
+const MDXContent = dynamic(() => import('@/components/mdx/MDXContent'), {
+  ssr: false,
+  loading: () => <PostSkeleton />,
+});
+
 interface PostLayoutProps {
-  post: PostMeta;
+  post: PostMeta & { imageMetas: MdxContent['imageMetas'] };
   headings: { id: string; text: string; level: number }[];
-  otherLangs: { exist: boolean; langs: Language[] };
-  children: React.ReactNode;
+  otherLangs: {
+    exist: boolean;
+    langs: Language[];
+    metadata: Partial<Record<Language, { date?: string }>>;
+  };
+  mdxSource: MdxContent['content'];
+  extraComponents?: MdxContent['extraComponents'];
 }
 
 interface ImageMeta {
@@ -37,7 +50,8 @@ const PostLayout = ({
   post,
   headings,
   otherLangs,
-  children,
+  mdxSource,
+  extraComponents,
 }: PostLayoutProps) => {
   const t = useTranslations('PostPage');
   const t_common = useTranslations('common');
@@ -60,10 +74,16 @@ const PostLayout = ({
     coverImage,
   } = post;
 
+  const localizedPath = getLocalizedPostPath({
+    lang,
+    date,
+    slug,
+  });
+
   const shareUrl =
     typeof window !== 'undefined'
-      ? `${window.location.origin}/posts/${slug}`
-      : `/posts/${slug}`;
+      ? `${window.location.origin}${localizedPath}`
+      : localizedPath;
 
   useEffect(() => {
     if (!post.coverImage) return;
@@ -156,12 +176,20 @@ const PostLayout = ({
                   curLang={lang}
                   langs={otherLangs.langs}
                   slug={slug}
+                  date={date}
+                  metadata={otherLangs.metadata}
                 />
               )}
             </div>
           </div>
         </header>
-        <section className={styles.articleContent}>{children}</section>
+        <section className={styles.articleContent}>
+          <MDXContent
+            content={mdxSource}
+            imageMetas={post.imageMetas ?? {}}
+            extraComponents={extraComponents}
+          />
+        </section>
         <hr className='text-text-gray-lighter dark:text-text-gray mx-auto my-8 w-20' />
         <footer className='space-y-4'>
           <div className='space-y-4'>

@@ -248,14 +248,23 @@ export const getPostsByTag = async (
 };
 
 // 檢查特定文章是否存在，並回傳存在的語系。
+type PostExistenceMetadata = {
+  date?: string;
+};
+
 export const checkPostExistence = cache(
   async (
     curLang: Language,
     slug: string
-  ): Promise<{ exist: boolean; langs: Language[] }> => {
+  ): Promise<{
+    exist: boolean;
+    langs: Language[];
+    metadata: Partial<Record<Language, PostExistenceMetadata>>;
+  }> => {
     const postDir = path.join(postsDirectory, slug);
 
-    if (!fs.existsSync(postDir)) return { exist: false, langs: [] };
+    if (!fs.existsSync(postDir))
+      return { exist: false, langs: [], metadata: {} };
 
     try {
       const files = await fs.promises.readdir(postDir);
@@ -269,9 +278,27 @@ export const checkPostExistence = cache(
       // 是否有除了 curLang 外的其他語系的文章存在
       const exist = langs.some((lang) => lang !== curLang);
 
-      return { exist, langs };
+      const metadataEntries = await Promise.all(
+        langs.map(async (language) => {
+          try {
+            const info = await getPostsInfo(language, slug);
+            if (!info || Array.isArray(info)) return [language, {}];
+
+            const { date } = info as Partial<PostInfo>;
+            return [language, date ? { date: String(date) } : {}];
+          } catch {
+            return [language, {}];
+          }
+        })
+      );
+
+      const metadata = Object.fromEntries(metadataEntries) as Partial<
+        Record<Language, PostExistenceMetadata>
+      >;
+
+      return { exist, langs, metadata };
     } catch {
-      return { exist: false, langs: [] };
+      return { exist: false, langs: [], metadata: {} };
     }
   }
 );
