@@ -16,7 +16,7 @@ import rehypeSlug from 'rehype-slug';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeExpressiveCode from 'rehype-expressive-code';
 import { rehypeExpressiveCodeOptions } from '@/config/expressiveCode';
-import { rehypeHeadings } from '@/utils/rehypeHeadings';
+import { rehypeHeadings } from './rehypeHeadings';
 
 interface ParseMDXResult {
   mdxSource: any;

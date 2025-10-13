@@ -11,7 +11,7 @@ import { Link } from '@/i18n/navigation';
 import { useCategoryInfoMap } from '@/hooks/useCategoryInfoMap';
 import { getLocalizedTag } from '@/lib/tags';
 import { useAlert } from '@/contexts/AlertContext';
-import { getLocalizedPostPath } from '@/utils/postPaths';
+import { getLocalizedPostPath } from '@/lib/paths';
 
 import PostPasswordGate from '@/components/features/post/PostPasswordGate';
 import TOC from '@/components/features/post/Toc';

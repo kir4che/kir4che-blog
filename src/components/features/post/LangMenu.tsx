@@ -4,7 +4,7 @@ import { Languages } from 'lucide-react';
 
 import type { Language } from '@/types';
 import { cn } from '@/lib/style';
-import { getLocalizedPostPath } from '@/utils/postPaths';
+import { getLocalizedPostPath } from '@/lib/paths';
 
 interface LangMenuProps {
   t: (key: string) => string;

@@ -10,7 +10,7 @@ import { X } from 'lucide-react';
 import type { Language } from '@/types';
 import { categoryMap } from '@/config/taxonomy';
 import { useAlert } from '@/contexts/AlertContext';
-import { getLocalizedPostPath } from '@/utils/postPaths';
+import { getLocalizedPostPath } from '@/lib/paths';
 
 import Checkbox from '@/components/ui/Checkbox';
 import InputField from '@/components/ui/InputField';

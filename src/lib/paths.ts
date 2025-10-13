@@ -1,8 +1,6 @@
 import { CONFIG } from '@/config';
 import type { Language } from '@/types';
 
-const FALLBACK_POST_PREFIX = '/posts';
-
 const NORMALIZED_LANGUAGE_PATHS = Object.fromEntries(
   Object.entries(CONFIG.paths.languagePaths).map(([language, pathValue]) => [
     language,
@@ -32,7 +30,8 @@ export const getPostPath = ({
   slug: string;
 }) => {
   const segments = getPostDateSegments(date);
-  if (!segments) return `${FALLBACK_POST_PREFIX}/${slug}`;
+  if (!segments)
+    throw new Error(`Post "${slug}" must have a valid date to generate path!`);
 
   return `/${segments.year}/${segments.month}/${slug}`;
 };

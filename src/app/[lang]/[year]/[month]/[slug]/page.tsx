@@ -9,7 +9,7 @@ import {
   DEFAULT_LANGUAGE,
   LANGUAGES,
 } from '@/config';
-import { getSeoConfig } from '@/utils/getSeoConfig';
+import { getSeoConfig } from '@/lib/seo';
 import { getPostData, checkPostExistence, getPostsInfo } from '@/lib/posts';
 import { parseMDX } from '@/lib/mdx';
 import { loadPostComponents } from '@/lib/posts';
@@ -17,7 +17,7 @@ import {
   getAbsolutePostUrl,
   getLocalizedPostPath,
   getPostDateSegments,
-} from '@/utils/postPaths';
+} from '@/lib/paths';
 
 import PostLayout from '@/components/features/post/PostLayout';
 

@@ -8,7 +8,7 @@ import { Calendar, ImageOff } from 'lucide-react';
 import type { PostMeta } from '@/types';
 import { Link } from '@/i18n/navigation';
 import { useAlert } from '@/contexts/AlertContext';
-import { getPostPath } from '@/utils/postPaths';
+import { getPostPath } from '@/lib/paths';
 
 interface RelatedPostsProps {
   lang: string;
