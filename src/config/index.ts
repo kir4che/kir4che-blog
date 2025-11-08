@@ -4,16 +4,16 @@ export const CONFIG = {
     email: 'mollydcxxiii@gmail.com',
     blog: {
       title: {
-        tw: 'kir4che 部落格',
-        en: 'kir4che Blog',
+        tw: `kir4che's Blog`,
+        en: `kir4che's Blog`,
       },
       description: {
         tw: '記錄在學習、前端開發、工作與生活中的所見所想。',
         en: 'A space for sharing thoughts and experiences from learning, front-end development, work, and life.',
       },
       siteName: {
-        tw: 'kir4che 部落格',
-        en: 'kir4che Blog',
+        tw: `kir4che's Blog`,
+        en: `kir4che's Blog`,
       },
     },
     socialLinks: {
