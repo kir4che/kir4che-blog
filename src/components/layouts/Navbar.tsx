@@ -10,17 +10,19 @@ const Navbar: React.FC = () => {
   const navItems = [
     { href: '/about', label: t('about') },
     { href: '/posts', label: t('archives') },
-    { href: '/notes', label: t('notes') },
+    { href: 'https://frontend-lab.kir4che.com', label: t('lab') },
   ] as const;
 
   return (
     <nav className='ml-auto flex items-center gap-x-4'>
       <NavigationLink href='/'>{t('home')}</NavigationLink>
-      {navItems.map(({ href, label }) => (
-        <NavigationLink key={href} href={href}>
-          {label}
-        </NavigationLink>
-      ))}
+      {navItems
+        .filter((item) => item.label)
+        .map(({ href, label }) => (
+          <NavigationLink key={href} href={href}>
+            {label}
+          </NavigationLink>
+        ))}
     </nav>
   );
 };
