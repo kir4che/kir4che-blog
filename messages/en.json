@@ -54,7 +54,7 @@
     "home": "Home",
     "about": "About",
     "archives": "Archives",
-    "notes": "Notes"
+    "lab": ""
   },
   "sidebar": {
     "popularPosts": "Popular Posts",
@@ -160,10 +160,6 @@
     "noTags": "No Tags yet.",
     "loadFailed": "Failed to load tags. Please try again later.",
     "backToTags": "Back to Tags"
-  },
-  "NotesPage": {
-    "title": "Notes",
-    "description": "Nothing here for now ヾ(｡ꏿ﹏ꏿ)ﾉﾞ"
   },
   "NotFoundPage": {
     "title": "Oops! Page not found",

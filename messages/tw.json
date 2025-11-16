@@ -54,7 +54,7 @@
     "home": "首頁",
     "about": "關於",
     "archives": "文章",
-    "notes": "便利貼"
+    "lab": "前端培養皿"
   },
   "sidebar": {
     "popularPosts": "熱門文章",
@@ -161,10 +161,6 @@
     "noTags": "尚無標籤",
     "loadFailed": "無法載入標籤，請稍後再試。",
     "backToTags": "返回標籤列表"
-  },
-  "NotesPage": {
-    "title": "便利貼",
-    "description": "暫時什麼東西都沒有 ヾ(｡ꏿ﹏ꏿ)ﾉﾞ"
   },
   "NotFoundPage": {
     "title": "糟糕！找不到這個頁面",
