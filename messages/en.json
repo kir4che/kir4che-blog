@@ -65,7 +65,9 @@
   },
   "websites": {
     "kaomojiLab": "Kaomoji Lab",
-    "picQuads": "PicQuads"
+    "picQuads": "PicQuads",
+    "decisionwheel": "Decision Wheel",
+    "lumical": "Lumical"
   },
   "HomePage": {
     "title": "Post List",
