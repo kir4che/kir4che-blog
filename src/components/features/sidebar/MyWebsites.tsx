@@ -21,7 +21,15 @@ const MyWebsites: React.FC = () => {
     },
     {
       name: tw('picQuads'),
-      url: 'https://picquads.vercel.app/',
+      url: 'https://picquads.zeabur.app/',
+    },
+    {
+      name: tw('decisionwheel'),
+      url: 'http://decisionwheel.kir4che.com/',
+    },
+    {
+      name: tw('lumical'),
+      url: 'https://lumical.kir4che.com/',
     },
   ];
 

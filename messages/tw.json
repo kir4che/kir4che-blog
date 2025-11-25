@@ -65,7 +65,9 @@
   },
   "websites": {
     "kaomojiLab": "顏文字實驗室",
-    "picQuads": "PicQuads"
+    "picQuads": "PicQuads",
+    "decisionwheel": "Decision Wheel",
+    "lumical": "Lumical"
   },
   "HomePage": {
     "title": "文章列表",
