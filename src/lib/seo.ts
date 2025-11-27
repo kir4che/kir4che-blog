@@ -29,7 +29,18 @@ export const getSeoConfig = (lang: string): Metadata => {
     lang
   );
   const blogSiteName = getLocalizedValue(CONFIG.siteInfo.blog.siteName, lang);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL!;
+
+  const fallbackSiteUrl = 'https://kir4che.com';
+  const rawSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || fallbackSiteUrl;
+
+  const siteUrl = rawSiteUrl.replace(/\/+$/, '');
+
+  let metadataBase: URL | undefined;
+  try {
+    metadataBase = new URL(siteUrl);
+  } catch {
+    metadataBase = undefined;
+  }
 
   const localeToUrl = Object.fromEntries(
     Object.entries(CONFIG.paths.languagePaths).map(([languageKey, path]) => [
@@ -63,8 +74,14 @@ export const getSeoConfig = (lang: string): Metadata => {
     ...(isSecureContext ? { secureUrl: defaultOgImage } : {}),
   };
 
+  const canonicalUrl =
+    localeToUrl[
+      LANGUAGE_TO_LOCALE_MAP[lang as keyof typeof LANGUAGE_TO_LOCALE_MAP] ||
+        lang
+    ] ?? `${siteUrl}/${lang}`;
+
   return {
-    metadataBase: new URL(siteUrl),
+    metadataBase,
     title: {
       default: blogTitle,
       template: `%s | ${blogTitle}`,
@@ -98,20 +115,12 @@ export const getSeoConfig = (lang: string): Metadata => {
     keywords:
       KEYWORDS_BY_LANG[lang] ?? KEYWORDS_BY_LANG[DEFAULT_LANGUAGE] ?? [],
     alternates: {
-      canonical:
-        localeToUrl[
-          LANGUAGE_TO_LOCALE_MAP[lang as keyof typeof LANGUAGE_TO_LOCALE_MAP] ||
-            lang
-        ] ?? `${siteUrl}/${lang}`,
+      canonical: canonicalUrl,
       languages: languageAlternates,
     },
     openGraph: {
       type: 'website',
-      url:
-        localeToUrl[
-          LANGUAGE_TO_LOCALE_MAP[lang as keyof typeof LANGUAGE_TO_LOCALE_MAP] ||
-            lang
-        ] ?? `${siteUrl}/${lang}`,
+      url: canonicalUrl,
       title: blogTitle,
       description: blogDescription,
       siteName: blogSiteName,

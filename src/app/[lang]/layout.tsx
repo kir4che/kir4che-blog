@@ -84,7 +84,7 @@ const RootLayout = async ({ children, params }: RootLayoutProps) => {
         <Providers locale={lang} messages={messages}>
           <StructuredData lang={lang} />
           <Sidebar lang={lang}>
-            <div className='flex w-full flex-grow flex-col'>
+            <div className='flex w-full grow flex-col'>
               <Header lang={lang} />
               <main className='flex-1'>
                 {children}
