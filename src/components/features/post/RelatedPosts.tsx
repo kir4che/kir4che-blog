@@ -72,7 +72,7 @@ const RelatedPosts = ({ lang, currentSlug, categories }: RelatedPostsProps) => {
           {t('relatedPosts')}
         </h2>
         <span
-          className='h-[1px] flex-1 rounded-full bg-gradient-to-r from-pink-200/60 to-transparent dark:from-pink-200/20'
+          className='h-px flex-1 rounded-full bg-linear-to-r from-pink-200/60 to-transparent dark:from-pink-200/20'
           aria-hidden='true'
         />
       </div>

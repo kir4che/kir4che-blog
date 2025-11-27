@@ -18,12 +18,15 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({
   params,
-}: {
-  params: Params;
-}): Promise<Metadata> {
+}: PageParams): Promise<Metadata> {
   const { lang } = await params;
   const baseMetadata = getSeoConfig(lang);
 
+  const aboutTitle = lang === 'tw' ? '關於我' : 'About';
+  const aboutDescription =
+    lang === 'tw'
+      ? `關於 ${CONFIG.siteInfo.name} - 前端工程師，熱愛分享技術與生活`
+      : `About ${CONFIG.siteInfo.name} - Frontend Developer, sharing tech and life`;
   const aboutTitle = lang === 'tw' ? '關於我' : 'About';
   const aboutDescription =
     lang === 'tw'
@@ -45,10 +48,26 @@ export async function generateMetadata({
       description: aboutDescription,
     },
   };
+  return {
+    ...baseMetadata,
+    title: aboutTitle,
+    description: aboutDescription,
+    openGraph: {
+      ...baseMetadata.openGraph,
+      title: aboutTitle,
+      description: aboutDescription,
+    },
+    twitter: {
+      ...baseMetadata.twitter,
+      title: aboutTitle,
+      description: aboutDescription,
+    },
+  };
 }
 
-const AboutPage = async ({ params }: { params: Params }) => {
-  await params; // 確保 params 被使用
+const AboutPage = async ({ params }: PageParams) => {
+  const { lang } = await params;
+  void lang;
   return <AboutPageClient />;
 };
 

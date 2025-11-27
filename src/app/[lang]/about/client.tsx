@@ -95,7 +95,7 @@ const AboutPageClient = () => {
         <h3 className='heading -ml-8'>{t('title_2')}</h3>
         <ExternalLink
           href={`mailto:${CONFIG.siteInfo.email}`}
-          className='relative text-xl/7 font-medium break-words text-pink-600 hover:no-underline dark:text-pink-300'
+          className='wrap-break-words relative text-xl/7 font-medium text-pink-600 hover:no-underline dark:text-pink-300'
         >
           {CONFIG.siteInfo.email}
           <span className='absolute top-full left-0 h-[3px] w-full origin-left scale-x-0 bg-pink-200 transition-transform duration-300 ease-in-out group-hover:scale-x-100' />

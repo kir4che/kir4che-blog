@@ -21,12 +21,14 @@ import {
 
 import PostLayout from '@/components/features/post/PostLayout';
 
-type Params = Promise<{
+type Params = {
   lang: Language;
   year: string;
   month: string;
   slug: string;
-}>;
+};
+
+type PageParams = { params: Promise<Params> };
 
 export async function generateStaticParams() {
   const postsByLang = await Promise.all(
@@ -54,7 +56,7 @@ export async function generateStaticParams() {
   );
 }
 
-export async function generateMetadata({ params }: { params: Params }) {
+export async function generateMetadata({ params }: PageParams) {
   const { lang, slug } = await params;
 
   const baseMetadata = getSeoConfig(lang);
@@ -65,16 +67,20 @@ export async function generateMetadata({ params }: { params: Params }) {
   if (!meta?.title || !meta?.date) return baseMetadata;
   const { title, description, date, tags } = meta;
 
-  const { langs: availableLangs, metadata: languageMetadata } =
-    await checkPostExistence(lang, slug);
+  const existence = await checkPostExistence(lang, slug).catch(() => {
+    return null;
+  });
+
+  const availableLangs = existence?.langs ?? [];
+  const languageMetadata = existence?.metadata ?? {};
 
   const languagesForAlternates =
     availableLangs.length > 0 ? availableLangs : [lang];
 
   const ogImage = new URL(
-    `api/og?lang=${lang}&title=${encodeURIComponent(title)}&tags=${encodeURIComponent(
-      tags?.join(',') || ''
-    )}`,
+    `api/og?lang=${lang}&title=${encodeURIComponent(
+      title
+    )}&tags=${encodeURIComponent(tags?.join(',') || '')}`,
     metadataBase
   ).toString();
 
@@ -188,40 +194,44 @@ export async function generateMetadata({ params }: { params: Params }) {
   };
 }
 
-const PostPage = async ({ params }: { params: Params }) => {
-  const { lang, slug, year, month } = await params;
+const PostPage = async ({ params }: PageParams) => {
+  try {
+    const { lang, slug, year, month } = await params;
 
-  const [otherLangs, post] = await Promise.all([
-    checkPostExistence(lang, slug),
-    getPostData(lang, slug),
-  ]);
+    const [otherLangs, post] = await Promise.all([
+      checkPostExistence(lang, slug),
+      getPostData(lang, slug),
+    ]);
 
-  if (!post) return notFound();
+    if (!post) return notFound();
 
-  const segments = getPostDateSegments(post.date);
-  if (segments && (segments.year !== year || segments.month !== month)) {
-    const targetPath = getLocalizedPostPath({
-      lang,
-      date: post.date,
-      slug: post.slug,
-    });
+    const segments = getPostDateSegments(post.date);
+    if (segments && (segments.year !== year || segments.month !== month)) {
+      const targetPath = getLocalizedPostPath({
+        lang,
+        date: post.date,
+        slug: post.slug,
+      });
 
-    redirect(targetPath);
+      redirect(targetPath);
+    }
+
+    const { mdxSource, headings } = await parseMDX(post.content);
+
+    const extraComponents = await loadPostComponents(slug);
+
+    return (
+      <PostLayout
+        post={{ ...post, imageMetas: post.imageMetas ?? {} }}
+        headings={headings}
+        otherLangs={otherLangs}
+        mdxSource={mdxSource}
+        extraComponents={extraComponents}
+      />
+    );
+  } catch (err) {
+    throw err;
   }
-
-  const { mdxSource, headings } = await parseMDX(post.content);
-
-  const extraComponents = await loadPostComponents(slug);
-
-  return (
-    <PostLayout
-      post={{ ...post, imageMetas: post.imageMetas ?? {} }}
-      headings={headings}
-      otherLangs={otherLangs}
-      mdxSource={mdxSource}
-      extraComponents={extraComponents}
-    />
-  );
 };
 
 export default PostPage;
