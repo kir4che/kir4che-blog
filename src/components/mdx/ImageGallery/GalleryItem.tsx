@@ -49,9 +49,9 @@ const GalleryItem: React.FC<GalleryItemProps> = ({
       key={index}
       className={cn(
         'transition-all duration-300',
-        '[max-height:var(--gallery-max-height)] sm:[max-height:var(--gallery-max-height-sm)]',
-        '[height:var(--gallery-height)] sm:[height:var(--gallery-height-sm)]',
-        'min-w-[var(--item-min-width)]',
+        'max-h-(--gallery-max-height) sm:max-h-(--gallery-max-height-sm)',
+        'h-(--gallery-height) sm:h-(--gallery-height-sm)',
+        'min-w-(--item-min-width)]',
         singleColumn ? 'w-full flex-none' : 'lg:min-w-0'
       )}
       style={
@@ -84,8 +84,8 @@ const GalleryItem: React.FC<GalleryItemProps> = ({
             singleColumn ? (item.height ?? resolvedHeight ?? '100%') : '100%'
           }
           className={cn(
-            'h-full w-full overflow-hidden',
-            !item.className && !resolvedHeight && 'aspect-[3/2]',
+            'size-full overflow-hidden',
+            !item.className && !resolvedHeight && 'aspect-3/2',
             item.className
           )}
         />
@@ -99,8 +99,8 @@ const GalleryItem: React.FC<GalleryItemProps> = ({
             }
             noProvider
             className={cn(
-              'h-full w-full overflow-hidden',
-              !item.className && !resolvedHeight && 'aspect-[3/2]',
+              'size-full overflow-hidden',
+              !item.className && !resolvedHeight && 'aspect-3/2',
               item.className
             )}
           />

@@ -23,7 +23,7 @@ const ExternalLink = ({
     target='_blank'
     rel='noopener noreferrer'
     className={cn(
-      'group inline-flex items-center text-blue-600 hover:underline hover:underline-offset-2 dark:text-blue-300',
+      'group inline-flex items-center text-blue-600 no-underline hover:underline hover:underline-offset-2 dark:text-blue-300',
       className
     )}
     aria-label={title}

@@ -9,8 +9,9 @@ const Navbar: React.FC = () => {
 
   const navItems = [
     { href: '/about', label: t('about') },
-    { href: '/posts', label: t('archives') },
-    { href: 'https://frontend-lab.kir4che.com', label: t('lab') },
+    { href: '/categories', label: t('categories') },
+    { href: '/tags', label: t('tags') },
+    { href: '/archives', label: t('archives') },
   ] as const;
 
   return (

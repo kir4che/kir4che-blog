@@ -32,7 +32,7 @@
   --text-gray-lighter: #cccccc;
 
   --scroll-thumb: #d8d8d8;
-  --scroll-track: white;
+  --scroll-track: #f7f7f7;
 }
 
 :root[class~='dark'] {
@@ -43,7 +43,7 @@
   --text-secondary: #262626;
 
   --scroll-thumb: #b6b6b6;
-  --scroll-track: #303030;
+  --scroll-track: transparent;
 }
 
 @theme inline {
@@ -108,7 +108,7 @@
 
 @layer base {
   html {
-    @apply box-border scroll-smooth break-words;
+    @apply box-border scroll-smooth wrap-break-word;
   }
 
   *,
@@ -118,16 +118,13 @@
   }
 
   body {
-    @apply text-text-primary m-0 min-h-screen tracking-[0.5px] antialiased transition-colors duration-300;
+    @apply bg-bg-primary text-text-primary m-0 min-h-screen tracking-[0.5px] antialiased transition-colors duration-300;
+    font-family: var(--font-main);
   }
 
   * {
     scrollbar-width: auto;
     scrollbar-color: var(--scroll-thumb) var(--scroll-track) !important;
-  }
-
-  a {
-    @apply hover:no-underline;
   }
 
   a,
@@ -198,21 +195,35 @@
   }
 }
 
-@layer utilities {
-  .flex-center {
-    @apply flex items-center justify-center;
+.custom-scrollbar::-webkit-scrollbar-track {
+  opacity: 0;
+}
+
+@utility flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@utility custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) transparent;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
   }
 
-  .text-gradient {
-    @apply bg-gradient-to-r from-pink-700 to-pink-500 bg-clip-text text-transparent dark:from-pink-200 dark:to-pink-100;
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--scroll-thumb);
+    border-radius: 9999px;
   }
 
-  .custom-scrollbar::-webkit-scrollbar-track {
-    opacity: 0;
+  &::-webkit-scrollbar-track {
+    background-color: var(--scroll-track);
   }
+}
 
-  .custom-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: var(--scroll-thumb) transparent;
-  }
+@utility text-gradient {
+  @apply bg-linear-to-r from-pink-700 to-pink-500 bg-clip-text text-transparent dark:from-pink-200 dark:to-pink-100;
 }

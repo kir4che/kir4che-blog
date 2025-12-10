@@ -13,10 +13,8 @@ import CategoryBadge from '@/components/features/category/CategoryBadge';
 import PostMetaInfo from '@/components/features/post/PostMetaInfo';
 import LockOverlay from '@/components/features/post/LockOverlay';
 
-type PreviewPost = PostMeta | PostInfo;
-
 interface PostPreviewProps {
-  post: PreviewPost;
+  post: PostMeta | PostInfo;
   variant?: 'card' | 'list';
   className?: string;
 }
@@ -30,7 +28,7 @@ const PostPreview: React.FC<PostPreviewProps> = memo(
       return (
         <Link
           href={getPostPath({ date: post.date, slug: post.slug })}
-          className={cn('group relative block h-full', className)}
+          className={cn('group relative block h-full min-h-28', className)}
         >
           <LockOverlay hasPassword={post.hasPassword} />
           <article
@@ -70,7 +68,7 @@ const PostPreview: React.FC<PostPreviewProps> = memo(
         <article className='group relative h-full cursor-pointer'>
           <LockOverlay hasPassword={post.hasPassword} />
           {post?.coverImage ? (
-            <div className='relative h-full overflow-hidden rounded-lg shadow-lg ring-1 ring-black/5 transition-all duration-300 group-hover:shadow-xl group-hover:ring-pink-500/20'>
+            <div className='relative h-full overflow-hidden'>
               <Image
                 src={post.coverImage}
                 alt={post.title || post.slug}
@@ -85,9 +83,9 @@ const PostPreview: React.FC<PostPreviewProps> = memo(
                   post.hasPassword && 'opacity-50'
                 )}
               >
-                <h3 className='mb-2 line-clamp-2 text-xl font-semibold text-white drop-shadow-md transition-all duration-300 ease-in-out group-hover:translate-y-[-2px]'>
+                <h2 className='mb-2 line-clamp-2 text-xl font-semibold text-white drop-shadow-md transition-all duration-300 ease-in-out group-hover:translate-y-0.5'>
                   {post.title || post.slug}
-                </h3>
+                </h2>
                 {post.description && (
                   <p className='mb-2 line-clamp-3 text-sm/5.5 text-white drop-shadow backdrop-blur-[1px] transition-all duration-300'>
                     {post.description}
@@ -124,9 +122,9 @@ const PostPreview: React.FC<PostPreviewProps> = memo(
                   post.hasPassword && 'opacity-50'
                 )}
               >
-                <h3 className='mb-2 line-clamp-2 text-xl font-semibold group-hover:text-pink-700 dark:group-hover:text-pink-400'>
+                <h2 className='mb-2 line-clamp-2 text-xl font-semibold group-hover:text-pink-700 dark:group-hover:text-pink-600'>
                   {post.title || post.slug}
-                </h3>
+                </h2>
                 {post.description && (
                   <p className='text-text-primary/65 mb-2 line-clamp-3 text-sm/5.5'>
                     {post.description}

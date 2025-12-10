@@ -89,7 +89,7 @@ const CustomImage: React.FC<CustomImageProps> = ({
     <div
       className={cn(
         'relative size-full overflow-hidden rounded-md',
-        useFill && 'aspect-[3/2]',
+        useFill && 'aspect-3/2',
         className
       )}
       style={
@@ -142,9 +142,9 @@ const CustomImage: React.FC<CustomImageProps> = ({
   const content = (
     <figure
       className={cn(
-        'xs:[max-height:var(--img-max-height)] flex max-h-80 w-full flex-col gap-y-2',
+        'xs:max-h-(--img-max-height) flex max-h-80 w-full flex-col gap-y-2',
         typeof width !== 'undefined' && typeof width !== 'number'
-          ? 'sm:[max-width:var(--img-width)]'
+          ? 'sm:max-w-(--img-width)'
           : 'md:max-w-5/6',
         alignment,
         className

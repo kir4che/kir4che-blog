@@ -27,7 +27,7 @@ const CategoryList: React.FC<{ categories: Category[] }> = ({ categories }) => {
           <li key={slug} style={getCategoryStyle(color)}>
             <Link
               href={`/categories/${slug}`}
-              className='category text-text-primary transition-color flex items-center gap-x-0.5 text-sm hover:text-[var(--category-color)] dark:hover:text-[var(--category-color-dark)]'
+              className='category text-text-primary transition-color flex items-center gap-x-0.5 text-sm hover:text-(--category-color) dark:hover:text-(--category-color-dark)'
             >
               <span>{name[lang]}</span>
               <span className='text-xs tracking-widest text-pink-700 dark:text-pink-200'>

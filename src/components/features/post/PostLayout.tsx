@@ -15,7 +15,7 @@ import { getLocalizedPostPath } from '@/lib/paths';
 
 import PostPasswordGate from '@/components/features/post/PostPasswordGate';
 import TOC from '@/components/features/post/Toc';
-import LangMenu from '@/components/features/post/LangMenu';
+import LangMenu from '@/components/ui/LangMenu';
 import CategoryBadge from '@/components/features/category/CategoryBadge';
 import PostMetaInfo from '@/components/features/post/PostMetaInfo';
 import RelatedPosts from '@/components/features/post/RelatedPosts';
@@ -55,7 +55,6 @@ const PostLayout = ({
 }: PostLayoutProps) => {
   const t = useTranslations('PostPage');
   const t_common = useTranslations('common');
-  const t_settings = useTranslations('settings');
   const categoryInfoMap = useCategoryInfoMap(post);
   const { showError, showSuccess } = useAlert();
 
@@ -172,7 +171,7 @@ const PostLayout = ({
               />
               {otherLangs.exist && (
                 <LangMenu
-                  t={t_settings}
+                  variant='post'
                   curLang={lang}
                   langs={otherLangs.langs}
                   slug={slug}

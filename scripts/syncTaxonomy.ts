@@ -257,10 +257,10 @@ const loadTagNamesFromContent = async () => {
     });
 
     return map;
-  } catch (error) {
+  } catch (err) {
     console.warn(
       '⚠️ 無法載入 tags.yaml：',
-      error instanceof Error ? error.message : String(error)
+      err instanceof Error ? err.message : String(err)
     );
     return new Map<string, LocalizedNames>();
   }
@@ -283,10 +283,10 @@ const loadCategoryDefinitions = async (): Promise<CategoryDefinition[]> => {
     const parsed = YAML.parse(content) as { categories?: CategoryDefinition[] };
     if (!parsed?.categories || !Array.isArray(parsed.categories)) return [];
     return parsed.categories;
-  } catch (error) {
+  } catch (err) {
     console.warn(
       '⚠️ 無法載入 categories.yaml：',
-      error instanceof Error ? error.message : String(error)
+      err instanceof Error ? err.message : String(err)
     );
     return [];
   }

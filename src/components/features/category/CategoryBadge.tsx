@@ -84,17 +84,13 @@ const CategoryBadge = ({
                 className={cn(
                   'flex items-center gap-x-1 text-sm hover:opacity-85',
                   className?.includes('force-dark-category')
-                    ? 'text-[var(--category-color-dark)]'
-                    : 'text-[var(--category-color)]',
+                    ? 'text-(--category-color-dark)'
+                    : 'text-(--category-color)',
                   className
                 )}
                 style={getCategoryStyle(categoryInfo.color)}
               >
-                <Circle
-                  className='h-2 w-2'
-                  fill='currentColor'
-                  aria-hidden='true'
-                />
+                <Circle size={8} fill='currentColor' aria-hidden='true' />
                 <span>{categoryInfo.name[lang]}</span>
               </button>
             );
@@ -106,14 +102,14 @@ const CategoryBadge = ({
               className={cn(
                 'flex items-center gap-x-1 text-sm hover:opacity-85',
                 className?.includes('force-dark-category')
-                  ? 'text-[var(--category-color-dark)]'
-                  : 'text-[var(--category-color)]',
+                  ? 'text-(--category-color-dark)'
+                  : 'text-(--category-color)',
                 className
               )}
               style={getCategoryStyle(categoryInfo.color)}
             >
               <Circle
-                className='h-2 w-2'
+                className='size-2'
                 fill='currentColor'
                 aria-hidden='true'
               />

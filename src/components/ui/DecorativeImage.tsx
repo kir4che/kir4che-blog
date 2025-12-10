@@ -19,7 +19,11 @@ const DecorativeImage: React.FC<DecorativeImageProps> = ({
     layout='responsive'
     width={200}
     height={200}
-    className={cn('-z-10', desktopOnly && 'hidden xl:block', className)}
+    className={cn(
+      '-z-10 select-none',
+      desktopOnly && 'hidden xl:block',
+      className
+    )}
     loading='lazy'
   />
 );

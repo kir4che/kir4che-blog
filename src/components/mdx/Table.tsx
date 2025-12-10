@@ -67,7 +67,7 @@ const Table: React.FC<TableProps> = ({ data }) => {
               <td
                 key={cellIndex}
                 colSpan={cell.colSpan}
-                className='border border-pink-400 text-base/6.5 dark:border-pink-600/50 [:first-child]:whitespace-nowrap'
+                className='border border-pink-400 text-base/6.5 first:whitespace-nowrap dark:border-pink-600/50'
               >
                 {renderInlineCode(cell.content)}
               </td>

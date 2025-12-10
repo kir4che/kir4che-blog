@@ -58,7 +58,7 @@ const TOCContent = ({
   onLinkClick?: () => void;
 }) => (
   <div
-    className='relative flex max-h-88 max-w-72 min-w-64 flex-col overflow-hidden rounded-xl bg-white/75 pt-4 pb-4 pl-4 shadow-md backdrop-blur-xl transition-all duration-300 before:pointer-events-none before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/25 before:to-white/10 dark:bg-neutral-900/30 dark:before:from-white/10 dark:before:to-white/5'
+    className='relative flex max-h-88 max-w-72 min-w-64 flex-col overflow-hidden rounded-xl bg-white/75 pt-4 pb-4 pl-4 shadow-md backdrop-blur-xl transition-all duration-300 before:pointer-events-none before:absolute before:inset-0 before:bg-linear-to-b before:from-white/25 before:to-white/10 dark:bg-neutral-900/30 dark:before:from-white/10 dark:before:to-white/5'
     role='navigation'
     aria-label={ariaLabel}
   >

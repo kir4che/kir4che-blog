@@ -19,9 +19,9 @@ import { getSeoConfig } from '@/lib/seo';
 
 import Header from '@/components/layouts/Header';
 import Footer from '@/components/layouts/Footer';
-import Sidebar from '@/components/layouts/Sidebar';
-import ScrollRestorer from '@/components/features/ScrollRestorer';
-import StructuredData from '@/components/common/StructuredData';
+import PageShell from '@/components/layouts/PageShell';
+import ScrollRestorer from '@/components/ui/ScrollRestorer';
+import StructuredData from '@/components/seo/StructuredData';
 
 import '@/app/globals.css';
 
@@ -44,15 +44,6 @@ type Params = Promise<{ lang: Language }>;
 interface RootLayoutProps {
   children: React.ReactNode;
   params: Params;
-}
-
-if (
-  typeof window !== 'undefined' &&
-  process.env.NEXT_PUBLIC_NODE_ENV !== 'development'
-) {
-  console.log = () => {};
-  console.warn = () => {};
-  console.error = () => {};
 }
 
 export function generateStaticParams() {
@@ -87,14 +78,14 @@ const RootLayout = async ({ children, params }: RootLayoutProps) => {
         />
       </head>
       <body
-        className={`bg-bg-primary font-main sm:px-4 ${notoSansTC.variable} ${dmSans.variable}`}
+        className={`bg-bg-primary font-main min-h-screen sm:px-4 ${notoSansTC.variable} ${dmSans.variable}`}
       >
         <Toaster position='top-center' toastOptions={{ duration: 3000 }} />
         <Providers locale={lang} messages={messages}>
           <StructuredData lang={lang} />
-          <Sidebar lang={lang}>
-            <div className='flex w-full flex-grow flex-col'>
-              <Header lang={lang} />
+          <PageShell lang={lang}>
+            <div className='flex w-full grow flex-col'>
+              <Header />
               <main className='flex-1'>
                 {children}
                 <Suspense>
@@ -103,7 +94,7 @@ const RootLayout = async ({ children, params }: RootLayoutProps) => {
               </main>
               <Footer />
             </div>
-          </Sidebar>
+          </PageShell>
         </Providers>
         <Analytics />
         <SpeedInsights />

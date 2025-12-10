@@ -8,8 +8,8 @@ import { Github, Instagram, Youtube } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/style';
 
-import ThemeToggle from '@/components/common/ThemeToggle';
-import LangMenu from '@/components/common/GlobalLangMenu';
+import ThemeToggle from '@/components/ui/ThemeToggle';
+import LangMenu from '@/components/ui/LangMenu';
 import ExternalLink from '@/components/ui/ExternalLink';
 
 interface SocialLink {
@@ -22,23 +22,19 @@ const socialLinks: SocialLink[] = [
   {
     label: 'GitHub',
     href: 'https://github.com/kir4che',
-    icon: () => (
-      <Github className='size-4.5 text-pink-600 dark:text-pink-400' />
-    ),
+    icon: () => <Github className='size-5 text-pink-600 dark:text-pink-400' />,
   },
   {
     label: 'Instagram',
     href: 'https://www.instagram.com/kir4che',
     icon: () => (
-      <Instagram className='size-4.5 text-pink-600 dark:text-pink-400' />
+      <Instagram className='size-5 text-pink-600 dark:text-pink-400' />
     ),
   },
   {
     label: 'YouTube',
     href: 'https://www.youtube.com/@kir4che',
-    icon: () => (
-      <Youtube className='size-4.5 text-pink-600 dark:text-pink-400' />
-    ),
+    icon: () => <Youtube className='size-5 text-pink-600 dark:text-pink-400' />,
   },
 ];
 
@@ -61,7 +57,7 @@ const LeftSidebar: React.FC = () => {
   return (
     <aside className='mb-4 flex flex-col justify-between py-4 sm:mb-0 md:sticky md:top-0 md:h-screen md:w-45 md:pt-6 lg:w-48'>
       <div className='flex items-center gap-x-3 gap-y-2 md:mb-2.5 md:flex-col md:items-start'>
-        <div className='relative block h-16 w-16 md:h-26 md:w-26'>
+        <div className='relative block size-16 md:h-26 md:w-26'>
           <Link href='/' className='avatar'>
             <Image
               src='/images/avatar.webp'

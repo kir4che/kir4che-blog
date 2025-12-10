@@ -9,21 +9,27 @@ const CustomLink = ({ href, children, ...rest }: Props) => {
   const isInternalLink = href && href.startsWith('/');
   const isAnchorLink = href && href.startsWith('#');
 
-  if (isInternalLink) {
+  if (isInternalLink)
     return (
-      <LangLink href={href} className='text-pink-700' {...rest}>
+      <LangLink
+        href={href}
+        className='hover:text-pink-700 hover:underline hover:underline-offset-2 dark:hover:text-pink-600'
+        {...rest}
+      >
         {children}
       </LangLink>
     );
-  }
 
-  if (isAnchorLink) {
+  if (isAnchorLink)
     return (
-      <Link href={href} className='text-pink-700' {...rest}>
+      <Link
+        href={href}
+        className='hover:text-pink-700 hover:underline hover:underline-offset-2 dark:hover:text-pink-600'
+        {...rest}
+      >
         {children}
       </Link>
     );
-  }
 
   return (
     <ExternalLink href={href!} showIcon={true} {...rest}>

@@ -59,7 +59,7 @@ const SubCategoryPosts = ({
         <span>/</span>
         <Link
           href={`/categories/${mainSlug}/${subSlug}`}
-          className='font-medium text-[var(--category-color)]'
+          className='font-medium text-(--category-color)'
           style={getCategoryStyle(subCategory.color)}
         >
           {subCategory.name[lang]}

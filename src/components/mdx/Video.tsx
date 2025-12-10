@@ -45,8 +45,10 @@ const CustomVideo: React.FC<CustomVideoProps> = ({
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () =>
+    return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      videoElement.pause();
+    };
   }, [autoPlay]);
 
   const alignment = {

@@ -61,7 +61,7 @@ const Accordion: React.FC<AccordionProps> = ({
       <Triangle
         size={10}
         fill='currentColor'
-        className='mr-2 mb-1 inline-block rotate-90 transition-transform group-has-[:checked]:rotate-180'
+        className='mr-2 mb-1 inline-block rotate-90 transition-transform group-has-checked:rotate-180'
       />
       {title}
     </div>

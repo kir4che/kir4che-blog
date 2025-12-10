@@ -1,8 +1,8 @@
 'use client';
 
 import { CONFIG } from '@/config';
-import ThemeToggle from '@/components/common/ThemeToggle';
-import LangMenu from '@/components/common/GlobalLangMenu';
+import ThemeToggle from '@/components/ui/ThemeToggle';
+import LangMenu from '@/components/ui/LangMenu';
 
 const Footer = () => (
   <div className='flex items-center justify-between py-4 sm:pt-6'>

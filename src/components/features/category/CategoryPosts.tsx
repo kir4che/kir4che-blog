@@ -72,7 +72,7 @@ const CategoryPosts = ({
     <div className='space-y-6'>
       <h1 className='mb-4 flex items-baseline justify-between'>
         <span
-          className='text-[var(--category-color)]'
+          className='text-(--category-color)'
           style={getCategoryStyle(category.color)}
         >
           {category?.name?.[lang]}

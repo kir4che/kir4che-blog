@@ -16,15 +16,12 @@ import Checkbox from '@/components/ui/Checkbox';
 import InputField from '@/components/ui/InputField';
 import LoadingSpin from '@/components/ui/LoadingSpin';
 
-const MDXEditor = dynamic(
-  () => import('@/components/features/editor/MDXEditor'),
-  {
-    ssr: false,
-    loading: () => (
-      <div className='border border-red-500 p-4'>Loading Editor...</div>
-    ),
-  }
-);
+const MDXEditor = dynamic(() => import('@/components/mdx/MDXEditor'), {
+  ssr: false,
+  loading: () => (
+    <div className='border border-red-500 p-4'>Loading Editor...</div>
+  ),
+});
 
 interface EditorClientProps {
   params?: Promise<{ lang: Language }>;

@@ -39,7 +39,7 @@ const CategoryTabs = ({
           key={subCat.slug}
           onClick={() => onTabChange(key)}
           className={cn(
-            'relative px-4 py-2.5 text-sm font-medium text-[var(--category-color)] hover:brightness-110',
+            'relative px-4 py-2.5 text-sm font-medium text-(--category-color) hover:brightness-110',
             activeTab === key && 'border-b-2 font-semibold'
           )}
           style={getCategoryStyle(subCat.color)}

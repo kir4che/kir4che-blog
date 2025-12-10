@@ -13,7 +13,7 @@ const KofiBtn = () => {
     <ExternalLink
       href={`https://ko-fi.com/${CONFIG.siteInfo.name}`}
       title='Support me on Ko-fi'
-      className='text-text-secondary dark:text-text-secondary inline-flex w-fit items-center gap-x-2 rounded-md bg-pink-500 px-3 py-2 text-sm font-semibold hover:bg-pink-500/90 hover:no-underline'
+      className='text-text-secondary dark:text-text-secondary inline-flex w-fit items-center gap-x-2 rounded-md bg-pink-700 px-3 py-2 text-sm font-semibold hover:no-underline dark:bg-pink-400'
     >
       <Image
         src={KofiIcon}

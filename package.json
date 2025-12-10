@@ -4,16 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "dev:clean": "rimraf .next && next dev",
-    "prebuild": "pnpm prepare:content",
     "build": "next build",
     "postbuild": "next-sitemap",
     "start": "next start",
     "lint": "eslint .",
-    "format:fix": "prettier --write .",
-    "prepare:content": "ts-node --project scripts/tsconfig.scripts.json scripts/prepareContent.ts",
-    "create:new-post": "ts-node --project scripts/tsconfig.scripts.json scripts/createPost.ts",
-    "sync:taxonomy": "ts-node --project scripts/tsconfig.scripts.json scripts/syncTaxonomy.ts && ts-node --project scripts/tsconfig.scripts.json scripts/generateSiteData.ts"
+    "format": "prettier --write .",
+    "content": "ts-node --project scripts/tsconfig.scripts.json scripts/contentPipeline.ts",
+    "post:new": "ts-node --project scripts/tsconfig.scripts.json scripts/createPost.ts"
   },
   "dependencies": {
     "@expressive-code/core": "^0.41.2",

@@ -7,6 +7,7 @@ import { getSiteData } from '@/lib/siteData';
 
 import PostPreview from '@/components/features/post/PostPreview';
 import Announcement from '@/components/ui/Announcement';
+import Advertisement from '@/components/layouts/sidebar/Advertisement';
 import Pagination from '@/components/features/home/HomePagination';
 
 const POSTS_PER_PAGE = 10;
@@ -49,11 +50,12 @@ const Home = async ({
   const mobileFeaturedPosts = isFirstPage ? currentPosts.slice(0, 4) : [];
   const listPosts = isFirstPage ? currentPosts.slice(4) : currentPosts;
 
-  const renderListPosts = () => (
+  const renderListPosts = (withAd: boolean) => (
     <div className='grid grid-cols-1 gap-4'>
-      {listPosts.map((post) => (
+      {listPosts.map((post, index) => (
         <React.Fragment key={post.slug}>
           <PostPreview post={post} variant='list' />
+          {withAd && index === AD_INSERT_INDEX && <Advertisement />}
         </React.Fragment>
       ))}
     </div>
@@ -97,10 +99,10 @@ const Home = async ({
                   </div>
                 )}
               </div>
-              {listPosts.length > 0 && renderListPosts()}
+              {listPosts.length > 0 && renderListPosts(true)}
             </>
           ) : (
-            renderListPosts()
+            renderListPosts(false)
           )}
           <Pagination currentPage={currentPage} totalPages={totalPages} />
         </section>

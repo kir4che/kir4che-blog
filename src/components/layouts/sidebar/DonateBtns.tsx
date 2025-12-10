@@ -21,8 +21,8 @@ const DonateBtns: React.FC = () => (
         title='Support me on Ko-fi'
         className='text-right text-sm text-[#FB7364] hover:text-[#F74C37] hover:no-underline dark:text-[#FB7364]'
       >
-        ⋆✴︎˚｡⋆{' '}
-        <span className='text-[#F74C37] dark:text-[#FB7364]'>Ko-fi</span> ⋆˚｡:⋆࿔
+        ⋆✴︎˚｡⋆ <span className='text-[#F74C37] dark:text-[#FB7364]'>Ko-fi</span>{' '}
+        ⋆˚｡:⋆࿔
       </ExternalLink>
     </div>
     <p className='text-text-primary dark:text-text-gray-light'>

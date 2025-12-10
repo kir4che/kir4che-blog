@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { Link as LinkIcon } from 'lucide-react';
 
-import { Link } from '@/i18n/navigation';
+import ExternalLink from '@/components/ui/ExternalLink';
 
 interface WebsiteInfo {
   name: string;
@@ -15,6 +15,10 @@ const MyWebsites: React.FC = () => {
   const tw = useTranslations('websites');
 
   const websites: WebsiteInfo[] = [
+    {
+      name: tw('frontendLab'),
+      url: 'https://frontend-lab.kir4che.com/',
+    },
     {
       name: tw('kaomojiLab'),
       url: 'https://kaomojilab.com/',
@@ -40,19 +44,16 @@ const MyWebsites: React.FC = () => {
           className='size-4 text-pink-700 dark:text-pink-300'
           aria-hidden='true'
         />
-        <span className='text-gradient'>{t('recommendedWebsites')}</span>
+        <span className='text-gradient'>{t('usefulSites')}</span>
       </h3>
       <ul className='list-disc space-y-1 pl-4'>
         {websites.map((website) => (
           <li key={website.name}>
-            <Link
+            <ExternalLink
               href={website.url}
-              target='_blank'
-              rel='noopener noreferrer'
-              className='text-sm hover:text-pink-700 hover:underline hover:underline-offset-2'
-            >
-              {website.name}
-            </Link>
+              title={website.name}
+              className='text-text-primary dark:text-text-primary text-sm hover:text-pink-700 dark:hover:text-pink-600'
+            />
           </li>
         ))}
       </ul>

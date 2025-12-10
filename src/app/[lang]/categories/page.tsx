@@ -40,8 +40,8 @@ const CategoriesPage = async ({ params }: { params: Params }) => {
                   className='size-full'
                   style={getCategoryStyle(color)}
                 >
-                  <div className='bg-bg-secondary transition-color flex size-full flex-col rounded-lg border-2 border-[var(--category-color)] p-3 duration-300 dark:border-[var(--category-color-dark)]'>
-                    <h2 className='mb-1 flex flex-wrap items-baseline justify-between text-xl text-[var(--category-color)] dark:text-[var(--category-color-dark)]'>
+                  <div className='bg-bg-secondary transition-color flex size-full flex-col rounded-lg border-2 border-(--category-color) p-3 duration-300 dark:border-(--category-color-dark)'>
+                    <h2 className='mb-1 flex flex-wrap items-baseline justify-between text-xl text-(--category-color) dark:text-(--category-color-dark)'>
                       <Link
                         href={`/categories/${slug}`}
                         className='block transition-transform hover:scale-[1.02]'
@@ -54,7 +54,7 @@ const CategoriesPage = async ({ params }: { params: Params }) => {
                       </span>
                     </h2>
                     {subcategories && (
-                      <div className='flex flex-wrap gap-2 pt-2'>
+                      <div className='flex flex-wrap gap-1.5 pt-2'>
                         {Object.entries(
                           subcategories as Record<
                             string,
@@ -64,7 +64,7 @@ const CategoriesPage = async ({ params }: { params: Params }) => {
                           <Link
                             key={subSlug}
                             href={`/categories/${slug}/${subSlug}`}
-                            className='block rounded-full bg-[var(--subcategory-color)] px-2.5 py-1 transition-transform hover:scale-[1.02] dark:bg-[var(--subcategory-color-dark)]'
+                            className='block rounded-full border border-(--subcategory-color)/50 bg-(--subcategory-color)/10 px-2.5 py-1 transition-transform hover:scale-[1.02] dark:border-(--subcategory-color-dark)/80 dark:bg-(--subcategory-color-dark)/20'
                             style={
                               {
                                 '--subcategory-color': subCategory.color.light,
@@ -74,7 +74,7 @@ const CategoriesPage = async ({ params }: { params: Params }) => {
                             }
                             aria-label={`${subCategory.name[lang]} (${subCategory.postCount || 0} posts)`}
                           >
-                            <h3 className='text-text-secondary text-sm font-medium'>
+                            <h3 className='text-xs font-medium text-(--subcategory-color) dark:text-(--subcategory-color-dark)'>
                               {subCategory.name[lang]}
                             </h3>
                           </Link>

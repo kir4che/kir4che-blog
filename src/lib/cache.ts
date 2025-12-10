@@ -97,9 +97,8 @@ export const getPostsByCategoryCache = cache(
     lang: Language,
     type: 'main' | 'sub' | 'all' = 'all'
   ): Promise<{ category: any; posts: PostInfo[] }> => {
-    const { getCategoryBySlug, isPostInCategory } = await import(
-      '@/lib/categories'
-    );
+    const { getCategoryBySlug, isPostInCategory } =
+      await import('@/lib/categories');
     const allPosts = await getAllPostsCache();
     const posts = allPosts[lang] || [];
 

@@ -6,6 +6,7 @@ import CategoryList from '@/components/layouts/sidebar/CategoryList';
 import TagCloud from '@/components/layouts/sidebar/TagCloud';
 import MyWebsites from '@/components/layouts/sidebar/MyWebsites';
 import DonateBtns from '@/components/layouts/sidebar/DonateBtns';
+import Advertisement from '@/components/layouts/sidebar/Advertisement';
 import LineStickersCTA from '@/components/layouts/sidebar/LineStickersCTA';
 
 interface RightSidebarProps {
@@ -19,12 +20,14 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   tags,
   popularPosts,
 }) => (
-  <aside className='hidden w-full max-w-64 space-y-8 px-2 pb-4 lg:block'>
+  <aside className='hidden w-full max-w-68 space-y-6 px-2 pb-4 lg:block'>
     <SearchBar />
     {popularPosts.length > 0 && <PopularPosts posts={popularPosts} />}
     {categories.length > 0 && <CategoryList categories={categories} />}
     {tags.length > 0 && <TagCloud tags={tags} />}
+    <Advertisement />
     <MyWebsites />
+    <LineStickersCTA />
     <DonateBtns />
   </aside>
 );

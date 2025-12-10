@@ -22,7 +22,7 @@ const TagLoading = () => (
           </div>
         ))}
       </section>
-      <div className='flex justify-center'>
+      <div className='flex-center'>
         <Skeleton className='h-10 w-64' />
       </div>
     </div>
