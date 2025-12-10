@@ -1,11 +1,12 @@
 import type { Category, Tag, PostInfo } from '@/types';
 
-import SearchBar from '@/components/features/sidebar/SearchBar';
-import PopularPosts from '@/components/features/sidebar/PopularPosts';
-import CategoryList from '@/components/features/sidebar/CategoryList';
-import TagCloud from '@/components/features/sidebar/TagCloud';
-import MyWebsites from '@/components/features/sidebar/MyWebsites';
-import DonateBtns from '@/components/features/sidebar/DonateBtns';
+import SearchBar from '@/components/layouts/sidebar/SearchBar';
+import PopularPosts from '@/components/layouts/sidebar/PopularPosts';
+import CategoryList from '@/components/layouts/sidebar/CategoryList';
+import TagCloud from '@/components/layouts/sidebar/TagCloud';
+import MyWebsites from '@/components/layouts/sidebar/MyWebsites';
+import DonateBtns from '@/components/layouts/sidebar/DonateBtns';
+import LineStickersCTA from '@/components/layouts/sidebar/LineStickersCTA';
 
 interface RightSidebarProps {
   categories: Category[];

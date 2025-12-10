@@ -1,98 +1,108 @@
-export const dynamic = 'force-static';
-export const revalidate = 3600;
-
+import React from 'react';
 import { getTranslations } from 'next-intl/server';
-import { ChevronRight } from 'lucide-react';
 
 import type { Language } from '@/types';
 import { LANGUAGES } from '@/config';
-import { Link } from '@/i18n/navigation';
 import { getSiteData } from '@/lib/siteData';
 
 import PostPreview from '@/components/features/post/PostPreview';
 import Announcement from '@/components/ui/Announcement';
+import Pagination from '@/components/features/home/HomePagination';
 
-type Params = Promise<{
+const POSTS_PER_PAGE = 10;
+const AD_INSERT_INDEX = 3;
+
+type Params = {
   lang: Language;
-}>;
+};
+
+type SearchParams = {
+  page?: string;
+};
 
 export async function generateStaticParams() {
   return LANGUAGES.map((lang) => ({ lang }));
 }
 
-const Home = async ({ params }: { params: Params }) => {
+const Home = async ({
+  params,
+  searchParams,
+}: {
+  params: Params;
+  searchParams: SearchParams;
+}) => {
   const { lang } = await params;
+  const resolvedSearchParams = await searchParams;
+  const currentPage = Number(resolvedSearchParams?.page) || 1;
+
   const t = await getTranslations('HomePage');
   const { posts } = getSiteData(lang);
-  const latestPosts = posts.slice(0, 4);
+
+  const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
+  const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+  const currentPosts = posts.slice(startIndex, startIndex + POSTS_PER_PAGE);
+  const hasPosts = currentPosts.length > 0;
+  const isFirstPage = currentPage === 1;
+
+  const heroPost = isFirstPage ? currentPosts[0] : undefined;
+  const highlightPosts = isFirstPage ? currentPosts.slice(1, 4) : [];
+  const mobileFeaturedPosts = isFirstPage ? currentPosts.slice(0, 4) : [];
+  const listPosts = isFirstPage ? currentPosts.slice(4) : currentPosts;
+
+  const renderListPosts = () => (
+    <div className='grid grid-cols-1 gap-4'>
+      {listPosts.map((post) => (
+        <React.Fragment key={post.slug}>
+          <PostPreview post={post} variant='list' />
+        </React.Fragment>
+      ))}
+    </div>
+  );
 
   return (
-    <div className='space-y-8 py-2'>
+    <div className='space-y-6'>
       <Announcement text={t('announcement')} />
-      {/* 最新文章 */}
-      {latestPosts.length > 0 && (
-        <section id='posts'>
-          <div className='flex items-baseline justify-between'>
-            <h2 className='mb-3 text-lg font-bold tracking-wider text-pink-600 dark:text-pink-400'>
-              {t('latestPosts')}
-            </h2>
-            <Link
-              href='/posts'
-              className='group relative flex h-[30px] items-center gap-x-1 text-sm text-pink-600 dark:text-pink-200'
-              tabIndex={0}
-              aria-label={t('morePosts')}
-            >
-              <span className='relative h-[20px] overflow-hidden p-0'>
-                <div className='transform transition-transform duration-400 ease-in-out group-hover:-translate-y-[20px]'>
-                  <span className='block origin-right transition-transform duration-400 ease-in-out group-hover:rotate-[20deg]'>
-                    {t('morePosts')}
-                  </span>
-                  <span className='block origin-left rotate-[20deg] transition-transform duration-400 ease-in-out group-hover:rotate-0'>
-                    {t('morePosts')}
-                  </span>
-                </div>
-              </span>
-              <div className='flex-center relative size-4 overflow-hidden'>
-                <ChevronRight
-                  className='absolute size-4 transition-transform duration-400 ease-in-out group-hover:translate-x-[40px]'
-                  aria-hidden='true'
-                />
-                <ChevronRight
-                  className='absolute size-4 -translate-x-[40px] transition-transform duration-400 ease-in-out group-hover:translate-x-0'
-                  aria-hidden='true'
-                />
+      {hasPosts && (
+        <section id='posts' className='space-y-6'>
+          {isFirstPage ? (
+            <>
+              <div className='grid grid-cols-1 gap-4 md:hidden'>
+                {mobileFeaturedPosts.map((post) => (
+                  <PostPreview
+                    key={post.slug}
+                    post={post}
+                    variant='card'
+                    className={post.coverImage ? 'h-60' : 'h-auto'}
+                  />
+                ))}
               </div>
-            </Link>
-          </div>
-          <div className='grid grid-cols-1 gap-4 md:hidden'>
-            {latestPosts.map((post) => (
-              <PostPreview
-                key={post.slug}
-                post={post}
-                variant='card'
-                className={post.coverImage ? 'h-60' : 'h-auto'}
-              />
-            ))}
-          </div>
-          <div className='hidden md:grid md:grid-cols-[5fr_4fr] md:gap-4'>
-            {latestPosts.length > 0 && (
-              <PostPreview
-                key={latestPosts[0].slug}
-                post={latestPosts[0]}
-                variant='card'
-              />
-            )}
-            <div className='grid grid-cols-1 gap-4'>
-              {latestPosts.slice(1).map((post) => (
-                <PostPreview
-                  key={post.slug}
-                  post={post}
-                  variant='card'
-                  className={post.coverImage ? 'h-56' : 'h-auto'}
-                />
-              ))}
-            </div>
-          </div>
+              <div className='hidden md:grid md:grid-cols-[5fr_4fr] md:gap-4'>
+                {heroPost && (
+                  <PostPreview
+                    key={heroPost.slug}
+                    post={heroPost}
+                    variant='card'
+                  />
+                )}
+                {highlightPosts.length > 0 && (
+                  <div className='grid grid-cols-1 gap-4'>
+                    {highlightPosts.map((post) => (
+                      <PostPreview
+                        key={post.slug}
+                        post={post}
+                        variant='card'
+                        className={post.coverImage ? 'h-56' : 'h-auto'}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+              {listPosts.length > 0 && renderListPosts()}
+            </>
+          ) : (
+            renderListPosts()
+          )}
+          <Pagination currentPage={currentPage} totalPages={totalPages} />
         </section>
       )}
     </div>

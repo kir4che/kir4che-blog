@@ -3,6 +3,7 @@ export const dynamic = 'force-static';
 import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { Noto_Sans_TC, DM_Sans } from 'next/font/google';
+import Script from 'next/script';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { hasLocale } from 'next-intl';
 import { getMessages } from 'next-intl/server';
@@ -77,6 +78,14 @@ const RootLayout = async ({ children, params }: RootLayoutProps) => {
 
   return (
     <html lang={lang} suppressHydrationWarning>
+      <head>
+        <Script
+          async
+          src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9209549258046593'
+          crossOrigin='anonymous'
+          strategy='afterInteractive'
+        />
+      </head>
       <body
         className={`bg-bg-primary font-main sm:px-4 ${notoSansTC.variable} ${dmSans.variable}`}
       >
