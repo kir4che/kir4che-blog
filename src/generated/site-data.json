@@ -12,7 +12,9 @@
         "lang": "tw",
         "featured": false,
         "coverImage": "https://cdni.fancaps.net/file/fancaps-animeimages/17947731.jpg",
-        "hasPassword": false
+        "hasPassword": false,
+        "draft": false,
+        "updatedAt": "2025-10-04T05:54:11.293Z"
       },
       {
         "slug": "css-only-pokemon-3d-card",
@@ -24,7 +26,9 @@
         "wordCount": 405,
         "lang": "tw",
         "featured": true,
-        "hasPassword": false
+        "hasPassword": false,
+        "draft": false,
+        "updatedAt": "2025-09-22T08:53:27.861Z"
       },
       {
         "slug": "mdx-usage",
@@ -35,7 +39,8 @@
         "wordCount": 138,
         "lang": "tw",
         "featured": false,
-        "hasPassword": false
+        "hasPassword": false,
+        "draft": true
       },
       {
         "slug": "japan-nagoya-5-day-trip",
@@ -47,7 +52,9 @@
         "wordCount": 1860,
         "lang": "tw",
         "featured": true,
-        "hasPassword": true
+        "hasPassword": true,
+        "draft": false,
+        "updatedAt": "2025-08-20T11:35:29.797Z"
       },
       {
         "slug": "deploy-express-typescript-to-vercel",
@@ -59,7 +66,8 @@
         "wordCount": 393,
         "lang": "tw",
         "featured": false,
-        "hasPassword": false
+        "hasPassword": false,
+        "draft": false
       },
       {
         "slug": "cookie-vs-web-storage",
@@ -71,7 +79,8 @@
         "wordCount": 1383,
         "lang": "tw",
         "featured": false,
-        "hasPassword": false
+        "hasPassword": false,
+        "draft": false
       },
       {
         "slug": "japan-kyushu-5-day-trip",
@@ -84,7 +93,8 @@
         "lang": "tw",
         "featured": true,
         "coverImage": "/posts/japan-kyushu-2024-trip/IMG_1307.webp",
-        "hasPassword": false
+        "hasPassword": false,
+        "draft": false
       },
       {
         "slug": "frontend-bundlers-webpack-vs-vite",
@@ -95,7 +105,8 @@
         "wordCount": 519,
         "lang": "tw",
         "featured": false,
-        "hasPassword": false
+        "hasPassword": false,
+        "draft": false
       },
       {
         "slug": "korea-seoul-5-day-trip",
@@ -108,7 +119,8 @@
         "lang": "tw",
         "featured": true,
         "coverImage": "/posts/korea-seoul-2024-trip/IMG_5813.webp",
-        "hasPassword": false
+        "hasPassword": false,
+        "draft": false
       },
       {
         "slug": "gitlab-pages-add-custom-domain",
@@ -119,7 +131,8 @@
         "wordCount": 298,
         "lang": "tw",
         "featured": false,
-        "hasPassword": false
+        "hasPassword": false,
+        "draft": false
       },
       {
         "slug": "squash-commits-into-one",
@@ -131,37 +144,11 @@
         "wordCount": 566,
         "lang": "tw",
         "featured": false,
-        "hasPassword": false
+        "hasPassword": false,
+        "draft": false
       }
     ],
     "categories": [
-      {
-        "name": {
-          "tw": "前端",
-          "en": "Frontend"
-        },
-        "slug": "frontend",
-        "color": {
-          "light": "#42B5F9",
-          "dark": "#6AC5FB"
-        },
-        "subcategories": {
-          "css": {
-            "name": {
-              "tw": "CSS",
-              "en": "CSS"
-            },
-            "slug": "css",
-            "color": {
-              "light": "#264de4",
-              "dark": "#3572b5"
-            },
-            "parentSlug": "frontend",
-            "postCount": 1
-          }
-        },
-        "postCount": 3
-      },
       {
         "name": {
           "tw": "生活",
@@ -228,6 +215,33 @@
           }
         },
         "postCount": 3
+      },
+      {
+        "name": {
+          "tw": "前端",
+          "en": "前端"
+        },
+        "slug": "frontend",
+        "color": {
+          "light": "#42B5F9",
+          "dark": "#6AC5FB"
+        },
+        "subcategories": {
+          "css": {
+            "name": {
+              "tw": "CSS",
+              "en": "CSS"
+            },
+            "slug": "css",
+            "color": {
+              "light": "#264de4",
+              "dark": "#3572b5"
+            },
+            "parentSlug": "frontend",
+            "postCount": 1
+          }
+        },
+        "postCount": 1
       },
       {
         "name": {
@@ -365,7 +379,9 @@
         "wordCount": 1327,
         "lang": "en",
         "featured": true,
-        "hasPassword": false
+        "hasPassword": false,
+        "draft": true,
+        "updatedAt": "2025-08-20T11:35:29.797Z"
       },
       {
         "slug": "deploy-express-typescript-to-vercel",
@@ -377,7 +393,8 @@
         "wordCount": 239,
         "lang": "en",
         "featured": false,
-        "hasPassword": false
+        "hasPassword": false,
+        "draft": false
       },
       {
         "slug": "japan-kyushu-5-day-trip",
@@ -390,7 +407,9 @@
         "lang": "en",
         "featured": true,
         "coverImage": "/posts/japan-kyushu-2024-trip/IMG_1307.webp",
-        "hasPassword": false
+        "hasPassword": false,
+        "draft": false,
+        "updatedAt": "2025-08-20T10:59:48.078Z"
       },
       {
         "slug": "korea-seoul-5-day-trip",
@@ -403,7 +422,9 @@
         "lang": "en",
         "featured": true,
         "coverImage": "/posts/korea-seoul-2024-trip/IMG_5813.webp",
-        "hasPassword": false
+        "hasPassword": false,
+        "draft": false,
+        "updatedAt": "2025-08-20T10:59:48.078Z"
       }
     ],
     "categories": [

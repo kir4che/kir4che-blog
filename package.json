@@ -9,8 +9,7 @@
     "start": "next start",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "content": "ts-node --project scripts/tsconfig.scripts.json scripts/contentPipeline.ts",
-    "post:new": "ts-node --project scripts/tsconfig.scripts.json scripts/createPost.ts"
+    "content": "npm exec ts-node -- --project scripts/tsconfig.scripts.json scripts/prepareContent.ts"
   },
   "dependencies": {
     "@expressive-code/core": "^0.41.2",

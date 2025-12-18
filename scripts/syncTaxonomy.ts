@@ -29,7 +29,6 @@ const TAXONOMY_CONFIG_PATH = path.join(
 const CATEGORIES_CONTENT_PATH = path.join(
   process.cwd(),
   'content',
-  'taxonomy',
   'categories.yaml'
 );
 const SITE_DATA_PATH = path.join(
@@ -38,12 +37,7 @@ const SITE_DATA_PATH = path.join(
   'generated',
   'site-data.json'
 );
-const TAGS_CONTENT_PATH = path.join(
-  process.cwd(),
-  'content',
-  'taxonomy',
-  'tags.yaml'
-);
+const TAGS_CONTENT_PATH = path.join(process.cwd(), 'content', 'tags.yaml');
 
 const DEFAULT_COLOR = {
   light: '#999999',
