@@ -163,6 +163,7 @@ const buildSitemapFields = async () => {
 module.exports = {
   siteUrl: SITE_URL,
   generateRobotsTxt: true, // 自動生成 robots.txt
+  generateIndexSitemap: false, // 只輸出單一 sitemap
   transform: async () => null, // 不修改預設路徑格式
   additionalPaths: async () => buildSitemapFields(), // 自訂動態 sitemap entry
 };
