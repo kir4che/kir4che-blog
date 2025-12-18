@@ -8,8 +8,10 @@ import { detectLocale } from '@/utils/detectLocale';
 const LOCALES = CONFIG.languages.supportedLanguages;
 const DEFAULT_PATH = CONFIG.paths.languagePaths.tw;
 
-export const middleware = (request: NextRequest) => {
+export const proxy = (request: NextRequest) => {
   const { pathname } = request.nextUrl;
+
+  if (pathname.startsWith('/admin')) return NextResponse.next();
 
   // 若是根目錄，自動導向預設語言路徑。
   if (pathname === '/')
@@ -24,11 +26,6 @@ export const middleware = (request: NextRequest) => {
     const locale = detectLocale(request);
     return NextResponse.redirect(new URL(`/${locale}${pathname}`, request.url));
   }
-
-  const isEditorPage = /^\/(tw|en)\/editor(?:\/|$)?/.test(pathname);
-  const locale = pathname.split('/')[1];
-  if (isEditorPage && process.env.NEXT_PUBLIC_NODE_ENV !== 'development')
-    return NextResponse.redirect(new URL(`/${locale}/not-found`, request.url));
 
   return createMiddleware(routing)(request);
 };

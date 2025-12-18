@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, Children, isValidElement } from 'react';
 import type { MDXComponents } from 'mdx/types';
 import type { ImageMeta } from '@/types';
 
@@ -82,11 +82,19 @@ export const useMDXComponents = ({
       Kbd: ({ children }) => (
         <kbd className='kbd border-neutral-400 bg-neutral-200'>{children}</kbd>
       ), // <Kbd>Enter</Kbd>
-      p: ({ children }) => (
-        <p className='text-text-primary my-4 text-base/7 first:mt-0 last:mb-0'>
-          {children}
-        </p>
-      ),
+      p: ({ children }) => {
+        const hasElementChild = Children.toArray(children).some((child) =>
+          isValidElement(child)
+        );
+
+        const Wrapper: any = hasElementChild ? 'div' : 'p';
+
+        return (
+          <Wrapper className='text-text-primary my-4 text-base/7 first:mt-0 last:mb-0'>
+            {children}
+          </Wrapper>
+        );
+      },
       a: CustomLink, // [Text](url)
       img: ImgComponent, // \![alt](url)
       ul: ({ children }) => (

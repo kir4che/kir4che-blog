@@ -105,6 +105,8 @@ export const getPostsInfo = cache(
               ? String(data.coverImage).trim()
               : undefined,
             hasPassword: Boolean(data.password),
+            draft: Boolean(data.draft),
+            updatedAt: data.updatedAt,
           };
 
           return post;

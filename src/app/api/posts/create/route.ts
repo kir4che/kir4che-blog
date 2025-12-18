@@ -3,50 +3,17 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { writeFile } from 'fs/promises';
 
-import type { Language, Post } from '@/types';
-
-type CreatePostRequest = Omit<
-  Post,
-  'date' | 'wordCount' | 'updatedAt' | 'hasPassword' | 'mdxSource'
-> & { date?: string };
-
-// 產生 .mdx 文章內容，包含 yaml 配置區。
-const createMDXContent = (data: CreatePostRequest): string => {
-  const frontmatter: any = {
-    title: data.title,
-    description: data.description,
-    date: data.date ?? new Date().toISOString(),
-    tags: data.tags,
-    categories: data.categories,
-    draft: data.draft || false,
-    featured: data.featured || false,
-  };
-
-  if (data.password) frontmatter.password = data.password;
-  if (data.coverImage) frontmatter.coverImage = data.coverImage;
-
-  // 把物件轉成 yaml 格式字串
-  const frontmatterString = Object.entries(frontmatter)
-    .map(([key, value]) => {
-      if (value === undefined || value === null) return null;
-      if (Array.isArray(value)) {
-        // 陣列（像 tag/category）每行前面要加上兩個空格及 -
-        const arrayItems = value.map((item) => `  - "${item}"`).join('\n');
-        return `${key}:\n${arrayItems}`;
-      }
-      return `${key}: "${value}"`;
-    })
-    .filter(Boolean)
-    .join('\n');
-
-  return `---
-${frontmatterString}
----
-
-${data.content}`;
-};
+import { createMDXContent } from '@/utils/mdxWriter';
+import {
+  ensureEditorAuthorized,
+  resolveLanguageFromFormData,
+} from '@/utils/adminApi';
+import { triggerPrepareContent } from '@/utils/prepareContent';
 
 export const POST = async (req: Request) => {
+  const unauthorized = await ensureEditorAuthorized();
+  if (unauthorized) return unauthorized;
+
   try {
     const formData = await req.formData();
 
@@ -58,7 +25,7 @@ export const POST = async (req: Request) => {
     const categories = JSON.parse(
       (formData.get('categories') as string) || '[]'
     );
-    const lang = formData.get('lang') as Language;
+    const lang = resolveLanguageFromFormData(formData);
     const draft = formData.get('draft') === 'true';
     const featured = formData.get('featured') === 'true';
     const password = formData.get('password') as string;
@@ -137,23 +104,26 @@ export const POST = async (req: Request) => {
 
     const now = new Date().toISOString();
 
-    const mdxContent = createMDXContent({
-      title,
-      slug,
-      description,
-      content,
-      tags,
-      categories,
-      lang,
-      draft,
-      featured,
-      password: password?.trim() || undefined,
-      coverImage: coverImagePath || undefined,
-      date: now,
-    });
+    const mdxContent = createMDXContent(
+      {
+        title,
+        description,
+        tags,
+        categories,
+        draft,
+        featured,
+        password: password?.trim() || undefined,
+        coverImage: coverImagePath || undefined,
+        date: now,
+      },
+      content
+    );
 
     // 寫入 mdx 檔案
     await fs.writeFile(filePath, mdxContent, 'utf8');
+
+    // 文章建立後自動更新衍生內容。
+    triggerPrepareContent();
 
     return NextResponse.json(
       {
