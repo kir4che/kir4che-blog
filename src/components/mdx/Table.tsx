@@ -1,7 +1,7 @@
 interface TableProps {
   data: {
     headers: string[];
-    rows: string[][];
+    rows: Array<Array<string | undefined>>;
   };
 }
 
@@ -26,15 +26,15 @@ const Table: React.FC<TableProps> = ({ data }) => {
     });
   };
 
-  const mergeCols = (row: string[]) => {
+  const mergeCols = (row: Array<string | undefined>) => {
     const merged: { content: string; colSpan: number }[] = [];
     let i = 0;
 
     while (i < row.length) {
-      const content = row[i];
+      const content = row[i] ?? '';
       let span = 1;
 
-      while (i + span < row.length && row[i + span] === content) span++;
+      while (i + span < row.length && (row[i + span] ?? '') === content) span++;
 
       merged.push({ content, colSpan: span });
       i += span;

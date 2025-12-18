@@ -85,6 +85,7 @@ const MDXEditor = ({
   // 負責插入大部分簡單標記
   const handleInsert = (key: MDXActionKey) => {
     const action = mdxActions[key];
+    if (!action) return;
     insertText(action.before, action.after ?? '');
   };
 

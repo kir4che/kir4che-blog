@@ -26,7 +26,12 @@ export const GET = async (req: Request) => {
   const lang = isSupportedLanguage(langParam) ? langParam : DEFAULT_LANGUAGE;
   const defaultTitle = getLocalizedValue(CONFIG.siteInfo.blog.title, lang);
   const siteName = getLocalizedValue(CONFIG.siteInfo.blog.siteName, lang);
-  const title = removeEmojis(searchParams.get('title') || defaultTitle);
+  const rawTitle =
+    searchParams.get('title') ||
+    defaultTitle ||
+    siteName ||
+    CONFIG.siteInfo.name;
+  const title = removeEmojis(rawTitle);
   const tags =
     searchParams
       .get('tags')

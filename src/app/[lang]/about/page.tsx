@@ -8,9 +8,11 @@ import { getSeoConfig } from '@/lib/seo';
 
 import AboutPageClient from './client';
 
-type Params = Promise<{
+type Params = {
   lang: Language;
-}>;
+};
+
+type PageParams = { params: Promise<Params> };
 
 export async function generateStaticParams() {
   return LANGUAGES.map((lang) => ({ lang }));
@@ -19,56 +21,44 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: PageParams): Promise<Metadata> {
-  const { lang } = await params;
-  const baseMetadata = getSeoConfig(lang);
+  try {
+    const { lang } = await params;
+    const baseMetadata = getSeoConfig(lang);
 
-  const aboutTitle = lang === 'tw' ? '關於我' : 'About';
-  const aboutDescription =
-    lang === 'tw'
-      ? `關於 ${CONFIG.siteInfo.name} - 前端工程師，熱愛分享技術與生活`
-      : `About ${CONFIG.siteInfo.name} - Frontend Developer, sharing tech and life`;
-  const aboutTitle = lang === 'tw' ? '關於我' : 'About';
-  const aboutDescription =
-    lang === 'tw'
-      ? `關於 ${CONFIG.siteInfo.name} - 前端工程師，熱愛分享技術與生活`
-      : `About ${CONFIG.siteInfo.name} - Frontend Developer, sharing tech and life`;
+    const aboutTitle = lang === 'tw' ? '關於我' : 'About';
+    const aboutDescription =
+      lang === 'tw'
+        ? `關於 ${CONFIG.siteInfo.name} - 前端工程師，熱愛分享技術與生活`
+        : `About ${CONFIG.siteInfo.name} - Frontend Developer, sharing tech and life`;
 
-  return {
-    ...baseMetadata,
-    title: aboutTitle,
-    description: aboutDescription,
-    openGraph: {
-      ...baseMetadata.openGraph,
+    return {
+      ...baseMetadata,
       title: aboutTitle,
       description: aboutDescription,
-    },
-    twitter: {
-      ...baseMetadata.twitter,
-      title: aboutTitle,
-      description: aboutDescription,
-    },
-  };
-  return {
-    ...baseMetadata,
-    title: aboutTitle,
-    description: aboutDescription,
-    openGraph: {
-      ...baseMetadata.openGraph,
-      title: aboutTitle,
-      description: aboutDescription,
-    },
-    twitter: {
-      ...baseMetadata.twitter,
-      title: aboutTitle,
-      description: aboutDescription,
-    },
-  };
+      openGraph: {
+        ...baseMetadata.openGraph,
+        title: aboutTitle,
+        description: aboutDescription,
+      },
+      twitter: {
+        ...baseMetadata.twitter,
+        title: aboutTitle,
+        description: aboutDescription,
+      },
+    };
+  } catch (err) {
+    throw err;
+  }
 }
 
 const AboutPage = async ({ params }: PageParams) => {
-  const { lang } = await params;
-  void lang;
-  return <AboutPageClient />;
+  try {
+    const { lang } = await params;
+    void lang;
+    return <AboutPageClient />;
+  } catch (err) {
+    throw err;
+  }
 };
 
 export default AboutPage;

@@ -23,13 +23,25 @@ const KEYWORDS_BY_LANG: Record<string, string[]> = {
 };
 
 export const getSeoConfig = (lang: string): Metadata => {
-  const blogTitle = getLocalizedValue(CONFIG.siteInfo.blog.title, lang);
-  const blogDescription = getLocalizedValue(
-    CONFIG.siteInfo.blog.description,
-    lang
-  );
-  const blogSiteName = getLocalizedValue(CONFIG.siteInfo.blog.siteName, lang);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL!;
+  const blogTitle =
+    getLocalizedValue(CONFIG.siteInfo.blog.title, lang) ?? CONFIG.siteInfo.name;
+  const blogDescription =
+    getLocalizedValue(CONFIG.siteInfo.blog.description, lang) ?? 'kir4che Blog';
+  const blogSiteName =
+    getLocalizedValue(CONFIG.siteInfo.blog.siteName, lang) ??
+    CONFIG.siteInfo.name;
+
+  const fallbackSiteUrl = 'https://kir4che.com';
+  const rawSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || fallbackSiteUrl;
+
+  const siteUrl = rawSiteUrl.replace(/\/+$/, '');
+
+  let metadataBase: URL | undefined;
+  try {
+    metadataBase = new URL(siteUrl);
+  } catch {
+    metadataBase = undefined;
+  }
 
   const localeToUrl = Object.fromEntries(
     Object.entries(CONFIG.paths.languagePaths).map(([languageKey, path]) => [

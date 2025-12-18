@@ -61,6 +61,8 @@ export async function generateMetadata({ params }: PageParams) {
 
   const baseMetadata = getSeoConfig(lang);
   const metadataBase = baseMetadata.metadataBase!;
+  const metadataBaseUrl =
+    typeof metadataBase === 'string' ? new URL(metadataBase) : metadataBase;
 
   const meta = (await getPostsInfo(lang, slug)) as Partial<PostInfo> | null;
 
@@ -81,13 +83,13 @@ export async function generateMetadata({ params }: PageParams) {
     `api/og?lang=${lang}&title=${encodeURIComponent(
       title
     )}&tags=${encodeURIComponent(tags?.join(',') || '')}`,
-    metadataBase
+    metadataBaseUrl
   ).toString();
 
   const languageAlternates = Object.fromEntries(
     languagesForAlternates.map((languageKey) => {
       const alternateUrl = getAbsolutePostUrl({
-        metadataBase,
+        metadataBase: metadataBaseUrl,
         lang: languageKey,
         date: languageMetadata[languageKey]?.date ?? date,
         slug,
@@ -100,7 +102,7 @@ export async function generateMetadata({ params }: PageParams) {
   const defaultLangUrl =
     languageAlternates[DEFAULT_LANGUAGE] ??
     languageAlternates[lang] ??
-    getAbsolutePostUrl({ metadataBase, lang, date, slug });
+    getAbsolutePostUrl({ metadataBase: metadataBaseUrl, lang, date, slug });
 
   const openGraphLocaleAlternates = Array.from(
     new Set(
@@ -125,7 +127,7 @@ export async function generateMetadata({ params }: PageParams) {
   ).slice(0, 10);
 
   const canonicalUrl = getAbsolutePostUrl({
-    metadataBase,
+    metadataBase: metadataBaseUrl,
     lang,
     date,
     slug,
@@ -187,7 +189,7 @@ export async function generateMetadata({ params }: PageParams) {
       ],
     },
     authors: baseMetadata.authors ?? [
-      { name: CONFIG.siteInfo.name, url: metadataBase.origin },
+      { name: CONFIG.siteInfo.name, url: metadataBaseUrl.origin },
     ],
     publisher: CONFIG.siteInfo.name,
     robots: baseMetadata.robots ?? 'index,follow',
