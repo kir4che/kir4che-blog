@@ -6,7 +6,7 @@ import CategoryList from '@/components/layouts/sidebar/CategoryList';
 import TagCloud from '@/components/layouts/sidebar/TagCloud';
 import MyWebsites from '@/components/layouts/sidebar/MyWebsites';
 import DonateBtns from '@/components/layouts/sidebar/DonateBtns';
-import Advertisement from '@/components/layouts/sidebar/Advertisement';
+// import Advertisement from '@/components/layouts/sidebar/Advertisement';
 import LineStickersCTA from '@/components/layouts/sidebar/LineStickersCTA';
 
 interface RightSidebarProps {
@@ -25,7 +25,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
     {popularPosts.length > 0 && <PopularPosts posts={popularPosts} />}
     {categories.length > 0 && <CategoryList categories={categories} />}
     {tags.length > 0 && <TagCloud tags={tags} />}
-    <Advertisement />
+    {/* <Advertisement /> */}
     <MyWebsites />
     <LineStickersCTA />
     <DonateBtns />

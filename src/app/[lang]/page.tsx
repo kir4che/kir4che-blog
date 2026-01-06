@@ -7,11 +7,11 @@ import { getSiteData } from '@/lib/siteData';
 
 import PostPreview from '@/components/features/post/PostPreview';
 import Announcement from '@/components/ui/Announcement';
-import Advertisement from '@/components/layouts/sidebar/Advertisement';
+// import Advertisement from '@/components/layouts/sidebar/Advertisement';
 import Pagination from '@/components/features/home/HomePagination';
 
 const POSTS_PER_PAGE = 10;
-const AD_INSERT_INDEX = 3;
+// const AD_INSERT_INDEX = 3;
 
 type Params = {
   lang: Language;
@@ -55,7 +55,7 @@ const Home = async ({
       {listPosts.map((post, index) => (
         <React.Fragment key={post.slug}>
           <PostPreview post={post} variant='list' />
-          {withAd && index === AD_INSERT_INDEX && <Advertisement />}
+          {/* {withAd && index === AD_INSERT_INDEX && <Advertisement />} */}
         </React.Fragment>
       ))}
     </div>
