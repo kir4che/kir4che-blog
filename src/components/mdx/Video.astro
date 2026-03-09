@@ -1,0 +1,90 @@
+---
+import { cn } from '@/utils/cn';
+import FigureShell from '@/components/mdx/FigureShell.astro';
+
+interface CustomVideoProps {
+  src: string;
+  title?: string;
+  height?: string | number;
+  width?: string | number;
+  align?: 'left' | 'center' | 'right';
+  controls?: boolean;
+  autoPlay?: boolean;
+  loop?: boolean;
+  muted?: boolean;
+  class?: string;
+  poster?: string;
+  [key: string]: any;
+}
+
+const {
+  src,
+  title,
+  height,
+  width,
+  align = 'center',
+  controls = true,
+  autoPlay = false,
+  loop = false,
+  muted = true,
+  class: className,
+  poster,
+  ...rest
+} = Astro.props as CustomVideoProps;
+
+const hasControlsProp = Object.prototype.hasOwnProperty.call(Astro.props, 'controls');
+const shouldShowControls = hasControlsProp ? controls : !loop;
+---
+
+<FigureShell
+  align={align}
+  title={title}
+  class={cn(className)}
+  style={{
+    height: height || 'auto',
+    width: width || '100%',
+  } as Record<string, string | number>}
+>
+  <div class="relative size-full overflow-hidden">
+    <video
+      src={src}
+      controls={shouldShowControls}
+      autoplay={autoPlay}
+      loop={loop}
+      muted={muted}
+      playsinline
+      preload="auto"
+      poster={poster}
+      class="size-full object-cover transition-opacity duration-300"
+      data-auto-play={autoPlay ? 'true' : undefined}
+      {...rest}></video>
+  </div>
+</FigureShell>
+
+{
+  autoPlay ? (
+    <script is:inline>
+      {`
+      (() => {
+        if (window.__astroVideoInit) return;
+        window.__astroVideoInit = true;
+
+        const getVideos = () => Array.from(document.querySelectorAll('video[data-auto-play="true"]'));
+
+        const syncVideos = () => {
+          const videos = getVideos();
+          videos.forEach((video) => {
+            if (document.hidden) {
+              video.pause();
+            } else {
+              video.play().catch(() => {});
+            }
+          });
+        };
+
+        document.addEventListener('visibilitychange', syncVideos);
+      })();
+    `}
+    </script>
+  ) : null
+}

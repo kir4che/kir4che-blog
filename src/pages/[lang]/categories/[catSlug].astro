@@ -1,0 +1,137 @@
+---
+import type { Category, CategoryInfo } from '@/types';
+import { resolveLanguage, createTranslator } from '@/lib/i18n';
+import { withLocalePrefix } from '@/lib/paths';
+import { getPostsInfo } from '@/lib/posts';
+import { paginate } from '@/lib/pagination';
+import { getCategoryBySlug, isPostInCategory, getCategoryStyle } from '@/lib/categories';
+import PostListLayout from '@/layouts/PostListLayout.astro';
+import Pagination from '@/components/ui/Pagination.astro';
+import PostPreviewList from '@/components/features/post/preview/PostPreviewList.astro';
+
+const lang = resolveLanguage(Astro.params.lang);
+const t = createTranslator(lang, 'CategoriesPage');
+
+const link = (href: string) => withLocalePrefix(href, lang);
+
+const catSlug = Astro.params.catSlug as string;
+
+const pageParam = Number(Astro.url.searchParams.get('page'));
+const currentPage = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
+
+const posts = await getPostsInfo(lang);
+
+const resolved = getCategoryBySlug(catSlug, posts, 'all');
+if (!resolved) return new Response(null, { status: 404 });
+
+const isSubCategory = 'parentSlug' in resolved && Boolean(resolved.parentSlug);
+const resolvedSub = isSubCategory ? (resolved as CategoryInfo) : null;
+
+// 取得主分類
+const mainCategory = isSubCategory
+  ? getCategoryBySlug(resolvedSub!.parentSlug!, posts, 'main')
+  : resolved;
+if (!mainCategory) return new Response(null, { status: 404 });
+if (!('subcategories' in mainCategory)) return new Response(null, { status: 404 });
+
+// 子分類（若存在）
+const subCategory = resolvedSub;
+const hasSubCategory = Boolean(subCategory);
+
+const pageTitle = isSubCategory
+  ? (subCategory!.name[lang] ?? subCategory!.name.en ?? Object.values(subCategory!.name)[0])
+  : (mainCategory.name[lang] ?? mainCategory.name.en ?? Object.values(mainCategory.name)[0]);
+
+const subcategories: Record<string, CategoryInfo> = (mainCategory as Category).subcategories ?? {};
+
+const filteredPosts = posts.filter((post) => {
+  if (subCategory) return isPostInCategory(post, subCategory.name, subCategory.slug);
+
+  if (isPostInCategory(post, mainCategory.name, mainCategory.slug)) return true;
+
+  return Object.values(subcategories).some((sub) => isPostInCategory(post, sub.name, sub.slug));
+});
+
+const {
+  items: paginatedPosts,
+  currentPage: safePage,
+  totalPages,
+  totalItems,
+} = paginate(filteredPosts, currentPage);
+---
+
+<PostListLayout title={pageTitle}>
+  <nav
+    slot="header"
+    class="flex items-baseline justify-between text-sm text-gray-400 dark:text-gray-300"
+  >
+    <div class="flex items-center space-x-2">
+      <a
+        href={withLocalePrefix('/categories', lang)}
+        class="hover:text-foreground-primary transition-colors"
+      >
+        {t('breadcrumb.categories')}
+      </a>
+      <span>/</span>
+      <a
+        href={withLocalePrefix(`/categories/${mainCategory.slug}`, lang)}
+        class="font-medium text-(--category-color)"
+        style={getCategoryStyle(mainCategory.color)}
+      >
+        {mainCategory.name[lang]}
+      </a>
+      {
+        hasSubCategory && subCategory && (
+          <>
+            <span>/</span>
+            <a
+              href={withLocalePrefix(`/categories/${subCategory.slug}`, lang)}
+              class="font-medium text-(--category-color)"
+              style={getCategoryStyle(subCategory.color)}
+            >
+              {subCategory.name[lang]}
+            </a>
+          </>
+        )
+      }
+    </div>
+    <span class="text-gray-500 dark:text-gray-400">
+      {t('postCount', { count: totalItems })}
+    </span>
+  </nav>
+  {
+    !hasSubCategory && Object.keys(subcategories).length > 0 && (
+      <div slot="subheader" class="flex flex-wrap items-center gap-2 text-xs">
+        {Object.entries(subcategories).map(([slug, sub]) => (
+          <a
+            href={withLocalePrefix(`/categories/${slug}`, lang)}
+            class="rounded-full border border-(--subcategory-color)/50 bg-(--subcategory-color)/10 px-2.5 py-1 transition hover:brightness-110 dark:border-(--subcategory-color-dark)/80 dark:bg-(--subcategory-color-dark)/20"
+            style={{
+              '--subcategory-color': sub.color.light,
+              '--subcategory-color-dark': sub.color.dark,
+            }}
+          >
+            <span class="text-(--subcategory-color) dark:text-(--subcategory-color-dark)">
+              {sub.name[lang]}
+            </span>
+          </a>
+        ))}
+      </div>
+    )
+  }
+  <section class="space-y-4">
+    {paginatedPosts.map((post) => <PostPreviewList post={post} lang={lang} />)}
+  </section>
+  {
+    totalPages > 1 && (
+      <Pagination
+        slot="pagination"
+        t={t}
+        link={link}
+        basePath={`/categories/${catSlug}`}
+        currentPage={safePage}
+        totalPages={totalPages}
+      />
+    )
+  }
+</PostListLayout>

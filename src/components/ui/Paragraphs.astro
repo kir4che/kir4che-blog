@@ -1,0 +1,17 @@
+---
+import { cn } from '@/utils/cn';
+
+interface ParagraphsProps {
+  text: string;
+  class?: string;
+}
+
+const { text, class: className } = Astro.props as ParagraphsProps;
+
+const paragraphs = text
+  .split('\n')
+  .map((line) => line.trim())
+  .filter(Boolean);
+---
+
+{paragraphs.map((line) => <p class={cn('text-base/8', className)}>{line}</p>)}

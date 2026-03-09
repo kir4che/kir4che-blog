@@ -1,118 +1,92 @@
-import { cache } from 'react';
-
-import type { PostInfo, Category, CategoryInfo } from '@/types';
-import { CONFIG } from '@/config';
-import { categoryMap } from '@/config/taxonomy';
+import type { PostMeta, Category, CategoryInfo, CategoryColorScheme } from '@/types';
+import { SUPPORTED_LANGUAGES, categoryMap } from '@/config';
 
 type PostCountMap = Record<string, number>;
 
-// 建立分類名稱 → slug 的映射表
-export const createCategoryNameToSlugMap = cache(
-  (): ReadonlyMap<string, string> => {
-    const langs = CONFIG.languages.supportedLanguages;
-    const entries: [string, string][] = [];
+// category name / slug → slug
+let categoryNameToSlugMap: ReadonlyMap<string, string> | null = null;
 
-    for (const [slug, category] of Object.entries(categoryMap)) {
-      entries.push([slug, slug]);
+// 建立「分類名稱 / slug → slug」
+export const createCategoryNameToSlugMap = (): ReadonlyMap<string, string> => {
+  if (categoryNameToSlugMap) return categoryNameToSlugMap;
 
-      for (const lang of langs) {
-        const categoryName = category.name[lang]?.trim();
-        if (categoryName) entries.push([categoryName, slug]);
-      }
+  const entries: [string, string][] = [];
 
-      // 處理子分類名稱對應
-      if (category.subcategories) {
-        for (const [subSlug, subCategory] of Object.entries(
-          category.subcategories
-        )) {
-          entries.push([subSlug, subSlug]);
+  for (const [slug, category] of Object.entries(categoryMap)) {
+    // 主分類 slug
+    entries.push([slug.toLowerCase(), slug]);
 
-          for (const lang of langs) {
-            const subCategoryName = subCategory.name[lang]?.trim();
-            if (subCategoryName) entries.push([subCategoryName, subSlug]);
-          }
+    // 主分類各語系名稱
+    for (const lang of SUPPORTED_LANGUAGES) {
+      const name = category.name[lang]?.trim();
+      if (name) entries.push([name.toLowerCase(), slug]);
+    }
+
+    // 子分類
+    if (category.subcategories) {
+      for (const [subSlug, sub] of Object.entries(category.subcategories)) {
+        entries.push([subSlug.toLowerCase(), subSlug]);
+
+        for (const lang of SUPPORTED_LANGUAGES) {
+          const subName = sub.name[lang]?.trim();
+          if (subName) entries.push([subName.toLowerCase(), subSlug]);
         }
       }
     }
-
-    return new Map(entries);
   }
-);
 
-// 建立子分類對應 → 父分類的映射表
+  categoryNameToSlugMap = new Map(entries);
+  return categoryNameToSlugMap;
+};
+
+// 子分類 slug → 父分類 slug
 const subcategoryParentMap: ReadonlyMap<string, string> = (() => {
   const map = new Map<string, string>();
 
   for (const [parentSlug, category] of Object.entries(categoryMap)) {
     if (!category.subcategories) continue;
 
-    for (const subSlug of Object.keys(category.subcategories))
+    for (const subSlug of Object.keys(category.subcategories)) {
       map.set(subSlug, parentSlug);
+    }
   }
 
   return map;
 })();
 
-// 計算每個分類（含子分類）出現過的文章數量
+// 計算每個分類（含父分類）的文章數量
 const calculatePostCounts = (
-  posts: PostInfo[],
+  posts: PostMeta[],
   nameToSlugMap: ReadonlyMap<string, string>
 ): PostCountMap => {
   const counts: PostCountMap = {};
 
   for (const post of posts) {
-    if (!Array.isArray(post.categories) || post.categories.length === 0)
-      continue;
+    if (!Array.isArray(post.categories)) continue;
 
+    // 同一篇文章中，避免同分類被算兩次
     const slugsForPost = new Set<string>();
 
-    for (const categoryName of post.categories) {
-      const trimmedName = categoryName?.trim();
-      if (!trimmedName) continue;
+    for (const raw of post.categories) {
+      const name = raw?.trim().toLowerCase();
+      if (!name) continue;
 
-      const categorySlug = nameToSlugMap.get(trimmedName);
-      if (!categorySlug) continue;
+      const slug = nameToSlugMap.get(name);
+      if (!slug) continue;
 
-      slugsForPost.add(categorySlug);
+      slugsForPost.add(slug);
 
-      // 如果是子分類，也要計入父分類。
-      const parentSlug = subcategoryParentMap.get(categorySlug);
-      if (parentSlug) slugsForPost.add(parentSlug);
+      const parent = subcategoryParentMap.get(slug);
+      if (parent) slugsForPost.add(parent);
     }
 
-    for (const slug of slugsForPost) counts[slug] = (counts[slug] || 0) + 1;
+    for (const slug of slugsForPost) counts[slug] = (counts[slug] ?? 0) + 1;
   }
 
   return counts;
 };
 
-// 檢查文章是否屬於指定分類
-export const isPostInCategory = (
-  post: PostInfo,
-  categoryName: { tw: string; en: string },
-  slug?: string
-): boolean => {
-  if (!Array.isArray(post.categories)) return false;
-
-  const lowerSlug = slug?.toLowerCase();
-
-  return post.categories.some((cat) => {
-    if (!cat || typeof cat !== 'string') return false;
-
-    const lowerCat = cat.toLowerCase();
-
-    // 比對所有支援語系的 name
-    const matchByName = CONFIG.languages.supportedLanguages.some((lang) => {
-      const name = categoryName[lang];
-      return name && lowerCat === name.toLowerCase();
-    });
-
-    // 比對 slug 或 name
-    return matchByName || (lowerSlug && lowerCat === lowerSlug);
-  });
-};
-
-// 處理子分類資料，只保留有文章的子分類。
+// 處理子分類資訊（只回傳有文章的子分類）
 const processSubcategories = (
   subcategories: Category['subcategories'],
   parentSlug: string,
@@ -122,42 +96,38 @@ const processSubcategories = (
 
   const result: Record<string, CategoryInfo> = {};
 
-  for (const [subSlug, sub] of Object.entries(subcategories)) {
-    const postCount = postCounts[subSlug] || 0;
+  for (const [slug, sub] of Object.entries(subcategories)) {
+    const count = postCounts[slug] ?? 0;
+    if (count === 0) continue;
 
-    if (postCount > 0)
-      result[subSlug] = {
-        name: sub.name,
-        slug: subSlug,
-        color: sub.color,
-        parentSlug,
-        postCount,
-      };
+    result[slug] = {
+      name: sub.name,
+      slug,
+      color: sub.color,
+      parentSlug,
+      postCount: count,
+    };
   }
 
   return result;
 };
 
-// 取得所有有文章的分類，依文章數排序。
-export const getAllCategoryByPosts = (
-  posts: PostInfo[],
-  limit?: number
-): Category[] => {
+// 依文章資料取得所有分類（含子分類），並計算文章數。
+export const getAllCategoryByPosts = (posts: PostMeta[], limit?: number): Category[] => {
   const nameToSlugMap = createCategoryNameToSlugMap();
   const postCounts = calculatePostCounts(posts, nameToSlugMap);
 
   const categories = Object.entries(categoryMap)
     .reduce<Category[]>((acc, [slug, cat]) => {
-      const subs = processSubcategories(cat.subcategories, slug, postCounts);
-      const total = postCounts[slug] || 0;
+      const count = postCounts[slug] ?? 0;
+      if (count === 0) return acc;
 
-      if (total > 0)
-        acc.push({
-          ...cat,
-          slug,
-          postCount: total,
-          subcategories: subs,
-        });
+      acc.push({
+        ...cat,
+        slug,
+        postCount: count,
+        subcategories: processSubcategories(cat.subcategories, slug, postCounts),
+      });
 
       return acc;
     }, [])
@@ -166,76 +136,124 @@ export const getAllCategoryByPosts = (
   return limit ? categories.slice(0, limit) : categories;
 };
 
-// 根據 slug 或名稱查找特定分類的詳細資料
-export const getCategoryBySlug = cache(
-  (
-    slugOrName: string,
-    posts: PostInfo[],
-    type: 'main' | 'sub' | 'all' = 'all'
-  ): Category | null => {
-    const nameToSlugMap = createCategoryNameToSlugMap();
-    const postCounts = calculatePostCounts(posts, nameToSlugMap);
+// 依 slug 取得單一分類資訊（主分類或子分類）
+export const getCategoryInfoBySlug = (slug: string): CategoryInfo | null => {
+  // 主分類
+  const main = categoryMap[slug];
+  if (main) {
+    return {
+      name: main.name,
+      slug,
+      color: main.color,
+    };
+  }
 
-    const mainCategory = categoryMap[slugOrName];
+  // 子分類
+  for (const [parentSlug, category] of Object.entries(categoryMap)) {
+    const sub = category.subcategories?.[slug];
+    if (!sub) continue;
 
-    // 搜尋主分類
-    if ((type === 'main' || type === 'all') && mainCategory) {
-      const categoryPosts = posts.filter((post) => {
-        // 判斷是否屬於該主分類或其子分類
-        const isMainCategory = isPostInCategory(
-          post,
-          mainCategory.name,
-          slugOrName
-        );
+    return {
+      name: sub.name,
+      slug,
+      color: sub.color,
+      parentSlug,
+    };
+  }
 
-        const hasSubcategory =
-          mainCategory.subcategories &&
-          Object.values(mainCategory.subcategories).some((sub) =>
-            isPostInCategory(post, sub.name, sub.slug)
-          );
+  return null;
+};
 
-        return isMainCategory || hasSubcategory;
-      });
+// 依 slug 取得分類（主分類或子分類），並包含文章數。
+export const getCategoryBySlug = (
+  slug: string,
+  posts: PostMeta[],
+  scope: 'all' | 'main' | 'sub' = 'all'
+): Category | CategoryInfo | null => {
+  if (!slug) return null;
 
-      if (categoryPosts.length === 0) return null;
+  const categories = getAllCategoryByPosts(posts);
+  const main = categories.find((category) => category.slug === slug);
+  if (main && scope !== 'sub') return main;
+  if (scope === 'main') return null;
 
-      const processedSubcategories = processSubcategories(
-        mainCategory.subcategories,
-        slugOrName,
-        postCounts
-      );
+  for (const category of categories) {
+    const sub = category.subcategories?.[slug];
+    if (sub) return sub;
+  }
 
-      return {
-        ...mainCategory,
-        slug: slugOrName,
-        postCount: categoryPosts.length,
-        subcategories: processedSubcategories,
-      };
-    }
+  return null;
+};
 
-    // 搜尋子分類
-    if (type === 'sub' || type === 'all') {
-      for (const [parentSlug, category] of Object.entries(categoryMap)) {
-        const subcategory = category.subcategories?.[slugOrName];
+// 判斷文章是否屬於指定分類
+export const isPostInCategory = (
+  post: PostMeta,
+  name: CategoryInfo['name'],
+  slug: string
+): boolean => {
+  if (!Array.isArray(post.categories) || !slug) return false;
 
-        if (subcategory) {
-          const categoryPosts = posts.filter((post) =>
-            isPostInCategory(post, subcategory.name, slugOrName)
-          );
+  const targetSlug = slug.trim().toLowerCase();
+  const nameToSlugMap = createCategoryNameToSlugMap();
+  const nameCandidates = new Set(
+    Object.values(name ?? {})
+      .map((value) => value?.trim().toLowerCase())
+      .filter(Boolean) as string[]
+  );
 
-          if (categoryPosts.length === 0) return null;
+  for (const raw of post.categories) {
+    const normalized = raw?.trim().toLowerCase();
+    if (!normalized) continue;
 
-          return {
-            ...subcategory,
-            slug: slugOrName,
-            parentSlug,
-            postCount: categoryPosts.length,
-            subcategories: {},
-          };
-        }
+    if (normalized === targetSlug) return true;
+    if (nameCandidates.has(normalized)) return true;
+
+    const mapped = nameToSlugMap.get(normalized);
+    if (mapped && mapped.toLowerCase() === targetSlug) return true;
+  }
+
+  return false;
+};
+
+// 將原始分類名稱陣列轉換為可用的 CategoryInfo 陣列
+export const normalizeCategories = (rawCategories: string[] = []): CategoryInfo[] => {
+  if (rawCategories.length === 0) return [];
+
+  const result: CategoryInfo[] = [];
+  const seen = new Set<string>(); // 避免重複加入分類
+  const nameToSlugMap = createCategoryNameToSlugMap();
+
+  for (const raw of rawCategories) {
+    const name = raw?.trim();
+    if (!name) continue;
+
+    const slug = nameToSlugMap.get(name.toLowerCase());
+    if (!slug) continue;
+
+    const info = getCategoryInfoBySlug(slug);
+    if (!info || seen.has(info.slug)) continue;
+
+    // 有的話先加入父分類
+    if (info.parentSlug && !seen.has(info.parentSlug)) {
+      const parent = getCategoryInfoBySlug(info.parentSlug);
+      if (parent) {
+        seen.add(parent.slug);
+        result.push(parent);
       }
     }
 
-    return null;
+    seen.add(info.slug);
+    result.push(info);
   }
-);
+
+  return result;
+};
+
+const isValidColor = (value: string) => /^#([0-9a-f]{3}){1,2}$/i.test(value);
+
+// 取得分類 badge 的 CSS 變數樣式
+export const getCategoryStyle = (color: CategoryColorScheme) =>
+  ({
+    '--category-color': isValidColor(color.light) ? color.light : '#ccc',
+    '--category-color-dark': isValidColor(color.dark) ? color.dark : '#666',
+  }) satisfies Record<string, string>;

@@ -1,0 +1,45 @@
+---
+import { ExternalLink as ExternalLinkIcon } from '@lucide/astro';
+import { cn } from '@/utils/cn';
+
+interface ExternalLinkProps {
+  href: string;
+  class?: string;
+  noline?: boolean;
+  showIcon?: boolean;
+  ariaLabel?: string;
+}
+
+const {
+  href,
+  class: className,
+  noline = false,
+  showIcon = false,
+  ariaLabel,
+} = Astro.props as ExternalLinkProps;
+
+const hasSlot = Astro.slots.default;
+---
+
+<a
+  href={href}
+  target="_blank"
+  rel="noopener noreferrer"
+  class={cn(
+    'group text-primary inline-flex items-center gap-1',
+    !noline && 'link link-hover hover:underline-offset-2',
+    className
+  )}
+  aria-label={!hasSlot ? ariaLabel : undefined}
+>
+  <slot />
+  {
+    showIcon && (
+      <ExternalLinkIcon
+        size={16}
+        class="opacity-70 transition-transform group-hover:-translate-y-0.5"
+        aria-hidden="true"
+      />
+    )
+  }
+</a>

@@ -1,0 +1,63 @@
+---
+import { Link as LinkIcon } from '@lucide/astro';
+import type { Translator } from '@/types';
+import ExternalLink from '@/components/ui/ExternalLink.astro';
+
+interface MyWebsitesProps {
+  t: Translator;
+}
+
+const { t } = Astro.props as MyWebsitesProps;
+
+const websites = [
+  {
+    key: 'frontendLab',
+    name: t('usefulSites.items.frontendLab'),
+    url: 'https://frontend-lab.kir4che.com/',
+  },
+  {
+    key: 'kaomojiLab',
+    name: t('usefulSites.items.kaomojiLab'),
+    url: 'https://kaomojilab.com/',
+  },
+  {
+    key: 'picQuads',
+    name: t('usefulSites.items.picQuads'),
+    url: 'https://picquads.zeabur.app/',
+  },
+  {
+    key: 'decisionwheel',
+    name: t('usefulSites.items.decisionwheel'),
+    url: 'https://decisionwheel.kir4che.com/',
+  },
+  {
+    key: 'lumical',
+    name: t('usefulSites.items.lumical'),
+    url: 'https://lumical.kir4che.com/',
+  },
+];
+---
+
+<section>
+  <h3 class="mb-3 flex items-center gap-x-2 uppercase">
+    <LinkIcon size={16} class="text-pink-700 dark:text-pink-300" aria-hidden="true" />
+    <span class="text-gradient">
+      {t('usefulSites.title')}
+    </span>
+  </h3>
+  <ul class="list-disc space-y-1 pl-4">
+    {
+      websites.map((website) => (
+        <li>
+          <ExternalLink
+            href={website.url}
+            class="text-foreground-primary text-sm hover:text-pink-700 dark:hover:text-pink-600"
+            ariaLabel={website.name}
+          >
+            {website.name}
+          </ExternalLink>
+        </li>
+      ))
+    }
+  </ul>
+</section>

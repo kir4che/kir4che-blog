@@ -1,65 +1,66 @@
-import type { Language, PostInfo, TagDefinition } from '@/types';
-import { DEFAULT_LANGUAGE } from '@/config';
-import { tagMap } from '@/config/taxonomy';
+import type { Language, PostMeta, SidebarTag, TagBadgeInfo } from '@/types';
+import { DEFAULT_LANGUAGE, tagMap } from '@/config';
+import { slugifyTag } from '@/utils/slug';
 
-// 將標籤名稱轉換為 slug 格式
-export const convertToSlug = (tag: string): string => {
-  return tag
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, '-') // 空白替換為連字符
-    .replace(/[^\w\u4e00-\u9fa5-]/g, ''); // 移除非英數中文字元
-};
-
-// 取得當前語系 Tag 的 slug、name
-export const getLocalizedTag = (
-  tagName: string,
-  lang: Language = DEFAULT_LANGUAGE
-) => {
-  const slug = convertToSlug(tagName);
-
+// 依據 slug、語系，取得最後顯示用的標籤名稱。
+export const getTagDisplayName = (slug: string, originalName: string, lang: Language): string => {
   const tagConfig = tagMap[slug];
 
-  // 取得當前語系名稱
-  const localizedName =
-    tagConfig?.name?.[lang]?.trim() ||
-    tagConfig?.name?.[DEFAULT_LANGUAGE]?.trim() ||
-    tagName;
-
-  return {
-    slug,
-    name: localizedName,
-  };
+  return (
+    tagConfig?.name?.[lang]?.trim() || tagConfig?.name?.[DEFAULT_LANGUAGE]?.trim() || originalName
+  );
 };
 
-// 計算並取得所有文章的 Tag 使用頻率，依使用次數排序。
+// 文章清單中統計所有標籤的使用次數
 export const getTagsByPosts = (
-  posts: PostInfo[],
+  posts: PostMeta[],
   limit?: number,
   lang: Language = DEFAULT_LANGUAGE
-): Array<{ name: string; slug: string; postCount: number }> => {
+): SidebarTag[] => {
   if (!Array.isArray(posts) || posts.length === 0) return [];
 
-  const tagCounts = new Map<string, number>();
+  const tagCounts = new Map<string, { count: number; original: string }>();
 
-  // 計算每個標籤的使用次數
+  // 逐篇文章處理
   for (const post of posts) {
-    if (Array.isArray(post.tags)) {
-      for (const tag of post.tags) {
-        const trimmedTag = tag?.trim();
-        if (trimmedTag)
-          tagCounts.set(trimmedTag, (tagCounts.get(trimmedTag) || 0) + 1);
-      }
+    if (!Array.isArray(post.tags)) continue;
+
+    // 逐一處理文章內的標籤
+    for (const rawTag of post.tags) {
+      const original = rawTag?.trim();
+      if (!original) continue;
+
+      const key = slugifyTag(original);
+      if (!key) continue;
+
+      const entry = tagCounts.get(key);
+      tagCounts.set(key, {
+        count: (entry?.count ?? 0) + 1,
+        original,
+      });
     }
   }
 
-  // 轉換為當前語系標籤並排序
-  const sortedTags = Array.from(tagCounts.entries())
-    .map(([tag, postCount]) => {
-      const { slug, name } = getLocalizedTag(tag, lang);
-      return { name, slug, postCount };
-    })
+  // Map → 陣列，並依使用次數由大到小排序。
+  const result: SidebarTag[] = Array.from(tagCounts.entries())
+    .map(([slug, { count, original }]) => ({
+      slug,
+      name: getTagDisplayName(slug, original, lang),
+      postCount: count,
+    }))
     .sort((a, b) => b.postCount - a.postCount);
 
-  return limit ? sortedTags.slice(0, limit) : sortedTags;
+  return typeof limit === 'number' ? result.slice(0, limit) : result;
+};
+
+// 將單一標籤字串解析為 slug 與顯示名稱
+export const normalizeTag = (tag: string, lang: Language): TagBadgeInfo | null => {
+  const original = tag?.trim();
+  if (!original) return null;
+
+  const slug = slugifyTag(original);
+  if (!slug) return null;
+
+  const name = getTagDisplayName(slug, original, lang);
+  return { slug, name };
 };

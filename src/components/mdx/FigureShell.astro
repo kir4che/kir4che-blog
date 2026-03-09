@@ -1,0 +1,41 @@
+---
+import { cn } from '@/utils/cn';
+
+interface FigureShellProps {
+  align?: 'left' | 'center' | 'right';
+  title?: string;
+  class?: string;
+  style?: string | Record<string, string | number | undefined>;
+  [key: string]: any;
+}
+
+const {
+  align = 'center',
+  title,
+  class: className,
+  style,
+  ...rest
+} = Astro.props as FigureShellProps;
+
+const ALIGNMENT_CLASSES = {
+  left: 'mr-auto items-start',
+  center: 'mx-auto items-center',
+  right: 'ml-auto items-end',
+} as const;
+const alignmentClass = ALIGNMENT_CLASSES[align];
+---
+
+<figure
+  class={cn('flex flex-col space-y-2 rounded-md', alignmentClass, className)}
+  style={style}
+  {...rest}
+>
+  <slot />
+  {
+    title && (
+      <figcaption class="line-clamp-1 text-center text-xs text-pink-700 dark:text-pink-200">
+        {title}
+      </figcaption>
+    )
+  }
+</figure>

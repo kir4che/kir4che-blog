@@ -1,0 +1,160 @@
+{
+  "common": {
+    "all": "All",
+    "allPosts": "All Posts",
+    "readMore": "Read More",
+    "unit": {
+      "posts": "posts",
+      "words": "words",
+      "updatedAt": "Updated"
+    },
+    "button": {
+      "publish": "Publish",
+      "publishing": "Publishing...",
+      "saveDraft": "Save as Draft",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "retry": "Retry",
+      "submit": "Submit",
+      "verifying": "Verifying..."
+    },
+    "search": {
+      "placeholder": "Search posts",
+      "noResults": "No matching posts found."
+    },
+    "pagination": {
+      "title": "Pagination",
+      "previous": "Previous",
+      "next": "Next",
+      "goToPage": "Go to page {page}"
+    },
+    "kofiButton": "Buy me a milktea"
+  },
+  "profile": {
+    "name": "Molly",
+    "subtitle": "Front-End Developer"
+  },
+  "settings": {
+    "theme": {
+      "title": "Switch Theme",
+      "dark": "Dark Mode",
+      "light": "Light Mode"
+    },
+    "language": {
+      "title": "Select Language",
+      "current": "Current Language",
+      "tw": "中文",
+      "en": "English",
+      "short": {
+        "tw": "中文",
+        "en": "EN"
+      }
+    }
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "categories": "Categories",
+    "tags": "Tags",
+    "archives": "Archives"
+  },
+  "sidebar": {
+    "popularPosts": {
+      "title": "Popular Posts",
+      "untitledPost": "Untitled Post"
+    },
+    "categories": "Categories",
+    "tags": "Tags",
+    "latestVideo": "Latest Video",
+    "usefulSites": {
+      "title": "My Websites",
+      "items": {
+        "frontendLab": "Frontend Lab",
+        "kaomojiLab": "Kaomoji Lab",
+        "picQuads": "PicQuads",
+        "decisionwheel": "Decision Wheel",
+        "lumical": "Lumical"
+      }
+    },
+    "lineStickersCta": "Support my LINE Stickers"
+  },
+  "HomePage": {
+    "title": "Home",
+    "description": "A personal blog sharing front-end development experience and everyday life, documenting learning journeys and daily moments. Welcome and enjoy reading.",
+    "announcement": "My blog has moved from Hugo to Next.js 🎉",
+    "search": "Search Posts",
+    "latestPosts": "Latest Posts",
+    "morePosts": "More Posts",
+    "noContent": "Empty here"
+  },
+  "AboutPage": {
+    "title": "About Me",
+    "description": "Hi, I’m Molly, a front-end developer who loves building web interfaces, playing games, and documenting life through vlogs. Get to know my work and passions.",
+    "intro": "Hi, I'm Molly",
+    "coverImageAlt": "About page cover image",
+    "personalInfo": {
+      "job": "👩🏻‍💻 Currently working as a Front-end Developer",
+      "mbti": "🦫 MBTI is a practical ISTJ (Logistician)",
+      "hobby": "🎮 Enjoys various games—Hearthstone, SF6, otome games—and also watches LoL esports.",
+      "hobby2": "🧶 Crocheting—currently challenging myself to make a vest."
+    },
+    "vlogIntro": "I love trying new things, and recently started vlogging to document every moment of life.",
+    "title_2": "💌 How to reach me:"
+  },
+  "ArchivePage": {
+    "title": "Archives",
+    "description": "Browse all posts by month and year.",
+    "search": "Search Posts",
+    "latestPosts": "Latest Posts",
+    "morePosts": "More Posts",
+    "noPosts": "No posts yet.",
+    "loadFailed": "Failed to load posts. Please try again later."
+  },
+  "PostPage": {
+    "lastUpdated": "Last updated on",
+    "thanks": "If you found this post helpful, consider buying me a milktea (◍•ᴗ•◍)❤",
+    "relatedPosts": "Related Posts",
+    "enterPassword": "Enter password",
+    "incorrectPassword": "Incorrect password, please try again!",
+    "tooManyAttempts": "Too many attempts, please try again in {seconds}s.",
+    "backToPosts": "Back to Post List",
+    "passwordGate": {
+      "title": "This article is password protected",
+      "description": "Please enter the password to view the content.",
+      "error": "Something went wrong. Please try again."
+    },
+    "toc": {
+      "title": "Table of contents",
+      "expand": "Expand table of contents",
+      "collapse": "Collapse table of contents"
+    },
+    "share": {
+      "copyLink": "Copy link",
+      "copySuccess": "Link copied to clipboard",
+      "copyUnavailable": "Clipboard is not available in this browser.",
+      "native": "Share to…"
+    }
+  },
+  "CategoriesPage": {
+    "title": "Categories",
+    "postCount": "{count} posts in total",
+    "noCategories": "No Categories yet.",
+    "categoryNotFound": "Category not found.",
+    "loadFailed": "Failed to load categories. Please try again later.",
+    "breadcrumb": {
+      "categories": "Categories"
+    }
+  },
+  "TagsPage": {
+    "title": "Tags",
+    "postCount": "{count} posts in total",
+    "noTags": "No Tags yet.",
+    "loadFailed": "Failed to load tags. Please try again later.",
+    "backToTags": "Back to Tags"
+  },
+  "NotFoundPage": {
+    "title": "Oops! Page not found",
+    "description": "The page you are looking for might have been removed, renamed, or temporarily unavailable.",
+    "backHome": "Back to Home"
+  }
+}

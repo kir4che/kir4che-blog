@@ -1,0 +1,12 @@
+---
+import { cn } from '@/utils/cn';
+
+const { class: className, ...rest } = Astro.props;
+---
+
+<span
+  class={cn('hidden loading loading-spinner loading-xl text-primary', className)}
+  aria-label="Loading"
+  role="status"
+  aria-hidden="true"
+  {...rest}></span>

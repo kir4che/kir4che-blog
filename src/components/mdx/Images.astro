@@ -1,0 +1,136 @@
+---
+import ImagesItem from '@/components/mdx/ImagesItem.astro';
+import { toCssLength, toPixelNumber } from '@/lib/cssLength';
+import type { MediaItem } from '@/types';
+import { cn } from '@/utils/cn';
+
+interface ImagesProps {
+  images: MediaItem[];
+  title?: string;
+  width?: string | number;
+  minWidth?: string | number;
+  height?: string | number;
+  minHeight?: string | number;
+  maxHeight?: string | number;
+  align?: 'left' | 'center' | 'right';
+}
+
+type Alignment = 'left' | 'center' | 'right';
+
+const ALIGNMENT_CLASSES: Record<Alignment, { container: string; column: string; stack: string }> = {
+  left: {
+    container: 'mr-auto justify-start',
+    column: 'ml-auto items-start',
+    stack: 'mr-auto items-start',
+  },
+  center: {
+    container: 'mx-auto justify-start',
+    column: 'mx-auto items-center',
+    stack: 'mx-auto items-center',
+  },
+  right: {
+    container: 'ml-auto justify-end',
+    column: 'mr-auto items-end',
+    stack: 'ml-auto items-end',
+  },
+};
+
+const {
+  images = [],
+  title,
+  width = '85%',
+  minWidth = '150px',
+  height,
+  minHeight,
+  maxHeight,
+  align = 'center',
+} = Astro.props as ImagesProps;
+
+// 將 height="auto" 視為未指定高度
+const normalizedHeight =
+  typeof height === 'string' && height.trim().toLowerCase() === 'auto' ? undefined : height;
+
+const resMinWidth = toCssLength(minWidth);
+const resHeight = normalizedHeight ? toCssLength(normalizedHeight) : undefined;
+const resMinHeight = minHeight ? toCssLength(minHeight) : undefined;
+const resMaxHeight = maxHeight ? toCssLength(maxHeight) : undefined;
+const defaultMinHeight = '200px';
+const defaultMaxHeight = '400px';
+const effectiveMinHeight = resMinHeight ?? defaultMinHeight;
+const effectiveMaxHeight = resMaxHeight ?? defaultMaxHeight;
+
+const heightPx = toPixelNumber(resHeight);
+const maxHeightPx = toPixelNumber(effectiveMaxHeight);
+
+// 決定最後要用的 max-height（避免給太小）
+const finalMaxHeight =
+  resHeight || effectiveMaxHeight
+    ? heightPx !== null && maxHeightPx !== null
+      ? heightPx >= maxHeightPx
+        ? resHeight
+        : effectiveMaxHeight
+      : (resHeight ?? effectiveMaxHeight)
+    : undefined;
+
+const galleryMinWidthPx = toPixelNumber(resMinWidth);
+
+const getItemWidth = (item: MediaItem): number | null => {
+  const explicitWidth = toPixelNumber(item.width);
+  if (explicitWidth !== null) return explicitWidth;
+
+  if (item.type === 'image' && typeof item.originalWidth === 'number') return item.originalWidth;
+
+  return null;
+};
+
+// 如果每張圖都很窄，就改成單欄直排
+const singleColumn =
+  galleryMinWidthPx !== null &&
+  images.length > 0 &&
+  images.every((item) => {
+    const w = getItemWidth(item);
+    return w !== null && w < galleryMinWidthPx;
+  });
+
+const { container, column, stack } = ALIGNMENT_CLASSES[align];
+---
+
+<div
+  class={cn(
+    'my-6 space-y-2 lg:my-8 w-full max-w-full md:max-w-(--gallery-max-width) min-w-0 overflow-hidden',
+    column
+  )}
+  style={{
+    '--gallery-max-width': width,
+    width: '100%',
+    boxSizing: 'border-box',
+  }}
+>
+  <div
+    class={cn(
+      'flex w-full max-w-full gap-2 md:gap-3 lg:gap-4',
+      singleColumn ? 'flex-col' : 'flex-row flex-wrap',
+      singleColumn ? stack : container
+    )}
+  >
+    {
+      images.map((item) => (
+        <ImagesItem
+          item={item}
+          singleColumn={singleColumn}
+          resolvedMinWidth={resMinWidth}
+          resolvedHeight={resHeight}
+          resolvedMinHeight={effectiveMinHeight}
+          resolvedMaxHeight={finalMaxHeight}
+        />
+      ))
+    }
+  </div>
+  {
+    title && (
+      <figcaption class="line-clamp-1 text-center text-xs text-pink-700 dark:text-pink-200">
+        {title}
+      </figcaption>
+    )
+  }
+</div>

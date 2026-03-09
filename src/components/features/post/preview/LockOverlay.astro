@@ -1,0 +1,20 @@
+---
+import { Lock } from '@lucide/astro';
+
+interface Props {
+  isLocked: boolean;
+}
+
+const { isLocked } = Astro.props as Props;
+if (!isLocked) return null;
+---
+
+<div
+  class="flex-center pointer-events-none absolute inset-0 z-30 bg-linear-to-br from-pink-200/20 to-pink-500/30 opacity-100 backdrop-blur-[2px] transition-opacity duration-300 group-hover:opacity-90"
+>
+  <div
+    class="flex flex-col items-center gap-1 rounded-full bg-white/80 px-4 py-2 shadow-sm dark:bg-gray-900/80"
+  >
+    <Lock size={20} class="text-pink-600 dark:text-pink-400" aria-hidden="true" />
+  </div>
+</div>

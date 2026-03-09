@@ -1,0 +1,160 @@
+{
+  "common": {
+    "all": "全部",
+    "allPosts": "所有文章",
+    "readMore": "閱讀更多",
+    "unit": {
+      "posts": "篇",
+      "words": "字",
+      "updatedAt": "更新於"
+    },
+    "button": {
+      "publish": "發佈",
+      "publishing": "發佈中...",
+      "saveDraft": "儲存為草稿",
+      "saving": "儲存中...",
+      "cancel": "取消",
+      "retry": "重試",
+      "submit": "送出",
+      "verifying": "驗證中..."
+    },
+    "search": {
+      "placeholder": "搜尋文章",
+      "noResults": "沒有找到相關文章"
+    },
+    "pagination": {
+      "title": "分頁導覽",
+      "previous": "上一頁",
+      "next": "下一頁",
+      "goToPage": "前往第 {page} 頁"
+    },
+    "kofiButton": "請我喝杯奶茶"
+  },
+  "profile": {
+    "name": "Molly",
+    "subtitle": "前端工程師"
+  },
+  "settings": {
+    "theme": {
+      "title": "切換主題",
+      "dark": "深色模式",
+      "light": "淺色模式"
+    },
+    "language": {
+      "title": "選擇語言",
+      "current": "當前語言",
+      "tw": "中文",
+      "en": "English",
+      "short": {
+        "tw": "中文",
+        "en": "EN"
+      }
+    }
+  },
+  "nav": {
+    "home": "首頁",
+    "about": "關於",
+    "categories": "分類",
+    "tags": "標籤",
+    "archives": "歸檔"
+  },
+  "sidebar": {
+    "popularPosts": {
+      "title": "熱門文章",
+      "untitledPost": "無標題文章"
+    },
+    "categories": "文章分類",
+    "tags": "標籤雲",
+    "latestVideo": "最新影片",
+    "usefulSites": {
+      "title": "好用網站",
+      "items": {
+        "frontendLab": "前端培養皿",
+        "kaomojiLab": "顏文字實驗室",
+        "picQuads": "PicQuads",
+        "decisionwheel": "Decision Wheel",
+        "lumical": "Lumical"
+      }
+    },
+    "lineStickersCta": "支持我的 LINE 貼圖"
+  },
+  "HomePage": {
+    "title": "首頁",
+    "description": "分享前端開發經驗與生活記錄的個人部落格，記錄我的學習歷程與日常生活點滴，歡迎閱讀。",
+    "announcement": "我的部落格已從 Next.js 搬家到 Astro 啦 🎉",
+    "search": "搜尋文章",
+    "latestPosts": "最新文章",
+    "morePosts": "更多文章",
+    "noContent": "空空如也"
+  },
+  "AboutPage": {
+    "title": "關於我",
+    "description": "嗨，我是 Molly，一名前端工程師，專注於網頁介面開發，同時熱愛遊戲與生活紀錄，分享工作與日常的點滴。",
+    "intro": "嗨，我是 Molly 🍒",
+    "coverImageAlt": "關於我的封面圖片",
+    "personalInfo": {
+      "job": "👩🏻‍💻 目前是一名前端工程師",
+      "mbti": "🦫 MBTI 是務實的 ISTJ（物流師）",
+      "hobby": "🎮 愛玩各種遊戲，爐石、快打、乙游...也有在看 LOL 的比賽。",
+      "hobby2": "🧶 喜歡鉤織，最近的挑戰是織背心～"
+    },
+    "vlogIntro": "喜歡嘗試很多事情，最近開始拍 Vlog 想要紀錄生活的每一刻。",
+    "title_2": "💌 如何聯繫我："
+  },
+  "ArchivePage": {
+    "title": "文章列表",
+    "description": "瀏覽所有文章，依月份和年份分類。",
+    "search": "搜尋文章",
+    "latestPosts": "最新文章",
+    "morePosts": "更多文章",
+    "noPosts": "尚無文章",
+    "loadFailed": "無法載入文章，請稍後再試。"
+  },
+  "PostPage": {
+    "lastUpdated": "最後更新於",
+    "thanks": "如果你覺得這篇文章對你有幫助，可以請我喝杯奶茶 (◍•ᴗ•◍)❤",
+    "relatedPosts": "相關文章",
+    "enterPassword": "輸入密碼",
+    "incorrectPassword": "密碼錯誤，請再試一次！",
+    "tooManyAttempts": "嘗試次數過多，請在 {seconds} 秒後再試。",
+    "backToPosts": "返回文章列表",
+    "passwordGate": {
+      "title": "此文章受密碼保護",
+      "description": "請輸入密碼以查看內容。",
+      "error": "發生錯誤，請稍後再試。"
+    },
+    "toc": {
+      "title": "文章目錄",
+      "expand": "展開目錄",
+      "collapse": "收合目錄"
+    },
+    "share": {
+      "copyLink": "複製連結",
+      "copySuccess": "已複製文章連結",
+      "copyUnavailable": "此瀏覽器不支援自動複製。",
+      "native": "分享至..."
+    }
+  },
+  "CategoriesPage": {
+    "title": "文章分類",
+    "postCount": "共 {count} 篇文章",
+    "noCategories": "尚無分類",
+    "categoryNotFound": "尚無該分類",
+    "loadFailed": "無法載入分類，請稍後再試。",
+    "breadcrumb": {
+      "categories": "分類"
+    }
+  },
+  "TagsPage": {
+    "title": "標籤",
+    "postCount": "共 {count} 篇文章",
+    "noTags": "尚無標籤",
+    "loadFailed": "無法載入標籤，請稍後再試。",
+    "backToTags": "返回標籤列表"
+  },
+  "NotFoundPage": {
+    "title": "糟糕！找不到這個頁面",
+    "description": "您訪問的頁面可能已被移除、名稱已更改或暫時無法使用",
+    "backHome": "返回首頁"
+  }
+}

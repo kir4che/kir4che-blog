@@ -1,5 +1,5 @@
-import { visit } from 'unist-util-visit'; // 遍歷 HAST 樹（HTML AST）
 import { toString } from 'hast-util-to-string'; // 將節點轉換成純文字內容
+import { visit } from 'unist-util-visit'; // 遍歷 HAST 樹（HTML AST）
 import type { VFile } from 'vfile';
 
 interface HeadingInfo {

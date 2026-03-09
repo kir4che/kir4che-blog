@@ -1,0 +1,60 @@
+---
+import { createTranslator, getLocaleFromUrl } from '@/lib/i18n';
+import { withLocalePrefix } from '@/lib/paths';
+import { getSidebarData } from '@/lib/sidebar';
+
+import Footer from '@/components/layouts/Footer.astro';
+import Header from '@/components/layouts/Header.astro';
+import LeftSidebar from '@/components/layouts/LeftSidebar.astro';
+import Navbar from '@/components/layouts/Navbar.astro';
+import RightSidebar from '@/components/layouts/RightSidebar.astro';
+import StructuredData from '@/components/seo/StructuredData.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+const { title, description, canonical, image, noindex } = Astro.props;
+
+const lang = getLocaleFromUrl(Astro.url);
+
+const tSearch = createTranslator(lang, 'common.search');
+const tProfile = createTranslator(lang, 'profile');
+const tNav = createTranslator(lang, 'nav');
+const tSidebar = createTranslator(lang, 'sidebar');
+
+const link = (href: string) => withLocalePrefix(href, lang);
+
+const { categories = [], tags = [], popularPosts = [] } = await getSidebarData(lang);
+const simplifiedTags = tags.map(({ name, slug }) => ({ name, slug }));
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  image={image}
+  noindex={noindex}
+>
+  <StructuredData />
+  <div class="mx-auto flex max-w-screen-2xl flex-1 px-4 max-md:flex-col">
+    <LeftSidebar t={tProfile} />
+    <div class="flex w-full min-w-0 flex-1 gap-x-10">
+      <div class="flex min-h-screen w-full min-w-0 flex-col">
+        <Header>
+          <Navbar t={tNav} />
+        </Header>
+        <main class="flex-1">
+          <slot />
+        </main>
+        <Footer />
+      </div>
+      <RightSidebar
+        tSearch={tSearch}
+        tSidebar={tSidebar}
+        lang={lang}
+        link={link}
+        categories={categories}
+        tags={simplifiedTags}
+        popularPosts={popularPosts}
+      />
+    </div>
+  </div>
+</BaseLayout>

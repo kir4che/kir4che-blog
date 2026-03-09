@@ -1,0 +1,113 @@
+---
+import type { Options } from '@splidejs/splide';
+import { Splide, SplideSlide, SplideTrack } from 'astro-splide';
+import { CalendarDays } from '@lucide/astro';
+
+import type { Language, PostMeta } from '@/types';
+import { createTranslator, resolveLanguage } from '@/lib/i18n';
+import { getLocalizedPostPath } from '@/lib/paths';
+import { createDateFormatter } from '@/utils/date';
+import { getPostsInfo } from '@/lib/posts';
+
+import '@splidejs/splide/css';
+
+interface RelatedPostsProps {
+  lang: Language;
+  currentSlug: string;
+  categories: string[];
+}
+
+const { lang, currentSlug, categories } = Astro.props as RelatedPostsProps;
+
+const t = createTranslator(lang, 'PostPage');
+const locale = resolveLanguage(lang);
+const formatDate = createDateFormatter(locale, 'short');
+
+const categorySet = new Set(categories.map((c) => c?.trim()).filter(Boolean));
+const posts = categorySet.size > 0 ? await getPostsInfo(lang) : [];
+
+const relatedPosts: PostMeta[] = posts.filter(
+  (post) => post.slug !== currentSlug && post.categories?.some((c) => categorySet.has(c?.trim()))
+);
+
+const shouldRender = relatedPosts.length > 0;
+
+const total = relatedPosts.length;
+const desktopPerPage = Math.min(3, total);
+const splideOptions: Options = {
+  type: total > desktopPerPage ? 'loop' : 'slide',
+  fixedWidth: '280px',
+  gap: '1rem',
+  arrows: false,
+  breakpoints: {
+    812: {
+      fixedWidth: '250px',
+    },
+    640: {
+      fixedWidth: '220px',
+    },
+  },
+};
+---
+
+{
+  shouldRender && (
+    <section class="relative space-y-4 py-6" aria-labelledby={`related-posts-${currentSlug}`}>
+      <Splide hasTrack={false} options={splideOptions}>
+        <div class="flex-between mb-4 gap-2">
+          <h2 class="text-base font-semibold text-pink-700 dark:text-pink-200">
+            {t('relatedPosts')}
+          </h2>
+          <span
+            class="h-px flex-1 bg-linear-to-r from-pink-200 to-transparent dark:from-pink-200/30"
+            aria-hidden="true"
+          />
+        </div>
+        <SplideTrack>
+          {relatedPosts.map((post) => {
+            const date = formatDate(post.date);
+            if (!date) return null;
+
+            return (
+              <SplideSlide class="group bg-surface-secondary dark:bg-surface-secondary/50 rounded-md p-4">
+                <div class="mb-3 aspect-video">
+                  <img
+                    src={post.coverImage ?? '/images/cover-fallback_lg.webp'}
+                    alt={post.title}
+                    class="size-full rounded object-cover"
+                    loading="lazy"
+                    decoding="async"
+                    onerror="this.onerror=null;this.src='/images/cover-fallback_lg.webp';"
+                  />
+                </div>
+                <a href={getLocalizedPostPath({ lang, slug: post.slug })} class="mb-1 block">
+                  <h3 class="line-clamp-2 text-base/5 font-semibold hover:text-pink-700 dark:hover:text-pink-400">
+                    {post.title}
+                  </h3>
+                </a>
+                <p class="mb-2 line-clamp-3 text-[13px]/4.5 text-gray-600 dark:text-gray-400">
+                  {post.description}
+                </p>
+                {date && (
+                  <div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-300">
+                    <CalendarDays size={13} aria-hidden="true" />
+                    <time datetime={date.datetime} class="tracking-wide">
+                      {date.display}
+                    </time>
+                  </div>
+                )}
+              </SplideSlide>
+            );
+          })}
+        </SplideTrack>
+      </Splide>
+    </section>
+  )
+}
+
+<style is:global>
+  .splide__pagination {
+    position: static;
+    margin-top: 24px;
+  }
+</style>

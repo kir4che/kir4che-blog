@@ -1,0 +1,49 @@
+---
+import { Triangle } from '@lucide/astro';
+import { cn } from '@/utils/cn';
+
+interface AccordionProps {
+  variant?: 'default' | 'basic' | 'pink';
+  title: string;
+}
+
+const { variant = 'default', title } = Astro.props as AccordionProps;
+---
+
+<div
+  class={cn(
+    'group collapse rounded-none',
+    variant === 'default' && 'border border-pink-300 dark:border-pink-400/50'
+  )}
+>
+  <input type="checkbox" class="peer" />
+  <div
+    class={cn(
+      'collapse-title flex items-center font-semibold text-base/4',
+      variant === 'default' &&
+        'px-3 text-pink-700 peer-checked:border-b border-pink-300 dark:border-pink-400/50 dark:text-pink-200',
+      variant === 'basic' && 'px-0 text-foreground-primary',
+      variant === 'pink' &&
+        'rounded-full border border-pink-300 bg-pink-50 py-2.5 text-sm text-pink-700 ' +
+          'peer-checked:rounded-t-xl peer-checked:rounded-b-none peer-checked:border-b-0 ' +
+          'dark:border-pink-400/50 dark:bg-pink-900/10 dark:text-pink-100'
+    )}
+  >
+    <Triangle
+      size={10}
+      fill="currentColor"
+      class="mr-2 rotate-90 transition-transform group-has-checked:rotate-180"
+    />
+    {title}
+  </div>
+  <div
+    class={cn(
+      'collapse-content overflow-hidden p-0',
+      variant === 'default' && 'peer-checked:p-3',
+      variant === 'pink' &&
+        'peer-checked:rounded-b-xl peer-checked:border-x peer-checked:border-b peer-checked:border-pink-300 peer-checked:bg-pink-50 peer-checked:p-3 peer-checked:text-pink-700 dark:peer-checked:border-pink-400/50 dark:peer-checked:bg-pink-900/10 dark:peer-checked:text-pink-100'
+    )}
+  >
+    <slot />
+  </div>
+</div>

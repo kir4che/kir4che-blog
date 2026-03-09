@@ -1,0 +1,53 @@
+---
+import { resolveLanguage, createTranslator } from '@/lib/i18n';
+import { withLocalePrefix } from '@/lib/paths';
+import { getPostsInfo } from '@/lib/posts';
+import { paginate } from '@/lib/pagination';
+import { getTagDisplayName } from '@/lib/tags';
+import { slugifyTag } from '@/utils/slug';
+import PostListLayout from '@/layouts/PostListLayout.astro';
+import PostPreviewList from '@/components/features/post/preview/PostPreviewList.astro';
+import Pagination from '@/components/ui/Pagination.astro';
+
+const lang = resolveLanguage(Astro.params.lang);
+const t = createTranslator(lang, 'TagsPage');
+const link = (href: string) => withLocalePrefix(href, lang);
+
+const tagSlug = Astro.params.tagSlug as string;
+
+const allPosts = await getPostsInfo(lang);
+const taggedPosts = allPosts.filter((post) => post.tags.some((raw) => slugifyTag(raw) === tagSlug));
+
+const pageParam = Number(Astro.url.searchParams.get('page'));
+const page = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
+
+const { items, currentPage, totalPages, totalItems } = paginate(taggedPosts, page);
+
+const originalTagName = taggedPosts[0]?.tags.find((t) => slugifyTag(t) === tagSlug) ?? tagSlug;
+
+const tagName = getTagDisplayName(tagSlug, originalTagName, lang);
+---
+
+<PostListLayout title={`#${tagName}`}>
+  <h1 slot="header" class="mb-4 flex items-baseline justify-between">
+    <span># {tagName}</span>
+    <span class="text-foreground-primary/80 text-sm font-normal">
+      {t('postCount', { count: totalItems ?? 0 })}
+    </span>
+  </h1>
+  <section class="space-y-4">
+    {items.map((post) => <PostPreviewList post={post} lang={lang} />)}
+  </section>
+  {
+    totalPages > 1 && (
+      <Pagination
+        slot="pagination"
+        t={t}
+        link={link}
+        basePath={`/tags/${tagSlug}`}
+        currentPage={currentPage}
+        totalPages={totalPages}
+      />
+    )
+  }
+</PostListLayout>

@@ -1,0 +1,26 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+import LocalizedLink from '@/components/ui/LocalizedLink.astro';
+import ExternalLink from '@/components/ui/ExternalLink.astro';
+
+interface LinkProps extends Omit<HTMLAttributes<'a'>, 'href'> {
+  href: string;
+}
+
+const { href, ...rest } = Astro.props as LinkProps;
+const slotContent = await Astro.slots.render('default');
+const trimmedContent = slotContent?.trim();
+---
+
+{
+  href.startsWith('#') || href.startsWith('/') ? (
+    <LocalizedLink href={href} class="group text-pink-700 hover:text-pink-800" {...rest}>
+      {trimmedContent ? <Fragment set:html={trimmedContent} /> : null}
+    </LocalizedLink>
+  ) : (
+    <ExternalLink href={href} showIcon class="text-blue-600 hover:text-blue-700" {...rest}>
+      {trimmedContent ? <Fragment set:html={trimmedContent} /> : null}
+    </ExternalLink>
+  )
+}

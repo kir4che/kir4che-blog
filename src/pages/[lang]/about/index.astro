@@ -1,0 +1,92 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import DecorativeImage from '@/components/ui/DecorativeImage.astro';
+import ExternalLink from '@/components/ui/ExternalLink.astro';
+
+import { CONFIG } from '@/config';
+import youtubes from '@/data/youtubes';
+import { getLocaleFromUrl, createTranslator } from '@/lib/i18n';
+
+const lang = getLocaleFromUrl(Astro.url);
+const t = createTranslator(lang, 'AboutPage');
+const videos = Object.values(youtubes);
+---
+
+<SiteLayout title={t('title')} description={t('description')}>
+  <div class="bg-surface-secondary relative rounded-xl shadow">
+    <DecorativeImage
+      src="/images/butterfly-illustration.webp"
+      class="absolute top-8 right-0 z-10 w-40 xl:right-8"
+    />
+    <DecorativeImage
+      src="/images/butterfly-illustration-2.webp"
+      class="absolute right-15 bottom-60 z-10 w-32 sm:right-75 md:right-48 lg:bottom-115 2xl:right-72"
+    />
+    <DecorativeImage
+      src="/images/about-illustration.webp"
+      class="absolute -right-8 -bottom-8 z-10 w-[50vw] max-sm:hidden md:-right-4 md:w-80"
+    />
+    <div class="relative z-20 space-y-6 px-8 py-6">
+      <h2>{t('title')}</h2>
+      <section class="space-y-4">
+        <h3 class="heading -ml-8">{t('intro')}</h3>
+        <ul class="list-inside list-disc leading-7">
+          <li>{t('personalInfo.job')}</li>
+          <li>{t('personalInfo.mbti')}</li>
+          <li>{t('personalInfo.hobby')}</li>
+          <li>{t('personalInfo.hobby2')}</li>
+        </ul>
+        <div class="space-y-2">
+          <p>{t('vlogIntro')}</p>
+          <ExternalLink href={CONFIG.siteInfo.socialLinks.youtube} noline>
+            &gt;&gt;&gt;
+            <span class="px-2 group-hover:font-medium">YT</span>
+            &lt;&lt;&lt;
+          </ExternalLink>
+          <section
+            class="flex flex-wrap gap-4"
+            role="region"
+            aria-label={`${CONFIG.siteInfo.name}'s youtube videos`}
+          >
+            {
+              videos.map((video) => (
+                <div class="max-w-60 transition-transform duration-200 ease-out hover:-translate-y-1 hover:-rotate-1">
+                  <figure>
+                    <iframe
+                      src={video.url}
+                      title={video.title}
+                      loading="lazy"
+                      referrerpolicy="strict-origin-when-cross-origin"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowfullscreen
+                      class="aspect-video size-full rounded"
+                    />
+                  </figure>
+                  <div class="py-2">
+                    <h4 class="truncate text-sm font-medium">{video.title}</h4>
+                    <time class="text-xs opacity-70">{video.date}</time>
+                  </div>
+                </div>
+              ))
+            }
+          </section>
+        </div>
+      </section>
+      <section class="relative space-y-2 xl:mb-36">
+        <h3 class="heading -ml-8">{t('title_2')}</h3>
+        <ExternalLink
+          href={`mailto:${CONFIG.siteInfo.email}`}
+          class="relative inline-block text-xl font-medium text-pink-600 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 after:ease-out hover:after:scale-x-100 dark:text-pink-300"
+          noline
+        >
+          {CONFIG.siteInfo.email}
+        </ExternalLink>
+        <div class="absolute bottom-3 left-44 -z-10">
+          <div class="animate-bounce">
+            <DecorativeImage src="/images/arrows-illustration.webp" class="w-24 rotate-6" />
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</SiteLayout>

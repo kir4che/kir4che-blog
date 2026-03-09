@@ -1,0 +1,89 @@
+---
+import Announcement from '@/components/ui/Announcement.astro';
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import { createTranslator, resolveLanguage } from '@/lib/i18n';
+import { paginate } from '@/lib/pagination';
+import { withLocalePrefix } from '@/lib/paths';
+import { getSidebarData } from '@/lib/sidebar';
+// import Advertisement from '@/components/ui/Advertisement.astro';
+import PostPreviewCard from '@/components/features/post/preview/PostPreviewCard.astro';
+import PostPreviewList from '@/components/features/post/preview/PostPreviewList.astro';
+import Pagination from '@/components/ui/Pagination.astro';
+
+// const AD_INSERT_INDEX = 3;
+
+const lang = resolveLanguage(Astro.params.lang);
+const t = createTranslator(lang, 'HomePage');
+
+const link = (href: string) => withLocalePrefix(href, lang);
+
+const { posts = [] } = await getSidebarData(lang);
+const visiblePosts = posts.filter((post) => !post.passwordHash);
+
+const pageParam = Number(Astro.url.searchParams.get('page'));
+const page = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
+
+const { items: currentPosts, currentPage, totalPages } = paginate(visiblePosts, page);
+
+const isFirstPage = currentPage === 1;
+const heroPost = isFirstPage ? currentPosts[0] : undefined;
+const highlightPosts = isFirstPage ? currentPosts.slice(1, 4) : [];
+const mobileFeaturedPosts = isFirstPage ? currentPosts.slice(0, 4) : [];
+const listPosts = isFirstPage ? currentPosts.slice(4) : currentPosts;
+---
+
+<SiteLayout title={t('title')} description={t('description')}>
+  <div class="flex min-h-full flex-1 flex-col gap-6">
+    <Announcement text={t('announcement')} />
+    {
+      currentPosts.length > 0 && (
+        <section id="posts" class="flex flex-1 flex-col gap-6">
+          <div class="flex flex-col gap-6">
+            {isFirstPage ? (
+              <>
+                <div class="grid grid-cols-1 gap-2 md:hidden">
+                  {mobileFeaturedPosts.map((post) => (
+                    <PostPreviewCard post={post} lang={lang} />
+                  ))}
+                </div>
+                <div class="hidden md:grid md:grid-cols-[5fr_4fr] md:gap-4">
+                  {heroPost && <PostPreviewCard post={heroPost} lang={lang} />}
+                  {highlightPosts.length > 0 && (
+                    <div class="grid gap-4">
+                      {highlightPosts.map((post) => (
+                        <PostPreviewCard post={post} lang={lang} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {listPosts.length > 0 && (
+                  <div class="grid gap-2 md:gap-4">
+                    {listPosts.map((post) => (
+                      <>
+                        <PostPreviewList post={post} lang={lang} />
+                        {/* {index === AD_INSERT_INDEX && <Advertisement />} */}
+                      </>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div class="grid gap-2 md:gap-4">
+                {listPosts.map((post) => (
+                  <PostPreviewList post={post} lang={lang} />
+                ))}
+              </div>
+            )}
+          </div>
+          <Pagination
+            t={t}
+            link={link}
+            basePath="/"
+            currentPage={currentPage}
+            totalPages={totalPages}
+          />
+        </section>
+      )
+    }
+  </div>
+</SiteLayout>

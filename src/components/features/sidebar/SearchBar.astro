@@ -1,0 +1,92 @@
+---
+import { Search } from '@lucide/astro';
+import type { Translator, LinkBuilder } from '@/types';
+
+interface SearchBarProps {
+  t: Translator;
+  link: LinkBuilder;
+}
+
+const { t, link } = Astro.props as SearchBarProps;
+---
+
+<div
+  class="relative w-full"
+  data-search-root
+  data-base-path={link('/')}
+  data-no-results={t('noResults')}
+>
+  <label class="input bg-surface-secondary flex items-center gap-2 rounded-full px-3 py-1">
+    <Search size={16} class="text-foreground-primary" />
+    <input
+      type="search"
+      autocomplete="off"
+      data-search-input
+      placeholder={t('placeholder')}
+      class="placeholder:text-foreground-primary/50 flex-1 bg-transparent text-sm focus:outline-none"
+    />
+  </label>
+  <ul
+    data-search-results
+    class="bg-surface-secondary absolute z-10 mt-1 hidden max-h-60 w-full overflow-auto rounded-lg p-2 text-sm shadow-lg"
+  >
+  </ul>
+</div>
+
+<script is:inline>
+  (() => {
+    const root = document.querySelector('[data-search-root]');
+    if (!root) return;
+
+    const input = root.querySelector('[data-search-input]');
+    const results = root.querySelector('[data-search-results]');
+    if (!input || !results) return;
+
+    const lang = document.documentElement.dataset.lang || 'tw';
+    const basePath = (root.dataset.basePath || '').replace(/\/$/, '');
+    const noResultsText = root.dataset.noResults || 'No results';
+
+    let controller, timer;
+
+    const renderResults = (posts) => {
+      results.innerHTML = posts.length
+        ? posts
+            .map(
+              ({ slug, title }) => `
+        <li>
+          <a href="${basePath}/${slug}" class="block w-full rounded px-3 py-2 text-sm text-foreground-primary hover:bg-pink-50 hover:text-pink-700 dark:hover:bg-pink-950 dark:hover:text-pink-300">
+            ${title || slug}
+          </a>
+        </li>`
+            )
+            .join('')
+        : `<li class="p-2 text-sm text-foreground-primary">${noResultsText}</li>`;
+      results.classList.toggle('hidden', posts.length === 0);
+    };
+
+    const search = async (query) => {
+      controller?.abort();
+      controller = new AbortController();
+      try {
+        const res = await fetch(`/api/posts?keyword=${encodeURIComponent(query)}&lang=${lang}`, {
+          signal: controller.signal,
+        });
+        if (res.ok) {
+          const data = await res.json();
+          renderResults(data.posts || []);
+        }
+      } catch {}
+    };
+
+    input.addEventListener('input', (e) => {
+      const query = e.target.value.trim();
+      clearTimeout(timer);
+      if (!query) return results.classList.add('hidden');
+      timer = setTimeout(() => search(query), 300);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!root.contains(e.target)) results.classList.add('hidden');
+    });
+  })();
+</script>

@@ -1,0 +1,14 @@
+---
+import type { MDXComponents } from 'mdx/types';
+
+interface MDXContentProps {
+  Content: any;
+  extraComponents?: MDXComponents;
+}
+
+const { Content, extraComponents } = Astro.props as MDXContentProps;
+---
+
+<section class="mdx-content">
+  <Content components={extraComponents} />
+</section>

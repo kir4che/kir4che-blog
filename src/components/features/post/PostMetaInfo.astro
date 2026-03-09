@@ -1,0 +1,52 @@
+---
+import { createTranslator, resolveLanguage } from '@/lib/i18n';
+import type { Language } from '@/types';
+import { cn } from '@/utils/cn';
+import { formatDateYmd } from '@/utils/date';
+import { CalendarDays, Pencil } from '@lucide/astro';
+
+interface PostMetaInfoProps {
+  lang: Language;
+  date?: string | null;
+  wordCount?: number;
+  class?: string;
+}
+
+const { lang, date, wordCount, class: className } = Astro.props as PostMetaInfoProps;
+
+const t = createTranslator(lang, 'common');
+
+const locale = resolveLanguage(lang);
+const formattedDate = formatDateYmd(date);
+
+const formatWordCount = (value?: number) => {
+  if (typeof value !== 'number' || value <= 0) return null;
+  return new Intl.NumberFormat(locale).format(value);
+};
+
+const formattedWords = formatWordCount(wordCount);
+---
+
+<div
+  class={cn(
+    'flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-gray-700 dark:text-white/90',
+    className
+  )}
+>
+  {
+    formattedDate && (
+      <time datetime={formattedDate.datetime} class="flex items-center gap-x-1">
+        <CalendarDays size={14} aria-hidden="true" />
+        {formattedDate.display}
+      </time>
+    )
+  }
+  {
+    formattedWords && (
+      <span class="flex items-center gap-x-1">
+        <Pencil size={14} aria-hidden="true" />
+        {formattedWords} {t('unit.words')}
+      </span>
+    )
+  }
+</div>

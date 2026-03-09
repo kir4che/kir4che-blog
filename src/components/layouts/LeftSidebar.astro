@@ -1,0 +1,83 @@
+---
+import type { Translator } from '@/types';
+import { CONFIG } from '@/config';
+import ExternalLink from '@/components/ui/ExternalLink.astro';
+import LocalizedLink from '@/components/ui/LocalizedLink.astro';
+import ThemeToggle from '@/components/ui/ThemeToggle.astro';
+import GlobalLangMenu from '@/components/ui/GlobalLangMenu.astro';
+import GithubIcon from '@/assets/icons/github.svg';
+import YoutubeIcon from '@/assets/icons/youtube.svg';
+import BlueskyIcon from '@/assets/icons/butterfly.svg';
+
+interface LeftSidebarProps {
+  t: Translator;
+}
+
+const { t } = Astro.props as LeftSidebarProps;
+
+const socialLinks = [
+  { label: 'GitHub', href: CONFIG.siteInfo.socialLinks.github, Icon: GithubIcon },
+  { label: 'Bluesky', href: CONFIG.siteInfo.socialLinks.bluesky, Icon: BlueskyIcon },
+  { label: 'YouTube', href: CONFIG.siteInfo.socialLinks.youtube, Icon: YoutubeIcon },
+];
+---
+
+<aside
+  class="flex flex-col justify-between py-4 md:sticky md:top-0 md:min-h-screen md:w-45 md:self-start md:pt-6 lg:w-48"
+>
+  <div class="flex gap-x-4 max-md:items-center md:mb-2.5 md:flex-col">
+    <div class="avatar size-16 md:mb-2 md:size-28">
+      <LocalizedLink href="/">
+        <img
+          src="/images/avatar.webp"
+          alt="Avatar"
+          width={96}
+          height={96}
+          onerror="this.onerror=null;this.src='/images/cover-fallback_sm.webp';"
+          class="rounded-full bg-pink-300"
+        />
+      </LocalizedLink>
+      <span
+        class="bg-surface-secondary flex-center absolute -right-1 bottom-0 size-6 rounded-full text-sm shadow md:size-8 md:text-xl"
+      >
+        🦫
+      </span>
+    </div>
+    <div class="flex-1">
+      <div class="flex-between">
+        <h1 class="text-lg">{t('name')}</h1>
+        <ul class="flex items-center gap-x-2.5 md:hidden">
+          {
+            socialLinks.map(({ label, href, Icon }) => (
+              <li>
+                <ExternalLink href={href} title={label}>
+                  <Icon class="size-5 fill-current text-pink-600 dark:text-pink-500" />
+                  <span class="sr-only">{label}</span>
+                </ExternalLink>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <p class="text-[13px]/5 text-gray-500 dark:text-gray-400">
+        {t('subtitle')}
+      </p>
+    </div>
+  </div>
+  <ul class="hidden items-center gap-x-2.5 md:flex">
+    {
+      socialLinks.map(({ label, href, Icon }) => (
+        <li>
+          <ExternalLink href={href} title={label} showLabel={false}>
+            <Icon class="size-5 fill-current text-pink-600 dark:text-pink-400" />
+            <span class="sr-only">{label}</span>
+          </ExternalLink>
+        </li>
+      ))
+    }
+  </ul>
+  <div class="mt-auto space-y-4 text-sm/3 max-md:hidden">
+    <ThemeToggle />
+    <GlobalLangMenu />
+  </div>
+</aside>

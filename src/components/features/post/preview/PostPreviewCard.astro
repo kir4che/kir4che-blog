@@ -1,0 +1,102 @@
+---
+import PostMetaInfo from '@/components/features/post/PostMetaInfo.astro';
+import LockOverlay from '@/components/features/post/preview/LockOverlay.astro';
+import CategoryBadge from '@/components/ui/CategoryBadge.astro';
+import type { Language, PostMeta } from '@/types';
+import { getLocalizedPostPath } from '@/lib/paths';
+import { cn } from '@/utils/cn';
+
+const {
+  post,
+  lang,
+  class: className,
+} = Astro.props as {
+  post: PostMeta;
+  lang: Language;
+  class?: string;
+};
+
+const href = getLocalizedPostPath({ lang, slug: post.slug });
+---
+
+<a
+  href={href}
+  class={cn(
+    'rounded-lg transition hover:-translate-y-1  overflow-hidden h-full block',
+    'shadow-[1px_2px_4px_rgba(247,126,157,0.15)] hover:shadow-[1px_3px_5px_rgba(233,92,133,0.30)] dark:shadow-[0_0_12px_rgba(255,214,224,0.15)] dark:hover:shadow-[0_0_18px_rgba(254,196,209,0.30)]',
+    !post.coverImage && 'bg-surface-secondary',
+    className
+  )}
+  aria-label={`Read post: ${post.title}`}
+>
+  <article class="group relative flex h-full">
+    <LockOverlay isLocked={Boolean(post.passwordHash)} />
+    <div
+      class={cn(
+        'relative flex flex-col rounded-lg overflow-hidden group w-full',
+        post.coverImage ? 'min-h-56' : 'bg-white dark:bg-gray-800'
+      )}
+    >
+      {
+        post.coverImage && (
+          <img
+            src={post.coverImage}
+            alt={post.title}
+            loading="lazy"
+            decoding="async"
+            onerror="this.onerror=null;this.src='/images/cover-fallback_lg.webp';"
+            class="absolute inset-0 h-full w-full object-cover brightness-[0.85] transition-all duration-500 group-hover:scale-110 group-hover:brightness-105"
+          />
+        )
+      }
+      <div class={cn('flex flex-col p-4', post.coverImage && 'absolute inset-0 z-10')}>
+        <div>
+          <h2
+            class={cn(
+              'mb-2 line-clamp-2 text-xl',
+              post.coverImage
+                ? 'text-white drop-shadow-md'
+                : 'text-gray-900 dark:text-white group-hover:text-pink-700 dark:group-hover:text-pink-400'
+            )}
+          >
+            {post.title}
+          </h2>
+          {
+            post.description && (
+              <p
+                class={cn(
+                  'mb-2 line-clamp-3 text-sm/5.5',
+                  post.coverImage ? 'text-gray-100 drop-shadow' : 'text-gray-500 dark:text-gray-400'
+                )}
+              >
+                {post.description}
+              </p>
+            )
+          }
+        </div>
+        <div class="mt-auto flex flex-wrap items-end gap-2">
+          <CategoryBadge
+            lang={lang}
+            categories={post.categories ?? []}
+            useDarkColor={Boolean(post.coverImage)}
+            class={cn(post.coverImage && 'rounded-full bg-black/35 px-2.5 py-0.5 backdrop-blur')}
+          />
+          <PostMetaInfo
+            lang={lang}
+            date={post.date}
+            wordCount={post.wordCount}
+            class={cn('ml-auto', post.coverImage && 'self-end text-gray-300')}
+          />
+        </div>
+      </div>
+      {
+        post.coverImage && (
+          <div
+            class="absolute inset-0"
+            style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.35), rgba(0,0,0,0.5))' }}
+          />
+        )
+      }
+    </div>
+  </article>
+</a>

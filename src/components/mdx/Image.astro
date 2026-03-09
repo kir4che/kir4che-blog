@@ -1,0 +1,120 @@
+---
+import FigureShell from '@/components/mdx/FigureShell.astro';
+import { cn } from '@/utils/cn';
+
+interface ImageProps {
+  src: string;
+  alt?: string;
+  title?: string;
+  width?: string | number;
+  height?: string | number;
+  align?: 'left' | 'center' | 'right';
+  objPos?: 'top' | 'bottom' | 'center';
+  priority?: boolean;
+  sizes?: string;
+  originalWidth?: number;
+  originalHeight?: number;
+  fallbackSrc?: string;
+  class?: string;
+  imgClass?: string;
+  imgWrapClass?: string;
+  [key: string]: any;
+}
+
+const {
+  src,
+  alt = '',
+  title,
+  width,
+  height,
+  align = 'center',
+  objPos = 'center',
+  priority = false,
+  sizes,
+  originalWidth,
+  originalHeight,
+  fallbackSrc = '/images/cover-fallback_lg.webp',
+  class: className,
+  imgClass,
+  imgWrapClass,
+  ...rest
+} = Astro.props as ImageProps;
+
+const normalizedHeight =
+  typeof height === 'string' && height.trim().toLowerCase() === 'auto' ? undefined : height;
+
+const objectPosition = {
+  top: 'object-top',
+  center: 'object-center',
+  bottom: 'object-bottom',
+}[objPos];
+
+const hasNumericDims =
+  typeof width === 'number' &&
+  typeof normalizedHeight === 'number' &&
+  width > 0 &&
+  normalizedHeight > 0;
+
+const useFill = !hasNumericDims;
+
+const renderWidth = hasNumericDims ? width : originalWidth;
+const renderHeight = hasNumericDims ? normalizedHeight : originalHeight;
+
+// 不同寬度時要載入多大的圖片
+const computedSizes =
+  sizes ??
+  (useFill
+    ? '(max-width: 768px) 100vw, (max-width: 1280px) 80vw, 800px'
+    : renderWidth
+      ? `(max-width: ${renderWidth}px) 100vw, ${renderWidth}px`
+      : '100vw');
+
+// figure 與圖片容器的尺寸控制，避免 title 被裁。
+const figureStyle = {
+  '--img-width': width || (useFill ? '100%' : undefined),
+  '--img-max-height': normalizedHeight
+    ? `max(${typeof normalizedHeight === 'number' ? `${normalizedHeight}px` : normalizedHeight}, 400px)`
+    : '400px',
+} as Record<string, string | number | undefined>;
+
+const imageWrapStyle = {
+  height: normalizedHeight || (useFill ? '100%' : undefined),
+  aspectRatio:
+    useFill && originalWidth && originalHeight ? `${originalWidth}/${originalHeight}` : undefined,
+} as Record<string, string | number | undefined>;
+---
+
+<FigureShell
+  align={align}
+  title={title}
+  class={cn(
+    'relative w-full',
+    typeof width !== 'undefined' && typeof width !== 'number'
+      ? 'sm:max-w-(--img-width)'
+      : 'md:max-w-5/6',
+    className
+  )}
+  style={figureStyle}
+>
+  <div
+    class={cn('xs:max-h-(--img-max-height) relative max-h-80 w-full overflow-hidden', imgWrapClass)}
+    style={imageWrapStyle}
+  >
+    <img
+      src={src}
+      alt={alt}
+      width={renderWidth}
+      height={renderHeight}
+      sizes={computedSizes}
+      loading={priority ? 'eager' : 'lazy'}
+      decoding="async"
+      onerror={`this.onerror=null;this.src='${fallbackSrc}';`}
+      class={cn(
+        'size-full object-cover transition-transform duration-300 hover:scale-105',
+        objectPosition,
+        imgClass
+      )}
+      {...rest}
+    />
+  </div>
+</FigureShell>

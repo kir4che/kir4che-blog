@@ -1,0 +1,56 @@
+---
+import { Languages, ChevronDown } from '@lucide/astro';
+
+import type { Language } from '@/types';
+import { SUPPORTED_LANGUAGES } from '@/config';
+import { createTranslator, getLocaleFromUrl } from '@/lib/i18n';
+import { swapLocaleInPath } from '@/lib/paths';
+import { cn } from '@/utils/cn';
+
+const lang = getLocaleFromUrl(Astro.url);
+const t = createTranslator(lang, 'settings');
+
+const buildPostHref = (l: Language) => {
+  const path = swapLocaleInPath(Astro.url.pathname, l);
+  return `${encodeURI(path)}${Astro.url.search}`;
+};
+---
+
+<div class="dropdown dropdown-top dropdown-start" data-lang-menu>
+  <button
+    type="button"
+    class="flex items-center gap-x-1.5 hover:bg-inherit"
+    aria-expanded="false"
+    aria-controls="global-lang-menu"
+    data-lang-menu-toggle
+  >
+    <Languages size={16} aria-hidden="true" />
+    <span>{t(`language.${lang}`)}</span>
+    <ChevronDown size={16} aria-hidden="true" />
+  </button>
+  <ul
+    id="global-lang-menu"
+    role="menu"
+    class="dropdown-content menu bg-surface-secondary z-10 hidden w-24 rounded shadow-md md:w-32"
+    data-lang-menu-list
+  >
+    {
+      SUPPORTED_LANGUAGES.map((l) => (
+        <li role="none">
+          <a
+            href={buildPostHref(l)}
+            role="menuitemradio"
+            aria-checked={l === lang}
+            data-lang-menu-item
+            class={cn(
+              'p-2 hover:bg-pink-100/80 md:px-3 dark:hover:bg-pink-900/20',
+              l === lang && 'font-semibold text-pink-700 dark:text-pink-200'
+            )}
+          >
+            {t(`language.${l}`)}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</div>

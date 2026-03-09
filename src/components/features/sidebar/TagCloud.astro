@@ -1,0 +1,38 @@
+---
+import { Hash } from '@lucide/astro';
+import type { Translator } from '@/types';
+import LocalizedLink from '@/components/ui/LocalizedLink.astro';
+
+interface TagCloudProps {
+  t: Translator;
+  tags: Array<{ name: string; slug: string }>;
+}
+
+const { t, tags } = Astro.props as TagCloudProps;
+if (!t || tags.length === 0) return null;
+---
+
+<section>
+  <h3 class="text-gradient mb-3 flex items-center gap-x-2 uppercase">
+    <Hash size={16} class="text-primary" aria-hidden="true" />
+    {t('tags')}
+  </h3>
+  <ul class="flex flex-wrap gap-2">
+    {
+      tags.map(({ name, slug }) => (
+        <li>
+          <LocalizedLink
+            href={`/tags/${slug}`}
+            class="group relative inline-flex items-center overflow-hidden rounded bg-pink-500/80 px-1.5 py-0.5 text-sm font-medium text-white transition-colors duration-300 dark:bg-pink-800/35 dark:text-pink-50"
+          >
+            <span class="relative z-10"># {name}</span>
+            <span
+              class="absolute top-0 left-[-75%] h-full w-1/2 skew-x-[-20deg] transform bg-white/10 transition-all duration-700 group-hover:left-[125%]"
+              aria-hidden="true"
+            />
+          </LocalizedLink>
+        </li>
+      ))
+    }
+  </ul>
+</section>

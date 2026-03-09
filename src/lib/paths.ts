@@ -1,65 +1,50 @@
-import { CONFIG } from '@/config';
 import type { Language } from '@/types';
+import { CONFIG } from '@/config';
+import { ensurePathname, normalizePathname } from '@/utils/path';
+import { normalizePathSlug } from '@/utils/slug';
 
-const NORMALIZED_LANGUAGE_PATHS = Object.fromEntries(
-  Object.entries(CONFIG.paths.languagePaths).map(([language, pathValue]) => [
-    language,
-    pathValue.replace(/\/$/, ''),
-  ])
-) as Partial<Record<Language, string>>;
+// 取得指定語言的基礎路徑
+export const getLanguageBasePath = (lang: Language): string =>
+  normalizePathname(CONFIG.paths.languagePaths[lang] ?? `/${lang}`);
 
-const getLanguageBasePath = (lang: Language) =>
-  NORMALIZED_LANGUAGE_PATHS[lang] ?? `/${lang}`;
+// 從 pathname 中匹配語系及其基礎路徑
+export const matchLanguageBasePath = (
+  pathname: string
+): { lang: Language; base: string } | null => {
+  const entries = Object.entries(CONFIG.paths.languagePaths)
+    .map(([lang, base]) => [lang as Language, normalizePathname(base)] as const)
+    .sort((a, b) => b[1].length - a[1].length);
 
-export const getPostDateSegments = (date?: string | null) => {
-  if (!date) return null;
-  const parsed = new Date(date);
-  if (Number.isNaN(parsed.getTime())) return null;
-
-  return {
-    year: String(parsed.getUTCFullYear()),
-    month: String(parsed.getUTCMonth() + 1).padStart(2, '0'),
-  } as const;
+  const match = entries.find(([, base]) => pathname === base || pathname.startsWith(`${base}/`));
+  return match ? { lang: match[0], base: match[1] } : null;
 };
 
-export const getPostPath = ({
-  date,
-  slug,
-}: {
-  date?: string | null;
-  slug: string;
-}) => {
-  const segments = getPostDateSegments(date);
-  if (!segments)
-    throw new Error(`Post "${slug}" must have a valid date to generate path!`);
+// 取得文章的相對路徑（不含語言）
+export const getPostPath = (slug: string): string => ensurePathname(normalizePathSlug(slug));
 
-  return `/${segments.year}/${segments.month}/${slug}`;
+// 取得包含語言的文章路徑
+export const getLocalizedPostPath = ({ lang, slug }: { lang: Language; slug: string }): string => {
+  const basePath = getLanguageBasePath(lang);
+  return `${basePath}${getPostPath(slug)}`;
 };
 
-export const getLocalizedPostPath = ({
-  lang,
-  date,
-  slug,
-}: {
-  lang: Language;
-  date?: string | null;
-  slug: string;
-}) => {
-  const languagePath = getLanguageBasePath(lang);
-  const postPath = getPostPath({ date, slug });
+// 移除 pathname 中的語系前綴
+export const stripLocalePrefix = (pathname: string): string => {
+  const match = matchLanguageBasePath(pathname);
+  if (!match) return pathname;
 
-  return `${languagePath}${postPath}`;
+  const stripped = pathname.slice(match.base.length);
+  return stripped.length === 0 ? '/' : stripped;
 };
 
-export const getAbsolutePostUrl = ({
-  metadataBase,
-  lang,
-  date,
-  slug,
-}: {
-  metadataBase: string | URL;
-  lang: Language;
-  date?: string | null;
-  slug: string;
-}) =>
-  new URL(getLocalizedPostPath({ lang, date, slug }), metadataBase).toString();
+// 為 pathname 加上語系前綴
+export const withLocalePrefix = (pathname: string, lang: Language): string => {
+  const base = getLanguageBasePath(lang);
+  const normalized = ensurePathname(pathname);
+
+  return normalized === '/' ? base : `${base}${normalized}`;
+};
+
+// 將 pathname 的語系替換為指定語系
+export const swapLocaleInPath = (pathname: string, lang: Language): string =>
+  withLocalePrefix(stripLocalePrefix(pathname), lang);

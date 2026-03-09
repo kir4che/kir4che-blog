@@ -1,0 +1,49 @@
+---
+import { Languages } from '@lucide/astro';
+
+import type { Language, Translator } from '@/types';
+import { cn } from '@/utils/cn';
+
+interface PostLangMenuProps {
+  curLang: Language;
+  langs: Language[];
+  t: Translator;
+  buildPostHref: (lang: Language) => string;
+}
+
+const { curLang, langs, t, buildPostHref } = Astro.props as PostLangMenuProps;
+---
+
+<nav class="relative text-xs" aria-label={t('language.title')} data-lang-menu data-lang-menu-hover>
+  <button
+    type="button"
+    class="text-primary flex items-center gap-x-0.5 font-medium"
+    aria-expanded="false"
+    aria-controls="post-lang-menu"
+    data-lang-menu-toggle
+  >
+    <Languages size={14} aria-hidden="true" />
+    {t(`language.short.${curLang}`)}
+  </button>
+  <ul
+    id="post-lang-menu"
+    role="menu"
+    class="bg-surface-secondary absolute right-0 z-50 mt-2 hidden min-w-24 overflow-hidden rounded shadow-md dark:bg-gray-700"
+    data-lang-menu-list
+  >
+    {
+      langs.map((l) => (
+        <li role="none">
+          <a
+            href={buildPostHref(l)}
+            role="menuitem"
+            data-lang-menu-item
+            class="text-foreground-primary block w-full px-3 py-2 hover:bg-pink-100/80 hover:text-pink-700 dark:hover:bg-pink-900/10 dark:hover:text-pink-200"
+          >
+            {t(`language.short.${l}`)}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>

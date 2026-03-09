@@ -1,0 +1,43 @@
+---
+import { Sparkles } from '@lucide/astro';
+import type { Translator } from '@/types';
+import { getPostPath } from '@/lib/paths';
+import LocalizedLink from '@/components/ui/LocalizedLink.astro';
+
+interface PopularPost {
+  slug: string;
+  title: string;
+}
+
+interface PopularPostsProps {
+  t: Translator;
+  posts: PopularPost[];
+}
+
+const { t, posts } = Astro.props as PopularPostsProps;
+if (!t || posts.length === 0) return null;
+---
+
+<section>
+  <h3 class="mb-3 flex items-center gap-x-2 uppercase">
+    <Sparkles size={16} class="text-primary" aria-hidden="true" />
+    <span class="text-gradient">{t('popularPosts.title')}</span>
+  </h3>
+  <ul class="space-y-2.5">
+    {
+      posts.map(({ slug, title }, index) => (
+        <li class="group relative pl-6">
+          <span class="flex-center text-primary absolute top-0.5 left-0 h-4.5 w-4.5 rounded-full bg-pink-100 text-xs font-medium group-hover:bg-pink-200 dark:bg-pink-800/40 dark:group-hover:bg-pink-700/50">
+            {index + 1}
+          </span>
+          <LocalizedLink
+            href={getPostPath(slug)}
+            class="link link-hover block truncate text-sm/relaxed hover:text-pink-700 dark:hover:text-pink-600"
+          >
+            {title ?? t('popularPosts.untitledPost')}
+          </LocalizedLink>
+        </li>
+      ))
+    }
+  </ul>
+</section>

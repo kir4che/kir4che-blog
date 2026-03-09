@@ -1,0 +1,86 @@
+---
+import { CONFIG, DEFAULT_LANGUAGE } from '@/config';
+import { getLocaleFromUrl, resolveLanguage } from '@/lib/i18n';
+
+type JsonLd = Record<string, unknown>;
+
+const lang = getLocaleFromUrl(Astro.url);
+const locale = resolveLanguage(lang);
+
+const siteUrl = import.meta.env.PUBLIC_SITE_URL || process.env.SITE_URL || 'https://kir4che.com';
+if (!siteUrl) return;
+
+const sameAs = Object.values(CONFIG.siteInfo.socialLinks).filter(Boolean) as string[];
+
+const alternateName =
+  CONFIG.siteInfo.blog.siteName?.[lang] ?? CONFIG.siteInfo.blog.siteName?.[DEFAULT_LANGUAGE];
+
+const blogTitle =
+  CONFIG.siteInfo.blog.title?.[lang] ?? CONFIG.siteInfo.blog.title?.[DEFAULT_LANGUAGE];
+
+const blogDescription =
+  CONFIG.siteInfo.blog.description?.[lang] ?? CONFIG.siteInfo.blog.description?.[DEFAULT_LANGUAGE];
+
+const pagePath = Astro.url.pathname;
+const pageUrl = pagePath ? `${siteUrl}${pagePath}` : siteUrl;
+
+const organizationId = `${siteUrl}/#organization`;
+const personId = `${siteUrl}/#person`;
+const websiteId = `${siteUrl}/#website`;
+
+const websiteEntry: JsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': websiteId,
+  url: siteUrl,
+  name: blogTitle ?? CONFIG.siteInfo.name,
+};
+
+const entries: JsonLd[] = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': organizationId,
+    url: siteUrl,
+    name: CONFIG.siteInfo.name,
+    alternateName,
+    logo: `${siteUrl}/images/avatar.webp`,
+    sameAs,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    '@id': personId,
+    name: CONFIG.siteInfo.name,
+    url: siteUrl,
+    sameAs,
+  },
+  websiteEntry,
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    '@id': `${pageUrl}#webpage`,
+    url: pageUrl,
+    name: blogTitle ?? CONFIG.siteInfo.name,
+    description: blogDescription,
+    inLanguage: locale,
+    isPartOf: {
+      '@type': 'WebSite',
+      '@id': websiteId,
+    },
+  },
+];
+
+const structuredDataScripts = entries.map((entry) => ({
+  type: 'application/ld+json',
+  content: JSON.stringify(entry),
+}));
+---
+
+{
+  structuredDataScripts.map((script) => (
+    <script type={script.type} is:inline>
+      {script.content}
+    </script>
+  ))
+}

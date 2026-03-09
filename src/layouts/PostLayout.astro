@@ -1,0 +1,227 @@
+---
+import type { Language, PostMeta } from '@/types';
+import { Copy, Share2 } from '@lucide/astro';
+
+import PostComments from '@/components/features/post/PostComments.astro';
+import PostLangMenu from '@/components/features/post/PostLangMenu.astro';
+import PostMetaInfo from '@/components/features/post/PostMetaInfo.astro';
+import PostPasswordGate from '@/components/features/post/PostPasswordGate.astro';
+import RelatedPosts from '@/components/features/post/RelatedPosts.astro';
+import Toc from '@/components/features/post/Toc.astro';
+import {
+  Accordion,
+  Correction,
+  H1,
+  H2,
+  H3,
+  H4,
+  H5,
+  H6,
+  Highlight,
+  Image,
+  Images,
+  ImagesItem,
+  Kbd,
+  Link,
+  MDXContent,
+  Rating,
+  SmallText,
+  Table,
+  Video,
+} from '@/components/mdx';
+import CategoryBadge from '@/components/ui/CategoryBadge.astro';
+import KofiBtn from '@/components/ui/KofiBtn.astro';
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import { createTranslator } from '@/lib/i18n';
+import { getLocalizedPostPath, withLocalePrefix } from '@/lib/paths';
+import { normalizeTag } from '@/lib/tags';
+import { createDateFormatter, parseToISODate } from '@/utils/date';
+
+interface PostLayoutProps {
+  lang: Language;
+  post: PostMeta;
+  otherLangs?: Language[];
+  isLocked: boolean;
+  content?: unknown;
+  headings?: { depth: number; slug: string; text: string }[];
+  extraComponents?: Record<string, unknown>;
+}
+
+const props = Astro.props as Partial<PostLayoutProps>;
+
+if (!props.post || !props.lang) {
+  throw new Error('PostLayout requires "lang" and "post" props');
+}
+
+const {
+  lang,
+  post,
+  otherLangs = [],
+  isLocked,
+  content,
+  headings = [],
+  extraComponents,
+} = props as PostLayoutProps;
+
+const MDX_COMPONENTS = {
+  Accordion,
+  Correction,
+  h1: H1,
+  h2: H2,
+  h3: H3,
+  h4: H4,
+  h5: H5,
+  h6: H6,
+  a: Link,
+  Highlight,
+  Image,
+  Images,
+  ImagesItem,
+  Kbd,
+  Link,
+  Rating,
+  SmallText,
+  Table,
+  Video,
+};
+
+const tSettings = createTranslator(lang, 'settings');
+const tCommon = createTranslator(lang, 'common');
+const tPost = createTranslator(lang, 'PostPage');
+
+const publishedDate = post.date ? parseToISODate(post.date) : null;
+const dateFormatter = createDateFormatter(lang);
+const updatedAt = post.updatedAt ? dateFormatter(post.updatedAt) : null;
+
+const buildPostHref = (targetLang: Language) =>
+  getLocalizedPostPath({ lang: targetLang, slug: post.slug });
+
+const hasCoverImage = Boolean(post.coverImage);
+
+const siteUrl = import.meta.env.PUBLIC_SITE_URL || Astro.url.origin;
+const shareUrl = `${siteUrl}${getLocalizedPostPath({
+  lang,
+  slug: post.slug,
+})}`;
+
+const tocHeadings = headings.map((h) => ({
+  id: h.slug,
+  text: h.text,
+  level: h.depth,
+}));
+---
+
+<SiteLayout
+  title={isLocked ? tPost('passwordGate.title') : post.title}
+  description={isLocked ? tPost('passwordGate.description') : post.description}
+>
+  {
+    isLocked ? (
+      <PostPasswordGate slug={post.slug} lang={lang} />
+    ) : (
+      <>
+        <article class="bg-surface-secondary/80 rounded p-4 transition-all duration-300 md:p-6">
+          {hasCoverImage && (
+            <img
+              src={post.coverImage}
+              alt={`Cover image for ${post.title}`}
+              width={1200}
+              height={640}
+              class="mb-3 h-45 w-full rounded object-cover object-[center_70%] sm:h-56 xl:h-68"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+            />
+          )}
+          <header>
+            <h1 class="mb-4">{post.title}</h1>
+            <div class="flex-between flex-wrap gap-x-4 gap-y-1">
+              <CategoryBadge lang={lang} categories={post.categories ?? []} />
+              <div class="flex items-center gap-2 sm:gap-3">
+                <PostMetaInfo lang={lang} date={post.date} wordCount={post.wordCount} />
+                {otherLangs.length > 0 && Boolean(publishedDate) && (
+                  <PostLangMenu
+                    curLang={lang}
+                    langs={otherLangs}
+                    t={tSettings}
+                    buildPostHref={buildPostHref}
+                  />
+                )}
+              </div>
+            </div>
+            {post.showUpdatedAt && updatedAt?.datetime && (
+              <div class="flex justify-end text-xs text-gray-600 dark:text-white/70">
+                <time datetime={updatedAt.datetime}>
+                  {tCommon('unit.updatedAt')} {updatedAt.display}
+                </time>
+              </div>
+            )}
+          </header>
+          {content ? (
+            <MDXContent
+              Content={content}
+              extraComponents={{ ...MDX_COMPONENTS, ...(extraComponents ?? {}) }}
+            />
+          ) : null}
+          <div class="pt-8">
+            <PostComments slug={post.slug} hasPassword={false} />
+            <hr />
+            <footer
+              data-share-root
+              data-share-url={shareUrl}
+              data-share-title={post.title}
+              data-copy-success={tPost('share.copySuccess')}
+              data-copy-unavailable={tPost('share.copyUnavailable')}
+            >
+              <div class="space-y-4">
+                <p>{tPost('thanks')}</p>
+                <KofiBtn label={tCommon('kofiButton')} />
+              </div>
+              {post.tags?.length > 0 && (
+                <div class="flex flex-wrap gap-2 pt-4 pb-2">
+                  {post.tags.map((tag) => {
+                    const normalizedTag = normalizeTag(tag, lang);
+                    if (!normalizedTag) return null;
+
+                    return (
+                      <a
+                        href={withLocalePrefix(`/tags/${normalizedTag.slug}`, lang)}
+                        class="text-primary text-sm text-nowrap"
+                        aria-label={`#${normalizedTag.name}`}
+                      >
+                        #{normalizedTag.name}
+                      </a>
+                    );
+                  })}
+                </div>
+              )}
+              <div class="flex flex-wrap items-center justify-end gap-2 text-sm text-pink-700 dark:text-pink-200">
+                <button
+                  type="button"
+                  data-share-action="copy"
+                  aria-label={tPost('share.copyLink')}
+                  class="flex items-center gap-1 rounded border border-pink-200 px-3 py-1 transition-colors hover:border-pink-400 dark:border-pink-300/40 dark:hover:border-pink-200/70"
+                >
+                  <Copy size={16} aria-hidden="true" />
+                  {tPost('share.copyLink')}
+                </button>
+                <button
+                  type="button"
+                  data-share-action="native"
+                  aria-label={tPost('share.native')}
+                  class="flex items-center gap-1 rounded border border-pink-200 px-3 py-1 transition-colors hover:border-pink-400 dark:border-pink-300/40 dark:hover:border-pink-200/70"
+                >
+                  <Share2 size={16} aria-hidden="true" />
+                  {tPost('share.native')}
+                </button>
+                <span class="sr-only" role="status" aria-live="polite" data-share-feedback />
+              </div>
+            </footer>
+          </div>
+        </article>
+        <RelatedPosts lang={lang} currentSlug={post.slug} categories={post.categories ?? []} />
+        <Toc lang={lang} headings={tocHeadings} />
+      </>
+    )
+  }
+</SiteLayout>

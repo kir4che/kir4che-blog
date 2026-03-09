@@ -1,0 +1,67 @@
+---
+import type { PostMeta } from '@/types';
+import { getPostsInfo } from '@/lib/posts';
+import { paginate } from '@/lib/pagination';
+import { resolveLanguage, createTranslator } from '@/lib/i18n';
+import { withLocalePrefix } from '@/lib/paths';
+import PostListLayout from '@/layouts/PostListLayout.astro';
+import PostPreviewList from '@/components/features/post/preview/PostPreviewList.astro';
+import Pagination from '@/components/ui/Pagination.astro';
+
+const lang = resolveLanguage(Astro.params.lang);
+const t = createTranslator(lang, 'ArchivePage');
+
+const link = (href: string) => withLocalePrefix(href, lang);
+
+const pageParam = Number(Astro.url.searchParams.get('page'));
+const page = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
+
+const allPosts = await getPostsInfo(lang);
+const { items: paginatedPosts, currentPage, totalPages } = paginate(allPosts, page);
+
+const postsByYear = paginatedPosts.reduce<Record<string, PostMeta[]>>((acc, post) => {
+  const year = new Date(post.date).getFullYear();
+  if (Number.isNaN(year)) return acc;
+
+  const key = String(year);
+  acc[key] ??= [];
+  acc[key].push(post);
+  return acc;
+}, {});
+
+const sortedEntries = Object.entries(postsByYear).sort(([a], [b]) => Number(b) - Number(a));
+---
+
+<PostListLayout title={t('title')} description={t('description')}>
+  <div class="flex flex-col gap-4">
+    {
+      sortedEntries.map(([year, yearPosts]) => (
+        <section aria-labelledby={`year-${year}`}>
+          <h2
+            id={`year-${year}`}
+            class="mb-2.5 text-base font-bold text-pink-500 dark:text-pink-200"
+          >
+            {year}
+          </h2>
+          <div class="space-y-4">
+            {yearPosts.map((post) => (
+              <PostPreviewList post={post} lang={lang} />
+            ))}
+          </div>
+        </section>
+      ))
+    }
+  </div>
+  {
+    totalPages > 1 && (
+      <Pagination
+        slot="pagination"
+        t={t}
+        link={link}
+        basePath="/archives"
+        currentPage={currentPage}
+        totalPages={totalPages}
+      />
+    )
+  }
+</PostListLayout>

@@ -1,0 +1,44 @@
+---
+import { Circle } from '@lucide/astro';
+
+import { getCategoryStyle, normalizeCategories } from '@/lib/categories';
+import type { Language } from '@/types';
+import { cn } from '@/utils/cn';
+
+interface CategoryBadgeProps {
+  lang: Language;
+  categories?: string[];
+  useDarkColor?: boolean;
+  class?: string;
+}
+
+const {
+  lang,
+  categories = [],
+  useDarkColor = false,
+  class: className,
+} = Astro.props as CategoryBadgeProps;
+
+const resolvedCategories = normalizeCategories(categories);
+---
+
+{
+  resolvedCategories.length > 0 && (
+    <div class={cn('flex flex-wrap items-center gap-x-2', className)}>
+      {resolvedCategories.map((info) => (
+        <span
+          class={cn(
+            'flex items-center gap-x-1 text-sm hover:opacity-85',
+            useDarkColor
+              ? 'text-(--category-color-dark)'
+              : 'text-(--category-color) dark:text-(--category-color-dark)'
+          )}
+          style={getCategoryStyle(info.color)}
+        >
+          <Circle size={8} fill="currentColor" aria-hidden="true" />
+          {info.name[lang]}
+        </span>
+      ))}
+    </div>
+  )
+}

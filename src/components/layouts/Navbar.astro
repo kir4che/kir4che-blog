@@ -1,0 +1,47 @@
+---
+import type { Translator } from '@/types';
+import { stripLocalePrefix } from '@/lib/paths';
+import { cn } from '@/utils/cn';
+import { normalizePathname } from '@/utils/path';
+import LocalizedLink from '@/components/ui/LocalizedLink.astro';
+
+interface NavbarProps {
+  t: Translator;
+}
+
+const { t } = Astro.props as NavbarProps;
+
+const isActive = (href: string) =>
+  normalizePathname(stripLocalePrefix(Astro.url.pathname)) === normalizePathname(href);
+
+const navItems = [
+  { href: '/', label: t('home') },
+  { href: '/about', label: t('about') },
+  { href: '/categories', label: t('categories') },
+  { href: '/tags', label: t('tags') },
+  { href: '/archives', label: t('archives') },
+];
+---
+
+<nav class="ml-auto">
+  <ul class="flex gap-4">
+    {
+      navItems
+        .filter((item) => item.label)
+        .map(({ href, label }) => (
+          <li>
+            <LocalizedLink
+              href={href}
+              class={cn(
+                'hover:text-primary inline-block text-sm',
+                isActive(href) && 'text-primary font-medium'
+              )}
+              aria-current={isActive(href) ? 'page' : undefined}
+            >
+              {label}
+            </LocalizedLink>
+          </li>
+        ))
+    }
+  </ul>
+</nav>

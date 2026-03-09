@@ -1,0 +1,28 @@
+---
+import { CONFIG } from '@/config';
+import ExternalLink from '@/components/ui/ExternalLink.astro';
+import KofiIcon from '@/assets/icons/kofi.svg';
+
+interface Props {
+  label: string;
+}
+
+const { label } = Astro.props;
+---
+
+<ExternalLink
+  href={`https://ko-fi.com/${CONFIG.siteInfo.name}`}
+  title={label}
+  noline
+  class="btn group text-foreground-secondary rounded-full bg-pink-600 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-pink-700"
+>
+  <img
+    src={KofiIcon.src}
+    alt=""
+    width="18"
+    height="18"
+    aria-hidden="true"
+    class="transition-transform duration-200 group-hover:scale-110"
+  />
+  <span>{label}</span>
+</ExternalLink>

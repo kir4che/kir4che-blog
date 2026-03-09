@@ -1,0 +1,79 @@
+---
+import { MoonStar, Sun } from '@lucide/astro';
+import { createTranslator, getLocaleFromUrl } from '@/lib/i18n';
+
+const lang = getLocaleFromUrl(Astro.url);
+const t = createTranslator(lang, 'settings');
+
+const labelLight = t('theme.light');
+const labelDark = t('theme.dark');
+---
+
+<button
+  type="button"
+  data-theme-toggle
+  data-label-light={labelLight}
+  data-label-dark={labelDark}
+  class="text-gray-700-700 hover:text-foreground-primary flex w-fit items-center gap-x-1.5 bg-transparent text-sm dark:text-white/80"
+  aria-label={labelDark}
+>
+  <span data-theme-icon="sun"><Sun size={16} /></span>
+  <span data-theme-icon="moon" class="hidden"><MoonStar size={16} /></span>
+  <span data-theme-label class="hidden md:block">{labelDark}</span>
+</button>
+
+<script is:inline>
+  (() => {
+    const storageKey = 'theme';
+
+    const ensureController = () => {
+      if (window.__themeToggleController) return window.__themeToggleController;
+
+      const controller = {
+        applyTheme(theme) {
+          document.documentElement.classList.toggle('dark', theme === 'dark');
+          const nextTheme = theme === 'dark' ? 'light' : 'dark';
+
+          document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+            const labelLight = button.dataset.labelLight || 'Light';
+            const labelDark = button.dataset.labelDark || 'Dark';
+            const labelNode = button.querySelector('[data-theme-label]');
+            const sunIcon = button.querySelector("[data-theme-icon='sun']");
+            const moonIcon = button.querySelector("[data-theme-icon='moon']");
+            const nextLabel = nextTheme === 'dark' ? labelDark : labelLight;
+
+            if (labelNode) labelNode.textContent = nextLabel;
+            button.setAttribute('aria-label', nextLabel);
+            if (sunIcon) sunIcon.classList.toggle('hidden', theme === 'dark');
+            if (moonIcon) moonIcon.classList.toggle('hidden', theme !== 'dark');
+            button.dataset.theme = theme;
+          });
+        },
+        init() {
+          const buttons = document.querySelectorAll('[data-theme-toggle]');
+          if (!buttons.length) return;
+
+          const stored = window.localStorage.getItem(storageKey);
+          const initialTheme = stored === 'dark' || stored === 'light' ? stored : 'light';
+          this.applyTheme(initialTheme);
+
+          buttons.forEach((button) => {
+            if (button.dataset.themeBound) return;
+            button.dataset.themeBound = 'true';
+            button.addEventListener('click', () => {
+              const current = button.dataset.theme === 'dark' ? 'dark' : 'light';
+              const next = current === 'dark' ? 'light' : 'dark';
+              window.localStorage.setItem(storageKey, next);
+              this.applyTheme(next);
+            });
+          });
+        },
+      };
+
+      window.__themeToggleController = controller;
+      return controller;
+    };
+
+    ensureController().init();
+  })();
+</script>

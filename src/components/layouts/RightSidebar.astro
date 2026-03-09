@@ -1,0 +1,34 @@
+---
+import type { Category, TagBadgeInfo, PostMeta, Translator, LinkBuilder } from '@/types';
+import SearchBar from '@/components/features/sidebar/SearchBar.astro';
+import PopularPosts from '@/components/features/sidebar/PopularPosts.astro';
+import CategoryList from '@/components/features/sidebar/CategoryList.astro';
+import TagCloud from '@/components/features/sidebar/TagCloud.astro';
+import MyWebsites from '@/components/features/sidebar/MyWebsites.astro';
+import DonateBtns from '@/components/features/sidebar/DonateBtns.astro';
+// import Advertisement from '@/components/ui/Advertisement.astro';
+import LineStickersCTA from '@/components/features/sidebar/LineStickersCTA.astro';
+
+interface RightSidebarProps {
+  tSearch: Translator;
+  tSidebar: Translator;
+  link: LinkBuilder;
+  categories: Category[];
+  tags: TagBadgeInfo[];
+  popularPosts: Array<Pick<PostMeta, 'slug' | 'title' | 'date'>>;
+}
+
+const { tSearch, tSidebar, link, categories, tags, popularPosts } =
+  Astro.props as RightSidebarProps;
+---
+
+<aside class="w-68 space-y-6 pt-6 pb-4 max-lg:hidden">
+  <SearchBar t={tSearch} link={link} />
+  {popularPosts.length > 0 && <PopularPosts t={tSidebar} posts={popularPosts} />}
+  {categories.length > 0 && <CategoryList t={tSidebar} categories={categories} />}
+  {tags.length > 0 && <TagCloud t={tSidebar} tags={tags} />}
+  <!-- <Advertisement /> -->
+  <MyWebsites t={tSidebar} />
+  <LineStickersCTA t={tSidebar} />
+  <DonateBtns />
+</aside>

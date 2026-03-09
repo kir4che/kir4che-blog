@@ -1,0 +1,100 @@
+---
+import { ChevronLeft, ChevronRight } from '@lucide/astro';
+import type { Translator, LinkBuilder } from '@/types';
+import { cn } from '@/utils/cn';
+
+interface PaginationProps {
+  t: Translator;
+  link: LinkBuilder;
+  basePath?: string;
+  currentPage?: number;
+  totalPages: number;
+}
+
+const { t, link, basePath = '', currentPage = 1, totalPages } = Astro.props as PaginationProps;
+if (!t || !link || totalPages <= 1) return null;
+
+const safeCurrent = Math.min(Math.max(currentPage, 1), totalPages);
+
+const MAX_VISIBLE_PAGES = 5;
+
+type PageItem = number | 'ellipsis';
+
+// 計算要顯示的頁碼清單
+const getPageNumbers = (): PageItem[] => {
+  let start = Math.max(1, safeCurrent - Math.floor(MAX_VISIBLE_PAGES / 2));
+  let end = Math.min(totalPages, start + MAX_VISIBLE_PAGES - 1);
+
+  if (end - start + 1 < MAX_VISIBLE_PAGES) start = Math.max(1, end - MAX_VISIBLE_PAGES + 1);
+
+  const pages: PageItem[] = [];
+
+  if (start > 1) {
+    pages.push(1);
+    if (start > 2) pages.push('ellipsis');
+  }
+
+  for (let i = start; i <= end; i++) pages.push(i);
+
+  if (end < totalPages) {
+    if (end < totalPages - 1) pages.push('ellipsis');
+    pages.push(totalPages);
+  }
+
+  return pages;
+};
+
+const pages = getPageNumbers();
+
+const buildPageHref = (page: number): string => {
+  const params = new URLSearchParams(Astro.url.search);
+
+  if (page > 1) params.set('page', String(page));
+  else params.delete('page');
+
+  const query = params.toString();
+  return link(`${basePath}${query ? `?${query}` : ''}`);
+};
+---
+
+<div class="mt-auto">
+  <nav class="flex-center mt-8 gap-x-3 text-sm" aria-label={t('title')}>
+    {
+      safeCurrent > 1 && (
+        <a href={buildPageHref(safeCurrent - 1)} aria-label={t('previous')}>
+          <ChevronLeft size={18} />
+        </a>
+      )
+    }
+    {
+      pages.map((page) =>
+        page === 'ellipsis' ? (
+          <span aria-hidden="true" class="text-foreground-primary/80">
+            …
+          </span>
+        ) : (
+          <a
+            href={buildPageHref(page)}
+            class={cn(
+              'size-6 rounded-full text-center leading-6',
+              page === safeCurrent
+                ? 'text-foreground-secondary bg-pink-500 font-medium dark:bg-pink-300'
+                : 'hover:bg-pink-500/30'
+            )}
+            aria-current={page === safeCurrent ? 'page' : undefined}
+            aria-label={t('goToPage', { page })}
+          >
+            {page}
+          </a>
+        )
+      )
+    }
+    {
+      safeCurrent < totalPages && (
+        <a href={buildPageHref(safeCurrent + 1)} aria-label={t('next')}>
+          <ChevronRight size={18} />
+        </a>
+      )
+    }
+  </nav>
+</div>

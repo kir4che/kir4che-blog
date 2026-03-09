@@ -1,6 +1,6 @@
-import type { CategoryMap, TagMap } from '@/types';
+import type { Language, Category } from '@/types';
 
-export const categoryMap: CategoryMap = {
+export const categoryMap: Record<string, Category> = {
   backend: {
     name: {
       tw: '後端',
@@ -163,9 +163,24 @@ export const categoryMap: CategoryMap = {
       },
     },
   },
+  uncategorized: {
+    name: {
+      tw: '未分類',
+      en: 'Uncategorized',
+    },
+    slug: 'uncategorized',
+    color: {
+      light: '#9CA3AF',
+      dark: '#6B7280',
+    },
+  },
 };
+interface TagDefinition {
+  name: Record<Language, string>;
+  slug: string;
+}
 
-export const tagMap: TagMap = {
+export const tagMap: Record<string, TagDefinition> = {
   bundler: {
     name: {
       tw: '打包工具',
@@ -243,6 +258,20 @@ export const tagMap: TagMap = {
     },
     slug: 'pokmon',
   },
+  react: {
+    name: {
+      tw: 'React',
+      en: 'React',
+    },
+    slug: 'react',
+  },
+  seo: {
+    name: {
+      tw: 'SEO',
+      en: 'SEO',
+    },
+    slug: 'seo',
+  },
   t1: {
     name: {
       tw: 'T1',
@@ -250,12 +279,26 @@ export const tagMap: TagMap = {
     },
     slug: 't1',
   },
+  tool: {
+    name: {
+      tw: '工具',
+      en: 'Tools',
+    },
+    slug: 'tool',
+  },
   trip: {
     name: {
       tw: '旅遊',
       en: 'Trip',
     },
     slug: 'trip',
+  },
+  typescript: {
+    name: {
+      tw: 'TypeScript',
+      en: 'TypeScript',
+    },
+    slug: 'typescript',
   },
   vercel: {
     name: {

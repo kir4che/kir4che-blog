@@ -1,0 +1,204 @@
+---
+title: MDX 使用指南
+date: 2025-04-15T00:00:00.000Z
+postId: 'mdx-usage'
+draft: true
+---
+
+# 標題 H1
+
+## 標題 H2
+
+### 標題 H3
+
+#### 標題 H4
+
+##### 標題 H5
+
+###### 標題 H6
+
+[內部連結](/about)
+[錨點連結](#section2)
+[外部連結](https://www.google.com)
+
+---
+
+![Test](/blog/deploy-express-typescript-to-vercel/server-folder-structure.webp)
+
+<Image
+  src="/blog/deploy-express-typescript-to-vercel/server-folder-structure.webp"
+  alt="server-folder-structure"
+  title="server-folder-structure"
+  width="240px"
+/>
+
+<Images
+  images={[
+    {
+      src: '/blog/gitlab-pages-add-custom-domain/add-new-domain.webp',
+      alt: 'Image 1',
+    },
+    {
+      src: '/blog/gitlab-pages-add-custom-domain/add-new-domain.webp',
+      alt: 'Image 2',
+      width: '50%',
+    },
+    {
+      src: '/blog/gitlab-pages-add-custom-domain/add-new-domain.webp',
+      alt: 'Image 3',
+    },
+    {
+      src: '/blog/gitlab-pages-add-custom-domain/add-new-domain.webp',
+      alt: 'Image 4',
+    },
+    {
+      src: '/blog/gitlab-pages-add-custom-domain/add-new-domain.webp',
+      alt: 'Image 5',
+    },
+    {
+      src: '/blog/gitlab-pages-add-custom-domain/add-new-domain.webp',
+      alt: 'Image 6',
+    },
+  ]}
+  height="150px"
+/>
+
+---
+
+## 有序清單
+
+1. 第一點
+   1. 第一點的子項目
+   2. 第二個子項目
+2. 第二點
+3. 第三點
+
+## 無序清單
+
+- 項目 A
+- 項目 B
+- 項目 C
+  - 項目 C 的子項目 1
+  - 項目 C 的子項目 2
+
+---
+
+<code>npm install</code>
+
+> 這是一段引用文字。
+
+<Kbd>Enter</Kbd>
+
+==這是一段被標記的文字==
+
+~~這是一段被刪除線劃掉的文字~~
+
+<ins>這是一段新插入的文字</ins>
+
+這是一段有上標的文字^1^（暫時沒有完成）
+
+<pre>
+const x = 10;
+if (x > 5) console.log(x);
+</pre>
+
+---
+
+`Test Code Snippet`
+
+```html
+<!-- src/content/index.html -->
+<div>File name comment example</div>
+```
+
+```powershell title="PowerShell terminal example"
+Write-Output "This one has a title!"
+```
+
+```sh frame="none"
+echo "Look ma, no frame!"
+```
+
+```js title="line-markers.js" del={2} ins={3-4} {6}
+function demo() {
+  console.log('this line is marked as deleted');
+  // This line and the next one are marked as inserted
+  console.log('this is the second inserted line');
+
+  return 'this line uses the neutral default marker type';
+}
+```
+
+```js {1, 4, 7-8}
+// Line 1 - targeted by line number
+// Line 2
+// Line 3
+// Line 4 - targeted by line number
+// Line 5
+// Line 6
+// Line 7 - targeted by range "7-8"
+// Line 8 - targeted by range "7-8"
+```
+
+```jsx {"1":5} del={"2":7-8} ins={"3":10-12}
+// labeled-line-markers.jsx
+<button
+  role="button"
+  {...props}
+  value={value}
+  className={buttonClassName}
+  disabled={disabled}
+  active={active}
+>
+  {children && !active && (typeof children === 'string' ? <span>{children}</span> : children)}
+</button>
+```
+
+```js "return true;" ins="inserted" del="deleted"
+function demo() {
+  console.log('These are inserted and deleted marker types');
+  // The return statement uses the default marker type
+  return true;
+}
+```
+
+```sh //ho.*//
+echo "Test" > /home/test.txt
+```
+
+```js "given text"
+function demo() {
+  // Mark any given text inside lines
+  return 'Multiple matches of the given text are supported';
+}
+```
+
+---
+
+<Table
+  data={{
+    headers: ['功能', 'React', 'Vue'],
+    rows: [
+      ['元件語法', 'JSX', '模版語法'],
+      ['開發工具', 'Create React App', 'Vite / Vue CLI'],
+      ['支援 JSX', '✅', '✅'], // 👈 這一列文字一樣
+      ['社群活躍度', '龐大', '也很活躍'],
+      ['狀態管理', 'Redux / Zustand / Jotai', 'Pinia / Vuex'],
+      ['路由工具', 'React Router', 'Vue Router'],
+    ],
+  }}
+/>
+
+---
+
+<Accordion title="什麼是 ChatGPT？">
+  ChatGPT 是一個由 OpenAI 訓練的語言模型，可以幫助你回答各種問題。
+</Accordion>
+
+---
+
+<Highlight>這段文字使用了 Highlight 元件</Highlight>
+
+<br />
+
+<Correction wrong="錯誤的文字" correct="正確的文字" />

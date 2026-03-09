@@ -1,0 +1,37 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+
+import { createTranslator, getLocaleFromUrl } from '@/lib/i18n';
+import { withLocalePrefix } from '@/lib/paths';
+import { ArrowLeft } from '@lucide/astro';
+
+const lang = getLocaleFromUrl(Astro.url);
+const homeHref = withLocalePrefix('/', lang);
+
+const t = createTranslator(lang, 'NotFoundPage');
+const title = t('title');
+const description = t('description');
+---
+
+<SiteLayout title={title} description={description}>
+  <div class="flex-center min-h-[70vh]">
+    <div class="space-y-3 text-center">
+      <h1 class="text-8xl text-pink-400 dark:text-pink-600">404</h1>
+      <h2 class="text-gray-700 dark:text-gray-400">
+        {t('title')}
+      </h2>
+      <p class="leading-7 text-gray-400 dark:text-gray-500">
+        {t('description')}
+      </p>
+      <a
+        href={homeHref}
+        rel="nofollow"
+        class="btn btn-lg mt-6 border-none bg-pink-600 text-white hover:bg-pink-700 dark:bg-pink-800 dark:hover:bg-pink-900"
+        aria-label={t('backHome')}
+      >
+        <ArrowLeft size={20} />
+        {t('backHome')}
+      </a>
+    </div>
+  </div>
+</SiteLayout>

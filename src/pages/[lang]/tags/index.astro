@@ -1,0 +1,42 @@
+---
+import { resolveLanguage, createTranslator } from '@/lib/i18n';
+import { withLocalePrefix } from '@/lib/paths';
+import { getPostsInfo } from '@/lib/posts';
+import { getTagsByPosts } from '@/lib/tags';
+import SiteLayout from '@/layouts/SiteLayout.astro';
+
+const lang = resolveLanguage(Astro.params.lang);
+const t = createTranslator(lang, 'TagsPage');
+
+const posts = await getPostsInfo(lang);
+const tags = getTagsByPosts(posts, undefined, lang);
+
+const localizedTags = tags.map((tag) => ({
+  ...tag,
+  href: withLocalePrefix(`/tags/${tag.slug}`, lang),
+}));
+---
+
+<SiteLayout title={t('title')}>
+  <h1 class="mb-4">{t('title')}</h1>
+  {
+    localizedTags.length === 0 ? (
+      <p class="text-foreground-primary/80 text-sm">{t('noTags')}</p>
+    ) : (
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-5 transition-colors duration-300">
+        {localizedTags.map(({ name, postCount, href }) => (
+          <a
+            href={href}
+            class="bg-surface-secondary flex-between w-fit gap-x-3 rounded-full p-3 shadow-[2px_2px_2px_rgba(0,0,0,0.05)] transition hover:scale-105 dark:bg-gray-700"
+            aria-label={`${name} (${postCount} posts)`}
+          >
+            <span class="text-sm text-nowrap"># {name}</span>
+            <span class="flex-center text-foreground-secondary size-4 rounded-full bg-pink-500 text-[11px] font-bold dark:bg-pink-200">
+              {postCount}
+            </span>
+          </a>
+        ))}
+      </div>
+    )
+  }
+</SiteLayout>

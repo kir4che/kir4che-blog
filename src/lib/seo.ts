@@ -1,18 +1,61 @@
-import { Metadata } from 'next';
+import { LANGUAGE_TO_LOCALE_MAP, CONFIG } from '@/config';
+import type { Language } from '@/types';
+import { resolveLanguage } from '@/lib/i18n';
+import { stripLocalePrefix, withLocalePrefix } from '@/lib/paths';
+import { ensurePathname } from '@/utils/path';
 
-import { CONFIG, LANGUAGE_TO_LOCALE_MAP, DEFAULT_LANGUAGE } from '@/config';
+type SeoConfig = {
+  title: {
+    default: string;
+    template: string;
+  };
+  description: string;
+  siteName: string;
+  canonical: string;
+  alternates: Record<string, string>;
+  openGraph: {
+    type: 'website';
+    url: string;
+    title: string;
+    description: string;
+    siteName: string;
+    locale: string;
+    localeAlternates?: string[];
+    images: Array<{
+      url: string;
+      alt: string;
+      width: number;
+      height: number;
+      type?: string;
+      secureUrl?: string;
+    }>;
+  };
+  twitter: {
+    card: 'summary_large_image';
+    title: string;
+    description: string;
+    images: string[];
+  };
+  robots: string;
+  keywords: string[];
+  verification?: {
+    google?: string;
+  };
+  icons: {
+    icon: string;
+    shortcut: string;
+    apple: string;
+  };
+};
 
-const getLocalizedValue = (map: Record<string, string>, lang: string) =>
-  map[lang] ?? map[DEFAULT_LANGUAGE];
+// 依語系取得對應文字，若無則 fallback 到第一個可用值。
+const getLocalizedValue = <T extends Record<Language, string>>(
+  map: T,
+  lang: Language
+): string | undefined => map[lang] ?? Object.values(map)[0];
 
-const KEYWORDS_BY_LANG: Record<string, string[]> = {
-  tw: [
-    'kir4che',
-    'kir4che 部落格',
-    '前端開發',
-    'React 教學',
-    'JavaScript 教學',
-  ],
+const KEYWORDS_BY_LANG: Record<Language, string[]> = {
+  tw: ['kir4che', 'kir4che 部落格', '前端開發', 'React 教學', 'JavaScript 教學'],
   en: [
     'kir4che',
     'kir4che blog',
@@ -22,125 +65,83 @@ const KEYWORDS_BY_LANG: Record<string, string[]> = {
   ],
 };
 
-export const getSeoConfig = (lang: string): Metadata => {
-  const blogTitle =
-    getLocalizedValue(CONFIG.siteInfo.blog.title, lang) ?? CONFIG.siteInfo.name;
+export const getSeoConfig = (lang: Language, url?: URL | string): SeoConfig => {
+  const blogTitle = getLocalizedValue(CONFIG.siteInfo.blog.title, lang) ?? CONFIG.siteInfo.name;
   const blogDescription =
     getLocalizedValue(CONFIG.siteInfo.blog.description, lang) ?? 'kir4che Blog';
   const blogSiteName =
-    getLocalizedValue(CONFIG.siteInfo.blog.siteName, lang) ??
-    CONFIG.siteInfo.name;
+    getLocalizedValue(CONFIG.siteInfo.blog.siteName, lang) ?? CONFIG.siteInfo.name;
 
-  const fallbackSiteUrl = 'https://kir4che.com';
-  const rawSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || fallbackSiteUrl;
-
+  const rawSiteUrl =
+    import.meta.env.PUBLIC_SITE_URL || process.env.SITE_URL || 'https://kir4che.com';
   const siteUrl = rawSiteUrl.replace(/\/+$/, '');
 
-  let metadataBase: URL | undefined;
-  try {
-    metadataBase = new URL(siteUrl);
-  } catch {
-    metadataBase = undefined;
-  }
+  const rawPathname = typeof url === 'string' ? url : url?.pathname;
+  const pathname = ensurePathname(rawPathname);
+
+  const strippedPath = stripLocalePrefix(pathname);
 
   const localeToUrl = Object.fromEntries(
-    Object.entries(CONFIG.paths.languagePaths).map(([languageKey, path]) => [
-      LANGUAGE_TO_LOCALE_MAP[
-        languageKey as keyof typeof LANGUAGE_TO_LOCALE_MAP
-      ] || languageKey,
-      `${siteUrl}${path}`,
-    ])
-  ) as Record<string, string>;
+    (Object.entries(LANGUAGE_TO_LOCALE_MAP) as [Language, string][]).map(
+      ([languageKey, localeValue]) => [
+        localeValue,
+        `${siteUrl}${withLocalePrefix(strippedPath, languageKey)}`,
+      ]
+    )
+  );
 
-  const languageAlternates = {
+  const languageAlternates: Record<string, string> = {
     ...localeToUrl,
-    'x-default': siteUrl,
-  } satisfies Record<string, string>;
+    'x-default': `${siteUrl}${withLocalePrefix(strippedPath, lang)}`,
+  };
 
-  const openGraphLocaleAlternates = Object.entries(LANGUAGE_TO_LOCALE_MAP)
+  const openGraphLocaleAlternates = (Object.entries(LANGUAGE_TO_LOCALE_MAP) as [Language, string][])
     .filter(([languageKey]) => languageKey !== lang)
     .map(([, localeValue]) => localeValue);
 
   const defaultOgImage = `${siteUrl}/images/default-og.jpg`;
-  const isSecureContext = defaultOgImage.startsWith('https://');
+
   const baseImage = {
     url: defaultOgImage,
     alt: blogTitle,
     width: 1200,
     height: 630,
-  } as const;
-  const openGraphImage = {
-    ...baseImage,
-    type: 'image/jpeg',
-    ...(isSecureContext ? { secureUrl: defaultOgImage } : {}),
   };
 
-  const canonicalUrl =
-    localeToUrl[
-      LANGUAGE_TO_LOCALE_MAP[lang as keyof typeof LANGUAGE_TO_LOCALE_MAP] ||
-        lang
-    ] ?? `${siteUrl}/${lang}`;
+  const canonicalUrl = `${siteUrl}${withLocalePrefix(strippedPath, lang)}`;
 
   return {
-    metadataBase,
     title: {
       default: blogTitle,
       template: `%s | ${blogTitle}`,
     },
     description: blogDescription,
-    authors: [{ name: CONFIG.siteInfo.name, url: siteUrl }],
-    creator: CONFIG.siteInfo.name,
-    publisher: CONFIG.siteInfo.name,
-    applicationName: blogTitle,
-    generator: 'Next.js 15.3.1',
-    referrer: 'origin-when-cross-origin',
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-      },
-    },
-    formatDetection: {
-      email: false,
-      address: false,
-      telephone: false,
-    },
-    verification: {
-      google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
-    },
-    keywords:
-      KEYWORDS_BY_LANG[lang] ?? KEYWORDS_BY_LANG[DEFAULT_LANGUAGE] ?? [],
-    alternates: {
-      canonical: canonicalUrl,
-      languages: languageAlternates,
-    },
+    siteName: blogSiteName,
+    canonical: canonicalUrl,
+    alternates: languageAlternates,
     openGraph: {
       type: 'website',
       url: canonicalUrl,
       title: blogTitle,
       description: blogDescription,
       siteName: blogSiteName,
-      locale:
-        LANGUAGE_TO_LOCALE_MAP[lang as keyof typeof LANGUAGE_TO_LOCALE_MAP] ??
-        'zh-TW',
-      ...(openGraphLocaleAlternates.length
-        ? { localeAlternate: openGraphLocaleAlternates }
-        : {}),
-      images: [openGraphImage],
+      locale: resolveLanguage(lang),
+      ...(openGraphLocaleAlternates.length ? { localeAlternates: openGraphLocaleAlternates } : {}),
+      images: [baseImage],
     },
     twitter: {
       card: 'summary_large_image',
       title: blogTitle,
       description: blogDescription,
-      images: [baseImage],
+      images: [baseImage.url],
     },
+    robots: 'index,follow',
+    verification: {
+      google: import.meta.env.GOOGLE_SITE_VERIFICATION || process.env.GOOGLE_SITE_VERIFICATION,
+    },
+    keywords: KEYWORDS_BY_LANG[lang] ?? Object.values(KEYWORDS_BY_LANG)[0] ?? [],
     icons: {
-      icon: [{ url: '/favicon.ico', sizes: '32x32' }],
+      icon: '/favicon.ico',
       shortcut: '/favicon.ico',
       apple: '/favicon.ico',
     },
