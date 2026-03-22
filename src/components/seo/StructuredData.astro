@@ -78,8 +78,6 @@ const structuredDataScripts = entries.map((entry) => ({
 
 {
   structuredDataScripts.map((script) => (
-    <script type={script.type} is:inline>
-      {script.content}
-    </script>
+    <script type={script.type} is:inline set:html={script.content} />
   ))
 }

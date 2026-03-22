@@ -1,6 +1,8 @@
 // @ts-check
+import cloudflare from '@astrojs/cloudflare';
 import mdx from '@astrojs/mdx';
 import react from '@astrojs/react';
+import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import expressiveCode from 'astro-expressive-code';
 import { defineConfig } from 'astro/config';
@@ -66,7 +68,7 @@ export default defineConfig({
     locales: ['tw', 'en'],
     routing: 'manual',
   },
-  integrations: [react(), expressiveCode(ecConfig), mdx()],
+  integrations: [react(), expressiveCode(ecConfig), mdx(), sitemap()],
   markdown: {
     remarkPlugins: [remarkGfm, remarkIns, remarkMark, remarkCustomHeaderId, remarkImages],
     rehypePlugins: [rehypeUnwrapImages, rehypeSlug],
