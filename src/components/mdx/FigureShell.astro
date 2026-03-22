@@ -1,6 +1,4 @@
 ---
-import { cn } from '@/utils/cn';
-
 interface FigureShellProps {
   align?: 'left' | 'center' | 'right';
   title?: string;
@@ -22,11 +20,10 @@ const ALIGNMENT_CLASSES = {
   center: 'mx-auto items-center',
   right: 'ml-auto items-end',
 } as const;
-const alignmentClass = ALIGNMENT_CLASSES[align];
 ---
 
 <figure
-  class={cn('flex flex-col space-y-2 rounded-md', alignmentClass, className)}
+  class:list={['flex flex-col space-y-2 rounded-md', ALIGNMENT_CLASSES[align], className]}
   style={style}
   {...rest}
 >

@@ -1,5 +1,5 @@
 import type { MarkdownHeading } from 'astro';
-import type { CollectionEntry } from 'astro:content';
+import type { render } from 'astro:content';
 
 import type { Language } from './i18n';
 
@@ -9,12 +9,11 @@ export interface PostMeta {
   title: string;
   description?: string;
   date: string;
-  postId?: string;
   categories: string[];
   tags: string[];
   featured: boolean;
   draft: boolean;
-  passwordHash?: string;
+  protected?: boolean;
   coverImage?: string;
   wordCount?: number;
   updatedAt?: string;
@@ -29,7 +28,7 @@ export interface PostContent {
 
 // Astro render 結果
 export interface PostRenderResult {
-  rendered: Awaited<ReturnType<CollectionEntry<'blog'>['render']>>;
+  rendered: Awaited<ReturnType<typeof render>>;
 }
 
 // 完整文章（文章頁使用）
@@ -38,9 +37,18 @@ export interface Post extends PostMeta, PostContent, Partial<PostRenderResult> {
 // 分頁資料
 export interface PaginationData<T> {
   items: T[];
-  currentPage: number;
+  currPage: number;
   totalPages: number;
   totalItems: number;
   start: number;
   end: number;
+}
+
+export interface AdminPost {
+  id: string;
+  lang: Language;
+  slug: string;
+  meta: PostMeta;
+  content: string;
+  fullPath: string;
 }

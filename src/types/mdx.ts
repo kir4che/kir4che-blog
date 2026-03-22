@@ -1,9 +1,3 @@
-import type { ComponentType } from 'react';
-
-export type MDXComponent<Props = any> = ComponentType<Props>;
-
-export type MDXComponents = Record<string, MDXComponent>;
-
 export type MediaType = 'image' | 'video';
 
 export type ObjectPosition = 'top' | 'center' | 'bottom';
@@ -40,7 +34,7 @@ export type MediaItem =
       height?: string | number;
       poster?: string;
       controls?: boolean;
-      autoPlay?: boolean;
+      autoplay?: boolean;
       loop?: boolean;
       muted?: boolean;
     };

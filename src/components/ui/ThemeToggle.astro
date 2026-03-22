@@ -61,8 +61,8 @@ const labelDark = t('theme.dark');
             if (button.dataset.themeBound) return;
             button.dataset.themeBound = 'true';
             button.addEventListener('click', () => {
-              const current = button.dataset.theme === 'dark' ? 'dark' : 'light';
-              const next = current === 'dark' ? 'light' : 'dark';
+              const curr = button.dataset.theme === 'dark' ? 'dark' : 'light';
+              const next = curr === 'dark' ? 'light' : 'dark';
               window.localStorage.setItem(storageKey, next);
               this.applyTheme(next);
             });

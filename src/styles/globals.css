@@ -100,13 +100,6 @@
 }
 
 @layer base {
-  :root {
-    --su: var(--color-success);
-    --wa: var(--color-warning);
-    --in: var(--color-info);
-    --er: var(--color-error);
-  }
-
   *,
   *::before,
   *::after {
@@ -167,11 +160,6 @@
     @apply text-sm font-medium;
   }
 
-  mark p {
-    margin: 0 !important;
-    display: inline !important;
-  }
-
   h1[id],
   h2[id],
   h3[id],
@@ -179,6 +167,19 @@
   h5[id],
   h6[id] {
     scroll-margin-top: 6rem;
+  }
+
+  mark p {
+    @apply m-0! inline!;
+  }
+
+  input:not([type='file']),
+  select {
+    @apply px-1.5!;
+  }
+
+  textarea {
+    @apply p-1.5!;
   }
 }
 
@@ -233,4 +234,8 @@
 
 @utility text-gradient {
   @apply bg-linear-to-r from-pink-700 to-pink-500 bg-clip-text text-transparent dark:from-pink-200 dark:to-pink-100;
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
 }

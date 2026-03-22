@@ -130,8 +130,6 @@
     },
     "share": {
       "copyLink": "Copy link",
-      "copySuccess": "Link copied to clipboard",
-      "copyUnavailable": "Clipboard is not available in this browser.",
       "native": "Share to…"
     }
   },

@@ -1,7 +1,7 @@
-import { LANGUAGE_TO_LOCALE_MAP, CONFIG } from '@/config';
-import type { Language } from '@/types';
+import { CONFIG, LANGUAGE_TO_LOCALE_MAP } from '@/config';
 import { resolveLanguage } from '@/lib/i18n';
 import { stripLocalePrefix, withLocalePrefix } from '@/lib/paths';
+import type { Language } from '@/types';
 import { ensurePathname } from '@/utils/path';
 
 type SeoConfig = {
@@ -65,50 +65,34 @@ const KEYWORDS_BY_LANG: Record<Language, string[]> = {
   ],
 };
 
-export const getSeoConfig = (lang: Language, url?: URL | string): SeoConfig => {
+export const getSeoConfig = (siteUrl: URL, lang: Language, url?: URL | string): SeoConfig => {
   const blogTitle = getLocalizedValue(CONFIG.siteInfo.blog.title, lang) ?? CONFIG.siteInfo.name;
   const blogDescription =
     getLocalizedValue(CONFIG.siteInfo.blog.description, lang) ?? 'kir4che Blog';
   const blogSiteName =
     getLocalizedValue(CONFIG.siteInfo.blog.siteName, lang) ?? CONFIG.siteInfo.name;
 
-  const rawSiteUrl =
-    import.meta.env.PUBLIC_SITE_URL || process.env.SITE_URL || 'https://kir4che.com';
-  const siteUrl = rawSiteUrl.replace(/\/+$/, '');
-
   const rawPathname = typeof url === 'string' ? url : url?.pathname;
-  const pathname = ensurePathname(rawPathname);
+  const strippedPath = stripLocalePrefix(ensurePathname(rawPathname));
+  const canonicalUrl = `${siteUrl}${withLocalePrefix(strippedPath, lang)}`;
 
-  const strippedPath = stripLocalePrefix(pathname);
+  const localeToUrl: Record<string, string> = {};
+  const openGraphLocaleAlternates: string[] = [];
 
-  const localeToUrl = Object.fromEntries(
-    (Object.entries(LANGUAGE_TO_LOCALE_MAP) as [Language, string][]).map(
-      ([languageKey, localeValue]) => [
-        localeValue,
-        `${siteUrl}${withLocalePrefix(strippedPath, languageKey)}`,
-      ]
-    )
-  );
-
-  const languageAlternates: Record<string, string> = {
-    ...localeToUrl,
-    'x-default': `${siteUrl}${withLocalePrefix(strippedPath, lang)}`,
-  };
-
-  const openGraphLocaleAlternates = (Object.entries(LANGUAGE_TO_LOCALE_MAP) as [Language, string][])
-    .filter(([languageKey]) => languageKey !== lang)
-    .map(([, localeValue]) => localeValue);
-
-  const defaultOgImage = `${siteUrl}/images/default-og.jpg`;
+  for (const [languageKey, localeValue] of Object.entries(LANGUAGE_TO_LOCALE_MAP) as [
+    Language,
+    string,
+  ][]) {
+    localeToUrl[localeValue] = `${siteUrl}${withLocalePrefix(strippedPath, languageKey)}`;
+    if (languageKey !== lang) openGraphLocaleAlternates.push(localeValue);
+  }
 
   const baseImage = {
-    url: defaultOgImage,
+    url: `${siteUrl}/images/default-og.jpg`,
     alt: blogTitle,
     width: 1200,
     height: 630,
   };
-
-  const canonicalUrl = `${siteUrl}${withLocalePrefix(strippedPath, lang)}`;
 
   return {
     title: {
@@ -118,7 +102,7 @@ export const getSeoConfig = (lang: Language, url?: URL | string): SeoConfig => {
     description: blogDescription,
     siteName: blogSiteName,
     canonical: canonicalUrl,
-    alternates: languageAlternates,
+    alternates: { ...localeToUrl, 'x-default': canonicalUrl },
     openGraph: {
       type: 'website',
       url: canonicalUrl,
@@ -137,7 +121,7 @@ export const getSeoConfig = (lang: Language, url?: URL | string): SeoConfig => {
     },
     robots: 'index,follow',
     verification: {
-      google: import.meta.env.GOOGLE_SITE_VERIFICATION || process.env.GOOGLE_SITE_VERIFICATION,
+      google: import.meta.env.GOOGLE_SITE_VERIFICATION,
     },
     keywords: KEYWORDS_BY_LANG[lang] ?? Object.values(KEYWORDS_BY_LANG)[0] ?? [],
     icons: {

@@ -25,10 +25,10 @@ const { slug, hasPassword = false } = Astro.props as PostCommentsProps;
     const resolveTheme = () =>
       document.documentElement.classList.contains('dark') ? 'github-dark' : 'github-light';
 
-    let currentTheme = '';
+    let currTheme = '';
     const mount = () => {
       const theme = resolveTheme();
-      currentTheme = theme;
+      currTheme = theme;
 
       root.replaceChildren();
       const script = document.createElement('script');
@@ -56,7 +56,7 @@ const { slug, hasPassword = false } = Astro.props as PostCommentsProps;
     const observer = new MutationObserver(() => {
       if (root.dataset.locked === 'true') return;
       const nextTheme = resolveTheme();
-      if (nextTheme === currentTheme) return;
+      if (nextTheme === currTheme) return;
       mount();
     });
 

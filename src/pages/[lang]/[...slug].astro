@@ -1,59 +1,40 @@
 ---
+export const prerender = false;
+
 import PostLayout from '@/layouts/PostLayout.astro';
+import { isAuthenticated } from '@/lib/admin';
 import { resolveLanguage } from '@/lib/i18n';
 import {
   getPost,
   getPostAvailableLangs,
+  getPostExtraComponents,
   getPostMetaBySlug,
   getPostUnlockCookieName,
 } from '@/lib/posts';
 
-const BLOG_COMPONENT_MODULES = import.meta.glob(
-  '/src/content/blog/**/components.{js,jsx,ts,tsx,astro}',
-  { eager: true }
-);
+const { lang: rawLang, slug } = Astro.params as { lang: string; slug: string };
+const lang = resolveLanguage(rawLang);
 
-const lang = resolveLanguage(Astro.params.lang);
-
-const slug = Astro.params.slug;
 if (!slug) return Astro.redirect('/404', 404);
 
 const postMeta = await getPostMetaBySlug(lang, slug);
 if (!postMeta) return Astro.redirect('/404', 404);
 
-const postId = postMeta.postId ?? postMeta.slug;
+let isLocked = !!postMeta.protected;
 
-// 是否已解鎖受保護文章
-const hasUnlockCookie = Boolean(Astro.cookies.get(getPostUnlockCookieName(postId))?.value);
-const isLocked = Boolean(postMeta.passwordHash) && !hasUnlockCookie;
+if (isLocked) {
+  const cookieName = getPostUnlockCookieName(slug);
+  const hasUnlock = Astro.cookies.has(cookieName);
+  const isAdmin = await isAuthenticated(Astro.cookies);
+  if (hasUnlock || isAdmin) isLocked = false;
+}
 
 const post = isLocked ? null : await getPost(lang, slug);
-
-const availableLangs = await getPostAvailableLangs({
-  postId: postMeta.postId,
-  slug: postMeta.slug,
-});
+const availableLangs = await getPostAvailableLangs(slug);
 const otherLangs = availableLangs.filter((l) => l !== lang);
-
 const displayPost = post ?? postMeta;
 const postContent = post?.rendered?.Content ?? null;
-
-const extraComponents = (() => {
-  const normalizedSlug = typeof displayPost.slug === 'string' ? displayPost.slug.trim() : '';
-
-  if (!normalizedSlug) return undefined;
-
-  const match = Object.entries(BLOG_COMPONENT_MODULES).find(([filePath]) =>
-    filePath.includes(`/blog/${normalizedSlug}/components.`)
-  );
-
-  if (!match) return undefined;
-
-  const mod = match[1] as Record<string, unknown>;
-  if (typeof mod !== 'object' || mod === null) return undefined;
-
-  return (mod.default ?? mod) as Record<string, unknown>;
-})();
+const extraComponents = await getPostExtraComponents(displayPost.slug);
 ---
 
 <PostLayout

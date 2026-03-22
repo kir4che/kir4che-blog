@@ -1,8 +1,8 @@
-import type { SidebarCategory, Language, PostMeta, SidebarTag } from '@/types';
 import { DEFAULT_LANGUAGE } from '@/config';
-import { getPostsInfo } from '@/lib/posts';
 import { getAllCategoryByPosts } from '@/lib/categories';
+import { getPostsInfo } from '@/lib/posts';
 import { getTagsByPosts } from '@/lib/tags';
+import type { Language, PostMeta, SidebarCategory, SidebarTag } from '@/types';
 
 interface SidebarData {
   posts: PostMeta[];
@@ -17,8 +17,6 @@ interface SidebarData {
 
 const cache = new Map<Language, SidebarData>();
 const isProd = import.meta.env.PROD;
-
-const normalizeDate = (date: string): string => date;
 
 // 建立側邊欄資料
 const buildSidebarData = async (lang: Language): Promise<SidebarData> => {
@@ -37,20 +35,7 @@ const buildSidebarData = async (lang: Language): Promise<SidebarData> => {
 
   const popularPosts = posts
     .filter((p) => p.featured)
-    .flatMap(({ slug, title, date }) => {
-      if (!date) {
-        if (!isProd) console.warn(`Featured post "${slug}" is missing date.`);
-        return [];
-      }
-
-      return [
-        {
-          slug,
-          title: title ?? slug,
-          date: normalizeDate(date),
-        },
-      ];
-    })
+    .map(({ slug, title, date }) => ({ slug, title: title ?? slug, date }))
     .slice(0, 5);
 
   return {

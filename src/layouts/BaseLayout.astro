@@ -3,7 +3,6 @@ import type { Language } from '@/types';
 import { getSeoConfig } from '@/lib/seo';
 import { getLocaleFromUrl } from '@/lib/i18n';
 import Toast from '@/components/ui/Toast.astro';
-import langMenu from '@/scripts/langMenu.ts?url';
 
 import '@/styles/globals.css';
 
@@ -21,120 +20,33 @@ const { title, description, canonical, image, noindex } = Astro.props as {
   noindex?: boolean;
 };
 
-const lang: Language = getLocaleFromUrl(Astro.url);
-const seo = getSeoConfig(lang, Astro.url);
+const siteOrigin = Astro.site!;
+const currUrl = Astro.url;
+const currLang: Language = getLocaleFromUrl(currUrl);
+const seoConfig = getSeoConfig(siteOrigin, currLang, currUrl);
 
-const slugParam = Astro.params?.slug;
-const slugSegments = Array.isArray(slugParam)
-  ? slugParam
-  : typeof slugParam === 'string'
-    ? [slugParam]
-    : null;
-const langParam = typeof Astro.params?.lang === 'string' ? Astro.params.lang : null;
-const isArticlePage = Boolean(slugSegments && langParam);
-const rawSiteUrl = import.meta.env.PUBLIC_SITE_URL || process.env.SITE_URL || Astro.url.origin;
-const siteUrl = rawSiteUrl.replace(/\/+$/, '');
-const lazyOgImageUrl = isArticlePage
-  ? `${siteUrl}/og/${langParam}/${(slugSegments ?? []).join('/')}.png`
-  : null;
-
-const keywords = seo.keywords.length > 0 ? seo.keywords.join(', ') : null;
-const googleAnalyticsId = import.meta.env.GOOGLE_ANALYTICS_ID;
+const keywords = seoConfig.keywords.length > 0 ? seoConfig.keywords.join(', ') : null;
 const canonicalUrl = canonical
   ? canonical.startsWith('http')
     ? canonical
-    : `${siteUrl}${canonical}`
-  : seo.canonical;
-const shouldIndex = noindex ? 'noindex,nofollow' : seo.robots;
-
-const resolvedImageUrl = image?.url
-  ? image.url.startsWith('http')
-    ? image.url
-    : `${siteUrl}${image.url.startsWith('/') ? image.url : `/${image.url}`}`
-  : null;
-
-const imageOverride = resolvedImageUrl
-  ? [
-      { name: 'og:image', content: resolvedImageUrl },
-      ...(image?.alt ? [{ name: 'og:image:alt', content: image.alt }] : []),
-      ...(image?.width ? [{ name: 'og:image:width', content: String(image.width) }] : []),
-      ...(image?.height ? [{ name: 'og:image:height', content: String(image.height) }] : []),
-      ...(image?.type ? [{ name: 'og:image:type', content: image.type }] : []),
-      { name: 'twitter:image', content: resolvedImageUrl },
-    ]
-  : [];
+    : `${siteOrigin}${canonical}`
+  : seoConfig.canonical;
+const shouldIndex = noindex ? 'noindex,nofollow' : seoConfig.robots;
 ---
 
 <!doctype html>
-<html lang={lang}>
+<html lang={currLang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>
-      {title ? seo.title.template.replace('%s', title) : seo.title.default}
+      {title ? seoConfig.title.template.replace('%s', title) : seoConfig.title.default}
     </title>
-    <meta name="description" content={description ?? seo.description} />
+    <meta name="description" content={description ?? seoConfig.description} />
     {keywords && <meta name="keywords" content={keywords} />}
     <meta name="robots" content={shouldIndex} />
     <link rel="canonical" href={canonicalUrl} />
-    {
-      Object.entries(seo.alternates).map(([locale, href]) => (
-        <link rel="alternate" hreflang={locale} href={href} />
-      ))
-    }
-    <link rel="icon" href={seo.icons.icon} />
-    <link rel="apple-touch-icon" href={seo.icons.apple} />
-    <meta property="og:type" content={isArticlePage ? 'article' : seo.openGraph.type} />
-    <meta property="og:title" content={seo.openGraph.title} />
-    <meta property="og:description" content={seo.openGraph.description} />
-    <meta property="og:url" content={canonicalUrl} />
-    <meta property="og:site_name" content={seo.openGraph.siteName} />
-    <meta property="og:locale" content={seo.openGraph.locale} />
-    {
-      seo.openGraph.localeAlternates?.map((locale) => (
-        <meta property="og:locale:alternate" content={locale} />
-      ))
-    }
-    {
-      imageOverride.length > 0 ? (
-        imageOverride.map(({ name, content }) =>
-          name.startsWith('og:') ? (
-            <meta property={name} content={content} />
-          ) : (
-            <meta name={name} content={content} />
-          )
-        )
-      ) : lazyOgImageUrl ? (
-        <>
-          <meta property="og:image" content={lazyOgImageUrl} />
-          <meta property="og:image:width" content="1200" />
-          <meta property="og:image:height" content="630" />
-          <meta name="twitter:image" content={lazyOgImageUrl} />
-        </>
-      ) : (
-        seo.openGraph.images.map((ogImage) => (
-          <>
-            <meta property="og:image" content={ogImage.url} />
-            <meta property="og:image:alt" content={ogImage.alt} />
-            <meta property="og:image:width" content={String(ogImage.width)} />
-            <meta property="og:image:height" content={String(ogImage.height)} />
-            {ogImage.type && <meta property="og:image:type" content={ogImage.type} />}
-          </>
-        ))
-      )
-    }
-    <meta name="twitter:card" content={seo.twitter.card} />
-    <meta name="twitter:title" content={seo.twitter.title} />
-    <meta name="twitter:description" content={seo.twitter.description} />
-    {
-      imageOverride.length === 0 &&
-        seo.twitter.images.map((imageUrl) => <meta name="twitter:image" content={imageUrl} />)
-    }
-    {
-      seo.verification?.google && (
-        <meta name="google-site-verification" content={seo.verification.google} />
-      )
-    }
+
     <slot name="head" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -142,29 +54,95 @@ const imageOverride = resolvedImageUrl
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    {
-      googleAnalyticsId && (
-        <script
-          async
-          is:inline
-          src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`}
-        />
-      )
-    }
-    {
-      googleAnalyticsId && (
-        <script is:inline>
-          {`window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', '${googleAnalyticsId}');`}
-        </script>
-      )
-    }
   </head>
   <body>
-    <slot />
     <Toast />
-    <script type="module" src={langMenu}></script>
+    <slot />
+    <script>
+      const root = '[data-lang-menu]';
+      const toggle = '[data-lang-menu-toggle]';
+      const list = '[data-lang-menu-list]';
+      const item = '[data-lang-menu-item]';
+      const hoverAttr = 'data-lang-menu-hover';
+
+      const initMenu = (menu: HTMLElement & { __langMenuBound?: boolean }) => {
+        if (menu.__langMenuBound) return;
+        menu.__langMenuBound = true;
+
+        const btn = menu.querySelector<HTMLElement>(toggle);
+        const panel = menu.querySelector<HTMLElement>(list);
+        if (!btn || !panel) return;
+
+        let isOpen = false;
+
+        const open = () => {
+          isOpen = true;
+          panel.classList.remove('hidden');
+          btn.setAttribute('aria-expanded', 'true');
+        };
+
+        const close = () => {
+          isOpen = false;
+          panel.classList.add('hidden');
+          btn.setAttribute('aria-expanded', 'false');
+        };
+
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          isOpen ? close() : open();
+        });
+
+        if (menu.hasAttribute(hoverAttr)) {
+          let timer: number | undefined;
+          const scheduleClose = () => {
+            if (timer) window.clearTimeout(timer);
+            timer = window.setTimeout(close, 120);
+          };
+          const cancelClose = () => {
+            if (timer) window.clearTimeout(timer);
+          };
+
+          btn.addEventListener('mouseenter', open);
+          btn.addEventListener('mouseleave', scheduleClose);
+          panel.addEventListener('mouseenter', cancelClose);
+          panel.addEventListener('mouseleave', scheduleClose);
+        }
+
+        menu
+          .querySelectorAll<HTMLElement>(item)
+          .forEach((el) => el.addEventListener('click', close));
+      };
+
+      const closeAll = () => {
+        document.querySelectorAll<HTMLElement>(list).forEach((el) => el.classList.add('hidden'));
+        document
+          .querySelectorAll<HTMLElement>(toggle)
+          .forEach((el) => el.setAttribute('aria-expanded', 'false'));
+      };
+
+      const initMenus = () => {
+        document.querySelectorAll<HTMLElement>(root).forEach(initMenu);
+      };
+
+      const win = window as Window & { __langMenuInit?: boolean };
+      if (!win.__langMenuInit) {
+        win.__langMenuInit = true;
+
+        document.addEventListener('click', (e) => {
+          const target = e.target;
+          if (!(target instanceof Element)) return;
+          if (!target.closest(root)) closeAll();
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') closeAll();
+        });
+
+        if (document.readyState !== 'loading') initMenus();
+        else document.addEventListener('DOMContentLoaded', initMenus, { once: true });
+
+        document.addEventListener('astro:page-load', initMenus);
+      } else initMenus();
+    </script>
   </body>
 </html>

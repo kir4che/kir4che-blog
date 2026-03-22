@@ -1,0 +1,407 @@
+<div
+  id="mdx-toolbar"
+  class="flex shrink-0 flex-wrap items-center gap-px bg-gray-900 px-2 py-1 select-none"
+>
+  <button type="button" class="tbtn font-bold" data-tid="bold">B</button>
+  <button type="button" class="tbtn italic" data-tid="italic">I</button>
+  <button type="button" class="tbtn font-mono text-[10px]" data-tid="code">code</button>
+  <button type="button" class="tbtn" data-tid="link">[…]</button>
+  <button type="button" class="tbtn" data-tid="blockquote">❝</button>
+  <button type="button" class="tbtn font-mono" data-tid="code-block">‹/›</button>
+  <div class="mx-2 h-4 w-px shrink-0 bg-gray-600"></div>
+  <button type="button" class="tbtn" data-tid="image">Image</button>
+  <button type="button" class="tbtn" data-tid="images">Images</button>
+  <button type="button" class="tbtn" data-tid="video">Video</button>
+  <div class="mx-2 h-4 w-px shrink-0 bg-gray-600"></div>
+  <button type="button" class="tbtn" data-tid="highlight">Highlight</button>
+  <button type="button" class="tbtn" data-tid="kbd">Kbd</button>
+  <button type="button" class="tbtn" data-tid="small-text">SmallText</button>
+  <button type="button" class="tbtn" data-tid="correction">Correction</button>
+  <div class="mx-2 h-4 w-px shrink-0 bg-gray-600"></div>
+  <button type="button" class="tbtn" data-tid="accordion">Accordion</button>
+  <button type="button" class="tbtn" data-tid="table">Table</button>
+  <button type="button" class="tbtn" data-tid="rating">Rating</button>
+</div>
+
+<div id="tb-tooltip" style="display:none; position:fixed; z-index:9999;"></div>
+
+<style is:global>
+  .tbtn {
+    padding: 2px 7px;
+    font-size: 11px;
+    line-height: 1.5;
+    color: #d1d5db;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+      background-color 100ms,
+      color 100ms;
+  }
+  .tbtn:hover {
+    background: #4b5563;
+    color: #fff;
+  }
+  /* 滑鼠點擊按下去瞬間的樣式 */
+  .tbtn:active {
+    background: #374151;
+  }
+
+  #tb-tooltip {
+    min-width: 210px;
+    max-width: 390px;
+    background: #0f172a;
+    border: 1px solid #2d3f55;
+    border-radius: 8px;
+    box-shadow: 0 10px 36px rgba(0, 0, 0, 0.65);
+    font-size: 12px;
+    color: #e2e8f0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  #tb-tooltip .tt-head {
+    padding: 8px 12px 6px;
+    border-bottom: 1px solid #1e293b;
+  }
+  #tb-tooltip .tt-name {
+    font-weight: 700;
+    font-size: 13px;
+    color: #f8fafc;
+  }
+  #tb-tooltip .tt-desc {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 2px;
+  }
+  #tb-tooltip .tt-props {
+    padding: 6px 12px 4px;
+  }
+  #tb-tooltip .tt-prop-row {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: 6px;
+    align-items: baseline;
+    padding: 2px 0;
+    font-family: ui-monospace, monospace;
+    font-size: 11px;
+  }
+  #tb-tooltip .tt-pname {
+    color: #93c5fd;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #tb-tooltip .tt-req {
+    color: #fca5a5;
+    font-size: 10px;
+    margin-left: 1px;
+  }
+  #tb-tooltip .tt-pinfo {
+    color: #6ee7b7;
+  }
+  #tb-tooltip .tt-pdefault {
+    color: #64748b;
+    margin-left: 5px;
+  }
+  #tb-tooltip .tt-code {
+    margin: 0;
+    padding: 6px 12px 8px;
+    border-top: 1px solid #1e293b;
+    background: #020617;
+    font-family: ui-monospace, monospace;
+    font-size: 11px;
+    color: #94a3b8;
+    white-space: pre;
+    line-height: 1.65;
+    overflow-x: auto;
+  }
+</style>
+
+<script>
+  interface Prop {
+    name: string;
+    type: string;
+    required?: true;
+    default?: string;
+    desc?: string;
+  }
+
+  interface Item {
+    label: string;
+    desc?: string;
+    props?: Prop[];
+    template: string;
+    wrap?: { before: string; after: string };
+  }
+
+  // 代表「插入文字後，游標應該停留在哪裡」
+  const CURSOR = '{|}';
+
+  const items: Record<string, Item> = {
+    bold: {
+      label: '粗體 Bold',
+      template: '**{|}**',
+      wrap: { before: '**', after: '**' },
+    },
+    italic: {
+      label: '斜體 Italic',
+      template: '*{|}*',
+      wrap: { before: '*', after: '*' },
+    },
+    code: {
+      label: '行內程式碼',
+      template: '`{|}`',
+      wrap: { before: '`', after: '`' },
+    },
+    link: {
+      label: '超連結',
+      desc: '方括號為顯示文字，圓括號為 URL',
+      template: '[{|}](url)',
+    },
+    blockquote: {
+      label: '引用區塊',
+      template: '> {|}',
+    },
+    'code-block': {
+      label: '程式碼區塊',
+      desc: '可指定語言（js, ts, bash, css…）',
+      template: '```js\n{|}\n```',
+    },
+    image: {
+      label: 'Image',
+      desc: '響應式圖片，支援標題與對齊',
+      props: [
+        { name: 'src', type: 'string', required: true, desc: '圖片路徑或 URL' },
+        { name: 'alt', type: 'string', desc: '替代文字（無障礙）' },
+        { name: 'title', type: 'string', desc: '說明文字（顯示於圖片下方）' },
+        { name: 'width', type: 'string|number', default: "'85%'", desc: '容器寬度' },
+        { name: 'height', type: 'string|number', desc: '圖片高度' },
+        { name: 'align', type: "'left'|'center'|'right'", default: "'center'" },
+        { name: 'objPos', type: "'top'|'center'|'bottom'", default: "'center'", desc: '裁切位置' },
+        { name: 'priority', type: 'boolean', default: 'false', desc: '優先載入（首屏用）' },
+      ],
+      template: '<Image src="{|}" alt="" title="" />',
+    },
+    images: {
+      label: 'Images',
+      desc: '多圖橫排展示（圖片集）',
+      props: [
+        {
+          name: 'images',
+          type: 'MediaItem[]',
+          required: true,
+          desc: '每項含 type、src、alt，可加 colSpan',
+        },
+        { name: 'title', type: 'string', desc: '整組說明文字' },
+        { name: 'width', type: 'string|number', default: "'85%'", desc: '容器最大寬度' },
+        { name: 'height', type: 'string|number', desc: '統一圖片高度' },
+        { name: 'minHeight', type: 'string|number', default: "'200px'" },
+        { name: 'maxHeight', type: 'string|number', default: "'400px'" },
+        { name: 'align', type: "'left'|'center'|'right'", default: "'center'" },
+      ],
+      template:
+        "<Images\n  images={[\n    { type: 'image', src: '{|}', alt: '' },\n    { type: 'image', src: '', alt: '' },\n  ]}\n  title=\"\"\n  align=\"center\"\n/>",
+    },
+    video: {
+      label: 'Video',
+      desc: '嵌入影片，支援自動播放與循環',
+      props: [
+        { name: 'src', type: 'string', required: true, desc: '影片路徑或 URL' },
+        { name: 'title', type: 'string', desc: '說明文字' },
+        { name: 'width', type: 'string|number', default: "'100%'" },
+        { name: 'height', type: 'string|number' },
+        { name: 'align', type: "'left'|'center'|'right'", default: "'center'" },
+        { name: 'controls', type: 'boolean', default: 'true', desc: '顯示播放控制列' },
+        { name: 'autoplay', type: 'boolean', default: 'false', desc: '自動播放（需搭配 muted）' },
+        { name: 'loop', type: 'boolean', default: 'false', desc: '循環播放' },
+        { name: 'muted', type: 'boolean', default: 'true', desc: '靜音' },
+        { name: 'poster', type: 'string', desc: '封面圖片 URL' },
+      ],
+      template: '<Video src="{|}" title="" controls />',
+    },
+    highlight: {
+      label: 'Highlight',
+      desc: '螢光筆效果，支援多種顏色',
+      props: [
+        {
+          name: 'color',
+          type: "'yellow'|'green'|'blue'|'pink'|'custom'",
+          default: "'pink'",
+          desc: '螢光顏色',
+        },
+      ],
+      template: '<Highlight color="pink">{|}</Highlight>',
+      wrap: { before: '<Highlight color="pink">', after: '</Highlight>' },
+    },
+    kbd: {
+      label: 'Kbd',
+      desc: '鍵盤按鍵樣式',
+      template: '<Kbd>{|}</Kbd>',
+      wrap: { before: '<Kbd>', after: '</Kbd>' },
+    },
+    'small-text': {
+      label: 'SmallText',
+      desc: '小字文字段落',
+      template: '<SmallText>{|}</SmallText>',
+      wrap: { before: '<SmallText>', after: '</SmallText>' },
+    },
+    correction: {
+      label: 'Correction',
+      desc: '勘誤標注：隱藏錯誤文字，並顯示正確文字',
+      props: [
+        { name: 'wrong', type: 'string', required: true, desc: '錯誤文字（點擊可展開查看）' },
+        { name: 'correct', type: 'string', required: true, desc: '正確文字' },
+      ],
+      template: '<Correction wrong="{|}" correct="" />',
+    },
+    accordion: {
+      label: 'Accordion',
+      desc: '可折疊的手風琴區塊',
+      props: [
+        { name: 'title', type: 'string', required: true, desc: '顯示標題' },
+        {
+          name: 'variant',
+          type: "'default'|'basic'|'pink'",
+          default: "'default'",
+          desc: '外觀樣式',
+        },
+      ],
+      template: '<Accordion title="{|}" variant="default">\n  內容文字\n</Accordion>',
+    },
+    table: {
+      label: 'Table',
+      desc: '自訂樣式表格，支援 `inline code` 與相鄰儲存格自動合併',
+      props: [
+        { name: 'data.headers', type: 'string[]', required: true, desc: '欄位標題' },
+        {
+          name: 'data.rows',
+          type: '(string|undefined)[][]',
+          required: true,
+          desc: '表格內容（相同值自動 colspan 合併）',
+        },
+      ],
+      template:
+        "<Table\n  data={{\n    headers: ['{|}', '欄位二', '欄位三'],\n    rows: [\n      ['資料一', '資料二', '資料三'],\n      ['資料四', '資料五', '資料六'],\n    ],\n  }}\n/>",
+    },
+    rating: {
+      label: 'Rating',
+      desc: '星形或愛心評分，0.5 步進',
+      props: [
+        { name: 'type', type: "'star'|'heart'", default: "'star'", desc: '評分圖示' },
+        { name: 'rating', type: 'number (0.5~5.0)', required: true, desc: '評分值' },
+        { name: 'size', type: "'sm'|'md'|'lg'", default: "'sm'" },
+      ],
+      template: '<Rating type="star" rating={4.5} size="sm" />',
+    },
+  };
+
+  const tooltip = document.getElementById('tb-tooltip') as HTMLDivElement;
+  let hideTimer: ReturnType<typeof setTimeout> | undefined;
+
+  // 字串轉 HTML 實體
+  const escapeHtml = (str: string): string => {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  };
+
+  // 根據 Item 內容產生對應的 tooltip HTML
+  const renderTooltip = (item: Item): string => {
+    const exampleCode = escapeHtml(item.template.replaceAll(CURSOR, ''));
+
+    const propsHtml = item.props
+      ? `<div class="tt-props">${item.props
+          .map(
+            (p) =>
+              `<div class="tt-prop-row">` +
+              `<span class="tt-pname">${p.name}${p.required ? '<span class="tt-req">*</span>' : ''}</span>` +
+              `<span><span class="tt-pinfo">${p.type}</span>${p.default ? `<span class="tt-pdefault">= ${p.default}</span>` : ''}${p.desc ? `<span class="tt-pdefault"> — ${p.desc}</span>` : ''}</span>` +
+              `</div>`
+          )
+          .join('')}</div>`
+      : '';
+
+    return (
+      `<div class="tt-head"><div class="tt-name">${item.label}</div>${item.desc ? `<div class="tt-desc">${item.desc}</div>` : ''}</div>` +
+      propsHtml +
+      `<pre class="tt-code">${exampleCode}</pre>`
+    );
+  };
+
+  // 把每個 tooltip HTML 快取，這樣滑鼠反覆移來移去，就不用重複執行 renderTooltip 去消耗 CPU 計算。
+  const tooltipCache = new Map(Object.values(items).map((item) => [item, renderTooltip(item)]));
+
+  // 顯示 tooltip
+  function showTooltip(btn: HTMLElement, item: Item) {
+    clearTimeout(hideTimer);
+
+    tooltip.innerHTML = tooltipCache.get(item)!;
+    tooltip.style.display = 'block';
+
+    // 計算 button 在螢幕上的位置
+    const rect = btn.getBoundingClientRect();
+    const tipWidth = 280;
+    let left = rect.left;
+
+    if (left + tipWidth > window.innerWidth - 8) left = window.innerWidth - tipWidth - 8;
+    if (left < 8) left = 8;
+
+    tooltip.style.left = `${left}px`;
+    tooltip.style.top = `${rect.bottom + 4}px`;
+  }
+
+  // 隱藏 tooltip
+  function hideTooltip() {
+    hideTimer = setTimeout(() => {
+      tooltip.style.display = 'none';
+    }, 120);
+  }
+
+  const textarea = document.querySelector('textarea[name="content"]') as HTMLTextAreaElement | null;
+
+  function insertTemplate(item: Item) {
+    if (!textarea) return;
+
+    const selStart = textarea.selectionStart ?? 0;
+    const selEnd = textarea.selectionEnd ?? 0;
+
+    const selectedText = textarea.value.substring(selStart, selEnd);
+
+    let tpl = item.template;
+
+    if (selectedText && item.wrap) tpl = item.wrap.before + selectedText + item.wrap.after;
+
+    const cursorIdx = tpl.indexOf(CURSOR);
+    const cleanTpl = tpl.replaceAll(CURSOR, '');
+
+    textarea.focus();
+
+    textarea.setRangeText(cleanTpl, selStart, selEnd, 'end');
+
+    const newPos = cursorIdx >= 0 ? selStart + cursorIdx : selStart + cleanTpl.length;
+
+    textarea.setSelectionRange(newPos, newPos);
+
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  const toolbar = document.getElementById('mdx-toolbar');
+  if (toolbar) {
+    toolbar.addEventListener('click', (e) => {
+      const btn = (e.target as Element).closest<HTMLElement>('[data-tid]');
+      if (!btn?.dataset.tid) return;
+
+      const item = items[btn.dataset.tid];
+      if (item) insertTemplate(item);
+    });
+
+    toolbar.addEventListener('mouseover', (e) => {
+      const btn = (e.target as Element).closest<HTMLElement>('[data-tid]');
+      if (!btn?.dataset.tid) return;
+      const item = items[btn.dataset.tid];
+      if (item) showTooltip(btn, item);
+    });
+
+    toolbar.addEventListener('mouseout', (e) => {
+      const btn = (e.target as Element).closest<HTMLElement>('[data-tid]');
+      if (btn) hideTooltip();
+    });
+  }
+</script>

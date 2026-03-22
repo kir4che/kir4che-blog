@@ -1,9 +1,8 @@
 ---
-import type { Translator } from '@/types';
-import { stripLocalePrefix } from '@/lib/paths';
-import { cn } from '@/utils/cn';
-import { normalizePathname } from '@/utils/path';
 import LocalizedLink from '@/components/ui/LocalizedLink.astro';
+import { stripLocalePrefix } from '@/lib/paths';
+import type { Translator } from '@/types';
+import { normalizePathname } from '@/utils/path';
 
 interface NavbarProps {
   t: Translator;
@@ -11,8 +10,11 @@ interface NavbarProps {
 
 const { t } = Astro.props as NavbarProps;
 
-const isActive = (href: string) =>
-  normalizePathname(stripLocalePrefix(Astro.url.pathname)) === normalizePathname(href);
+const isActive = (href: string) => {
+  const currPath = normalizePathname(stripLocalePrefix(Astro.url.pathname));
+  const targetPath = normalizePathname(stripLocalePrefix(href));
+  return currPath === targetPath;
+};
 
 const navItems = [
   { href: '/', label: t('home') },
@@ -32,10 +34,12 @@ const navItems = [
           <li>
             <LocalizedLink
               href={href}
-              class={cn(
+              class:list={[
                 'hover:text-primary inline-block text-sm',
-                isActive(href) && 'text-primary font-medium'
-              )}
+                {
+                  'text-primary font-medium': isActive(href),
+                },
+              ]}
               aria-current={isActive(href) ? 'page' : undefined}
             >
               {label}

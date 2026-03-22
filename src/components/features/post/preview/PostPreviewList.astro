@@ -1,10 +1,10 @@
 ---
-import type { PostMeta, Language } from '@/types';
-import { cn } from '@/utils/cn';
-import { getLocalizedPostPath } from '@/lib/paths';
-import CategoryBadge from '@/components/ui/CategoryBadge.astro';
 import PostMetaInfo from '@/components/features/post/PostMetaInfo.astro';
 import LockOverlay from '@/components/features/post/preview/LockOverlay.astro';
+import CategoryBadge from '@/components/ui/CategoryBadge.astro';
+import { getLocalizedPostPath } from '@/lib/paths';
+import type { Language, PostMeta } from '@/types';
+import { cn } from '@/utils/cn';
 
 const {
   post,
@@ -29,7 +29,7 @@ const href = getLocalizedPostPath({ lang, slug: post.slug });
   aria-label={`Read post: ${post.title}`}
 >
   <article class="relative flex flex-col p-4">
-    <LockOverlay isLocked={Boolean(post.passwordHash)} />
+    <LockOverlay isLocked={Boolean(post.protected)} />
     <h2 class="mb-2 line-clamp-2 text-xl group-hover:text-pink-700 dark:group-hover:text-pink-400">
       {post.title}
     </h2>

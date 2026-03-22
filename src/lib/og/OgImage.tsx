@@ -1,10 +1,11 @@
+import type { Language } from '@/types';
 import type { CSSProperties } from 'react';
 
 export type OgImageProps = {
   siteName: string;
   title: string;
   tags: string[];
-  lang: string;
+  lang: Language;
 };
 
 const MAX_TITLE_LENGTH = 80;
@@ -88,7 +89,7 @@ export function OgImage({ siteName, title, tags, lang }: OgImageProps) {
 
   const fontFamily =
     lang === 'tw'
-      ? 'GenSenRounded2TW, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+      ? '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
       : '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
 
   return (

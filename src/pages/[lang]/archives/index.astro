@@ -1,12 +1,14 @@
 ---
-import type { PostMeta } from '@/types';
-import { getPostsInfo } from '@/lib/posts';
-import { paginate } from '@/lib/pagination';
-import { resolveLanguage, createTranslator } from '@/lib/i18n';
-import { withLocalePrefix } from '@/lib/paths';
-import PostListLayout from '@/layouts/PostListLayout.astro';
+export const prerender = false;
+
 import PostPreviewList from '@/components/features/post/preview/PostPreviewList.astro';
 import Pagination from '@/components/ui/Pagination.astro';
+import PostListLayout from '@/layouts/PostListLayout.astro';
+import { createTranslator, resolveLanguage } from '@/lib/i18n';
+import { paginate } from '@/lib/pagination';
+import { withLocalePrefix } from '@/lib/paths';
+import { getPostsInfo } from '@/lib/posts';
+import type { PostMeta } from '@/types';
 
 const lang = resolveLanguage(Astro.params.lang);
 const t = createTranslator(lang, 'ArchivePage');
@@ -17,7 +19,7 @@ const pageParam = Number(Astro.url.searchParams.get('page'));
 const page = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
 
 const allPosts = await getPostsInfo(lang);
-const { items: paginatedPosts, currentPage, totalPages } = paginate(allPosts, page);
+const { items: paginatedPosts, currPage, totalPages } = paginate(allPosts, page);
 
 const postsByYear = paginatedPosts.reduce<Record<string, PostMeta[]>>((acc, post) => {
   const year = new Date(post.date).getFullYear();
@@ -59,7 +61,7 @@ const sortedEntries = Object.entries(postsByYear).sort(([a], [b]) => Number(b) -
         t={t}
         link={link}
         basePath="/archives"
-        currentPage={currentPage}
+        currPage={currPage}
         totalPages={totalPages}
       />
     )

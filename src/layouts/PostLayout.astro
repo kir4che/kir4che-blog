@@ -33,7 +33,7 @@ import CategoryBadge from '@/components/ui/CategoryBadge.astro';
 import KofiBtn from '@/components/ui/KofiBtn.astro';
 import SiteLayout from '@/layouts/SiteLayout.astro';
 import { createTranslator } from '@/lib/i18n';
-import { getLocalizedPostPath, withLocalePrefix } from '@/lib/paths';
+import { withLocalePrefix } from '@/lib/paths';
 import { normalizeTag } from '@/lib/tags';
 import { createDateFormatter, parseToISODate } from '@/utils/date';
 
@@ -49,9 +49,7 @@ interface PostLayoutProps {
 
 const props = Astro.props as Partial<PostLayoutProps>;
 
-if (!props.post || !props.lang) {
-  throw new Error('PostLayout requires "lang" and "post" props');
-}
+if (!props.post || !props.lang) throw new Error('PostLayout 至少需要提供 "post" 與 "lang" props。');
 
 const {
   lang,
@@ -93,17 +91,6 @@ const publishedDate = post.date ? parseToISODate(post.date) : null;
 const dateFormatter = createDateFormatter(lang);
 const updatedAt = post.updatedAt ? dateFormatter(post.updatedAt) : null;
 
-const buildPostHref = (targetLang: Language) =>
-  getLocalizedPostPath({ lang: targetLang, slug: post.slug });
-
-const hasCoverImage = Boolean(post.coverImage);
-
-const siteUrl = import.meta.env.PUBLIC_SITE_URL || Astro.url.origin;
-const shareUrl = `${siteUrl}${getLocalizedPostPath({
-  lang,
-  slug: post.slug,
-})}`;
-
 const tocHeadings = headings.map((h) => ({
   id: h.slug,
   text: h.text,
@@ -116,18 +103,23 @@ const tocHeadings = headings.map((h) => ({
   description={isLocked ? tPost('passwordGate.description') : post.description}
 >
   {
+    post.coverImage && !isLocked && (
+      <link slot="head" rel="preload" href={post.coverImage} as="image" fetchpriority="high" />
+    )
+  }
+  {
     isLocked ? (
       <PostPasswordGate slug={post.slug} lang={lang} />
     ) : (
       <>
         <article class="bg-surface-secondary/80 rounded p-4 transition-all duration-300 md:p-6">
-          {hasCoverImage && (
+          {post.coverImage && (
             <img
               src={post.coverImage}
               alt={`Cover image for ${post.title}`}
               width={1200}
               height={640}
-              class="mb-3 h-45 w-full rounded object-cover object-[center_70%] sm:h-56 xl:h-68"
+              class="mb-3 h-45 w-full rounded-t object-cover object-[center_70%] sm:h-56 xl:h-68"
               loading="eager"
               fetchpriority="high"
               decoding="async"
@@ -139,12 +131,12 @@ const tocHeadings = headings.map((h) => ({
               <CategoryBadge lang={lang} categories={post.categories ?? []} />
               <div class="flex items-center gap-2 sm:gap-3">
                 <PostMetaInfo lang={lang} date={post.date} wordCount={post.wordCount} />
-                {otherLangs.length > 0 && Boolean(publishedDate) && (
+                {otherLangs.length > 0 && publishedDate && (
                   <PostLangMenu
                     curLang={lang}
+                    currSlug={post.slug}
                     langs={otherLangs}
                     t={tSettings}
-                    buildPostHref={buildPostHref}
                   />
                 )}
               </div>
@@ -166,13 +158,7 @@ const tocHeadings = headings.map((h) => ({
           <div class="pt-8">
             <PostComments slug={post.slug} hasPassword={false} />
             <hr />
-            <footer
-              data-share-root
-              data-share-url={shareUrl}
-              data-share-title={post.title}
-              data-copy-success={tPost('share.copySuccess')}
-              data-copy-unavailable={tPost('share.copyUnavailable')}
-            >
+            <footer>
               <div class="space-y-4">
                 <p>{tPost('thanks')}</p>
                 <KofiBtn label={tCommon('kofiButton')} />
@@ -219,7 +205,7 @@ const tocHeadings = headings.map((h) => ({
             </footer>
           </div>
         </article>
-        <RelatedPosts lang={lang} currentSlug={post.slug} categories={post.categories ?? []} />
+        <RelatedPosts lang={lang} currSlug={post.slug} categories={post.categories ?? []} />
         <Toc lang={lang} headings={tocHeadings} />
       </>
     )

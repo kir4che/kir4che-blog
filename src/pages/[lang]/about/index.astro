@@ -1,13 +1,15 @@
 ---
-import SiteLayout from '@/layouts/SiteLayout.astro';
 import DecorativeImage from '@/components/ui/DecorativeImage.astro';
 import ExternalLink from '@/components/ui/ExternalLink.astro';
+import SiteLayout from '@/layouts/SiteLayout.astro';
 
 import { CONFIG } from '@/config';
 import youtubes from '@/data/youtubes';
-import { getLocaleFromUrl, createTranslator } from '@/lib/i18n';
+import { createTranslator, getLangStaticPaths, resolveLanguage } from '@/lib/i18n';
 
-const lang = getLocaleFromUrl(Astro.url);
+export const getStaticPaths = getLangStaticPaths;
+
+const lang = resolveLanguage(Astro.params.lang);
 const t = createTranslator(lang, 'AboutPage');
 const videos = Object.values(youtubes);
 ---

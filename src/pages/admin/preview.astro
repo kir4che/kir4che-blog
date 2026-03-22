@@ -1,0 +1,46 @@
+---
+export const prerender = false;
+
+import PostLayout from '@/layouts/PostLayout.astro';
+import { getAdminPost, isAuthenticated } from '@/lib/admin';
+import { countWordsFromMarkdown, getPostExtraComponents } from '@/lib/posts';
+import type { Post } from '@/types/post';
+import { getEntry, render } from 'astro:content';
+
+if (!isAuthenticated(Astro.cookies)) return Astro.redirect('/admin/login');
+
+const id = Astro.url.searchParams.get('id');
+if (!id) return new Response('Not found', { status: 404 });
+
+const adminPost = await getAdminPost(id);
+if (!adminPost) return new Response('Not found', { status: 404 });
+
+const entry = await getEntry('blog', id as any);
+if (!entry)
+  return new Response(
+    'Not found in collection. You may need to restart the dev server or wait for the collection to rebuild.',
+    { status: 404 }
+  );
+
+const rendered = await render(entry);
+
+const post: Post = {
+  ...adminPost.meta,
+  content: entry.body || '',
+  headings: rendered.headings,
+  rendered,
+  wordCount: countWordsFromMarkdown(entry.body || ''),
+};
+
+const extraComponents = await getPostExtraComponents(post.slug);
+---
+
+<PostLayout
+  lang={adminPost.lang}
+  post={post}
+  otherLangs={[]}
+  isLocked={false}
+  content={rendered.Content}
+  headings={rendered.headings ?? []}
+  extraComponents={extraComponents}
+/>

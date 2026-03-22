@@ -1,17 +1,17 @@
 ---
 import { Languages } from '@lucide/astro';
 
+import { getLocalizedPostPath } from '@/lib/paths';
 import type { Language, Translator } from '@/types';
-import { cn } from '@/utils/cn';
 
 interface PostLangMenuProps {
   curLang: Language;
+  currSlug: string;
   langs: Language[];
   t: Translator;
-  buildPostHref: (lang: Language) => string;
 }
 
-const { curLang, langs, t, buildPostHref } = Astro.props as PostLangMenuProps;
+const { curLang, currSlug, langs, t } = Astro.props as PostLangMenuProps;
 ---
 
 <nav class="relative text-xs" aria-label={t('language.title')} data-lang-menu data-lang-menu-hover>
@@ -35,7 +35,7 @@ const { curLang, langs, t, buildPostHref } = Astro.props as PostLangMenuProps;
       langs.map((l) => (
         <li role="none">
           <a
-            href={buildPostHref(l)}
+            href={getLocalizedPostPath({ lang: l, slug: currSlug })}
             role="menuitem"
             data-lang-menu-item
             class="text-foreground-primary block w-full px-3 py-2 hover:bg-pink-100/80 hover:text-pink-700 dark:hover:bg-pink-900/10 dark:hover:text-pink-200"

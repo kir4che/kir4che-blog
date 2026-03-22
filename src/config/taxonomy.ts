@@ -1,4 +1,4 @@
-import type { Language, Category } from '@/types';
+import type { Category, Language } from '@/types';
 
 export const categoryMap: Record<string, Category> = {
   backend: {

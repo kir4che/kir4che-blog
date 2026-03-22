@@ -5,16 +5,6 @@ declare module '*.astro' {
   export default Component;
 }
 
-// declare module '*.yaml' {
-//   const value: Record<string, unknown>;
-//   export default value;
-// }
-
-// declare module '*.yml' {
-//   const value: Record<string, unknown>;
-//   export default value;
-// }
-
 declare module 'mdx/types' {
   export type MDXComponents = Record<string, import('react').ComponentType<any>>;
 

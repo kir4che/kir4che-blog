@@ -1,5 +1,5 @@
-import type { PostMeta, Category, CategoryInfo, CategoryColorScheme } from '@/types';
 import { SUPPORTED_LANGUAGES, categoryMap } from '@/config';
+import type { Category, CategoryColorScheme, CategoryInfo, PostMeta } from '@/types';
 
 type PostCountMap = Record<string, number>;
 

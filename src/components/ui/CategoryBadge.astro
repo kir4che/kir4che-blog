@@ -27,12 +27,13 @@ const resolvedCategories = normalizeCategories(categories);
     <div class={cn('flex flex-wrap items-center gap-x-2', className)}>
       {resolvedCategories.map((info) => (
         <span
-          class={cn(
+          class:list={[
             'flex items-center gap-x-1 text-sm hover:opacity-85',
-            useDarkColor
-              ? 'text-(--category-color-dark)'
-              : 'text-(--category-color) dark:text-(--category-color-dark)'
-          )}
+            {
+              'text-(--category-color-dark)': useDarkColor,
+              'text-(--category-color) dark:text-(--category-color-dark)': !useDarkColor,
+            },
+          ]}
           style={getCategoryStyle(info.color)}
         >
           <Circle size={8} fill="currentColor" aria-hidden="true" />

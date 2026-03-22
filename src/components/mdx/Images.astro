@@ -2,7 +2,6 @@
 import ImagesItem from '@/components/mdx/ImagesItem.astro';
 import { toCssLength, toPixelNumber } from '@/lib/cssLength';
 import type { MediaItem } from '@/types';
-import { cn } from '@/utils/cn';
 
 interface ImagesProps {
   images: MediaItem[];
@@ -96,10 +95,10 @@ const { container, column, stack } = ALIGNMENT_CLASSES[align];
 ---
 
 <div
-  class={cn(
-    'my-6 space-y-2 lg:my-8 w-full max-w-full md:max-w-(--gallery-max-width) min-w-0 overflow-hidden',
-    column
-  )}
+  class:list={[
+    'my-6 w-full max-w-full min-w-0 space-y-2 overflow-hidden md:max-w-(--gallery-max-width) lg:my-8',
+    column,
+  ]}
   style={{
     '--gallery-max-width': width,
     width: '100%',
@@ -107,11 +106,14 @@ const { container, column, stack } = ALIGNMENT_CLASSES[align];
   }}
 >
   <div
-    class={cn(
+    class:list={[
       'flex w-full max-w-full gap-2 md:gap-3 lg:gap-4',
-      singleColumn ? 'flex-col' : 'flex-row flex-wrap',
-      singleColumn ? stack : container
-    )}
+      {
+        'flex-col': singleColumn,
+        'flex-row flex-wrap': !singleColumn,
+      },
+      singleColumn ? stack : container,
+    ]}
   >
     {
       images.map((item) => (

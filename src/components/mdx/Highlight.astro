@@ -1,12 +1,10 @@
 ---
-import { cn } from '@/utils/cn';
-
 interface HighlightProps {
   color?: 'yellow' | 'green' | 'blue' | 'pink' | 'custom';
   class?: string;
 }
 
-const { color = 'pink', class: className } = Astro.props as HighlightProps;
+const { color = 'pink' } = Astro.props as HighlightProps;
 
 const colorMap: Record<NonNullable<HighlightProps['color']>, Record<string, string>> = {
   yellow: {
@@ -29,6 +27,6 @@ const colorMap: Record<NonNullable<HighlightProps['color']>, Record<string, stri
 };
 ---
 
-<mark class={cn('text-foreground-primary px-0.5', className)} style={colorMap[color]}>
+<mark class="text-foreground-primary px-0.5" style={colorMap[color]}>
   <slot />
 </mark>

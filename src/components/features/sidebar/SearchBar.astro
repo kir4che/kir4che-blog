@@ -46,7 +46,8 @@ const { t, link } = Astro.props as SearchBarProps;
     const basePath = (root.dataset.basePath || '').replace(/\/$/, '');
     const noResultsText = root.dataset.noResults || 'No results';
 
-    let controller, timer;
+    let allPosts = null;
+    let timer;
 
     const renderResults = (posts) => {
       results.innerHTML = posts.length
@@ -64,17 +65,25 @@ const { t, link } = Astro.props as SearchBarProps;
       results.classList.toggle('hidden', posts.length === 0);
     };
 
+    const loadIndex = async () => {
+      if (allPosts) return allPosts;
+      const res = await fetch(`${basePath}/search.json`);
+      if (!res.ok) throw new Error('Failed to load search index');
+      allPosts = await res.json();
+      return allPosts;
+    };
+
     const search = async (query) => {
-      controller?.abort();
-      controller = new AbortController();
       try {
-        const res = await fetch(`/api/posts?keyword=${encodeURIComponent(query)}&lang=${lang}`, {
-          signal: controller.signal,
-        });
-        if (res.ok) {
-          const data = await res.json();
-          renderResults(data.posts || []);
-        }
+        const posts = await loadIndex();
+        const q = query.toLowerCase();
+        const filtered = posts.filter(
+          ({ slug, title, description }) =>
+            title?.toLowerCase().includes(q) ||
+            description?.toLowerCase().includes(q) ||
+            slug.toLowerCase().includes(q)
+        );
+        renderResults(filtered.slice(0, 10));
       } catch {}
     };
 

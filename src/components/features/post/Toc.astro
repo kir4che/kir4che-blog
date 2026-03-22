@@ -58,11 +58,14 @@ const collapseLabel = t('collapse');
         {
           headings.map((h) => (
             <li
-              class={cn('mb-2 text-gray-700 dark:text-gray-300', {
-                'font-semibold': h.level === 2,
-                'text-[13px]/6 font-medium': h.level === 3,
-                'text-xs': h.level >= 4,
-              })}
+              class:list={[
+                'mb-2 text-gray-700 dark:text-gray-300',
+                {
+                  'font-semibold': h.level === 2,
+                  'text-[13px]/6 font-medium': h.level === 3,
+                  'text-xs': h.level >= 4,
+                },
+              ]}
               style={`margin-left: ${(h.level - 2) * 12}px`}
             >
               <a
@@ -170,20 +173,20 @@ const collapseLabel = t('collapse');
     const setActive = () => {
       const scrollY = window.scrollY + HEADER_OFFSET + 20;
 
-      let currentId = null;
+      let currId = null;
       for (let i = headings.length - 1; i >= 0; i--) {
         if (headings[i].target.offsetTop <= scrollY) {
-          currentId = headings[i].target.id;
+          currId = headings[i].target.id;
           break;
         }
       }
 
       links.forEach((a) => {
-        const isActive = currentId && a.getAttribute('href') === `#${currentId}`;
+        const isActive = currId && a.getAttribute('href') === `#${currId}`;
 
-        a.classList.toggle('text-pink-600', Boolean(isActive));
-        a.classList.toggle('dark:text-pink-400', Boolean(isActive));
-        a.classList.toggle('font-semibold', Boolean(isActive));
+        a.classList.toggle('text-pink-600', isActive);
+        a.classList.toggle('dark:text-pink-400', isActive);
+        a.classList.toggle('font-semibold', isActive);
       });
     };
 

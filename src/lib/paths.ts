@@ -1,5 +1,5 @@
-import type { Language } from '@/types';
 import { CONFIG } from '@/config';
+import type { Language } from '@/types';
 import { ensurePathname, normalizePathname } from '@/utils/path';
 import { normalizePathSlug } from '@/utils/slug';
 

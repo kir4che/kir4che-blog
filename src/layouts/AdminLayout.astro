@@ -1,0 +1,23 @@
+---
+import '@/styles/globals.css';
+
+import Toast from '@/components/ui/Toast.astro';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<html lang="zh-TW">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{title} - kir4che's Blog 後台</title>
+  </head>
+  <body>
+    <Toast />
+    <slot />
+  </body>
+</html>

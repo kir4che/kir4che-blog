@@ -1,4 +1,6 @@
 ---
+export const prerender = false;
+
 import Announcement from '@/components/ui/Announcement.astro';
 import SiteLayout from '@/layouts/SiteLayout.astro';
 import { createTranslator, resolveLanguage } from '@/lib/i18n';
@@ -18,25 +20,25 @@ const t = createTranslator(lang, 'HomePage');
 const link = (href: string) => withLocalePrefix(href, lang);
 
 const { posts = [] } = await getSidebarData(lang);
-const visiblePosts = posts.filter((post) => !post.passwordHash);
+const visiblePosts = posts.filter((post) => !post.protected);
 
 const pageParam = Number(Astro.url.searchParams.get('page'));
 const page = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
 
-const { items: currentPosts, currentPage, totalPages } = paginate(visiblePosts, page);
+const { items: currPosts, currPage, totalPages } = paginate(visiblePosts, page);
 
-const isFirstPage = currentPage === 1;
-const heroPost = isFirstPage ? currentPosts[0] : undefined;
-const highlightPosts = isFirstPage ? currentPosts.slice(1, 4) : [];
-const mobileFeaturedPosts = isFirstPage ? currentPosts.slice(0, 4) : [];
-const listPosts = isFirstPage ? currentPosts.slice(4) : currentPosts;
+const isFirstPage = currPage === 1;
+const leftPosts = isFirstPage ? currPosts.slice(0, 2) : [];
+const highlightPosts = isFirstPage ? currPosts.slice(2, 5) : [];
+const mobileFeaturedPosts = isFirstPage ? currPosts.slice(0, 5) : [];
+const listPosts = isFirstPage ? currPosts.slice(5) : currPosts;
 ---
 
 <SiteLayout title={t('title')} description={t('description')}>
   <div class="flex min-h-full flex-1 flex-col gap-6">
     <Announcement text={t('announcement')} />
     {
-      currentPosts.length > 0 && (
+      currPosts.length > 0 && (
         <section id="posts" class="flex flex-1 flex-col gap-6">
           <div class="flex flex-col gap-6">
             {isFirstPage ? (
@@ -47,7 +49,13 @@ const listPosts = isFirstPage ? currentPosts.slice(4) : currentPosts;
                   ))}
                 </div>
                 <div class="hidden md:grid md:grid-cols-[5fr_4fr] md:gap-4">
-                  {heroPost && <PostPreviewCard post={heroPost} lang={lang} />}
+                  {leftPosts.length > 0 && (
+                    <div class="grid gap-4">
+                      {leftPosts.map((post) => (
+                        <PostPreviewCard post={post} lang={lang} />
+                      ))}
+                    </div>
+                  )}
                   {highlightPosts.length > 0 && (
                     <div class="grid gap-4">
                       {highlightPosts.map((post) => (
@@ -75,13 +83,7 @@ const listPosts = isFirstPage ? currentPosts.slice(4) : currentPosts;
               </div>
             )}
           </div>
-          <Pagination
-            t={t}
-            link={link}
-            basePath="/"
-            currentPage={currentPage}
-            totalPages={totalPages}
-          />
+          <Pagination t={t} link={link} basePath="/" currPage={currPage} totalPages={totalPages} />
         </section>
       )
     }

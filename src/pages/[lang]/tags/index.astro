@@ -1,9 +1,11 @@
 ---
-import { resolveLanguage, createTranslator } from '@/lib/i18n';
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import { createTranslator, getLangStaticPaths, resolveLanguage } from '@/lib/i18n';
+
+export const getStaticPaths = getLangStaticPaths;
 import { withLocalePrefix } from '@/lib/paths';
 import { getPostsInfo } from '@/lib/posts';
 import { getTagsByPosts } from '@/lib/tags';
-import SiteLayout from '@/layouts/SiteLayout.astro';
 
 const lang = resolveLanguage(Astro.params.lang);
 const t = createTranslator(lang, 'TagsPage');

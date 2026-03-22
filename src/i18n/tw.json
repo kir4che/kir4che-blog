@@ -130,8 +130,6 @@
     },
     "share": {
       "copyLink": "複製連結",
-      "copySuccess": "已複製文章連結",
-      "copyUnavailable": "此瀏覽器不支援自動複製。",
       "native": "分享至..."
     }
   },

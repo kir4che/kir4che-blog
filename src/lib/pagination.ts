@@ -1,9 +1,9 @@
-import type { PaginationData } from '@/types/post';
 import { DEFAULT_POSTS_PER_PAGE } from '@/config';
+import type { PaginationData } from '@/types/post';
 
 export const paginate = <T>(
   items: T[],
-  currentPage: number,
+  currPage: number,
   perPage: number = DEFAULT_POSTS_PER_PAGE
 ): PaginationData<T> => {
   const totalItems = items.length;
@@ -15,14 +15,14 @@ export const paginate = <T>(
   const totalPages = totalItems === 0 ? 1 : Math.ceil(totalItems / safePerPage);
 
   // 確保目前頁碼在合法範圍
-  const safePage = Math.min(Math.max(currentPage, 1), totalPages);
+  const safePage = Math.min(Math.max(currPage, 1), totalPages);
 
   const startIndex = (safePage - 1) * safePerPage;
   const endIndex = startIndex + safePerPage;
 
   return {
     items: items.slice(startIndex, endIndex),
-    currentPage: safePage,
+    currPage: safePage,
     totalPages,
     totalItems,
     start: startIndex,

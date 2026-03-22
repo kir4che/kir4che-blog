@@ -1,15 +1,15 @@
-import { getCollection, type CollectionEntry } from 'astro:content';
-import { statSync } from 'node:fs';
-import path from 'node:path';
-import { unified } from 'unified';
-import remarkParse from 'remark-parse';
-import remarkMdx from 'remark-mdx';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
 import { toString } from 'mdast-util-to-string';
+import { stat } from 'node:fs/promises';
+import path from 'node:path';
+import remarkMdx from 'remark-mdx';
+import remarkParse from 'remark-parse';
+import { unified } from 'unified';
 
-import type { Language, Post, PostMeta } from '@/types';
 import { DEFAULT_LANGUAGE } from '@/config';
 import { isSupportedLanguage } from '@/lib/i18n';
-import { toISODateOrThrow } from '@/utils/date';
+import type { Language, Post, PostMeta } from '@/types';
+import { parseToISODate } from '@/utils/date';
 
 type PostEntry = CollectionEntry<'blog'>;
 type ParsedEntry = { lang: Language | null; slug: string };
@@ -19,24 +19,24 @@ const isProd = import.meta.env.PROD;
 const postsInfoCache = new Map<Language, PostMeta[]>();
 const entriesCache: { value: PostEntry[] | null } = { value: null };
 const wordCountCache = new Map<string, number>();
+const updatedAtCache = new Map<string, string | undefined>();
 const postIndexCache: {
   value: {
-    postIdToLangs: Map<string, Language[]>;
-    slugToPostId: Map<string, string>;
+    slugToLangs: Map<string, Language[]>;
     langSlugToEntry: Map<string, { entry: PostEntry; parsed: ParsedEntry }>;
   } | null;
 } = { value: null };
-const renderCache = new Map<string, Awaited<ReturnType<PostEntry['render']>>>();
+const renderCache = new Map<string, Awaited<ReturnType<typeof render>>>();
 const markdownParser = unified().use(remarkParse).use(remarkMdx);
 const CJK_CHAR_REGEX = /[\u4e00-\u9fff]/g;
 
-// 從 entry.slug 解析語言與實際 slug
+// 從 entry.id 解析語言與實際 slug
 const parseEntryLangAndSlug = (entry: PostEntry): ParsedEntry => {
-  const parts = entry.slug.split('/').filter(Boolean);
-  if (parts.length < 2) return { lang: null, slug: entry.slug };
+  const parts = entry.id.split('/').filter(Boolean);
+  if (parts.length < 2) return { lang: null, slug: entry.id };
 
   const [langCandidate, ...rest] = parts;
-  if (!isSupportedLanguage(langCandidate)) return { lang: null, slug: entry.slug };
+  if (!isSupportedLanguage(langCandidate)) return { lang: null, slug: entry.id };
 
   return {
     lang: langCandidate,
@@ -51,14 +51,21 @@ const parseEntryLangAndSlug = (entry: PostEntry): ParsedEntry => {
  * 2. 實體檔案的 mtime
  * 3. 無法取得時回傳 undefined
  */
-const resolveUpdatedAt = (entry: PostEntry): string | undefined => {
+const resolveUpdatedAt = async (entry: PostEntry): Promise<string | undefined> => {
   if (typeof entry.data.updatedAt === 'string' && entry.data.updatedAt.trim())
     return entry.data.updatedAt.trim();
 
+  if (isProd && updatedAtCache.has(entry.id)) return updatedAtCache.get(entry.id);
+
   try {
-    const filePath = path.join(process.cwd(), 'src', 'content', entry.collection, entry.id);
-    return statSync(filePath).mtime.toISOString();
+    const filePath = entry.filePath
+      ? path.join(process.cwd(), entry.filePath)
+      : path.join(process.cwd(), 'src', 'content', 'blog', `${entry.id}.mdx`);
+    const result = (await stat(filePath)).mtime.toISOString();
+    if (isProd) updatedAtCache.set(entry.id, result);
+    return result;
   } catch {
+    if (isProd) updatedAtCache.set(entry.id, undefined);
     return undefined;
   }
 };
@@ -86,22 +93,19 @@ const resolveSlugFromFrontmatter = (
   return (parsed ?? parseEntryLangAndSlug(entry)).slug;
 };
 
-// 解析文章描述，以 frontmatter.description 為主；否則從文章內容擷取前 160 字。
-const resolveDescription = (entry: PostEntry): string =>
-  entry.data.description?.trim() || entry.body.replace(/\s+/g, ' ').trim().slice(0, 160);
-
-// 解析文章 postId
-const resolvePostId = (entry: PostEntry, parsed?: ParsedEntry): string => {
-  const postId = entry.data.postId;
-  if (typeof postId === 'string' && postId.trim()) return postId.trim();
-
-  if (!isProd) throw new Error(`Missing postId in frontmatter for ${entry.id}`);
-
-  return (parsed ?? parseEntryLangAndSlug(entry)).slug;
+// 解析文章敘述
+const resolveDescription = (entry: PostEntry): string => {
+  if (entry.data.description?.trim()) return entry.data.description.trim();
+  const body = entry.body ?? '';
+  const plainText = body
+    .replace(/[#*`_~[\]()]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return plainText.slice(0, 160);
 };
 
 // 從 markdown 內容計算字數
-const countWordsFromMarkdown = (markdown: string): number => {
+export const countWordsFromMarkdown = (markdown: string): number => {
   if (!markdown?.trim()) return 0;
 
   const tree = markdownParser.parse(markdown);
@@ -115,43 +119,52 @@ const countWordsFromMarkdown = (markdown: string): number => {
 };
 
 // 取得文章字數（production 有快取）
-const getWordCount = (entry: PostEntry): number => {
-  if (!isProd) return countWordsFromMarkdown(entry.body);
+const getWordCount = (entry: PostEntry, updatedAt: string | undefined): number => {
+  const body = entry.body ?? '';
+  if (!isProd) return countWordsFromMarkdown(body);
 
-  const updatedAt = resolveUpdatedAt(entry) ?? '';
-  const key = `${entry.id}:${updatedAt}`;
+  const key = `${entry.id}:${updatedAt ?? ''}`;
 
   const cached = wordCountCache.get(key);
   if (cached !== undefined) return cached;
 
-  const count = countWordsFromMarkdown(entry.body);
+  const count = countWordsFromMarkdown(body);
   wordCountCache.set(key, count);
   return count;
 };
 
 // 將 entry 正規化為 PostMeta
-const normalizePostMeta = (entry: PostEntry, lang: Language, parsed?: ParsedEntry): PostMeta => {
+const normalizePostMeta = async (
+  entry: PostEntry,
+  lang: Language,
+  parsed?: ParsedEntry
+): Promise<PostMeta> => {
   const rawCategories = entry.data.categories;
   const resolvedParsed = parsed ?? parseEntryLangAndSlug(entry);
 
   const categories =
     Array.isArray(rawCategories) && rawCategories.length > 0 ? rawCategories : ['未分類'];
 
+  const updatedAt = await resolveUpdatedAt(entry);
+
   return {
     slug: resolveSlugFromFrontmatter(entry, lang, resolvedParsed),
     lang,
     title: entry.data.title,
     description: resolveDescription(entry),
-    date: toISODateOrThrow(entry.data.date, 'Post is missing a valid date.'),
-    postId: resolvePostId(entry, resolvedParsed),
+    date: (() => {
+      const dateStr = parseToISODate(entry.data.date);
+      if (!dateStr) throw new Error('文章缺少有效的日期！');
+      return dateStr;
+    })(),
     categories,
     tags: entry.data.tags ?? [],
     featured: entry.data.featured ?? false,
     draft: entry.data.draft ?? false,
-    passwordHash: entry.data.passwordHash,
+    protected: entry.data.protected,
     coverImage: entry.data.coverImage,
-    updatedAt: resolveUpdatedAt(entry),
-    wordCount: getWordCount(entry),
+    updatedAt,
+    wordCount: getWordCount(entry, updatedAt),
   };
 };
 
@@ -166,46 +179,34 @@ const getBlogEntries = async (): Promise<PostEntry[]> => {
 
 // 建立文章索引
 const getPostIndex = async (): Promise<{
-  postIdToLangs: Map<string, Language[]>;
-  slugToPostId: Map<string, string>;
+  slugToLangs: Map<string, Language[]>;
   langSlugToEntry: Map<string, { entry: PostEntry; parsed: ParsedEntry }>;
 }> => {
   if (isProd && postIndexCache.value) return postIndexCache.value;
 
   const entries = await getBlogEntries();
-  const postIdToLangs = new Map<string, Set<Language>>();
-  const slugToPostId = new Map<string, string>();
+  const slugToLangsSet = new Map<string, Set<Language>>();
   const langSlugToEntry = new Map<string, { entry: PostEntry; parsed: ParsedEntry }>();
 
   for (const entry of entries) {
     const parsed = parseEntryLangAndSlug(entry);
     if (!parsed.lang) continue;
 
-    const postId = resolvePostId(entry, parsed);
     const slug = resolveSlugFromFrontmatter(entry, parsed.lang, parsed);
-    if (slug) {
-      const existing = slugToPostId.get(slug);
-      if (existing && existing !== postId) {
-        if (!isProd)
-          throw new Error(`Slug "${slug}" maps to multiple postIds: "${existing}" and "${postId}"`);
-      } else if (!existing) {
-        slugToPostId.set(slug, postId);
-      }
+    if (!slug) continue;
 
-      const key = `${parsed.lang}:${slug}`;
-      if (!langSlugToEntry.has(key)) langSlugToEntry.set(key, { entry, parsed });
-    }
+    const key = `${parsed.lang}:${slug}`;
+    if (!langSlugToEntry.has(key)) langSlugToEntry.set(key, { entry, parsed });
 
-    const langs = postIdToLangs.get(postId) ?? new Set<Language>();
+    const langs = slugToLangsSet.get(slug) ?? new Set<Language>();
     langs.add(parsed.lang);
-    postIdToLangs.set(postId, langs);
+    slugToLangsSet.set(slug, langs);
   }
 
   const resolved = {
-    postIdToLangs: new Map(
-      Array.from(postIdToLangs.entries(), ([key, set]) => [key, Array.from(set)])
+    slugToLangs: new Map(
+      Array.from(slugToLangsSet.entries(), ([key, set]) => [key, Array.from(set)])
     ),
-    slugToPostId,
     langSlugToEntry,
   };
   if (isProd) postIndexCache.value = resolved;
@@ -223,13 +224,13 @@ export const getPost = async (lang: Language, slug: string): Promise<Post | null
 
   let rendered = renderCache.get(entry.id);
   if (!rendered) {
-    rendered = await entry.render();
+    rendered = await render(entry);
     if (isProd) renderCache.set(entry.id, rendered);
   }
 
   return {
-    ...normalizePostMeta(entry, lang, parsed),
-    content: entry.body,
+    ...(await normalizePostMeta(entry, lang, parsed)),
+    content: entry.body ?? '',
     rendered,
     headings: rendered.headings,
   };
@@ -247,13 +248,16 @@ export const getPostsInfo = async (lang: Language): Promise<PostMeta[]> => {
 
   const entries = await getBlogEntries();
 
-  const posts: PostMeta[] = [];
-  for (const entry of entries) {
-    if (entry.data.draft && isProd) continue;
-    const parsed = parseEntryLangAndSlug(entry);
-    if (parsed.lang !== lang) continue;
-    posts.push(normalizePostMeta(entry, lang, parsed));
-  }
+  const posts = (
+    await Promise.all(
+      entries.map(async (entry) => {
+        if (entry.data.draft && isProd) return null;
+        const parsed = parseEntryLangAndSlug(entry);
+        if (parsed.lang !== lang) return null;
+        return normalizePostMeta(entry, lang, parsed);
+      })
+    )
+  ).filter((post): post is PostMeta => post !== null);
 
   const sorted = sortByDateDesc(posts);
 
@@ -273,18 +277,31 @@ export const getPostMetaBySlug = async (lang: Language, slug: string): Promise<P
 };
 
 // 取得文章解鎖用的 Cookie 名稱
-export const getPostUnlockCookieName = (postId: string): string => `postUnlock:${postId}`;
+export const getPostUnlockCookieName = (slug: string): string => `postUnlock-${slug}`;
 
 // 取得同一篇文章支援的所有語言
-export const getPostAvailableLangs = async (
-  input: { slug?: string; postId?: string } | string
-): Promise<Language[]> => {
-  const { slug, postId } = typeof input === 'string' ? { slug: input } : input;
-  if (!postId && !slug) return [];
+export const getPostAvailableLangs = async (slug: string): Promise<Language[]> => {
+  if (!slug) return [];
+  const { slugToLangs } = await getPostIndex();
+  return slugToLangs.get(slug) ?? [];
+};
 
-  const { postIdToLangs, slugToPostId } = await getPostIndex();
-  const resolvedPostId = postId ?? (slug ? slugToPostId.get(slug) : undefined);
-  if (!resolvedPostId) return [];
+const BLOG_COMPONENT_MODULES = import.meta.glob<Record<string, unknown>>(
+  '/src/content/blog/**/components.{js,jsx,ts,tsx,astro}'
+);
 
-  return postIdToLangs.get(resolvedPostId) ?? [];
+// 取得文章的額外組件（有的話）
+export const getPostExtraComponents = async (slug: string) => {
+  const normalizedSlug = typeof slug === 'string' ? slug.trim() : '';
+  if (!normalizedSlug) return undefined;
+
+  const matchKey = Object.keys(BLOG_COMPONENT_MODULES).find((filePath) =>
+    filePath.includes(`/blog/${normalizedSlug}/components.`)
+  );
+  if (!matchKey) return undefined;
+
+  const mod = await BLOG_COMPONENT_MODULES[matchKey]();
+  if (typeof mod !== 'object' || mod === null) return undefined;
+
+  return (mod.default ?? mod) as Record<string, unknown>;
 };

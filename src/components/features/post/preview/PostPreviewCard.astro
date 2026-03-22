@@ -30,12 +30,15 @@ const href = getLocalizedPostPath({ lang, slug: post.slug });
   aria-label={`Read post: ${post.title}`}
 >
   <article class="group relative flex h-full">
-    <LockOverlay isLocked={Boolean(post.passwordHash)} />
+    <LockOverlay isLocked={Boolean(post.protected)} />
     <div
-      class={cn(
-        'relative flex flex-col rounded-lg overflow-hidden group w-full',
-        post.coverImage ? 'min-h-56' : 'bg-white dark:bg-gray-800'
-      )}
+      class:list={[
+        'group relative flex w-full flex-col overflow-hidden rounded-lg',
+        {
+          'min-h-56': post.coverImage,
+          'bg-white dark:bg-gray-800': !post.coverImage,
+        },
+      ]}
     >
       {
         post.coverImage && (
@@ -49,25 +52,37 @@ const href = getLocalizedPostPath({ lang, slug: post.slug });
           />
         )
       }
-      <div class={cn('flex flex-col p-4', post.coverImage && 'absolute inset-0 z-10')}>
+      <div
+        class:list={[
+          'flex h-full flex-col p-4',
+          {
+            'absolute inset-0 z-10': post.coverImage,
+          },
+        ]}
+      >
         <div>
           <h2
-            class={cn(
+            class:list={[
               'mb-2 line-clamp-2 text-xl',
-              post.coverImage
-                ? 'text-white drop-shadow-md'
-                : 'text-gray-900 dark:text-white group-hover:text-pink-700 dark:group-hover:text-pink-400'
-            )}
+              {
+                'text-white drop-shadow-md': post.coverImage,
+                'text-gray-900 group-hover:text-pink-700 dark:text-white dark:group-hover:text-pink-400':
+                  !post.coverImage,
+              },
+            ]}
           >
             {post.title}
           </h2>
           {
             post.description && (
               <p
-                class={cn(
+                class:list={[
                   'mb-2 line-clamp-3 text-sm/5.5',
-                  post.coverImage ? 'text-gray-100 drop-shadow' : 'text-gray-500 dark:text-gray-400'
-                )}
+                  {
+                    'text-gray-100 drop-shadow': post.coverImage,
+                    'text-gray-500 dark:text-gray-400': !post.coverImage,
+                  },
+                ]}
               >
                 {post.description}
               </p>
@@ -79,13 +94,22 @@ const href = getLocalizedPostPath({ lang, slug: post.slug });
             lang={lang}
             categories={post.categories ?? []}
             useDarkColor={Boolean(post.coverImage)}
-            class={cn(post.coverImage && 'rounded-full bg-black/35 px-2.5 py-0.5 backdrop-blur')}
+            class:list={[
+              {
+                'rounded-full bg-black/35 px-2.5 py-0.5 backdrop-blur': post.coverImage,
+              },
+            ]}
           />
           <PostMetaInfo
             lang={lang}
             date={post.date}
             wordCount={post.wordCount}
-            class={cn('ml-auto', post.coverImage && 'self-end text-gray-300')}
+            class:list={[
+              'ml-auto',
+              {
+                'text-gray-300': post.coverImage,
+              },
+            ]}
           />
         </div>
       </div>

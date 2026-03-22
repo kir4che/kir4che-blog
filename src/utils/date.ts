@@ -4,27 +4,23 @@ type DateInput = string | Date | null | undefined;
 const parseDateInput = (value: DateInput): Date | null => {
   if (!value) return null;
 
-  if (typeof value === 'string') {
-    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-    if (match) {
-      const [, y, m, d] = match;
-      const date = new Date(Number(y), Number(m) - 1, Number(d));
-      return Number.isNaN(date.getTime()) ? null : date;
-    }
+  let date = value instanceof Date ? value : new Date(value);
 
-    const parsed = new Date(value);
-    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  // 處理 YYYY-MM-DD 格式
+  if (typeof value === 'string' && /^(\d{4})-(\d{2})-(\d{2})$/.test(value)) {
+    const [y, m, d] = value.split('-').map(Number);
+    date = new Date(y, m - 1, d);
+    if (date.getDate() !== d) return null;
   }
 
-  if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
-
-  return null;
+  return Number.isNaN(date.getTime()) ? null : date;
 };
 
-type DateFormatVariant = 'default' | 'short';
+const formatWith = (date: Date | null, display: string) =>
+  date ? { display, datetime: date.toISOString() } : null;
 
 // 建立日期 formatter
-export const createDateFormatter = (locale: string, variant: DateFormatVariant = 'default') => {
+export const createDateFormatter = (locale: string, variant: 'default' | 'short' = 'default') => {
   const formatter = new Intl.DateTimeFormat(locale, {
     year: 'numeric',
     month: variant === 'short' ? 'short' : '2-digit',
@@ -33,43 +29,32 @@ export const createDateFormatter = (locale: string, variant: DateFormatVariant =
 
   return (value?: DateInput) => {
     const date = parseDateInput(value);
-    if (!date) return null;
-
-    return {
-      display: formatter.format(date),
-      datetime: date.toISOString(),
-    };
+    return formatWith(date, date ? formatter.format(date) : '');
   };
 };
 
-// 將日期轉為 ISO 字串
-export const parseToISODate = (value?: DateInput): string | null => {
-  const date = parseDateInput(value);
-  return date ? date.toISOString() : null;
+// 日期轉為 ISO 字串
+export const parseToISODate = (value?: unknown): string | null => {
+  const safeValue: DateInput =
+    value == null || typeof value === 'string' || value instanceof Date ? value : undefined;
+
+  return parseDateInput(safeValue)?.toISOString() ?? null;
 };
 
-// 將日期轉為 ISO 字串
-export const toISODateOrThrow = (
-  value?: DateInput,
-  errorMessage: string = 'Invalid date value.'
-): string => {
-  const date = parseDateInput(value);
-  if (!date) throw new Error(errorMessage);
-
-  return date.toISOString();
+// 取得本地時區 ISO 字串（YYYY-MM-DDTHH:mm）
+export const toLocalISO = (value?: DateInput): string => {
+  const d = parseDateInput(value) ?? new Date();
+  return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
 };
 
 // 固定格式 YYYY/MM/DD
 export const formatDateYmd = (value?: DateInput) => {
-  const date = parseDateInput(value);
-  if (!date) return null;
+  const d = parseDateInput(value);
+  if (!d) return null;
 
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
+  const display = [d.getFullYear(), d.getMonth() + 1, d.getDate()]
+    .map((n) => String(n).padStart(2, '0'))
+    .join('/');
 
-  return {
-    display: `${year}/${month}/${day}`,
-    datetime: date.toISOString(),
-  };
+  return formatWith(d, display);
 };

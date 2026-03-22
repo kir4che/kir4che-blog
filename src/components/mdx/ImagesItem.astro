@@ -2,7 +2,6 @@
 import CustomImage from '@/components/mdx/Image.astro';
 import CustomVideo from '@/components/mdx/Video.astro';
 import type { MediaItem } from '@/types';
-import { cn } from '@/utils/cn';
 
 interface ImagesItemProps {
   item: MediaItem;
@@ -27,7 +26,7 @@ const effectiveMaxHeight = resolvedMaxHeight ?? '400px';
 
 const rawSpan = Number(item.colSpan);
 const span = singleColumn || !Number.isFinite(rawSpan) || rawSpan <= 0 ? 1 : rawSpan;
-const hasFixedHeight = Boolean(resolvedHeight || effectiveMinHeight || effectiveMaxHeight);
+const hasFixedHeight = resolvedHeight || effectiveMinHeight || effectiveMaxHeight;
 
 const style = {
   '--item-min-width': singleColumn ? '100%' : (resolvedMinWidth ?? '0px'),
@@ -54,14 +53,17 @@ const videoStyle = { width: '100%', height: '100%' } as Record<string, string>;
 
 <div
   data-images-item
-  class={cn(
+  class:list={[
     'transition-all duration-300',
-    hasFixedHeight && 'min-h-(--gallery-min-height)',
-    hasFixedHeight && 'max-h-(--gallery-max-height)',
     'min-w-(--item-min-width)',
     'overflow-hidden',
-    singleColumn ? 'w-full flex-none' : 'lg:min-w-0'
-  )}
+    {
+      'min-h-(--gallery-min-height)': hasFixedHeight,
+      'max-h-(--gallery-max-height)': hasFixedHeight,
+      'w-full flex-none': singleColumn,
+      'lg:min-w-0': !singleColumn,
+    },
+  ]}
   style={style}
 >
   {
@@ -72,7 +74,7 @@ const videoStyle = { width: '100%', height: '100%' } as Record<string, string>;
         height="100%"
         data-images-media
         style={videoStyle}
-        class={cn('size-full overflow-hidden', item.className)}
+        class:list={['size-full overflow-hidden', item.className]}
       />
     ) : (
       <CustomImage
@@ -82,7 +84,7 @@ const videoStyle = { width: '100%', height: '100%' } as Record<string, string>;
         imgClass={galleryImageClass}
         imgWrapClass={imageWrapClass}
         data-images-media
-        class={cn('size-full overflow-hidden', item.className)}
+        class:list={['size-full overflow-hidden', item.className]}
       />
     )
   }

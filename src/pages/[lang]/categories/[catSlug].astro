@@ -1,13 +1,15 @@
 ---
-import type { Category, CategoryInfo } from '@/types';
-import { resolveLanguage, createTranslator } from '@/lib/i18n';
+export const prerender = false;
+
+import PostPreviewList from '@/components/features/post/preview/PostPreviewList.astro';
+import Pagination from '@/components/ui/Pagination.astro';
+import PostListLayout from '@/layouts/PostListLayout.astro';
+import { getCategoryBySlug, getCategoryStyle, isPostInCategory } from '@/lib/categories';
+import { createTranslator, resolveLanguage } from '@/lib/i18n';
+import { paginate } from '@/lib/pagination';
 import { withLocalePrefix } from '@/lib/paths';
 import { getPostsInfo } from '@/lib/posts';
-import { paginate } from '@/lib/pagination';
-import { getCategoryBySlug, isPostInCategory, getCategoryStyle } from '@/lib/categories';
-import PostListLayout from '@/layouts/PostListLayout.astro';
-import Pagination from '@/components/ui/Pagination.astro';
-import PostPreviewList from '@/components/features/post/preview/PostPreviewList.astro';
+import type { Category, CategoryInfo } from '@/types';
 
 const lang = resolveLanguage(Astro.params.lang);
 const t = createTranslator(lang, 'CategoriesPage');
@@ -17,14 +19,14 @@ const link = (href: string) => withLocalePrefix(href, lang);
 const catSlug = Astro.params.catSlug as string;
 
 const pageParam = Number(Astro.url.searchParams.get('page'));
-const currentPage = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
+const currPage = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
 
 const posts = await getPostsInfo(lang);
 
 const resolved = getCategoryBySlug(catSlug, posts, 'all');
 if (!resolved) return new Response(null, { status: 404 });
 
-const isSubCategory = 'parentSlug' in resolved && Boolean(resolved.parentSlug);
+const isSubCategory = 'parentSlug' in resolved && resolved.parentSlug;
 const resolvedSub = isSubCategory ? (resolved as CategoryInfo) : null;
 
 // 取得主分類
@@ -36,7 +38,7 @@ if (!('subcategories' in mainCategory)) return new Response(null, { status: 404 
 
 // 子分類（若存在）
 const subCategory = resolvedSub;
-const hasSubCategory = Boolean(subCategory);
+const hasSubCategory = subCategory;
 
 const pageTitle = isSubCategory
   ? (subCategory!.name[lang] ?? subCategory!.name.en ?? Object.values(subCategory!.name)[0])
@@ -54,10 +56,10 @@ const filteredPosts = posts.filter((post) => {
 
 const {
   items: paginatedPosts,
-  currentPage: safePage,
+  currPage: safePage,
   totalPages,
   totalItems,
-} = paginate(filteredPosts, currentPage);
+} = paginate(filteredPosts, currPage);
 ---
 
 <PostListLayout title={pageTitle}>
@@ -129,7 +131,7 @@ const {
         t={t}
         link={link}
         basePath={`/categories/${catSlug}`}
-        currentPage={safePage}
+        currPage={safePage}
         totalPages={totalPages}
       />
     )

@@ -1,10 +1,12 @@
 ---
-import type { PostMeta } from '@/types';
-import { resolveLanguage, createTranslator } from '@/lib/i18n';
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import { getAllCategoryByPosts, getCategoryStyle } from '@/lib/categories';
+import { createTranslator, getLangStaticPaths, resolveLanguage } from '@/lib/i18n';
+
+export const getStaticPaths = getLangStaticPaths;
 import { withLocalePrefix } from '@/lib/paths';
 import { getPostsInfo } from '@/lib/posts';
-import { getAllCategoryByPosts, getCategoryStyle } from '@/lib/categories';
-import SiteLayout from '@/layouts/SiteLayout.astro';
+import type { PostMeta } from '@/types';
 
 const lang = resolveLanguage(Astro.params.lang);
 const t = createTranslator(lang, 'CategoriesPage');
@@ -14,7 +16,7 @@ let posts: PostMeta[] = [];
 try {
   posts = await getPostsInfo(lang);
 } catch (err) {
-  console.error('[CategoriesPage] Failed to load posts info.', err);
+  throw new Error(`讀取文章時發生錯誤: ${err instanceof Error ? err.message : '未知錯誤'}`);
 }
 
 const categories = getAllCategoryByPosts(posts);

@@ -22,7 +22,7 @@
       const adElement = document.querySelector('.adsbygoogle:not([data-adsbygoogle-status])');
       if (adElement) window.adsbygoogle.push({});
     } catch (err) {
-      console.warn('Adsense initialization failed', err);
+      console.warn('[AdSense] Failed to load ad.', err);
     }
   }
 </script>

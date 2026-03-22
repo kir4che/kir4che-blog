@@ -1,0 +1,28 @@
+---
+import { Eye } from '@lucide/astro';
+
+interface Props {
+  previewUrl: string;
+}
+
+const { previewUrl } = Astro.props;
+---
+
+<div class="relative size-full flex-1 bg-white dark:bg-gray-900">
+  <iframe
+    id="preview-iframe"
+    src={previewUrl}
+    class:list={['size-full border-none', !previewUrl && 'hidden']}></iframe>
+  {
+    !previewUrl && (
+      <div
+        id="empty-preview"
+        class="flex-center absolute inset-0 flex-col space-y-4 p-8 text-center text-gray-400"
+      >
+        <Eye size={48} aria-hidden="true" />
+        <h3>預覽準備就緒</h3>
+        <p class="mt-2 text-sm">請輸入標題或內容自動保存為草稿以加載預覽</p>
+      </div>
+    )
+  }
+</div>

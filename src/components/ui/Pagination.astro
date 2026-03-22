@@ -1,20 +1,19 @@
 ---
+import type { LinkBuilder, Translator } from '@/types';
 import { ChevronLeft, ChevronRight } from '@lucide/astro';
-import type { Translator, LinkBuilder } from '@/types';
-import { cn } from '@/utils/cn';
 
 interface PaginationProps {
   t: Translator;
   link: LinkBuilder;
   basePath?: string;
-  currentPage?: number;
+  currPage?: number;
   totalPages: number;
 }
 
-const { t, link, basePath = '', currentPage = 1, totalPages } = Astro.props as PaginationProps;
+const { t, link, basePath = '', currPage = 1, totalPages } = Astro.props as PaginationProps;
 if (!t || !link || totalPages <= 1) return null;
 
-const safeCurrent = Math.min(Math.max(currentPage, 1), totalPages);
+const safeCurrent = Math.min(Math.max(currPage, 1), totalPages);
 
 const MAX_VISIBLE_PAGES = 5;
 
@@ -75,12 +74,14 @@ const buildPageHref = (page: number): string => {
         ) : (
           <a
             href={buildPageHref(page)}
-            class={cn(
+            class:list={[
               'size-6 rounded-full text-center leading-6',
-              page === safeCurrent
-                ? 'text-foreground-secondary bg-pink-500 font-medium dark:bg-pink-300'
-                : 'hover:bg-pink-500/30'
-            )}
+              {
+                'text-foreground-secondary bg-pink-500 font-medium dark:bg-pink-300':
+                  page === safeCurrent,
+                'hover:bg-pink-500/30': page !== safeCurrent,
+              },
+            ]}
             aria-current={page === safeCurrent ? 'page' : undefined}
             aria-label={t('goToPage', { page })}
           >

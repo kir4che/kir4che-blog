@@ -1,0 +1,182 @@
+---
+export const prerender = false;
+
+import { LogOut, Plus, Search } from '@lucide/astro';
+
+import { DEFAULT_LANGUAGE } from '@/config';
+import type { Language } from '@/types';
+import {
+  getAdminPosts,
+  getAdminPost,
+  getNextCopySlug,
+  saveAdminPost,
+  deleteAdminPost,
+  isAuthenticated,
+  clearAdminSessionCookie,
+} from '@/lib/admin';
+import AdminLayout from '@/layouts/AdminLayout.astro';
+import AdminPostListSection from '@/components/features/admin/AdminPostListSection.astro';
+
+if (!(await isAuthenticated(Astro.cookies))) return Astro.redirect('/admin/login');
+
+if (Astro.request.method === 'POST') {
+  const data = await Astro.request.formData();
+  const action = data.get('action');
+
+  if (action === 'logout') {
+    clearAdminSessionCookie(Astro.cookies);
+    return Astro.redirect('/admin/login');
+  }
+  if (action === 'delete') {
+    const id = data.get('id') as string;
+    if (id) await deleteAdminPost(id);
+    return Astro.redirect('/admin');
+  }
+  if (action === 'duplicate') {
+    const id = data.get('id') as string;
+    if (id) {
+      const post = await getAdminPost(id);
+      if (post) {
+        const posts = await getAdminPosts();
+        const sameLangSlugs = posts
+          .filter((item) => item.lang === post.lang)
+          .map((item) => item.slug);
+        const nextSlug = getNextCopySlug(post.slug, sameLangSlugs);
+
+        await saveAdminPost(
+          post.lang,
+          nextSlug,
+          { ...post.meta, draft: true, date: new Date().toISOString() },
+          post.content
+        );
+      }
+    }
+    return Astro.redirect('/admin');
+  }
+}
+
+const posts = await getAdminPosts();
+const draftCount = posts.filter((p) => p.meta.draft).length;
+const publishedCount = posts.length - draftCount;
+
+const postsByLang = new Map<Language, typeof posts>();
+for (const post of posts) {
+  const items = postsByLang.get(post.lang) ?? [];
+  postsByLang.set(post.lang, [...items, post]);
+}
+
+const sortedLangEntries = Array.from(postsByLang).sort(([a], [b]) => a.localeCompare(b));
+---
+
+<AdminLayout title="文章管理">
+  <div class="min-h-screen p-6 md:p-8" data-default-lang={DEFAULT_LANGUAGE}>
+    <div class="mx-auto max-w-6xl space-y-4">
+      <div class="flex-between gap-4">
+        <div class="flex items-center gap-3">
+          <h1>文章管理</h1>
+          <a
+            href="/admin/editor"
+            class="btn border-primary hover:bg-primary flex-center text-primary bg-surface-secondary hover:text-surface-secondary size-6 rounded-full p-0"
+            aria-label="新增文章"
+          >
+            <Plus size={16} aria-hidden="true" />
+          </a>
+        </div>
+        <div class="flex items-center gap-4">
+          <a href="/" class="text-sm font-medium hover:opacity-80">回到首頁</a>
+          <form method="POST" class="m-0">
+            <input type="hidden" name="action" value="logout" />
+            <button type="submit" class="flex-center gap-1 text-sm font-medium hover:opacity-80">
+              <LogOut size={16} aria-hidden="true" />
+              登出
+            </button>
+          </form>
+        </div>
+      </div>
+      <div class="bg-surface-secondary space-y-3 rounded p-5 shadow">
+        <div class="flex-between flex-wrap gap-3">
+          <label class="input w-fit rounded-full border border-gray-300 md:min-w-64">
+            <Search size={16} />
+            <input
+              type="search"
+              autocomplete="off"
+              data-search-input
+              placeholder="搜尋文章標題或 slug"
+            />
+          </label>
+          <div class="ml-auto flex flex-wrap gap-3 text-sm">
+            <select data-status-select class="border px-1 py-0.5">
+              <option value="all">全部狀態 ({posts.length})</option>
+              <option value="published">已發布 ({publishedCount})</option>
+              <option value="draft">草稿 ({draftCount})</option>
+            </select>
+            <select data-lang-select class="border px-1 py-0.5">
+              <option value="all">全部語系</option>
+              {
+                sortedLangEntries.map(([lang, langPosts]) => (
+                  <option value={lang} selected={lang === DEFAULT_LANGUAGE}>
+                    {lang} ({langPosts.length})
+                  </option>
+                ))
+              }
+            </select>
+          </div>
+        </div>
+        {
+          sortedLangEntries.map(([lang, langPosts]) => (
+            <AdminPostListSection lang={lang} posts={langPosts} />
+          ))
+        }
+        {posts.length === 0 && <p class="py-10 text-center text-gray-500">尚無文章</p>}
+      </div>
+    </div>
+  </div>
+  <script>
+    const defaultLang =
+      document.querySelector<HTMLElement>('[data-default-lang]')?.dataset.defaultLang || '';
+
+    const searchInput = document.querySelector<HTMLInputElement>('[data-search-input]');
+    const statusSelect = document.querySelector<HTMLSelectElement>('[data-status-select]');
+    const langSelect = document.querySelector<HTMLSelectElement>('[data-lang-select]');
+
+    // 合併選取篩選項目，減少 DOM 查詢次數。
+    const filterableItems = document.querySelectorAll<HTMLElement>(
+      '[data-post-row], [data-post-card]'
+    );
+    const sections = document.querySelectorAll<HTMLElement>('[data-lang-section]');
+
+    if (langSelect && defaultLang) langSelect.value = defaultLang;
+
+    const applyFilters = () => {
+      const query = (searchInput?.value || '').trim().toLowerCase();
+      const status = statusSelect?.value || 'all';
+      const lang = langSelect?.value || 'all';
+
+      // 1. 進行篩選
+      filterableItems.forEach((el) => {
+        const matchQuery = !query || (el.dataset.search || '').includes(query);
+        const matchStatus = status === 'all' || el.dataset.status === status;
+        const matchLang = lang === 'all' || el.dataset.lang === lang;
+        el.classList.toggle('hidden', !(matchQuery && matchStatus && matchLang));
+      });
+
+      // 2. 顯示 / 隱藏語系區塊
+      sections.forEach((sec) => {
+        if (lang !== 'all' && sec.dataset.langSection !== lang) {
+          sec.classList.add('hidden');
+        } else {
+          const hasVisibleItems = sec.querySelector(
+            '[data-post-row]:not(.hidden), [data-post-card]:not(.hidden)'
+          );
+          sec.classList.toggle('hidden', !hasVisibleItems);
+        }
+      });
+    };
+
+    [searchInput, statusSelect, langSelect].forEach((el) => {
+      el?.addEventListener('input', applyFilters);
+    });
+
+    applyFilters();
+  </script>
+</AdminLayout>

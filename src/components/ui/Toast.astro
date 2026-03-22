@@ -1,8 +1,8 @@
 ---
 import { cn } from '@/utils/cn';
+import { X } from '@lucide/astro';
 ---
 
-<!-- Toast 容器，固定在畫面上方中央。 -->
 <div
   id="toast-root"
   class="toast toast-top toast-center z-50"
@@ -11,24 +11,15 @@ import { cn } from '@/utils/cn';
 >
 </div>
 
-<!-- Toast 模版（動態複製用）-->
 <template id="toast-template">
   <div
     role="alert"
-    class={cn(
-      'alert flex-between gap-2 rounded-md border-none transition-opacity duration-300',
-      'data-[variant=success]:bg-green-100 data-[variant=success]:text-green-700 data-[variant=error]:bg-red-100 data-[variant=error]:text-red-700 data-[variant=info]:bg-blue-100 data-[variant=info]:text-blue-700 data-[variant=warning]:bg-yellow-100 data-[variant=warning]:text-yellow-800 dark:data-[variant=success]:bg-green-900/50 dark:data-[variant=success]:text-green-100 dark:data-[variant=error]:bg-red-900/50 dark:data-[variant=error]:text-red-100 dark:data-[variant=info]:bg-blue-900/50 dark:data-[variant=info]:text-blue-100 dark:data-[variant=warning]:bg-yellow-900/50 dark:data-[variant=warning]:text-yellow-100'
-    )}
+    class="alert flex-between gap-2 rounded-md border-none transition-opacity duration-300 data-[variant=error]:bg-red-100 data-[variant=error]:text-red-700 data-[variant=info]:bg-blue-100 data-[variant=info]:text-blue-700 data-[variant=success]:bg-green-100 data-[variant=success]:text-green-700 data-[variant=warning]:bg-yellow-100 data-[variant=warning]:text-yellow-800 dark:data-[variant=error]:bg-red-900/50 dark:data-[variant=error]:text-red-100 dark:data-[variant=info]:bg-blue-900/50 dark:data-[variant=info]:text-blue-100 dark:data-[variant=success]:bg-green-900/50 dark:data-[variant=success]:text-green-100 dark:data-[variant=warning]:bg-yellow-900/50 dark:data-[variant=warning]:text-yellow-100"
   >
     <span data-toast-icon class="text-sm leading-none"></span>
     <span data-toast-message class="flex-1 text-sm"></span>
-    <button
-      type="button"
-      class="btn btn-ghost btn-xs p-0"
-      aria-label="Dismiss toast"
-      data-toast-close
-    >
-      ✕
+    <button type="button" class="hover:opacity-80" aria-label="Dismiss toast" data-toast-close>
+      <X size={14} aria-hidden="true" />
     </button>
   </div>
 </template>
@@ -62,16 +53,16 @@ import { cn } from '@/utils/cn';
 
     const appendToast = (toast) => {
       while (root.children.length >= MAX_TOASTS) {
-        root.firstElementChild?.remove(); // 超過上限時移除最舊的 toast
+        root.firstElementChild?.remove();
       }
-      root.appendChild(toast); // 加入新的 toast
+      root.appendChild(toast);
     };
 
     const createToast = ({ message, variant }) => {
       const node = template.content.firstElementChild?.cloneNode(true);
       if (!(node instanceof HTMLElement)) return null;
 
-      const v = VARIANTS.includes(variant) ? variant : 'error'; // 預設為 error
+      const v = VARIANTS.includes(variant) ? variant : 'error';
       node.dataset.variant = v;
 
       const text = node.querySelector('[data-toast-message]');
@@ -88,17 +79,14 @@ import { cn } from '@/utils/cn';
         setTimeout(() => node.remove(), 300);
       };
 
-      // 點擊關閉按鈕關閉
       if (close instanceof HTMLButtonElement) close.addEventListener('click', remove);
 
-      // 或時間到自動關閉
       const duration = DURATIONS[v];
       if (duration) setTimeout(remove, duration);
 
       return node;
     };
 
-    // 監聽全域的 toast 事件
     window.addEventListener('toast', (event) => {
       const detail = event?.detail ?? {};
       if (typeof detail.message !== 'string' || !detail.message) return;
@@ -108,7 +96,7 @@ import { cn } from '@/utils/cn';
         variant: detail.variant,
       });
 
-      if (toast) appendToast(toast); // 顯示 toast
+      if (toast) appendToast(toast);
     });
   })();
 </script>

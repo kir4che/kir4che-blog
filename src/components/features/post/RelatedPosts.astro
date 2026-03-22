@@ -13,11 +13,11 @@ import '@splidejs/splide/css';
 
 interface RelatedPostsProps {
   lang: Language;
-  currentSlug: string;
+  currSlug: string;
   categories: string[];
 }
 
-const { lang, currentSlug, categories } = Astro.props as RelatedPostsProps;
+const { lang, currSlug, categories } = Astro.props as RelatedPostsProps;
 
 const t = createTranslator(lang, 'PostPage');
 const locale = resolveLanguage(lang);
@@ -27,7 +27,7 @@ const categorySet = new Set(categories.map((c) => c?.trim()).filter(Boolean));
 const posts = categorySet.size > 0 ? await getPostsInfo(lang) : [];
 
 const relatedPosts: PostMeta[] = posts.filter(
-  (post) => post.slug !== currentSlug && post.categories?.some((c) => categorySet.has(c?.trim()))
+  (post) => post.slug !== currSlug && post.categories?.some((c) => categorySet.has(c?.trim()))
 );
 
 const shouldRender = relatedPosts.length > 0;
@@ -52,7 +52,7 @@ const splideOptions: Options = {
 
 {
   shouldRender && (
-    <section class="relative space-y-4 py-6" aria-labelledby={`related-posts-${currentSlug}`}>
+    <section class="relative space-y-4 py-6" aria-labelledby={`related-posts-${currSlug}`}>
       <Splide hasTrack={false} options={splideOptions}>
         <div class="flex-between mb-4 gap-2">
           <h2 class="text-base font-semibold text-pink-700 dark:text-pink-200">

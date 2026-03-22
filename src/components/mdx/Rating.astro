@@ -1,6 +1,4 @@
 ---
-import { cn } from '@/utils/cn';
-
 interface StarRatingProps {
   type: 'star' | 'heart';
   rating: number; // 0.5 ~ 5.0
@@ -8,7 +6,7 @@ interface StarRatingProps {
   class?: string;
 }
 
-const { type = 'star', rating, size = 'sm', class: className } = Astro.props as StarRatingProps;
+const { type = 'star', rating, size = 'sm' } = Astro.props as StarRatingProps;
 
 const maskShape = {
   star: 'mask-star-2',
@@ -36,19 +34,23 @@ const steps = Array.from({ length: 10 }, (_, index) => {
 ---
 
 <div
-  class={cn('rating rating-half mt-1 mb-2', sizeClass, className)}
+  class:list={['rating rating-half mt-1 mb-2', sizeClass]}
   role="img"
   aria-label={`rating: ${rating}/5`}
 >
   {
     steps.map(({ value, isHalf, isFilled }) => (
       <div
-        class={cn(
+        class:list={[
           'mask',
           maskShape,
-          isHalf ? 'mask-half-1' : 'mask-half-2 mr-1',
-          isFilled ? filledColor : 'bg-gray-200 dark:bg-gray-700'
-        )}
+          {
+            'mask-half-1': isHalf,
+            'mask-half-2 mr-1': !isHalf,
+            [filledColor]: isFilled,
+            'bg-gray-200 dark:bg-gray-700': !isFilled,
+          },
+        ]}
         aria-current={rating === value}
       />
     ))

@@ -11,21 +11,19 @@ const detectLocale = (request: Request): string => {
   return isSupportedLanguage(lang) ? lang : DEFAULT_LANGUAGE;
 };
 
-export const onRequest: MiddlewareHandler = async ({ request, url, params }, next) => {
+export const onRequest: MiddlewareHandler = async ({ request, url }, next) => {
   const { pathname } = url; // 目前路徑
 
   if (
     pathname.startsWith('/api') ||
     pathname.startsWith('/_astro') ||
     pathname.startsWith('/admin') ||
+    pathname.startsWith('/404') ||
     pathname === '/favicon.ico' ||
     pathname === '/robots.txt' ||
     /\.[^/]+$/.test(pathname)
   )
     return next();
-
-  if (params.lang && !isSupportedLanguage(params.lang))
-    return new Response('Not Found', { status: 404 });
 
   // 若路徑中沒有語系前綴，則進行偵測並重新導向。
   if (!matchLanguageBasePath(pathname)) {

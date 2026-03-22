@@ -1,5 +1,4 @@
 ---
-import { cn } from '@/utils/cn';
 import FigureShell from '@/components/mdx/FigureShell.astro';
 
 interface CustomVideoProps {
@@ -9,10 +8,9 @@ interface CustomVideoProps {
   width?: string | number;
   align?: 'left' | 'center' | 'right';
   controls?: boolean;
-  autoPlay?: boolean;
+  autoplay?: boolean;
   loop?: boolean;
   muted?: boolean;
-  class?: string;
   poster?: string;
   [key: string]: any;
 }
@@ -24,10 +22,9 @@ const {
   width,
   align = 'center',
   controls = true,
-  autoPlay = false,
+  autoplay = false,
   loop = false,
   muted = true,
-  class: className,
   poster,
   ...rest
 } = Astro.props as CustomVideoProps;
@@ -39,7 +36,6 @@ const shouldShowControls = hasControlsProp ? controls : !loop;
 <FigureShell
   align={align}
   title={title}
-  class={cn(className)}
   style={{
     height: height || 'auto',
     width: width || '100%',
@@ -49,20 +45,20 @@ const shouldShowControls = hasControlsProp ? controls : !loop;
     <video
       src={src}
       controls={shouldShowControls}
-      autoplay={autoPlay}
+      autoplay={autoplay}
       loop={loop}
       muted={muted}
       playsinline
       preload="auto"
       poster={poster}
       class="size-full object-cover transition-opacity duration-300"
-      data-auto-play={autoPlay ? 'true' : undefined}
+      data-auto-play={autoplay ? 'true' : undefined}
       {...rest}></video>
   </div>
 </FigureShell>
 
 {
-  autoPlay ? (
+  autoplay ? (
     <script is:inline>
       {`
       (() => {

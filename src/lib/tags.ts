@@ -1,6 +1,6 @@
-import type { Language, PostMeta, SidebarTag, TagBadgeInfo } from '@/types';
 import { DEFAULT_LANGUAGE, tagMap } from '@/config';
-import { slugifyTag } from '@/utils/slug';
+import type { Language, PostMeta, SidebarTag, TagBadgeInfo } from '@/types';
+import { slugify } from '@/utils/slug';
 
 // 依據 slug、語系，取得最後顯示用的標籤名稱。
 export const getTagDisplayName = (slug: string, originalName: string, lang: Language): string => {
@@ -30,7 +30,7 @@ export const getTagsByPosts = (
       const original = rawTag?.trim();
       if (!original) continue;
 
-      const key = slugifyTag(original);
+      const key = slugify(original);
       if (!key) continue;
 
       const entry = tagCounts.get(key);
@@ -58,7 +58,7 @@ export const normalizeTag = (tag: string, lang: Language): TagBadgeInfo | null =
   const original = tag?.trim();
   if (!original) return null;
 
-  const slug = slugifyTag(original);
+  const slug = slugify(original);
   if (!slug) return null;
 
   const name = getTagDisplayName(slug, original, lang);

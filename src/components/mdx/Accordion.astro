@@ -1,6 +1,6 @@
 ---
-import { Triangle } from '@lucide/astro';
 import { cn } from '@/utils/cn';
+import { Triangle } from '@lucide/astro';
 
 interface AccordionProps {
   variant?: 'default' | 'basic' | 'pink';
@@ -11,10 +11,12 @@ const { variant = 'default', title } = Astro.props as AccordionProps;
 ---
 
 <div
-  class={cn(
+  class:list={[
     'group collapse rounded-none',
-    variant === 'default' && 'border border-pink-300 dark:border-pink-400/50'
-  )}
+    {
+      'border border-pink-300 dark:border-pink-400/50': variant === 'default',
+    },
+  ]}
 >
   <input type="checkbox" class="peer" />
   <div

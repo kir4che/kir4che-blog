@@ -1,11 +1,10 @@
 ---
-import { Languages, ChevronDown } from '@lucide/astro';
+import { ChevronDown, Languages } from '@lucide/astro';
 
-import type { Language } from '@/types';
 import { SUPPORTED_LANGUAGES } from '@/config';
 import { createTranslator, getLocaleFromUrl } from '@/lib/i18n';
 import { swapLocaleInPath } from '@/lib/paths';
-import { cn } from '@/utils/cn';
+import type { Language } from '@/types';
 
 const lang = getLocaleFromUrl(Astro.url);
 const t = createTranslator(lang, 'settings');
@@ -42,10 +41,12 @@ const buildPostHref = (l: Language) => {
             role="menuitemradio"
             aria-checked={l === lang}
             data-lang-menu-item
-            class={cn(
+            class:list={[
               'p-2 hover:bg-pink-100/80 md:px-3 dark:hover:bg-pink-900/20',
-              l === lang && 'font-semibold text-pink-700 dark:text-pink-200'
-            )}
+              {
+                'font-semibold text-pink-700 dark:text-pink-200': l === lang,
+              },
+            ]}
           >
             {t(`language.${l}`)}
           </a>
