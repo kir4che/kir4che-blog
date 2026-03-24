@@ -1,8 +1,8 @@
 ---
-import { Folder } from '@lucide/astro';
-import type { Translator, SidebarCategory } from '@/types';
-import { getCategoryStyle } from '@/lib/categories';
 import LocalizedLink from '@/components/ui/LocalizedLink.astro';
+import { getCategoryStyle } from '@/lib/categories';
+import type { SidebarCategory, Translator } from '@/types';
+import { Folder } from '@lucide/astro';
 
 interface CategoryListProps {
   t: Translator;

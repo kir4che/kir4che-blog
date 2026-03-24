@@ -1,16 +1,22 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "include": ["src", "env.d.ts"],
+  "include": ["src", "env.d.ts", "./worker-configuration.d.ts"],
   "exclude": ["dist"],
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "verbatimModuleSyntax": true,
     "allowArbitraryExtensions": true,
-    "plugins": [{ "name": "@astrojs/ts-plugin" }],
+    "plugins": [
+      {
+        "name": "@astrojs/ts-plugin"
+      }
+    ],
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
-    }
+    },
+    "skipLibCheck": true,
+    "moduleResolution": "Bundler"
   }
 }

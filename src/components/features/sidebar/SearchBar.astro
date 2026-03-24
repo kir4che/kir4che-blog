@@ -33,69 +33,57 @@ const { t, link } = Astro.props as SearchBarProps;
   </ul>
 </div>
 
-<script is:inline>
-  (() => {
-    const root = document.querySelector('[data-search-root]');
-    if (!root) return;
+<script>
+  const root = document.querySelector<HTMLElement>('[data-search-root]');
+  const input = root?.querySelector<HTMLInputElement>('[data-search-input]');
+  const resultsList = root?.querySelector<HTMLElement>('[data-search-results]');
 
-    const input = root.querySelector('[data-search-input]');
-    const results = root.querySelector('[data-search-results]');
-    if (!input || !results) return;
+  if (root && input && resultsList) {
+    const basePath = (root.dataset.basePath ?? '').replace(/\/$/, '');
+    const noResultsText = root.dataset.noResults ?? 'No results';
 
-    const lang = document.documentElement.dataset.lang || 'tw';
-    const basePath = (root.dataset.basePath || '').replace(/\/$/, '');
-    const noResultsText = root.dataset.noResults || 'No results';
+    type Post = { slug: string; title: string; description?: string };
+    let cachedPosts: Post[] | null = null;
+    let timer: ReturnType<typeof setTimeout>;
 
-    let allPosts = null;
-    let timer;
+    async function loadIndex(): Promise<Post[]> {
+      cachedPosts ??= await fetch(`${basePath}/search.json`).then((r) => r.json());
+      return cachedPosts!;
+    }
 
-    const renderResults = (posts) => {
-      results.innerHTML = posts.length
+    function renderResults(posts: Post[]) {
+      resultsList!.innerHTML = posts.length
         ? posts
             .map(
-              ({ slug, title }) => `
-        <li>
-          <a href="${basePath}/${slug}" class="block w-full rounded px-3 py-2 text-sm text-foreground-primary hover:bg-pink-50 hover:text-pink-700 dark:hover:bg-pink-950 dark:hover:text-pink-300">
-            ${title || slug}
-          </a>
-        </li>`
+              ({ slug, title }) =>
+                `<li><a href="${basePath}/${slug}" class="block w-full rounded px-3 py-2 text-sm text-foreground-primary hover:bg-pink-50 hover:text-pink-700 dark:hover:bg-pink-950 dark:hover:text-pink-300">${title || slug}</a></li>`
             )
             .join('')
         : `<li class="p-2 text-sm text-foreground-primary">${noResultsText}</li>`;
-      results.classList.toggle('hidden', posts.length === 0);
-    };
-
-    const loadIndex = async () => {
-      if (allPosts) return allPosts;
-      const res = await fetch(`${basePath}/search.json`);
-      if (!res.ok) throw new Error('Failed to load search index');
-      allPosts = await res.json();
-      return allPosts;
-    };
-
-    const search = async (query) => {
-      try {
-        const posts = await loadIndex();
-        const q = query.toLowerCase();
-        const filtered = posts.filter(
-          ({ slug, title, description }) =>
-            title?.toLowerCase().includes(q) ||
-            description?.toLowerCase().includes(q) ||
-            slug.toLowerCase().includes(q)
-        );
-        renderResults(filtered.slice(0, 10));
-      } catch {}
-    };
+      resultsList!.classList.remove('hidden');
+    }
 
     input.addEventListener('input', (e) => {
-      const query = e.target.value.trim();
       clearTimeout(timer);
-      if (!query) return results.classList.add('hidden');
-      timer = setTimeout(() => search(query), 300);
+      const query = (e.target as HTMLInputElement).value.trim();
+      if (!query) return void resultsList!.classList.add('hidden');
+      timer = setTimeout(async () => {
+        try {
+          const posts = await loadIndex();
+          const q = query.toLowerCase();
+          const filtered = posts.filter(
+            ({ slug, title, description }) =>
+              title?.toLowerCase().includes(q) ||
+              description?.toLowerCase().includes(q) ||
+              slug.toLowerCase().includes(q)
+          );
+          renderResults(filtered.slice(0, 10));
+        } catch {}
+      }, 300);
     });
 
     document.addEventListener('click', (e) => {
-      if (!root.contains(e.target)) results.classList.add('hidden');
+      if (!root!.contains(e.target as Node)) resultsList!.classList.add('hidden');
     });
-  })();
+  }
 </script>

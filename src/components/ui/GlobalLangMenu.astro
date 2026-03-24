@@ -6,6 +6,12 @@ import { createTranslator, getLocaleFromUrl } from '@/lib/i18n';
 import { swapLocaleInPath } from '@/lib/paths';
 import type { Language } from '@/types';
 
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+
 const lang = getLocaleFromUrl(Astro.url);
 const t = createTranslator(lang, 'settings');
 
@@ -20,7 +26,7 @@ const buildPostHref = (l: Language) => {
     type="button"
     class="flex items-center gap-x-1.5 hover:bg-inherit"
     aria-expanded="false"
-    aria-controls="global-lang-menu"
+    aria-controls={id}
     data-lang-menu-toggle
   >
     <Languages size={16} aria-hidden="true" />
@@ -28,7 +34,7 @@ const buildPostHref = (l: Language) => {
     <ChevronDown size={16} aria-hidden="true" />
   </button>
   <ul
-    id="global-lang-menu"
+    id={id}
     role="menu"
     class="dropdown-content menu bg-surface-secondary z-10 hidden w-24 rounded shadow-md md:w-32"
     data-lang-menu-list

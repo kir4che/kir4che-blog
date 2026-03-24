@@ -9,10 +9,12 @@ import { cn } from '@/utils/cn';
 const {
   post,
   lang,
+  priority = false,
   class: className,
 } = Astro.props as {
   post: PostMeta;
   lang: Language;
+  priority?: boolean;
   class?: string;
 };
 
@@ -45,8 +47,9 @@ const href = getLocalizedPostPath({ lang, slug: post.slug });
           <img
             src={post.coverImage}
             alt={post.title}
-            loading="lazy"
-            decoding="async"
+            loading={priority ? 'eager' : 'lazy'}
+            fetchpriority={priority ? 'high' : 'auto'}
+            decoding={priority ? 'sync' : 'async'}
             onerror="this.onerror=null;this.src='/images/cover-fallback_lg.webp';"
             class="absolute inset-0 h-full w-full object-cover brightness-[0.85] transition-all duration-500 group-hover:scale-110 group-hover:brightness-105"
           />

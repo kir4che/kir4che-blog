@@ -1,15 +1,64 @@
 ---
-export const prerender = false;
+export const prerender = true;
 
 import PostPreviewList from '@/components/features/post/preview/PostPreviewList.astro';
 import Pagination from '@/components/ui/Pagination.astro';
+import { DEFAULT_POSTS_PER_PAGE, SUPPORTED_LANGUAGES } from '@/config';
 import PostListLayout from '@/layouts/PostListLayout.astro';
-import { getCategoryBySlug, getCategoryStyle, isPostInCategory } from '@/lib/categories';
+import {
+  getAllCategoryByPosts,
+  getCategoryBySlug,
+  getCategoryStyle,
+  isPostInCategory,
+} from '@/lib/categories';
 import { createTranslator, resolveLanguage } from '@/lib/i18n';
 import { paginate } from '@/lib/pagination';
 import { withLocalePrefix } from '@/lib/paths';
 import { getPostsInfo } from '@/lib/posts';
 import type { Category, CategoryInfo } from '@/types';
+
+export async function getStaticPaths() {
+  const paths: { params: { lang: string; catSlug: string; page: string | undefined } }[] = [];
+
+  for (const lang of SUPPORTED_LANGUAGES) {
+    const posts = await getPostsInfo(lang);
+    const categories = getAllCategoryByPosts(posts);
+
+    const allCatSlugs: string[] = [];
+    for (const cat of categories) {
+      allCatSlugs.push(cat.slug);
+      for (const subSlug of Object.keys(cat.subcategories ?? {})) {
+        allCatSlugs.push(subSlug);
+      }
+    }
+
+    for (const catSlug of allCatSlugs) {
+      const resolved = getCategoryBySlug(catSlug, posts, 'all');
+      if (!resolved) continue;
+
+      const isSubCat = 'parentSlug' in resolved && resolved.parentSlug;
+      const resolvedSub = isSubCat ? (resolved as CategoryInfo) : null;
+      const mainCat = isSubCat
+        ? getCategoryBySlug(resolvedSub!.parentSlug!, posts, 'main')
+        : resolved;
+      if (!mainCat || !('subcategories' in mainCat)) continue;
+
+      const subcats = (mainCat as Category).subcategories ?? {};
+      const catPosts = posts.filter((post) => {
+        if (resolvedSub) return isPostInCategory(post, resolvedSub.name, resolvedSub.slug);
+        if (isPostInCategory(post, mainCat.name, mainCat.slug)) return true;
+        return Object.values(subcats).some((sub) => isPostInCategory(post, sub.name, sub.slug));
+      });
+
+      const totalPages = Math.ceil(catPosts.length / DEFAULT_POSTS_PER_PAGE) || 1;
+      for (let p = 1; p <= totalPages; p++) {
+        paths.push({ params: { lang, catSlug, page: p === 1 ? undefined : String(p) } });
+      }
+    }
+  }
+
+  return paths;
+}
 
 const lang = resolveLanguage(Astro.params.lang);
 const t = createTranslator(lang, 'CategoriesPage');
@@ -17,9 +66,7 @@ const t = createTranslator(lang, 'CategoriesPage');
 const link = (href: string) => withLocalePrefix(href, lang);
 
 const catSlug = Astro.params.catSlug as string;
-
-const pageParam = Number(Astro.url.searchParams.get('page'));
-const currPage = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
+const page = Astro.params.page ? parseInt(Astro.params.page, 10) : 1;
 
 const posts = await getPostsInfo(lang);
 
@@ -29,14 +76,12 @@ if (!resolved) return new Response(null, { status: 404 });
 const isSubCategory = 'parentSlug' in resolved && resolved.parentSlug;
 const resolvedSub = isSubCategory ? (resolved as CategoryInfo) : null;
 
-// 取得主分類
 const mainCategory = isSubCategory
   ? getCategoryBySlug(resolvedSub!.parentSlug!, posts, 'main')
   : resolved;
 if (!mainCategory) return new Response(null, { status: 404 });
 if (!('subcategories' in mainCategory)) return new Response(null, { status: 404 });
 
-// 子分類（若存在）
 const subCategory = resolvedSub;
 const hasSubCategory = subCategory;
 
@@ -59,7 +104,7 @@ const {
   currPage: safePage,
   totalPages,
   totalItems,
-} = paginate(filteredPosts, currPage);
+} = paginate(filteredPosts, page);
 ---
 
 <PostListLayout title={pageTitle}>

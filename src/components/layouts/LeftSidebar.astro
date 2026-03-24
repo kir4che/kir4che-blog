@@ -8,6 +8,7 @@ import GlobalLangMenu from '@/components/ui/GlobalLangMenu.astro';
 import GithubIcon from '@/assets/icons/github.svg';
 import YoutubeIcon from '@/assets/icons/youtube.svg';
 import BlueskyIcon from '@/assets/icons/butterfly.svg';
+import AvatarImage from '@/assets/images/avatar.webp';
 
 interface LeftSidebarProps {
   t: Translator;
@@ -29,7 +30,7 @@ const socialLinks = [
     <div class="avatar size-16 md:mb-2 md:size-28">
       <LocalizedLink href="/">
         <img
-          src="/images/avatar.webp"
+          src={AvatarImage.src}
           alt="Avatar"
           width={96}
           height={96}
@@ -78,6 +79,6 @@ const socialLinks = [
   </ul>
   <div class="mt-auto space-y-4 text-sm/3 max-md:hidden">
     <ThemeToggle />
-    <GlobalLangMenu />
+    <GlobalLangMenu id="global-lang-menu-leftsidebar" />
   </div>
 </aside>

@@ -1,10 +1,4 @@
 import { getCollection, render, type CollectionEntry } from 'astro:content';
-import { toString } from 'mdast-util-to-string';
-import { stat } from 'node:fs/promises';
-import path from 'node:path';
-import remarkMdx from 'remark-mdx';
-import remarkParse from 'remark-parse';
-import { unified } from 'unified';
 
 import { DEFAULT_LANGUAGE } from '@/config';
 import { isSupportedLanguage } from '@/lib/i18n';
@@ -27,8 +21,6 @@ const postIndexCache: {
   } | null;
 } = { value: null };
 const renderCache = new Map<string, Awaited<ReturnType<typeof render>>>();
-const markdownParser = unified().use(remarkParse).use(remarkMdx);
-const CJK_CHAR_REGEX = /[\u4e00-\u9fff]/g;
 
 // 從 entry.id 解析語言與實際 slug
 const parseEntryLangAndSlug = (entry: PostEntry): ParsedEntry => {
@@ -55,19 +47,10 @@ const resolveUpdatedAt = async (entry: PostEntry): Promise<string | undefined> =
   if (typeof entry.data.updatedAt === 'string' && entry.data.updatedAt.trim())
     return entry.data.updatedAt.trim();
 
-  if (isProd && updatedAtCache.has(entry.id)) return updatedAtCache.get(entry.id);
-
-  try {
-    const filePath = entry.filePath
-      ? path.join(process.cwd(), entry.filePath)
-      : path.join(process.cwd(), 'src', 'content', 'blog', `${entry.id}.mdx`);
-    const result = (await stat(filePath)).mtime.toISOString();
-    if (isProd) updatedAtCache.set(entry.id, result);
-    return result;
-  } catch {
-    if (isProd) updatedAtCache.set(entry.id, undefined);
-    return undefined;
-  }
+  // 💡 在 Cloudflare 等 Edge 環境無法直接存取檔案系統。
+  // 若 entry.data 沒寫，建議在靜態建置時透過 CI/CD 注入或手動管理。
+  // 這裡我們安全地回傳 undefined 以避免 build crash。
+  return undefined;
 };
 
 // 解析文章 slug
@@ -108,12 +91,21 @@ const resolveDescription = (entry: PostEntry): string => {
 export const countWordsFromMarkdown = (markdown: string): number => {
   if (!markdown?.trim()) return 0;
 
-  const tree = markdownParser.parse(markdown);
-  const text = toString(tree);
-  if (!text.trim()) return 0;
+  const cleanText = markdown
+    .replace(/^#+\s+/gm, '')
+    .replace(/(!\[.*?\]\(.*?\))|(\[.*?\]\(.*?\))/g, '$2')
+    .replace(/[`*_{}[\]()#+\-.!]/g, ' ')
+    .replace(/<[^>]*>/g, '');
 
-  const cjkChars = text.match(CJK_CHAR_REGEX)?.length ?? 0;
-  const latinWords = text.replace(CJK_CHAR_REGEX, ' ').trim().split(/\s+/).filter(Boolean).length;
+  if (!cleanText.trim()) return 0;
+
+  const cjkChars = cleanText.match(/[\u4e00-\u9fff]/g)?.length ?? 0;
+
+  const latinWords = cleanText
+    .replace(/[\u4e00-\u9fff]/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean).length;
 
   return cjkChars + latinWords;
 };
@@ -133,7 +125,7 @@ const getWordCount = (entry: PostEntry, updatedAt: string | undefined): number =
   return count;
 };
 
-// 將 entry 正規化為 PostMeta
+// 正規化 PostMeta
 const normalizePostMeta = async (
   entry: PostEntry,
   lang: Language,
@@ -178,10 +170,7 @@ const getBlogEntries = async (): Promise<PostEntry[]> => {
 };
 
 // 建立文章索引
-const getPostIndex = async (): Promise<{
-  slugToLangs: Map<string, Language[]>;
-  langSlugToEntry: Map<string, { entry: PostEntry; parsed: ParsedEntry }>;
-}> => {
+export const getPostIndex = async () => {
   if (isProd && postIndexCache.value) return postIndexCache.value;
 
   const entries = await getBlogEntries();

@@ -1,7 +1,8 @@
 import type { AstroCookies } from 'astro';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 
-import { deleteGithubFile, getGithubFile, putGithubFile } from '@/lib/github';
+import { SUPPORTED_LANGUAGES } from '@/config';
+import { deleteGithubFile, getGithubFile, listGithubDir, putGithubFile } from '@/lib/github';
 import { isSupportedLanguage } from '@/lib/i18n';
 import {
   getPostPassword,
@@ -28,13 +29,9 @@ const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
 const SESSION_MAX_AGE_MS = SESSION_MAX_AGE_SECONDS * 1000;
 const POST_EXTENSION = '.mdx';
 
-// 組合出單篇文章的完整路徑
-const getPostFilePath = (lang: Language, slug: string): string =>
-  path.join(getContentDir(), lang, `${slug}${POST_EXTENSION}`);
-
-// 把檔名最後的 .mdx 拿掉，只留文章 slug。
-const stripPostExtension = (filename: string): string =>
-  filename.endsWith(POST_EXTENSION) ? filename.slice(0, -POST_EXTENSION.length) : filename;
+// GitHub 文章路徑格式
+const getGithubFilePath = (lang: Language, slug: string): string =>
+  `src/content/blog/${lang}/${slug}${POST_EXTENSION}`;
 
 const utf8 = new TextEncoder();
 const utf8Decode = (b: Uint8Array) => new TextDecoder().decode(b);
@@ -134,7 +131,7 @@ export const clearAdminSessionCookie = (cookies: AstroCookies) => {
   cookies.delete(ADMIN_COOKIE_NAME, { path: '/' });
 };
 
-// 驗證路徑 segment（防止 path traversal）
+// 驗證路徑 segment
 const sanitizeSegment = (input: string): string => {
   if (!/^[a-z0-9-_]+$/i.test(input)) throw new Error('無效的路徑片段');
   return input;
@@ -170,40 +167,48 @@ const buildMeta = (data: any = {}, slug: string, lang: Language): PostMeta => ({
   updatedAt: typeof data.updatedAt === 'string' ? data.updatedAt : undefined,
 });
 
+// 把檔名最後的 .mdx 拿掉，只留文章 slug。
+const stripPostExtension = (filename: string): string =>
+  filename.endsWith(POST_EXTENSION) ? filename.slice(0, -POST_EXTENSION.length) : filename;
+
+// 從 GitHub 遞迴取得所有文章路徑
+async function fetchAllPostPathsFromGithub(): Promise<{ lang: Language; slug: string }[]> {
+  const allPaths: { lang: Language; slug: string }[] = [];
+
+  for (const lang of SUPPORTED_LANGUAGES) {
+    try {
+      const files = await listGithubDir(`src/content/blog/${lang}`);
+
+      if (Array.isArray(files)) {
+        files.forEach((file) => {
+          if (file.name.endsWith(POST_EXTENSION))
+            allPaths.push({
+              lang,
+              slug: stripPostExtension(file.name),
+            });
+        });
+      }
+    } catch (e) {
+      console.error(`無法讀取 GitHub 中的 ${lang} 資料夾:`, e);
+    }
+  }
+  return allPaths;
+}
+
 // 取得所有文章
 export const getAdminPosts = async (): Promise<AdminPost[]> => {
-  try {
-    const langs = await fs.readdir(getContentDir());
-    const posts = await Promise.all(
-      langs.filter(isSupportedLanguage).map(async (lang) => {
-        const langDir = path.join(getContentDir(), lang);
-        const files = await fs.readdir(langDir);
+  const postPaths = await fetchAllPostPathsFromGithub();
 
-        return Promise.all(
-          files
-            .filter((file) => file.endsWith(POST_EXTENSION)) // 只找 .mdx 檔
-            .map(async (file) => {
-              const slug = stripPostExtension(file);
-              const fullPath = path.join(langDir, file);
-              const { data, content } = matter(await fs.readFile(fullPath, 'utf-8'));
+  const posts = await Promise.all(
+    postPaths.map(async ({ lang, slug }) => {
+      const id = `${lang}/${slug}`;
+      return await getAdminPost(id);
+    })
+  );
 
-              return {
-                id: `${lang}/${slug}`,
-                lang,
-                slug,
-                meta: buildMeta(data, slug, lang),
-                content,
-                fullPath,
-              };
-            })
-        );
-      })
-    );
-    return posts.flat().sort((a, b) => b.meta.date.localeCompare(a.meta.date));
-  } catch (err: any) {
-    if (err.code === 'ENOENT') return [];
-    throw err;
-  }
+  return posts
+    .filter((p): p is AdminPost => p !== null)
+    .sort((a, b) => b.meta.date.localeCompare(a.meta.date));
 };
 
 // 解析文章的 ID
@@ -240,7 +245,7 @@ export const saveAdminPost = async (
   slug: string,
   meta: Partial<PostMeta>,
   content: string,
-  oldSlug?: string // 若傳了舊的 slug，代表有改 slug。
+  oldSlug?: string
 ) => {
   const safeLang = sanitizeLanguage(lang);
   const safeSlug = sanitizeSegment(slug);
@@ -316,12 +321,12 @@ export const saveAdminPost = async (
 // 刪除文章
 export const deleteAdminPost = async (id: string) => {
   const ids = parseAdminPostId(id);
-  if (ids) await fs.rm(getPostFilePath(ids.safeLang, ids.safeSlug), { force: true });
+  if (ids) {
+    const path = getGithubFilePath(ids.safeLang, ids.safeSlug);
+    const existingFile = await getGithubFile(path);
+    if (existingFile) await deleteGithubFile(path, `chore: delete post ${id}`, existingFile.sha);
+  }
 };
-
-// GitHub 文章路徑
-const getGithubFilePath = (lang: Language, slug: string): string =>
-  `src/content/blog/${lang}/${slug}${POST_EXTENSION}`;
 
 // 儲存文章到 GitHub
 export const saveAdminPostToGithub = async (
@@ -406,15 +411,13 @@ export const saveAdminPostToGithub = async (
     );
 };
 
-// 取得複製文章的下一個 slug
+// 取得下一個文章 slug
 export const getNextCopySlug = (slug: string, existingSlugs: string[]): string => {
-  // 找出最原始的檔名
   const baseSlug = slug.replace(/-copy-\d+$/i, '');
   const matcher = new RegExp(
     `^${baseSlug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}-copy-(\\d+)$`,
     'i'
   );
-
   const maxSuffix = existingSlugs.reduce((max, candidate) => {
     const match = candidate.match(matcher);
     // 找出目前最大的是 -copy- 多少

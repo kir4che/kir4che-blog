@@ -6,11 +6,19 @@ interface PaginationProps {
   t: Translator;
   link: LinkBuilder;
   basePath?: string;
+  page1Path?: string;
   currPage?: number;
   totalPages: number;
 }
 
-const { t, link, basePath = '', currPage = 1, totalPages } = Astro.props as PaginationProps;
+const {
+  t,
+  link,
+  basePath = '',
+  page1Path,
+  currPage = 1,
+  totalPages,
+} = Astro.props as PaginationProps;
 if (!t || !link || totalPages <= 1) return null;
 
 const safeCurrent = Math.min(Math.max(currPage, 1), totalPages);
@@ -45,15 +53,8 @@ const getPageNumbers = (): PageItem[] => {
 
 const pages = getPageNumbers();
 
-const buildPageHref = (page: number): string => {
-  const params = new URLSearchParams(Astro.url.search);
-
-  if (page > 1) params.set('page', String(page));
-  else params.delete('page');
-
-  const query = params.toString();
-  return link(`${basePath}${query ? `?${query}` : ''}`);
-};
+const buildPageHref = (page: number): string =>
+  link(page === 1 ? (page1Path ?? basePath) : `${basePath}/${page}`);
 ---
 
 <div class="mt-auto">

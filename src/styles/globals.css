@@ -127,7 +127,7 @@
   }
 
   body {
-    @apply font-main bg-surface-primary text-foreground-primary min-h-screen tracking-[0.8px] antialiased transition-colors duration-300;
+    @apply font-main bg-surface-primary text-foreground-primary min-h-dvh tracking-[0.8px] antialiased transition-colors duration-300;
   }
 
   a,

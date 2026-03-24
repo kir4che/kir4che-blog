@@ -1,12 +1,14 @@
 ---
+export const prerender = true;
+
 import SiteLayout from '@/layouts/SiteLayout.astro';
 import { getAllCategoryByPosts, getCategoryStyle } from '@/lib/categories';
 import { createTranslator, getLangStaticPaths, resolveLanguage } from '@/lib/i18n';
-
-export const getStaticPaths = getLangStaticPaths;
 import { withLocalePrefix } from '@/lib/paths';
 import { getPostsInfo } from '@/lib/posts';
 import type { PostMeta } from '@/types';
+
+export const getStaticPaths = getLangStaticPaths;
 
 const lang = resolveLanguage(Astro.params.lang);
 const t = createTranslator(lang, 'CategoriesPage');

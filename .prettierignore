@@ -3,3 +3,5 @@ public
 dist
 .astro
 pnpm-lock.yaml
+src/content/blog/**/*.mdx
+wrangler.jsonc

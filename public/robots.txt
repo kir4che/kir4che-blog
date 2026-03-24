@@ -1,9 +1,16 @@
-# *
 User-agent: *
 Allow: /
 
-# Host
-Host: https://kir4che.com
+User-agent: GPTBot
+Disallow: /
+User-agent: ChatGPT-User
+Disallow: /
+User-agent: Google-Extended
+Disallow: /
+User-agent: CCBot
+Disallow: /
 
-# Sitemaps
+User-agent: Googlebot-image
+Disallow: /images/
+
 Sitemap: https://kir4che.com/sitemap-index.xml

@@ -1,13 +1,13 @@
 ---
-import { CONFIG } from '@/config';
-import ThemeToggle from '@/components/ui/ThemeToggle.astro';
 import GlobalLangMenu from '@/components/ui/GlobalLangMenu.astro';
+import ThemeToggle from '@/components/ui/ThemeToggle.astro';
+import { CONFIG } from '@/config';
 ---
 
 <footer class="flex-between py-4 sm:pt-6">
   <div class="flex items-center gap-x-3 md:hidden">
     <ThemeToggle />
-    <GlobalLangMenu />
+    <GlobalLangMenu id="global-lang-menu-footer" />
   </div>
   <p class="text-xs dark:text-gray-400">
     © 2025 by {CONFIG.siteInfo.name}

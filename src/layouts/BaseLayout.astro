@@ -3,6 +3,7 @@ import type { Language } from '@/types';
 import { getSeoConfig } from '@/lib/seo';
 import { getLocaleFromUrl } from '@/lib/i18n';
 import Toast from '@/components/ui/Toast.astro';
+import ThemeScript from '@/components/layouts/ThemeScript.astro';
 
 import '@/styles/globals.css';
 
@@ -39,6 +40,14 @@ const shouldIndex = noindex ? 'noindex,nofollow' : seoConfig.robots;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
+    />
+    <ThemeScript />
     <title>
       {title ? seoConfig.title.template.replace('%s', title) : seoConfig.title.default}
     </title>
@@ -46,16 +55,9 @@ const shouldIndex = noindex ? 'noindex,nofollow' : seoConfig.robots;
     {keywords && <meta name="keywords" content={keywords} />}
     <meta name="robots" content={shouldIndex} />
     <link rel="canonical" href={canonicalUrl} />
-
     <slot name="head" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
   </head>
-  <body>
+  <body class="preload">
     <Toast />
     <slot />
     <script>

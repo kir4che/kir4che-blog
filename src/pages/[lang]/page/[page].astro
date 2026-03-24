@@ -1,0 +1,64 @@
+---
+export const prerender = true;
+
+import PostPreviewList from '@/components/features/post/preview/PostPreviewList.astro';
+import Pagination from '@/components/ui/Pagination.astro';
+import { DEFAULT_POSTS_PER_PAGE, SUPPORTED_LANGUAGES } from '@/config';
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import { createTranslator, resolveLanguage } from '@/lib/i18n';
+import { paginate } from '@/lib/pagination';
+import { withLocalePrefix } from '@/lib/paths';
+import { getSidebarData } from '@/lib/sidebar';
+
+export async function getStaticPaths() {
+  const paths: { params: { lang: string; page: string } }[] = [];
+
+  for (const lang of SUPPORTED_LANGUAGES) {
+    const { posts = [] } = await getSidebarData(lang);
+    const visiblePosts = posts.filter((post) => !post.protected);
+    const totalPages = Math.ceil(visiblePosts.length / DEFAULT_POSTS_PER_PAGE) || 1;
+
+    for (let p = 2; p <= totalPages; p++) {
+      paths.push({ params: { lang, page: String(p) } });
+    }
+  }
+
+  return paths;
+}
+
+const lang = resolveLanguage(Astro.params.lang);
+const t = createTranslator(lang, 'HomePage');
+
+const link = (href: string) => withLocalePrefix(href, lang);
+
+const page = parseInt(Astro.params.page, 10);
+
+const { posts = [] } = await getSidebarData(lang);
+const visiblePosts = posts.filter((post) => !post.protected);
+
+const { items: currPosts, currPage, totalPages } = paginate(visiblePosts, page);
+---
+
+<SiteLayout title={t('title')} description={t('description')}>
+  <div class="flex min-h-full flex-1 flex-col gap-6">
+    {
+      currPosts.length > 0 && (
+        <section id="posts" class="flex flex-1 flex-col gap-6">
+          <div class="grid gap-2 md:gap-4">
+            {currPosts.map((post) => (
+              <PostPreviewList post={post} lang={lang} />
+            ))}
+          </div>
+          <Pagination
+            t={t}
+            link={link}
+            basePath="/page"
+            page1Path="/"
+            currPage={currPage}
+            totalPages={totalPages}
+          />
+        </section>
+      )
+    }
+  </div>
+</SiteLayout>

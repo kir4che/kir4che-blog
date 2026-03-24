@@ -1,5 +1,9 @@
 ---
-export const prerender = false;
+export const prerender = true;
+
+export function getStaticPaths() {
+  return [{ params: { lang: 'tw' } }, { params: { lang: 'en' } }];
+}
 
 import Announcement from '@/components/ui/Announcement.astro';
 import SiteLayout from '@/layouts/SiteLayout.astro';
@@ -22,10 +26,7 @@ const link = (href: string) => withLocalePrefix(href, lang);
 const { posts = [] } = await getSidebarData(lang);
 const visiblePosts = posts.filter((post) => !post.protected);
 
-const pageParam = Number(Astro.url.searchParams.get('page'));
-const page = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
-
-const { items: currPosts, currPage, totalPages } = paginate(visiblePosts, page);
+const { items: currPosts, currPage, totalPages } = paginate(visiblePosts, 1);
 
 const isFirstPage = currPage === 1;
 const leftPosts = isFirstPage ? currPosts.slice(0, 2) : [];
@@ -44,15 +45,15 @@ const listPosts = isFirstPage ? currPosts.slice(5) : currPosts;
             {isFirstPage ? (
               <>
                 <div class="grid grid-cols-1 gap-2 md:hidden">
-                  {mobileFeaturedPosts.map((post) => (
-                    <PostPreviewCard post={post} lang={lang} />
+                  {mobileFeaturedPosts.map((post, index) => (
+                    <PostPreviewCard post={post} lang={lang} priority={index < 2} />
                   ))}
                 </div>
                 <div class="hidden md:grid md:grid-cols-[5fr_4fr] md:gap-4">
                   {leftPosts.length > 0 && (
                     <div class="grid gap-4">
                       {leftPosts.map((post) => (
-                        <PostPreviewCard post={post} lang={lang} />
+                        <PostPreviewCard post={post} lang={lang} priority={true} />
                       ))}
                     </div>
                   )}
@@ -83,7 +84,14 @@ const listPosts = isFirstPage ? currPosts.slice(5) : currPosts;
               </div>
             )}
           </div>
-          <Pagination t={t} link={link} basePath="/" currPage={currPage} totalPages={totalPages} />
+          <Pagination
+            t={t}
+            link={link}
+            basePath="/page"
+            page1Path="/"
+            currPage={currPage}
+            totalPages={totalPages}
+          />
         </section>
       )
     }

@@ -1,5 +1,4 @@
 ---
-import { cn } from '@/utils/cn';
 import FigureShell from '@/components/mdx/FigureShell.astro';
 
 interface ImageProps {
@@ -10,7 +9,6 @@ interface ImageProps {
   height?: string | number;
   align?: 'left' | 'center' | 'right';
   objPos?: 'top' | 'bottom' | 'center';
-  priority?: boolean;
   sizes?: string;
   originalWidth?: number;
   originalHeight?: number;
@@ -29,7 +27,6 @@ const {
   height,
   align = 'center',
   objPos = 'center',
-  priority = false,
   sizes,
   originalWidth,
   originalHeight,
@@ -108,10 +105,10 @@ const imageWrapStyle = {
     <img
       src={src}
       alt={alt}
-      width={renderWidth}
-      height={renderHeight}
+      width={renderWidth || undefined}
+      height={renderHeight || undefined}
       sizes={computedSizes}
-      loading={priority ? 'eager' : 'lazy'}
+      loading="lazy"
       decoding="async"
       onerror={`this.onerror=null;this.src='${fallbackSrc}';`}
       onload="this.classList.remove('opacity-0')"

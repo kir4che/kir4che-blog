@@ -1,8 +1,8 @@
 // @ts-check
-import cloudflare from '@astrojs/cloudflare';
 import mdx from '@astrojs/mdx';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
+import vercel from '@astrojs/vercel';
 import tailwindcss from '@tailwindcss/vite';
 import expressiveCode from 'astro-expressive-code';
 import { defineConfig } from 'astro/config';
@@ -29,8 +29,7 @@ const srcDir = path.resolve(__dirname, 'src');
 
 export default defineConfig({
   site: env.PUBLIC_SITE_URL || 'https://kir4che.com',
-  output: 'static',
-  adapter: process.env.NODE_ENV === 'production' ? cloudflare() : undefined,
+  adapter: vercel(),
   build: {
     inlineStylesheets: 'always',
   },
@@ -66,11 +65,17 @@ export default defineConfig({
   i18n: {
     defaultLocale: 'tw',
     locales: ['tw', 'en'],
-    routing: 'manual',
+    routing: {
+      prefixDefaultLocale: true,
+      redirectToDefaultLocale: true,
+    },
   },
   integrations: [react(), expressiveCode(ecConfig), mdx(), sitemap()],
   markdown: {
     remarkPlugins: [remarkGfm, remarkIns, remarkMark, remarkCustomHeaderId, remarkImages],
     rehypePlugins: [rehypeUnwrapImages, rehypeSlug],
+  },
+  image: {
+    remotePatterns: [{ protocol: 'https', hostname: 'cdn.kir4che.com' }],
   },
 });

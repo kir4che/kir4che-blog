@@ -1,3 +1,5 @@
+export const prerender = true;
+
 import type { APIRoute } from 'astro';
 
 import { getLangStaticPaths } from '@/lib/i18n';

@@ -1,4 +1,6 @@
 ---
+export const prerender = true;
+
 import DecorativeImage from '@/components/ui/DecorativeImage.astro';
 import ExternalLink from '@/components/ui/ExternalLink.astro';
 import SiteLayout from '@/layouts/SiteLayout.astro';
@@ -6,6 +8,11 @@ import SiteLayout from '@/layouts/SiteLayout.astro';
 import { CONFIG } from '@/config';
 import youtubes from '@/data/youtubes';
 import { createTranslator, getLangStaticPaths, resolveLanguage } from '@/lib/i18n';
+
+import aboutImg from '@/assets/images/about-illustration.webp';
+import arrowsImg from '@/assets/images/arrows-illustration.webp';
+import butterflyImg2 from '@/assets/images/butterfly-illustration-2.webp';
+import butterflyImg1 from '@/assets/images/butterfly-illustration.webp';
 
 export const getStaticPaths = getLangStaticPaths;
 
@@ -16,16 +23,13 @@ const videos = Object.values(youtubes);
 
 <SiteLayout title={t('title')} description={t('description')}>
   <div class="bg-surface-secondary relative rounded-xl shadow">
+    <DecorativeImage src={butterflyImg1.src} class="absolute top-8 right-0 z-10 w-40 xl:right-8" />
     <DecorativeImage
-      src="/images/butterfly-illustration.webp"
-      class="absolute top-8 right-0 z-10 w-40 xl:right-8"
-    />
-    <DecorativeImage
-      src="/images/butterfly-illustration-2.webp"
+      src={butterflyImg2.src}
       class="absolute right-15 bottom-60 z-10 w-32 sm:right-75 md:right-48 lg:bottom-115 2xl:right-72"
     />
     <DecorativeImage
-      src="/images/about-illustration.webp"
+      src={aboutImg.src}
       class="absolute -right-8 -bottom-8 z-10 w-[50vw] max-sm:hidden md:-right-4 md:w-80"
     />
     <div class="relative z-20 space-y-6 px-8 py-6">
@@ -85,7 +89,7 @@ const videos = Object.values(youtubes);
         </ExternalLink>
         <div class="absolute bottom-3 left-44 -z-10">
           <div class="animate-bounce">
-            <DecorativeImage src="/images/arrows-illustration.webp" class="w-24 rotate-6" />
+            <DecorativeImage src={arrowsImg.src} class="w-24 rotate-6" />
           </div>
         </div>
       </section>
