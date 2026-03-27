@@ -1,16 +1,23 @@
 ---
+import type { MDXContent as MDXContentType } from 'astro';
+
 import type { Language, PostMeta } from '@/types';
 import { Copy, Share2 } from '@lucide/astro';
 
-import PostComments from '@/components/features/post/PostComments.astro';
+import PostComments from '@/components/features/post/PostComments';
 import PostLangMenu from '@/components/features/post/PostLangMenu.astro';
+import TripMap from '@/components/features/post/TripMap';
 import PostMetaInfo from '@/components/features/post/PostMetaInfo.astro';
-import PostPasswordGate from '@/components/features/post/PostPasswordGate.astro';
+import PostPasswordGate from '@/components/features/post/PostPasswordGate';
 import RelatedPosts from '@/components/features/post/RelatedPosts.astro';
-import Toc from '@/components/features/post/Toc.astro';
+import Toc from '@/components/features/post/Toc';
 import {
   Accordion,
+  Alert,
+  Badge,
+  Card,
   Correction,
+  FigureShell,
   H1,
   H2,
   H3,
@@ -29,25 +36,27 @@ import {
   Table,
   Video,
 } from '@/components/mdx';
+import Lightbox from '@/components/mdx/Lightbox';
 import CategoryBadge from '@/components/ui/CategoryBadge.astro';
 import KofiBtn from '@/components/ui/KofiBtn.astro';
 import SiteLayout from '@/layouts/SiteLayout.astro';
+import { isPostInCategory } from '@/lib/categories';
 import { createTranslator } from '@/lib/i18n';
 import { withLocalePrefix } from '@/lib/paths';
 import { normalizeTag } from '@/lib/tags';
 import { createDateFormatter, parseToISODate } from '@/utils/date';
 
-interface PostLayoutProps {
+interface Props {
   lang: Language;
   post: PostMeta;
   otherLangs?: Language[];
-  isLocked: boolean;
-  content?: unknown;
+  isProtected?: boolean;
+  content?: MDXContentType;
   headings?: { depth: number; slug: string; text: string }[];
   extraComponents?: Record<string, unknown>;
 }
 
-const props = Astro.props as Partial<PostLayoutProps>;
+const props = Astro.props;
 
 if (!props.post || !props.lang) throw new Error('PostLayout 至少需要提供 "post" 與 "lang" props。');
 
@@ -55,28 +64,34 @@ const {
   lang,
   post,
   otherLangs = [],
-  isLocked,
+  isProtected = false,
   content,
   headings = [],
   extraComponents,
-} = props as PostLayoutProps;
+} = props as Props;
+
+const BoundLink = (props: Parameters<typeof Link>[0]) => Link({ lang, ...props });
 
 const MDX_COMPONENTS = {
   Accordion,
+  Alert,
+  Badge,
+  Card,
   Correction,
+  FigureShell,
   h1: H1,
   h2: H2,
   h3: H3,
   h4: H4,
   h5: H5,
   h6: H6,
-  a: Link,
+  a: BoundLink,
   Highlight,
   Image,
   Images,
   ImagesItem,
   Kbd,
-  Link,
+  Link: BoundLink,
   Rating,
   SmallText,
   Table,
@@ -96,24 +111,44 @@ const tocHeadings = headings.map((h) => ({
   text: h.text,
   level: h.depth,
 }));
+
+const isTripPost = isPostInCategory(post, { tw: '旅遊', en: 'Trip' }, 'trip');
 ---
 
 <SiteLayout
-  title={isLocked ? tPost('passwordGate.title') : post.title}
-  description={isLocked ? tPost('passwordGate.description') : post.description}
+  title={isProtected ? tPost('passwordGate.title') : post.title}
+  description={isProtected ? tPost('passwordGate.description') : post.description}
 >
   {
-    post.coverImage && !isLocked && (
+    post.coverImage && !isProtected && (
       <link slot="head" rel="preload" href={post.coverImage} as="image" fetchpriority="high" />
     )
   }
   {
-    isLocked ? (
-      <PostPasswordGate slug={post.slug} lang={lang} />
-    ) : (
-      <>
-        <article class="bg-surface-secondary/80 rounded p-4 transition-all duration-300 md:p-6">
-          {post.coverImage && (
+    isProtected && (
+      <PostPasswordGate
+        client:load
+        slug={post.slug}
+        lang={lang}
+        backHref={withLocalePrefix('/archives', lang)}
+        texts={{
+          title: tPost('passwordGate.title'),
+          enterPassword: tPost('enterPassword'),
+          incorrectPassword: tPost('incorrectPassword'),
+          tooManyAttempts: tPost('tooManyAttempts'),
+          verifying: tCommon('button.verifying'),
+          submit: tCommon('button.submit'),
+          error: tPost('passwordGate.error'),
+          backToPosts: tPost('backToPosts'),
+        }}
+      />
+    )
+  }
+  <div data-protected-content class:list={[{ hidden: isProtected }]}>
+    <>
+      <article class="bg-surface-secondary/80 rounded p-4 transition-all duration-300 md:p-6">
+        {
+          post.coverImage && (
             <img
               src={post.coverImage}
               alt={`Cover image for ${post.title}`}
@@ -124,46 +159,61 @@ const tocHeadings = headings.map((h) => ({
               decoding="async"
               class="mb-3 h-45 w-full rounded-t object-cover object-[center_70%] sm:h-56 xl:h-68"
             />
-          )}
-          <header>
-            <h1 class="mb-4">{post.title}</h1>
-            <div class="flex-between flex-wrap gap-x-4 gap-y-1">
-              <CategoryBadge lang={lang} categories={post.categories ?? []} />
-              <div class="flex items-center gap-2 sm:gap-3">
-                <PostMetaInfo lang={lang} date={post.date} wordCount={post.wordCount} />
-                {otherLangs.length > 0 && publishedDate && (
+          )
+        }
+        <header>
+          <h1 class="mb-4">{post.title}</h1>
+          <div class="flex-between flex-wrap gap-x-4 gap-y-1">
+            <CategoryBadge lang={lang} categories={post.categories ?? []} />
+            <div class="flex items-center gap-2 sm:gap-3">
+              <PostMetaInfo lang={lang} date={post.date} wordCount={post.wordCount} />
+              {
+                otherLangs.length > 0 && publishedDate && (
                   <PostLangMenu
                     curLang={lang}
                     currSlug={post.slug}
                     langs={otherLangs}
                     t={tSettings}
                   />
-                )}
-              </div>
+                )
+              }
             </div>
-            {post.showUpdatedAt && updatedAt?.datetime && (
+          </div>
+          {
+            post.showUpdatedAt && updatedAt?.datetime && (
               <div class="flex justify-end text-xs text-gray-600 dark:text-white/70">
                 <time datetime={updatedAt.datetime}>
                   {tCommon('unit.updatedAt')} {updatedAt.display}
                 </time>
               </div>
-            )}
-          </header>
-          {content ? (
+            )
+          }
+        </header>
+        {
+          isTripPost && (post.places?.length ?? 0) > 0 && (
+            <TripMap client:visible places={post.places ?? []} />
+          )
+        }
+        {
+          content ? (
             <MDXContent
+              id="post-body"
+              lang={lang}
               Content={content}
               extraComponents={{ ...MDX_COMPONENTS, ...(extraComponents ?? {}) }}
             />
-          ) : null}
-          <div class="pt-8">
-            <PostComments slug={post.slug} hasPassword={false} />
-            <hr />
-            <footer>
-              <div class="space-y-4">
-                <p>{tPost('thanks')}</p>
-                <KofiBtn label={tCommon('kofiButton')} />
-              </div>
-              {post.tags?.length > 0 && (
+          ) : null
+        }
+        <div class="pt-8">
+          <PostComments client:visible slug={post.slug} hasPassword={isProtected} />
+          <hr />
+          <footer>
+            <div class="space-y-4">
+              <p>{tPost('thanks')}</p>
+              <KofiBtn label={tCommon('kofiButton')} />
+            </div>
+            {
+              post.tags?.length > 0 && (
                 <div class="flex flex-wrap gap-2 pt-4 pb-2">
                   {post.tags.map((tag) => {
                     const normalizedTag = normalizeTag(tag, lang);
@@ -180,34 +230,150 @@ const tocHeadings = headings.map((h) => ({
                     );
                   })}
                 </div>
-              )}
-              <div class="flex flex-wrap items-center justify-end gap-2 text-sm text-pink-700 dark:text-pink-200">
-                <button
-                  type="button"
-                  data-share-action="copy"
-                  aria-label={tPost('share.copyLink')}
-                  class="flex items-center gap-1 rounded border border-pink-200 px-3 py-1 transition-colors hover:border-pink-400 dark:border-pink-300/40 dark:hover:border-pink-200/70"
-                >
-                  <Copy size={16} aria-hidden="true" />
-                  {tPost('share.copyLink')}
-                </button>
-                <button
-                  type="button"
-                  data-share-action="native"
-                  aria-label={tPost('share.native')}
-                  class="flex items-center gap-1 rounded border border-pink-200 px-3 py-1 transition-colors hover:border-pink-400 dark:border-pink-300/40 dark:hover:border-pink-200/70"
-                >
-                  <Share2 size={16} aria-hidden="true" />
-                  {tPost('share.native')}
-                </button>
-                <span class="sr-only" role="status" aria-live="polite" data-share-feedback />
-              </div>
-            </footer>
-          </div>
-        </article>
-        <RelatedPosts lang={lang} currSlug={post.slug} categories={post.categories ?? []} />
-        <Toc lang={lang} headings={tocHeadings} />
-      </>
-    )
-  }
+              )
+            }
+            <div
+              class="flex flex-wrap items-center justify-end gap-2 text-sm text-pink-700 dark:text-pink-200"
+              data-msg-copied={tPost('share.copied')}
+              data-msg-copy-failed={tPost('share.copyFailed')}
+            >
+              <button
+                type="button"
+                data-share-action="copy"
+                aria-label={tPost('share.copyLink')}
+                class="flex items-center gap-1 rounded border border-pink-200 px-3 py-1 transition-colors hover:border-pink-400 dark:border-pink-300/40 dark:hover:border-pink-200/70"
+              >
+                <Copy size={16} aria-hidden="true" />
+                {tPost('share.copyLink')}
+              </button>
+              <button
+                type="button"
+                data-share-action="native"
+                aria-label={tPost('share.native')}
+                class="flex items-center gap-1 rounded border border-pink-200 px-3 py-1 transition-colors hover:border-pink-400 dark:border-pink-300/40 dark:hover:border-pink-200/70"
+              >
+                <Share2 size={16} aria-hidden="true" />
+                {tPost('share.native')}
+              </button>
+            </div>
+          </footer>
+        </div>
+      </article>
+      <RelatedPosts lang={lang} currSlug={post.slug} categories={post.categories ?? []} />
+      <Toc
+        client:idle
+        headings={tocHeadings}
+        title={tPost('toc.title')}
+        expandLabel={tPost('toc.expand')}
+        collapseLabel={tPost('toc.collapse')}
+      />
+    </>
+  </div>
+  <Lightbox client:load />
 </SiteLayout>
+
+<script>
+  import { LIGHTBOX_EVENT } from '@/components/mdx/Lightbox';
+  import { showToast } from '@/utils/toast';
+
+  let onVisibilityChange: (() => void) | null = null;
+
+  // 複製網址到剪貼簿
+  const copyToClipboard = async (url: string, msgCopied: string, msgCopyFailed: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      showToast(msgCopied, 'success');
+    } catch {
+      showToast(msgCopyFailed, 'error');
+    }
+  };
+
+  // 收集文章中所有圖片作為 lightbox slides，並標記元素。
+  let articleSlides: { src: string; alt?: string }[] = [];
+
+  const buildArticleSlides = () => {
+    const postBody = document.getElementById('post-body');
+    if (!postBody) return;
+
+    const allEls = Array.from(postBody.querySelectorAll<HTMLElement>('[data-lightbox-slides]'));
+
+    const seen = new Set<string>();
+    articleSlides = [];
+    const elToGlobalIndex = new Map<HTMLElement, number>();
+
+    for (const el of allEls) {
+      const localSlides: { src: string; alt?: string }[] = JSON.parse(
+        el.dataset.lightboxSlides ?? '[]'
+      );
+      const localIndex = Number(el.dataset.lightboxIndex ?? 0);
+      const slide = localSlides[localIndex];
+      if (!slide) continue;
+      if (!seen.has(slide.src)) {
+        seen.add(slide.src);
+        articleSlides.push(slide);
+      }
+      elToGlobalIndex.set(
+        el,
+        articleSlides.findIndex((s) => s.src === slide.src)
+      );
+    }
+
+    // 將 index 寫回元素，方便點擊時觸發正確的圖片。
+    for (const [el, idx] of elToGlobalIndex) {
+      el.dataset.lightboxGlobalIndex = String(idx);
+    }
+  };
+
+  buildArticleSlides();
+
+  // 點擊圖片時觸發 lightbox
+  document.addEventListener('click', (e) => {
+    const el = (e.target as Element).closest('[data-lightbox-slides]') as HTMLElement | null;
+    if (!el) return;
+    const index = Number(el.dataset.lightboxGlobalIndex ?? 0);
+    window.dispatchEvent(
+      new CustomEvent(LIGHTBOX_EVENT, { detail: { slides: articleSlides, index } })
+    );
+  });
+
+  // 每次頁面載入時執行
+  document.addEventListener('astro:page-load', () => {
+    if (onVisibilityChange) {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      onVisibilityChange = null;
+    }
+
+    // 使用者切換分頁時暫停/播放影片
+    const autoPlayVideos = document.querySelectorAll<HTMLVideoElement>(
+      'video[data-auto-play="true"]'
+    );
+    if (autoPlayVideos.length) {
+      onVisibilityChange = () => {
+        autoPlayVideos.forEach((v) => (document.hidden ? v.pause() : v.play().catch(() => {})));
+      };
+      document.addEventListener('visibilitychange', onVisibilityChange);
+    }
+
+    // 分享、複製按鈕
+    document.querySelectorAll<HTMLButtonElement>('[data-share-action]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const action = btn.dataset.shareAction;
+        const url = window.location.href;
+        const container = btn.closest<HTMLElement>('[data-msg-copied]');
+        const msgCopied = container?.dataset.msgCopied ?? '';
+        const msgCopyFailed = container?.dataset.msgCopyFailed ?? '';
+
+        if (action === 'copy') {
+          await copyToClipboard(url, msgCopied, msgCopyFailed);
+        } else if (action === 'native') {
+          // 系統不支援分享時改用複製
+          if (navigator.share) {
+            try {
+              await navigator.share({ url });
+            } catch {}
+          } else await copyToClipboard(url, msgCopied, msgCopyFailed);
+        }
+      });
+    });
+  });
+</script>

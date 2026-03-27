@@ -3,24 +3,24 @@ import { CalendarDays } from '@lucide/astro';
 
 import { createTranslator, resolveLanguage } from '@/lib/i18n';
 import { getLocalizedPostPath } from '@/lib/paths';
-import { getPostsInfo } from '@/lib/posts';
+import { getPostsMeta } from '@/lib/posts';
 import type { Language, PostMeta } from '@/types';
 import { createDateFormatter } from '@/utils/date';
 
-interface RelatedPostsProps {
+interface Props {
   lang: Language;
   currSlug: string;
   categories: string[];
 }
 
-const { lang, currSlug, categories } = Astro.props as RelatedPostsProps;
+const { lang, currSlug, categories } = Astro.props;
 
 const t = createTranslator(lang, 'PostPage');
 const locale = resolveLanguage(lang);
 const formatDate = createDateFormatter(locale, 'short');
 
 const categorySet = new Set(categories.map((c) => c?.trim()).filter(Boolean));
-const posts = categorySet.size > 0 ? await getPostsInfo(lang) : [];
+const posts = categorySet.size > 0 ? await getPostsMeta(lang) : [];
 
 const relatedPosts: PostMeta[] = posts.filter(
   (post) => post.slug !== currSlug && post.categories?.some((c) => categorySet.has(c?.trim()))

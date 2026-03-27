@@ -1,0 +1,42 @@
+---
+import { Lock } from '@lucide/astro';
+
+import PostMetaInfo from '@/components/features/post/PostMetaInfo.astro';
+import { getLocalizedPostPath } from '@/lib/paths';
+import type { Language, PostMeta } from '@/types';
+
+interface Props {
+  post: PostMeta;
+  lang: Language;
+}
+
+const { post, lang } = Astro.props;
+
+const href = getLocalizedPostPath({ lang, slug: post.slug });
+---
+
+<div class="group flex items-center gap-3 border-b border-gray-200 py-2.5 dark:border-gray-800">
+  <div class="flex-1">
+    <div class="flex-between mt-1.5 flex-wrap gap-2">
+      <div class="flex items-center gap-1.5">
+        {
+          post.protected && (
+            <Lock
+              size={14}
+              class="shrink-0 text-pink-600 dark:text-pink-400"
+              aria-label="Protected"
+            />
+          )
+        }
+        <a href={href} aria-label={`Read post: ${post.title}`}>
+          <h3
+            class="text-sm text-gray-900 group-hover:text-pink-700 dark:text-white dark:group-hover:text-pink-400"
+          >
+            {post.title}
+          </h3>
+        </a>
+      </div>
+      <PostMetaInfo lang={lang} date={post.date} class="text-xs" />
+    </div>
+  </div>
+</div>

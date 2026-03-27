@@ -5,4 +5,5 @@
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   })();
   document.documentElement.classList[theme === 'dark' ? 'add' : 'remove']('dark');
+  window.addEventListener('load', () => document.body.classList.remove('preload'), { once: true });
 </script>

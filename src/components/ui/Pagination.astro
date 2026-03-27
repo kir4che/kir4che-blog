@@ -2,7 +2,7 @@
 import type { LinkBuilder, Translator } from '@/types';
 import { ChevronLeft, ChevronRight } from '@lucide/astro';
 
-interface PaginationProps {
+interface Props {
   t: Translator;
   link: LinkBuilder;
   basePath?: string;
@@ -11,14 +11,7 @@ interface PaginationProps {
   totalPages: number;
 }
 
-const {
-  t,
-  link,
-  basePath = '',
-  page1Path,
-  currPage = 1,
-  totalPages,
-} = Astro.props as PaginationProps;
+const { t, link, basePath = '', page1Path, currPage = 1, totalPages } = Astro.props;
 if (!t || !link || totalPages <= 1) return null;
 
 const safeCurrent = Math.min(Math.max(currPage, 1), totalPages);
@@ -58,7 +51,10 @@ const buildPageHref = (page: number): string =>
 ---
 
 <div class="mt-auto">
-  <nav class="flex-center mt-8 gap-x-3 text-sm" aria-label={t('title')}>
+  <nav
+    class="flex items-center justify-end gap-x-3 py-4 text-sm max-lg:justify-center"
+    aria-label={t('title')}
+  >
     {
       safeCurrent > 1 && (
         <a href={buildPageHref(safeCurrent - 1)} aria-label={t('previous')}>

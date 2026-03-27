@@ -1,30 +1,17 @@
 ---
 export const prerender = true;
 
-import PostPreviewList from '@/components/features/post/preview/PostPreviewList.astro';
+import PostPreviewListArchive from '@/components/features/post/preview/PostPreviewListArchive.astro';
 import Pagination from '@/components/ui/Pagination.astro';
-import { DEFAULT_POSTS_PER_PAGE, SUPPORTED_LANGUAGES } from '@/config';
 import PostListLayout from '@/layouts/PostListLayout.astro';
 import { createTranslator, resolveLanguage } from '@/lib/i18n';
 import { paginate } from '@/lib/pagination';
 import { withLocalePrefix } from '@/lib/paths';
-import { getPostsInfo } from '@/lib/posts';
+import { getPostsMeta } from '@/lib/posts';
+import { getArchiveStaticPaths } from '@/lib/routing';
 import type { PostMeta } from '@/types';
 
-export async function getStaticPaths() {
-  const paths: { params: { lang: string; page: string | undefined } }[] = [];
-
-  for (const lang of SUPPORTED_LANGUAGES) {
-    const posts = await getPostsInfo(lang);
-    const totalPages = Math.ceil(posts.length / DEFAULT_POSTS_PER_PAGE) || 1;
-
-    for (let p = 1; p <= totalPages; p++) {
-      paths.push({ params: { lang, page: p === 1 ? undefined : String(p) } });
-    }
-  }
-
-  return paths;
-}
+export const getStaticPaths = getArchiveStaticPaths;
 
 const lang = resolveLanguage(Astro.params.lang);
 const t = createTranslator(lang, 'ArchivePage');
@@ -33,8 +20,8 @@ const link = (href: string) => withLocalePrefix(href, lang);
 
 const page = Astro.params.page ? parseInt(Astro.params.page, 10) : 1;
 
-const allPosts = await getPostsInfo(lang);
-const { items: paginatedPosts, currPage, totalPages } = paginate(allPosts, page);
+const allPosts = await getPostsMeta(lang);
+const { items: paginatedPosts, currPage, totalPages } = paginate(allPosts, page, 25);
 
 const postsByYear = paginatedPosts.reduce<Record<string, PostMeta[]>>((acc, post) => {
   const year = new Date(post.date).getFullYear();
@@ -50,21 +37,16 @@ const sortedEntries = Object.entries(postsByYear).sort(([a], [b]) => Number(b) -
 ---
 
 <PostListLayout title={t('title')} description={t('description')}>
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-6">
     {
       sortedEntries.map(([year, yearPosts]) => (
         <section aria-labelledby={`year-${year}`}>
-          <h2
-            id={`year-${year}`}
-            class="mb-2.5 text-base font-bold text-pink-500 dark:text-pink-200"
-          >
+          <h2 id={`year-${year}`} class="mb-2 text-base font-bold text-pink-500 dark:text-pink-200">
             {year}
           </h2>
-          <div class="space-y-4">
-            {yearPosts.map((post) => (
-              <PostPreviewList post={post} lang={lang} />
-            ))}
-          </div>
+          {yearPosts.map((post) => (
+            <PostPreviewListArchive post={post} lang={lang} />
+          ))}
         </section>
       ))
     }

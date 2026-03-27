@@ -1,35 +1,39 @@
 ---
-import ExternalLink from '@/components/ui/ExternalLink.astro';
+import ExternalLink from '@/components/ui/ExternalLink';
 import { CONFIG } from '@/config';
 ---
 
-<div class="flex flex-col items-center gap-y-2">
-  <p class="text-gray-800 dark:text-gray-400" aria-hidden="true">
-    ───────<span class="text-pink-600 dark:text-pink-300">୨ৎ</span>───────
-  </p>
-  <div class="flex-between gap-x-2.5 text-sm">
+<div class="flex w-full flex-col items-center gap-y-3">
+  <div class="flex w-full items-center gap-x-3" aria-hidden="true">
+    <div class="bg-foreground-primary/35 h-px flex-1"></div>
+    <span class="text-pink-600 dark:text-pink-300">୨ৎ</span>
+    <div class="bg-foreground-primary/35 h-px flex-1"></div>
+  </div>
+  <div class="flex w-full flex-wrap justify-evenly gap-x-2 gap-y-2 text-sm">
     <ExternalLink
       href="https://paypal.me/dcxxiii"
-      class="text-sm text-[#5DCEFF] hover:text-[#009cde] dark:text-[#5DCEFF]"
+      className="inline-flex items-center text-sm whitespace-nowrap text-[#5DCEFF] hover:text-[#8adcff] dark:text-[#5DCEFF]"
       noline
-      ariaLabel="Donate with PayPal"
+      aria-label="Donate with PayPal"
     >
-      <span aria-hidden="true">｡･: * </span>
+      <span aria-hidden="true">｡･: *&nbsp;</span>
       <span class="text-[#009cde] dark:text-[#5DCEFF]">PayPal</span>
-      <span aria-hidden="true"> ˚:✧｡･</span>
+      <span aria-hidden="true">&nbsp;˚:✧｡･</span>
     </ExternalLink>
     <ExternalLink
       href={`https://ko-fi.com/${CONFIG.siteInfo.name}`}
-      class="text-[#FB7364] hover:text-[#F74C37] dark:text-[#FB7364]"
+      className="inline-flex items-center whitespace-nowrap text-[#FB7364] hover:text-[#F74C37] dark:text-[#FB7364]"
       noline
-      ariaLabel="Support me on Ko-fi"
+      aria-label="Support me on Ko-fi"
     >
-      <span aria-hidden="true">｡･: * </span>
+      <span aria-hidden="true">｡･: *&nbsp;</span>
       <span class="text-[#F74C37] dark:text-[#FB7364]">Ko-fi</span>
-      <span aria-hidden="true"> ˚:✧｡･</span>
+      <span aria-hidden="true">&nbsp;˚:✧｡･</span>
     </ExternalLink>
   </div>
-  <p class="text-gray-800 dark:text-gray-400" aria-hidden="true">
-    ───────<span class="text-pink-600 dark:text-pink-300">୨ৎ</span>───────
-  </p>
+  <div class="flex w-full items-center gap-x-3" aria-hidden="true">
+    <div class="bg-foreground-primary/35 h-px flex-1"></div>
+    <span class="text-pink-600 dark:text-pink-300">୨ৎ</span>
+    <div class="bg-foreground-primary/35 h-px flex-1"></div>
+  </div>
 </div>

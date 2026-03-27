@@ -5,12 +5,25 @@ import { SUPPORTED_LANGUAGES } from '@/config';
 import { createTranslator, getLocaleFromUrl } from '@/lib/i18n';
 import { swapLocaleInPath } from '@/lib/paths';
 import type { Language } from '@/types';
+import { cn } from '@/utils/cn';
 
 interface Props {
-  id: string;
+  id?: string;
+  class?: string;
+  direction?: 'top' | 'bottom';
 }
 
-const { id } = Astro.props;
+const { id, class: className, direction = 'bottom' } = Astro.props;
+
+const directionClass = {
+  top: 'dropdown-top',
+  bottom: 'dropdown-bottom',
+}[direction];
+
+const marginClass =
+  direction === 'top'
+    ? "mb-2 before:absolute before:inset-x-0 before:-bottom-2 before:h-2 before:content-['']"
+    : "mt-2 before:absolute before:inset-x-0 before:-top-2 before:h-2 before:content-['']";
 
 const lang = getLocaleFromUrl(Astro.url);
 const t = createTranslator(lang, 'settings');
@@ -21,7 +34,7 @@ const buildPostHref = (l: Language) => {
 };
 ---
 
-<div class="dropdown dropdown-top dropdown-start" data-lang-menu>
+<div id={id} class={cn('dropdown dropdown-hover', directionClass, className)} data-lang-menu>
   <button
     type="button"
     class="flex items-center gap-x-1.5 hover:bg-inherit"
@@ -36,7 +49,10 @@ const buildPostHref = (l: Language) => {
   <ul
     id={id}
     role="menu"
-    class="dropdown-content menu bg-surface-secondary z-10 hidden w-24 rounded shadow-md md:w-32"
+    class={cn(
+      'dropdown-content menu bg-surface-secondary w-24 rounded pt-1.5 shadow-md md:w-32',
+      marginClass
+    )}
     data-lang-menu-list
   >
     {

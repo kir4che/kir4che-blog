@@ -3,14 +3,9 @@ export const prerender = false;
 
 import { UserRound, Lock } from '@lucide/astro';
 import AdminLayout from '@/layouts/AdminLayout.astro';
-import { isAuthenticated, setAdminSessionCookie, verifyAdminCredentials } from '@/lib/admin';
+import { isAuthenticated, setAdminSessionCookie, verifyAdminCredentials } from '@/lib/auth';
 
 let errorMessage = '';
-
-if (import.meta.env.DEV) {
-  await setAdminSessionCookie(Astro.cookies);
-  return Astro.redirect('/admin');
-}
 
 if (await isAuthenticated(Astro.cookies)) return Astro.redirect('/admin');
 

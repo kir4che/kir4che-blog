@@ -1,6 +1,11 @@
 import type { Language } from './i18n';
 
-interface TaxonomyBase {
+export interface TaxonomyItem {
+  slug: string;
+  label: string;
+}
+
+export interface TaxonomyBase {
   slug: string;
   name: Partial<Record<Language, string>>;
   postCount?: number;

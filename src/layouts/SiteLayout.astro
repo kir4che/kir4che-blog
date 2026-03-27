@@ -1,8 +1,11 @@
 ---
+import { TextAlignJustify } from '@lucide/astro';
+
 import { createTranslator, getLocaleFromUrl } from '@/lib/i18n';
 import { withLocalePrefix } from '@/lib/paths';
 import { getSidebarData } from '@/lib/sidebar';
 
+import SearchBar from '@/components/features/sidebar/SearchBar.tsx';
 import Footer from '@/components/layouts/Footer.astro';
 import Header from '@/components/layouts/Header.astro';
 import LeftSidebar from '@/components/layouts/LeftSidebar.astro';
@@ -14,43 +17,80 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 const { title, description, canonical, image, noindex } = Astro.props;
 
 const lang = getLocaleFromUrl(Astro.url);
-
 const tSearch = createTranslator(lang, 'common.search');
-const tProfile = createTranslator(lang, 'profile');
 const tNav = createTranslator(lang, 'nav');
+const tProfile = createTranslator(lang, 'profile');
 const tSidebar = createTranslator(lang, 'sidebar');
-
 const link = (href: string) => withLocalePrefix(href, lang);
 
 const { categories = [], tags = [], popularPosts = [] } = await getSidebarData(lang);
 const simplifiedTags = tags.map(({ name, slug }) => ({ name, slug }));
 ---
 
-<BaseLayout
-  title={title}
-  description={description}
-  canonical={canonical}
-  image={image}
-  noindex={noindex}
->
+<BaseLayout {title} {description} {canonical} {image} {noindex}>
   <StructuredData />
-  <div class="mx-auto flex max-w-screen-2xl flex-1 px-4 max-md:flex-col">
-    <LeftSidebar t={tProfile} />
-    <div class="flex w-full min-w-0 flex-1 gap-x-10">
-      <div class="flex min-h-dvh w-full min-w-0 flex-col">
+  <div
+    id="layout-container"
+    data-sidebar-open="false"
+    class="group/layout mx-auto flex max-w-screen-2xl flex-1 px-5 max-md:flex-col sm:px-6"
+  >
+    <div
+      id="sidebar-backdrop"
+      class="pointer-events-none fixed inset-0 z-40 bg-gray-900/60 opacity-0 transition-opacity duration-300 group-data-[sidebar-open=true]/layout:pointer-events-auto group-data-[sidebar-open=true]/layout:opacity-100 xl:hidden"
+    >
+    </div>
+    <LeftSidebar t={tProfile} lang={lang} />
+    <div id="main-content-wrapper" class="flex w-full min-w-0 flex-1 xl:gap-x-10">
+      <div class="flex min-h-dvh min-w-0 flex-1 flex-col">
         <Header>
-          <Navbar t={tNav} />
+          <div class="flex w-full flex-col">
+            <div class="flex w-full items-center gap-3 max-sm:flex-wrap sm:gap-4">
+              <Navbar t={tNav} />
+              <div>
+                <SearchBar
+                  client:idle
+                  collapsible
+                  basePath={link('/')}
+                  noResultsText={tSearch('noResults')}
+                  placeholder={tSearch('placeholder')}
+                />
+              </div>
+            </div>
+            <div class="flex w-full items-center justify-end gap-x-3 md:gap-x-4">
+              <div class="flex items-center gap-x-4">
+                <GlobalLangMenu class="max-md:hidden" />
+                <ThemeToggle
+                  translations={{
+                    light: tSettings('theme.light'),
+                    dark: tSettings('theme.dark'),
+                  }}
+                  iconOnly
+                />
+              </div>
+              <button
+                id="right-sidebar-toggle"
+                class="hover:text-primary transition-colors xl:hidden"
+                aria-label="Toggle Right Sidebar"
+              >
+                <TextAlignJustify size={18} aria-hidden="true" />
+              </button>
+            </div>
+          </div>
         </Header>
         <main class="flex-1">
           <slot />
         </main>
-        <Footer />
+        <footer class="flex-between py-6">
+          <GlobalLangMenu id="global-lang-menu-footer" class="md:hidden" direction="top" />
+          <p class="text-xs text-gray-400">
+            © 2024 - {new Date().getFullYear()}
+            {CONFIG.siteInfo.name}
+            <span class="text-pink-400 dark:text-pink-500">♥</span>
+          </p>
+        </footer>
       </div>
       <RightSidebar
-        tSearch={tSearch}
         tSidebar={tSidebar}
-        lang={lang}
-        link={link}
         categories={categories}
         tags={simplifiedTags}
         popularPosts={popularPosts}
@@ -58,3 +98,27 @@ const simplifiedTags = tags.map(({ name, slug }) => ({ name, slug }));
     </div>
   </div>
 </BaseLayout>
+
+<script>
+  const setupSidebar = () => {
+    const toggleBtn = document.getElementById('right-sidebar-toggle');
+    const container = document.getElementById('layout-container');
+    const backdrop = document.getElementById('sidebar-backdrop');
+
+    if (!toggleBtn || !container || toggleBtn.dataset.initialized === 'true') return;
+    toggleBtn.dataset.initialized = 'true';
+
+    const toggleMenu = () => {
+      const isOpen = container.dataset.sidebarOpen === 'true';
+      container.dataset.sidebarOpen = String(!isOpen);
+      document.body.style.overflow = !isOpen && window.innerWidth < 1280 ? 'hidden' : '';
+    };
+
+    toggleBtn.addEventListener('click', toggleMenu);
+    if (backdrop) backdrop.addEventListener('click', toggleMenu);
+  };
+
+  setupSidebar();
+
+  document.addEventListener('astro:page-load', setupSidebar);
+</script>

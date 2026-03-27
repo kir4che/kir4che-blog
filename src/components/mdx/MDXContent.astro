@@ -1,14 +1,15 @@
 ---
-import type { MDXComponents } from 'mdx/types';
+import type { MDXContent as MDXContentType } from 'astro';
 
-interface MDXContentProps {
-  Content: any;
-  extraComponents?: MDXComponents;
+interface Props {
+  id?: string;
+  Content: MDXContentType;
+  extraComponents?: Record<string, unknown>;
 }
 
-const { Content, extraComponents } = Astro.props as MDXContentProps;
+const { id, Content, extraComponents } = Astro.props;
 ---
 
-<section class="mdx-content">
+<section id={id} class="mdx-content">
   <Content components={extraComponents} />
 </section>

@@ -48,7 +48,7 @@ export default defineConfig({
       },
     },
     ssr: {
-      external: ['node:crypto'],
+      external: ['node:crypto', 'node:fs', 'node:fs/promises', 'node:path', 'fs', 'path'],
     },
     optimizeDeps: {
       include: [
@@ -65,10 +65,7 @@ export default defineConfig({
   i18n: {
     defaultLocale: 'tw',
     locales: ['tw', 'en'],
-    routing: {
-      prefixDefaultLocale: true,
-      redirectToDefaultLocale: true,
-    },
+    routing: 'manual',
   },
   integrations: [react(), expressiveCode(ecConfig), mdx(), sitemap()],
   markdown: {

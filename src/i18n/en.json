@@ -60,7 +60,7 @@
   },
   "sidebar": {
     "popularPosts": {
-      "title": "Popular Posts",
+      "title": "Featured Posts",
       "untitledPost": "Untitled Post"
     },
     "categories": "Categories",
@@ -81,7 +81,7 @@
   "HomePage": {
     "title": "Home",
     "description": "A personal blog sharing front-end development experience and everyday life, documenting learning journeys and daily moments. Welcome and enjoy reading.",
-    "announcement": "My blog has moved from Hugo to Next.js 🎉",
+    "announcement": "",
     "search": "Search Posts",
     "latestPosts": "Latest Posts",
     "morePosts": "More Posts",
@@ -95,8 +95,9 @@
     "personalInfo": {
       "job": "👩🏻‍💻 Currently working as a Front-end Developer",
       "mbti": "🦫 MBTI is a practical ISTJ (Logistician)",
-      "hobby": "🎮 Enjoys various games—Hearthstone, SF6, otome games—and also watches LoL esports.",
-      "hobby2": "🧶 Crocheting—currently challenging myself to make a vest."
+      "hobby": "🎮 Enjoys various games—Hearthstone, SF6, sandbox games—and also watches LoL esports.",
+      "hobby2": "🇯🇵 Recently got back into anime—really into Conan, YuYu Hakusho, Zatch Bell, and Gintama.",
+      "hobby3": "🧶 Crocheting—currently challenging myself to make a vest."
     },
     "vlogIntro": "I love trying new things, and recently started vlogging to document every moment of life.",
     "title_2": "💌 How to reach me:"
@@ -130,7 +131,9 @@
     },
     "share": {
       "copyLink": "Copy link",
-      "native": "Share to…"
+      "native": "Share to…",
+      "copied": "✓ Link copied!",
+      "copyFailed": "Failed to copy, please copy manually"
     }
   },
   "CategoriesPage": {

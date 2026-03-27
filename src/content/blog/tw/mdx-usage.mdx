@@ -204,3 +204,146 @@ function demo() {
 <br />
 
 <Correction wrong="錯誤的文字" correct="正確的文字" />
+
+---
+
+## Alert（提示框）
+
+<Alert type="tip">
+  這是一個提示框，用於展示有用的建議或技巧。
+</Alert>
+
+<Alert type="note">
+  這是一個備註框，用於展示補充說明或注意事項。
+</Alert>
+
+<Alert type="warning">
+  這是一個警告框，用於展示需要特別注意的重要信息。
+</Alert>
+
+<Alert type="error">
+  這是一個錯誤框，用於展示錯誤訊息或失敗的操作。
+</Alert>
+
+---
+
+## Badge（徽章）
+
+<Badge text="默認（藍色）" />
+
+<Badge text="紅色徽章" color="red" />
+
+<Badge text="黃色徽章" color="yellow" />
+
+<Badge text="橙色徽章" color="orange" />
+
+<Badge text="綠色徽章" color="green" />
+
+<Badge text="紫色徽章" color="purple" />
+
+<Badge text="粉紅色徽章" color="pink" />
+
+---
+
+## Card（卡片）
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <Card
+    title="受控元件"
+    subtitle="Controlled Component"
+    description="每次輸入都更新 state，React 掌握資料的『真相』。"
+  />
+  <Card
+    title="非受控元件"
+    subtitle="Uncontrolled Component"
+    description="資料留在 DOM 裡，需要時才用 ref 去取值。"
+  />
+</div>
+
+---
+
+## SmallText（小字體）
+
+<SmallText>這是一段使用 SmallText 元件的小字體文字，用於展示備註或次要資訊。</SmallText>
+
+---
+
+## Rating（評分）
+
+### 星星評分
+
+<Rating type="star" rating={4.5} size="md" />
+
+### 心形評分
+
+<Rating type="heart" rating={4} size="lg" />
+
+---
+
+## Video（視頻播放器）
+
+<Video 
+  src="https://commondatastorage.googleapis.com/gtv-videos-library/sample/big_buck_bunny.mp4"
+  title="Big Buck Bunny - 示例視頻"
+  width="100%"
+  height="400px"
+  controls
+/>
+
+### 自動播放的視頻（無聲）
+
+<Video 
+  src="https://commondatastorage.googleapis.com/gtv-videos-library/sample/big_buck_bunny.mp4"
+  title="自動播放視頻"
+  width="100%"
+  height="300px"
+  autoPlay
+  loop
+  muted
+/>
+
+---
+
+## FigureShell（圖形容器）
+
+<FigureShell title="使用 FigureShell 包裝內容">
+  <div className="bg-blue-100 dark:bg-blue-900 p-4 rounded-lg text-center">
+    這是被 FigureShell 包裝的內容區域
+  </div>
+</FigureShell>
+
+---
+
+## ImagesItem（圖片項目）
+
+ImagesItem 通常在 Images 元件內部使用，作為單個圖片/視頻項目的容器。可參考上面的 `Images` 使用範例。
+
+---
+
+## Lightbox（燈箱）
+
+Lightbox 組件會透過 Image/Images 元件自動觸發。點擊下面的圖片可以開啟燈箱全屏檢視：
+
+<Image
+  src="https://cdn.kir4che.com/deploy-express-typescript-to-vercel/server-folder-structure.webp"
+  alt="可點擊開啟燈箱的圖片"
+  title="server-folder-structure"
+  width="300px"
+  className="cursor-pointer"
+/>
+
+或手動使用 `openLightbox` 函數：
+
+```tsx
+import { openLightbox } from '@/components/mdx/Lightbox';
+
+const handleOpenLightbox = () => {
+  openLightbox({
+    slides: [
+      { src: 'https://example.com/image1.jpg', alt: '圖片 1' },
+      { src: 'https://example.com/image2.jpg', alt: '圖片 2' },
+    ],
+    index: 0,
+  });
+};
+```

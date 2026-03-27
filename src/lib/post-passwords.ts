@@ -1,5 +1,8 @@
+import { timingSafeEqual } from '@/utils/crypto';
+
 let passwordStore: Record<string, string> | null = null;
 
+// 取得密碼紀錄表
 const getStore = (): Record<string, string> => {
   if (!passwordStore) {
     try {
@@ -11,16 +14,6 @@ const getStore = (): Record<string, string> => {
   return passwordStore;
 };
 
-const timingSafeEqual = (a: string, b: string): boolean => {
-  const enc = new TextEncoder();
-  const bytesA = enc.encode(a);
-  const bytesB = enc.encode(b);
-  if (bytesA.length !== bytesB.length) return false;
-  let diff = 0;
-  for (let i = 0; i < bytesA.length; i++) diff |= bytesA[i] ^ bytesB[i];
-  return diff === 0;
-};
-
 // 驗證密碼
 export const verifyPostPassword = (input: string, stored: string): boolean => {
   try {
@@ -30,22 +23,23 @@ export const verifyPostPassword = (input: string, stored: string): boolean => {
   }
 };
 
-// 取得文章密碼
-export const getPostPassword = (postId: string): string | undefined => getStore()[postId];
+// 取得特定文章對應密碼
+export const getPostPassword = (postId: string): string | undefined =>
+  getStore()[postId] || import.meta.env.DEFAULT_POST_PASSWORD;
 
-// 設定/更新文章密碼
+// 設定或更新特定文章的密碼
 export const setPostPassword = (postId: string, password: string): void => {
   const store = getStore();
   store[postId] = password;
 };
 
-// 移除文章密碼
+// 移除特定文章的密碼
 export const removePostPassword = (postId: string): void => {
   const store = getStore();
   delete store[postId];
 };
 
-// 重命名 postId（slug 或語系變更時）
+// 重新命名紀錄表裡的文章 ID
 export const renamePostPassword = (oldId: string, newId: string): void => {
   if (oldId === newId) return;
 

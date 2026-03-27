@@ -4,7 +4,7 @@ export const prerender = true;
 import SiteLayout from '@/layouts/SiteLayout.astro';
 import { createTranslator, getLangStaticPaths, resolveLanguage } from '@/lib/i18n';
 import { withLocalePrefix } from '@/lib/paths';
-import { getPostsInfo } from '@/lib/posts';
+import { getPostsMeta } from '@/lib/posts';
 import { getTagsByPosts } from '@/lib/tags';
 
 export const getStaticPaths = getLangStaticPaths;
@@ -12,7 +12,7 @@ export const getStaticPaths = getLangStaticPaths;
 const lang = resolveLanguage(Astro.params.lang);
 const t = createTranslator(lang, 'TagsPage');
 
-const posts = await getPostsInfo(lang);
+const posts = await getPostsMeta(lang);
 const tags = getTagsByPosts(posts, undefined, lang);
 
 const localizedTags = tags.map((tag) => ({

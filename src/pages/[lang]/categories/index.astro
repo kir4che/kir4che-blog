@@ -5,7 +5,7 @@ import SiteLayout from '@/layouts/SiteLayout.astro';
 import { getAllCategoryByPosts, getCategoryStyle } from '@/lib/categories';
 import { createTranslator, getLangStaticPaths, resolveLanguage } from '@/lib/i18n';
 import { withLocalePrefix } from '@/lib/paths';
-import { getPostsInfo } from '@/lib/posts';
+import { getPostsMeta } from '@/lib/posts';
 import type { PostMeta } from '@/types';
 
 export const getStaticPaths = getLangStaticPaths;
@@ -16,7 +16,7 @@ const t = createTranslator(lang, 'CategoriesPage');
 let posts: PostMeta[] = [];
 
 try {
-  posts = await getPostsInfo(lang);
+  posts = await getPostsMeta(lang);
 } catch (err) {
   throw new Error(`讀取文章時發生錯誤: ${err instanceof Error ? err.message : '未知錯誤'}`);
 }

@@ -1,18 +1,22 @@
 ---
 export const prerender = true;
 
-import DecorativeImage from '@/components/ui/DecorativeImage.astro';
-import ExternalLink from '@/components/ui/ExternalLink.astro';
-import SiteLayout from '@/layouts/SiteLayout.astro';
-
 import { CONFIG } from '@/config';
 import youtubes from '@/data/youtubes';
 import { createTranslator, getLangStaticPaths, resolveLanguage } from '@/lib/i18n';
+
+import { Image, Images } from '@/components/mdx';
+import DecorativeImage from '@/components/ui/DecorativeImage.astro';
+import ExternalLink from '@/components/ui/ExternalLink';
+import SiteLayout from '@/layouts/SiteLayout.astro';
 
 import aboutImg from '@/assets/images/about-illustration.webp';
 import arrowsImg from '@/assets/images/arrows-illustration.webp';
 import butterflyImg2 from '@/assets/images/butterfly-illustration-2.webp';
 import butterflyImg1 from '@/assets/images/butterfly-illustration.webp';
+import booImg from '@/assets/images/cat-boo.webp';
+import huamiAndBooImg from '@/assets/images/cat-huami-and-boo.webp';
+import huamiImg from '@/assets/images/cat-huami.webp';
 
 export const getStaticPaths = getLangStaticPaths;
 
@@ -22,15 +26,15 @@ const videos = Object.values(youtubes);
 ---
 
 <SiteLayout title={t('title')} description={t('description')}>
-  <div class="bg-surface-secondary relative rounded-xl shadow">
+  <div class="bg-surface-secondary relative rounded-xl pb-10 shadow lg:pb-24">
     <DecorativeImage src={butterflyImg1.src} class="absolute top-8 right-0 z-10 w-40 xl:right-8" />
     <DecorativeImage
       src={butterflyImg2.src}
-      class="absolute right-15 bottom-60 z-10 w-32 sm:right-75 md:right-48 lg:bottom-115 2xl:right-72"
+      class="absolute right-5 bottom-150 z-10 w-32 md:right-12 lg:right-60 lg:bottom-165 2xl:right-72"
     />
     <DecorativeImage
       src={aboutImg.src}
-      class="absolute -right-8 -bottom-8 z-10 w-[50vw] max-sm:hidden md:-right-4 md:w-80"
+      class="absolute -right-8 -bottom-8 z-30 w-[50vw] md:-right-4 md:w-80"
     />
     <div class="relative z-20 space-y-6 px-8 py-6">
       <h2>{t('title')}</h2>
@@ -41,6 +45,7 @@ const videos = Object.values(youtubes);
           <li>{t('personalInfo.mbti')}</li>
           <li>{t('personalInfo.hobby')}</li>
           <li>{t('personalInfo.hobby2')}</li>
+          <li>{t('personalInfo.hobby3')}</li>
         </ul>
         <div class="space-y-2">
           <p>{t('vlogIntro')}</p>
@@ -63,7 +68,7 @@ const videos = Object.values(youtubes);
                       title={video.title}
                       loading="lazy"
                       referrerpolicy="strict-origin-when-cross-origin"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allow="accelerometer; autoPlay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowfullscreen
                       class="aspect-video size-full rounded"
                     />
@@ -78,20 +83,48 @@ const videos = Object.values(youtubes);
           </section>
         </div>
       </section>
-      <section class="relative space-y-2 xl:mb-36">
+      <section class="relative space-y-2.5">
         <h3 class="heading -ml-8">{t('title_2')}</h3>
         <ExternalLink
           href={`mailto:${CONFIG.siteInfo.email}`}
-          class="relative inline-block text-xl font-medium text-pink-600 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 after:ease-out hover:after:scale-x-100 dark:text-pink-300"
+          className="relative inline-block text-xl font-medium text-pink-600 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 after:ease-out hover:after:scale-x-100 dark:text-pink-300"
           noline
         >
           {CONFIG.siteInfo.email}
         </ExternalLink>
-        <div class="absolute bottom-3 left-44 -z-10">
+        <p>
+          這裡也可以找到我：<a
+            href="https://www.facebook.com/kir4che/"
+            target="_blank"
+            class="relative inline-block text-xl font-medium text-blue-600 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 after:ease-out hover:after:scale-x-100 dark:text-blue-400"
+            >FB</a
+          ><span class="text-xs">（雖然還沒開始經營）</span>
+        </p>
+        <div class="absolute bottom-8 left-48 -z-10">
           <div class="animate-bounce">
             <DecorativeImage src={arrowsImg.src} class="w-24 rotate-6" />
           </div>
         </div>
+      </section>
+      <section class="space-y-4">
+        <h3 class="heading -ml-8">曬貓</h3>
+        <p>家裡養了兩隻貓貓－花咪、小晡，霹靂可愛 (*´∀`)~🩷</p>
+        <Images
+          images={[
+            {
+              src: huamiImg.src,
+              alt: '花咪的照片',
+              title: '花咪',
+            },
+            {
+              src: booImg.src,
+              alt: '小晡的照片',
+              title: '小晡',
+            },
+          ]}
+          align="left"
+        />
+        <Image src={huamiAndBooImg.src} alt="花咪和小晡的照片" align="left" width={520} />
       </section>
     </div>
   </div>

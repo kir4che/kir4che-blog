@@ -1,6 +1,6 @@
 import { DEFAULT_LANGUAGE } from '@/config';
 import { getAllCategoryByPosts } from '@/lib/categories';
-import { getPostsInfo } from '@/lib/posts';
+import { getPostsMeta } from '@/lib/posts';
 import { getTagsByPosts } from '@/lib/tags';
 import type { Language, PostMeta, SidebarCategory, SidebarTag } from '@/types';
 
@@ -20,18 +20,22 @@ const isProd = import.meta.env.PROD;
 
 // 建立側邊欄資料
 const buildSidebarData = async (lang: Language): Promise<SidebarData> => {
-  const posts: PostMeta[] = (await getPostsInfo(lang)) ?? [];
+  const posts: PostMeta[] = (await getPostsMeta(lang)) ?? [];
 
   const rawCategories = getAllCategoryByPosts(posts);
 
-  const categories: SidebarCategory[] = rawCategories.map((c) => ({
-    slug: c.slug,
-    name: c.name[lang] ?? c.name[DEFAULT_LANGUAGE] ?? c.slug,
-    color: c.color,
-    postCount: c.postCount ?? 0,
-  }));
+  // 取前 15 個文章量最多的分類、標籤
+  const categories: SidebarCategory[] = rawCategories
+    .map((c) => ({
+      slug: c.slug,
+      name: c.name[lang] ?? c.name[DEFAULT_LANGUAGE] ?? c.slug,
+      color: c.color,
+      postCount: c.postCount ?? 0,
+    }))
+    .sort((a, b) => b.postCount - a.postCount)
+    .slice(0, 15);
 
-  const tags = getTagsByPosts(posts, undefined, lang);
+  const tags = getTagsByPosts(posts, 15, lang);
 
   const popularPosts = posts
     .filter((p) => p.featured)

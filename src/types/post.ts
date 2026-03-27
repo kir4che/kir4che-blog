@@ -3,6 +3,12 @@ import type { render } from 'astro:content';
 
 import type { Language } from './i18n';
 
+export interface TripPlace {
+  lat: number;
+  lng: number;
+  icon: string;
+}
+
 export interface PostMeta {
   slug: string;
   lang: Language;
@@ -15,6 +21,7 @@ export interface PostMeta {
   draft: boolean;
   protected?: boolean;
   coverImage?: string;
+  places?: TripPlace[];
   wordCount?: number;
   updatedAt?: string;
   showUpdatedAt?: boolean;

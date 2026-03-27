@@ -1,14 +1,12 @@
 ---
 export const prerender = false;
 
-import { ChevronLeft, Link } from '@lucide/astro';
-
-import { getAdminPost, isAuthenticated } from '@/lib/admin';
-import { toLocalISO } from '@/utils/date';
+import PostEditor from '@/components/features/admin/Editor';
+import { categoryMap, tagMap } from '@/config/taxonomy';
 import AdminLayout from '@/layouts/AdminLayout.astro';
-import EditorMetadata from '@/components/features/admin/EditorMetadata.astro';
-import EditorPreview from '@/components/features/admin/EditorPreview.astro';
-import EditorToolbar from '@/components/features/admin/EditorToolbar.astro';
+import { getAdminPost } from '@/lib/admin';
+import { isAuthenticated } from '@/lib/auth';
+import { toLocalISO } from '@/utils/date';
 
 if (!(await isAuthenticated(Astro.cookies))) return Astro.redirect('/admin/login');
 
@@ -19,531 +17,54 @@ if (id && !post) return Astro.redirect('/admin');
 
 const isEditing = !!post;
 const defaultDate = toLocalISO(isEditing ? post.meta.date : undefined);
-
 const previewUrl = post ? `/admin/preview?id=${post.id}` : '';
+
+const allCategories = Object.values(categoryMap).flatMap((cat) => {
+  const items = [{ slug: cat.slug, label: cat.name.tw ?? cat.slug }];
+  if (cat.subcategories)
+    items.push(
+      ...Object.values(cat.subcategories).map((sub) => ({
+        slug: sub.slug,
+        label: sub.name.tw ?? sub.slug,
+      }))
+    );
+  return items;
+});
+
+const allTags = Object.values(tagMap).map((tag) => ({
+  slug: tag.slug,
+  label: tag.name.tw ?? tag.slug,
+}));
+
+const postData = post
+  ? {
+      id: post.id,
+      slug: post.slug,
+      lang: post.lang,
+      title: post.meta.title,
+      content: post.content,
+      description: post.meta.description || '',
+      coverImage: post.meta.coverImage || '',
+      categories: post.meta.categories || [],
+      tags: post.meta.tags || [],
+      featured: post.meta.featured || false,
+      draft: post.meta.draft !== false,
+      showUpdatedAt: post.meta.showUpdatedAt || false,
+      protected: post.meta.protected || false,
+      updatedAt: post.meta.updatedAt || '',
+      date: post.meta.date?.toString() || '',
+    }
+  : null;
 ---
 
 <AdminLayout title={isEditing ? '編輯文章' : '新增文章'}>
-  <div class="bg-surface-primary flex h-screen flex-col overflow-hidden">
-    <form id="editor-form" class="flex h-full flex-col">
-      <input type="hidden" id="curr-id" name="id" value={post?.id || ''} />
-      <input
-        type="checkbox"
-        id="draft-input"
-        name="draft"
-        class="hidden"
-        checked={post?.meta.draft !== false}
-      />
-      <div class="navbar h-16 border-b px-4 shadow">
-        <a href="/admin" class="text-foreground-primary hover:text-primary" aria-label="返回">
-          <ChevronLeft size={20} aria-hidden="true" />
-        </a>
-        <input
-          type="text"
-          id="title-input"
-          name="title"
-          required
-          value={post?.meta.title || ''}
-          class:list={[
-            'input input-ghost focus:text-primary flex-1 text-lg font-bold sm:text-xl',
-            {
-              'opacity-50': post?.meta.draft,
-            },
-          ]}
-          placeholder="輸入文章標題..."
-        />
-        <div class="flex-center gap-3">
-          <EditorMetadata isEditing={isEditing} post={post} defaultDate={defaultDate} />
-          {
-            post?.meta.draft !== false ? (
-              <>
-                <button
-                  type="button"
-                  id="save-draft-btn"
-                  class="btn btn-sm bg-surface-secondary text-primary border-primary text-nowrap"
-                >
-                  儲存草稿
-                </button>
-                <button
-                  type="button"
-                  id="publish-btn"
-                  class="btn btn-primary border-primary text-surface-secondary btn-sm"
-                >
-                  <span id="publish-text">發布文章</span>
-                  <span id="publish-spinner" class="loading loading-spinner loading-xs hidden" />
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  id="update-btn"
-                  class="btn btn-sm bg-surface-secondary text-primary border-primary text-nowrap"
-                >
-                  <span id="update-text">更新</span>
-                  <span id="update-spinner" class="loading loading-spinner loading-xs hidden" />
-                </button>
-                <button
-                  type="button"
-                  id="unpublish-btn"
-                  class="btn btn-primary text-foreground-secondary btn-sm"
-                >
-                  取消發布
-                </button>
-              </>
-            )
-          }
-          <a
-            id="preview-link"
-            href={previewUrl}
-            target="_blank"
-            rel="noopener"
-            class:list={[
-              'text-foreground-primary hover:text-primary',
-              {
-                hidden: !previewUrl,
-              },
-            ]}
-            aria-label="預覽文章"
-          >
-            <Link size={20} aria-hidden="true" />
-          </a>
-        </div>
-      </div>
-      <div class="flex flex-1 overflow-hidden">
-        <div class="text-foreground-secondary relative flex h-full w-1/2 flex-col bg-gray-800">
-          <span
-            id="sync-status"
-            class="absolute top-5 right-6 z-10 size-2.5 rounded-full bg-green-400 shadow-sm transition-colors duration-300"
-            title="已同步"></span>
-          <EditorToolbar />
-          <textarea
-            name="content"
-            class="scrollbar-none w-full flex-1 resize-none p-6 text-base leading-relaxed outline-none"
-            placeholder="支援標準 Markdown 語法與自訂組件..."
-            spellcheck="false">{post?.content || ''}</textarea
-          >
-        </div>
-        <EditorPreview previewUrl={previewUrl} />
-      </div>
-    </form>
-  </div>
-  <script>
-    import { showToast } from '@/lib/toast';
-
-    type SyncState = 'success' | 'warning' | 'error';
-    type SaveMode = 'save' | 'draft' | 'publish';
-
-    const form = document.getElementById('editor-form') as HTMLFormElement | null;
-    const title = document.getElementById('title-input') as HTMLInputElement | null;
-    const draft = document.getElementById('draft-input') as HTMLInputElement | null;
-    const currId = document.getElementById('curr-id') as HTMLInputElement | null;
-    const sync = document.getElementById('sync-status') as HTMLSpanElement | null;
-    const content = document.querySelector(
-      'textarea[name="content"]'
-    ) as HTMLTextAreaElement | null;
-    const iframe = document.getElementById('preview-iframe') as HTMLIFrameElement | null;
-    const emptyPreview = document.getElementById('empty-preview') as HTMLElement | null;
-    const link = document.getElementById('preview-link') as HTMLAnchorElement | null;
-
-    const publishText = document.getElementById('publish-text') as HTMLElement | null;
-    const publishSpinner = document.getElementById('publish-spinner') as HTMLElement | null;
-    const updateText = document.getElementById('update-text') as HTMLElement | null;
-    const updateSpinner = document.getElementById('update-spinner') as HTMLElement | null;
-
-    const langInput = document.getElementById('lang-input') as HTMLSelectElement | null;
-    const backBtn = document.querySelector('a[aria-label="返回"]') as HTMLAnchorElement | null;
-
-    const syncColors: Record<SyncState, string> = {
-      success: 'bg-green-400',
-      warning: 'bg-yellow-400',
-      error: 'bg-red-400',
-    };
-    let currSyncState: SyncState | undefined;
-    let isDirty = false; // 追蹤是否有未儲存（推送）的變更
-
-    // 更新狀態燈的函式
-    const setSyncStatus = (text: string, state: SyncState = 'success'): void => {
-      if (!sync) return;
-      if (state !== currSyncState) {
-        if (currSyncState) sync.classList.remove(syncColors[currSyncState]);
-        sync.classList.add(syncColors[state]);
-        currSyncState = state;
-      }
-      sync.title = text;
-    };
-
-    // 表單驗證
-    const validateForm = (): string[] => {
-      const missing: string[] = [];
-      if (!title?.value.trim()) missing.push('標題');
-      if (!currId?.value && !langInput?.value) missing.push('語言');
-      return missing;
-    };
-
-    interface DraftData {
-      title: string;
-      content: string;
-      slug: string;
-      lang: string;
-      date: string;
-      description: string;
-      tags: string;
-      categories: string;
-      featured: boolean;
-      showUpdatedAt: boolean;
-      protected: boolean;
-      coverImage: string;
-      savedAt: number; // 記錄存檔時間
-    }
-
-    const getDraftKey = (): string =>
-      currId?.value ? `admin-draft-${currId.value}` : 'admin-draft-new';
-
-    const collectDraft = (): DraftData => ({
-      title: title?.value || '',
-      content: content?.value || '',
-      slug: (document.getElementById('slug-input') as HTMLInputElement | null)?.value || '',
-      lang: langInput?.value || '',
-      date: (document.getElementById('date-input') as HTMLInputElement | null)?.value || '',
-      description:
-        (document.getElementById('desc-input') as HTMLTextAreaElement | null)?.value || '',
-      tags: (document.getElementById('tags-input') as HTMLInputElement | null)?.value || '',
-      categories: (document.getElementById('cat-input') as HTMLInputElement | null)?.value || '',
-      featured:
-        (document.querySelector('input[name="featured"]') as HTMLInputElement | null)?.checked ??
-        false,
-      showUpdatedAt:
-        (document.getElementById('show-updated-at') as HTMLInputElement | null)?.checked ?? false,
-      protected:
-        (document.getElementById('has-password') as HTMLInputElement | null)?.checked ?? false,
-      coverImage:
-        (document.getElementById('cover-url-input') as HTMLInputElement | null)?.value || '',
-      savedAt: Date.now(),
-    });
-
-    const saveToLocal = (): void => {
-      try {
-        localStorage.setItem(getDraftKey(), JSON.stringify(collectDraft()));
-        setSyncStatus('已自動儲存', 'success');
-      } catch {
-        setSyncStatus('自動儲存失敗', 'error');
-      }
-    };
-
-    const restoreFromLocal = (data: DraftData): void => {
-      if (title) title.value = data.title;
-      if (content) content.value = data.content;
-
-      const slugInput = document.getElementById('slug-input') as HTMLInputElement | null;
-      const dateInput = document.getElementById('date-input') as HTMLInputElement | null;
-      const descInput = document.getElementById('desc-input') as HTMLTextAreaElement | null;
-      const tagsInput = document.getElementById('tags-input') as HTMLInputElement | null;
-      const catInput = document.getElementById('cat-input') as HTMLInputElement | null;
-      const featuredInput = document.querySelector(
-        'input[name="featured"]'
-      ) as HTMLInputElement | null;
-      const showUpdatedAtInput = document.getElementById(
-        'show-updated-at'
-      ) as HTMLInputElement | null;
-      const protectedInput = document.getElementById('has-password') as HTMLInputElement | null;
-      const coverUrlInput = document.getElementById('cover-url-input') as HTMLInputElement | null;
-
-      if (slugInput && !slugInput.disabled) slugInput.value = data.slug;
-      if (langInput && !langInput.disabled && data.lang) langInput.value = data.lang;
-      if (dateInput && data.date) dateInput.value = data.date;
-      if (descInput) descInput.value = data.description;
-      if (tagsInput) tagsInput.value = data.tags;
-      if (catInput) catInput.value = data.categories;
-      if (featuredInput) featuredInput.checked = data.featured;
-
-      if (showUpdatedAtInput) {
-        showUpdatedAtInput.checked = data.showUpdatedAt;
-        showUpdatedAtInput.dispatchEvent(new Event('change'));
-      }
-      if (protectedInput) protectedInput.checked = data.protected;
-      if (coverUrlInput) {
-        coverUrlInput.value = data.coverImage;
-        coverUrlInput.dispatchEvent(new Event('input'));
-      }
-    };
-
-    const DRAFT_PREFIX = 'admin-draft-';
-    const MAX_AGE_MS = 3 * 24 * 60 * 60 * 1000; // 保留 3 天
-
-    // 清理過期草稿
-    const cleanupOldDrafts = (): void => {
-      const now = Date.now();
-      const keysToRemove: string[] = [];
-
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith(DRAFT_PREFIX)) {
-          if (key === getDraftKey()) continue;
-          try {
-            const item = localStorage.getItem(key);
-            if (!item) continue;
-            const data = JSON.parse(item) as Partial<DraftData>;
-            if (!data.savedAt || now - data.savedAt > MAX_AGE_MS) keysToRemove.push(key);
-          } catch (e) {
-            keysToRemove.push(key);
-          }
-        }
-      }
-      keysToRemove.forEach((key) => localStorage.removeItem(key));
-      if (keysToRemove.length > 0) {
-        console.log(`[Editor GC] 已清理 ${keysToRemove.length} 筆過期草稿。`);
-      }
-    };
-
-    cleanupOldDrafts();
-
-    // 頁面剛載入時，先檢查有沒有這篇之前的草稿，有的話就幫你還原。
-    const stored = localStorage.getItem(getDraftKey());
-    if (stored) {
-      try {
-        restoreFromLocal(JSON.parse(stored) as DraftData);
-        showToast('已從本地草稿還原！', 'success');
-      } catch {
-        localStorage.removeItem(getDraftKey());
-      }
-    }
-
-    // 自動儲存機制，且用 debounce 避免輸入過快導致頻繁儲存。
-    let saveTimeout: ReturnType<typeof setTimeout> | undefined;
-
-    const scheduleSave = (): void => {
-      setSyncStatus('編輯中...', 'warning');
-      clearTimeout(saveTimeout);
-      saveTimeout = setTimeout(saveToLocal, 1500);
-    };
-
-    form?.addEventListener('input', () => {
-      isDirty = true;
-      scheduleSave();
-    });
-    form?.addEventListener('change', () => {
-      isDirty = true;
-      scheduleSave();
-    });
-
-    // 當使用者按下「發布」或「更新」按鈕時，將資料透過 API 存入 GitHub
-    let isSaving = false;
-    const triggerSave = async ({ mode }: { mode?: SaveMode } = {}): Promise<boolean> => {
-      if (!form) return false;
-
-      if (isSaving) {
-        let waited = 0;
-        while (isSaving && waited < 10000) {
-          await new Promise((r) => setTimeout(r, 100));
-          waited += 100;
-        }
-      }
-
-      const missing = validateForm();
-      if (missing.length > 0) {
-        showToast(`請填寫必填欄位：${missing.join('、')}！`, 'error');
-        return false;
-      }
-
-      isSaving = true;
-      let success = false;
-
-      if (mode === 'publish') {
-        publishText?.classList.add('hidden');
-        publishSpinner?.classList.remove('hidden');
-      } else if (mode === 'save' && !draft?.checked) {
-        updateText?.classList.add('hidden');
-        updateSpinner?.classList.remove('hidden');
-      }
-
-      setSyncStatus('推送中...', 'warning');
-
-      try {
-        const formData = new FormData(form);
-        formData.set('draft', draft?.checked ? 'true' : 'false');
-
-        const id = formData.get('id')?.toString() || '';
-        const res = await fetch(`/api/admin/posts${id ? `/${encodeURIComponent(id)}` : ''}`, {
-          method: id ? 'PUT' : 'POST',
-          body: formData,
-        });
-
-        const result = (await res.json()) as {
-          id?: string;
-          lang?: string;
-          slug?: string;
-          message?: string;
-        };
-
-        if (!res.ok) throw new Error(result.message || '推送失敗！');
-
-        setSyncStatus('已同步 GitHub', 'success');
-        isDirty = false;
-
-        if (!id && result.id && result.lang && result.slug) {
-          window.history.replaceState(
-            null,
-            '',
-            `/admin/editor?id=${encodeURIComponent(result.id)}`
-          );
-          if (currId) currId.value = result.id;
-          if (langInput) langInput.disabled = true;
-
-          const oldDraft = localStorage.getItem('admin-draft-new');
-          if (oldDraft) {
-            localStorage.setItem(`admin-draft-${result.id}`, oldDraft);
-            localStorage.removeItem('admin-draft-new');
-          }
-
-          const nextPreviewUrl = `/admin/preview?id=${result.lang}/${result.slug}`;
-          emptyPreview?.classList.add('hidden');
-          if (iframe) {
-            iframe.src = nextPreviewUrl;
-            iframe.classList.remove('hidden');
-          }
-          if (link) {
-            link.href = nextPreviewUrl;
-            link.classList.remove('hidden');
-          }
-        } else if (id && iframe && !iframe.classList.contains('hidden'))
-          iframe.contentWindow?.location.reload();
-
-        saveToLocal();
-        showToast('已推送至 GitHub！', 'success');
-        success = true;
-      } catch (err) {
-        setSyncStatus('推送失敗！', 'error');
-        showToast(err instanceof Error ? err.message : '推送失敗！', 'error');
-      } finally {
-        isSaving = false;
-        publishText?.classList.remove('hidden');
-        publishSpinner?.classList.add('hidden');
-        updateText?.classList.remove('hidden');
-        updateSpinner?.classList.add('hidden');
-      }
-      return success;
-    };
-
-    // 編輯器跟預覽畫面同步捲動位置
-    const syncScroll = (): void => {
-      if (!content || !iframe?.contentWindow) return;
-      const { scrollTop, scrollHeight, clientHeight } = content;
-      const maxScroll = scrollHeight - clientHeight;
-      if (maxScroll <= 0) return;
-
-      const ratio = scrollTop / maxScroll;
-      const iframeBody = iframe.contentDocument?.body;
-      if (!iframeBody) return;
-
-      const iframeMax = iframeBody.scrollHeight - iframe.clientHeight;
-      iframe.contentWindow.scrollTo({ top: ratio * iframeMax, behavior: 'instant' });
-    };
-    content?.addEventListener('scroll', syncScroll);
-
-    // === 編輯器快捷鍵綁定 ===
-    const isMac =
-      typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    const isModPressed = (e: KeyboardEvent): boolean => (isMac ? e.metaKey : e.ctrlKey);
-
-    content?.addEventListener('keydown', (e) => {
-      if (!isModPressed(e)) return;
-
-      const key = e.key.toLowerCase();
-      if (key >= '1' && key <= '6') {
-        e.preventDefault();
-
-        const level = parseInt(key, 10);
-        const newHashes = '#'.repeat(level) + ' ';
-
-        const val = content.value;
-        const selStart = content.selectionStart ?? 0;
-        const selEnd = content.selectionEnd ?? 0;
-
-        const lineStart = val.lastIndexOf('\n', selStart - 1) + 1;
-        let lineEnd = val.indexOf('\n', selStart);
-        if (lineEnd === -1) lineEnd = val.length;
-        const currLine = val.substring(lineStart, lineEnd);
-
-        const match = currLine.match(/^#+\s*/);
-        const oldMatchLength = match ? match[0].length : 0;
-
-        // 使用 setRangeText 替代廢棄的 document.execCommand
-        content.setRangeText(newHashes, lineStart, lineStart + oldMatchLength);
-
-        const calcNewPos = (pos: number) => {
-          if (pos < lineStart + oldMatchLength) return lineStart + newHashes.length;
-          return pos - oldMatchLength + newHashes.length;
-        };
-
-        // 重新設定游標並觸發 input 事件以觸發自動儲存與預覽
-        content.setSelectionRange(calcNewPos(selStart), calcNewPos(selEnd));
-        content.focus();
-        content.dispatchEvent(new Event('input', { bubbles: true }));
-
-        return;
-      }
-    });
-
-    // 離開確認，避免誤觸導致草稿遺失。
-    backBtn?.addEventListener('click', (e) => {
-      if (isDirty) {
-        const confirmLeave = window.confirm('您有未儲存的變更。確定要離開並捨棄草稿嗎？');
-        if (!confirmLeave) {
-          e.preventDefault();
-          return;
-        }
-      }
-      // 確定離開後，清空草稿。
-      localStorage.removeItem(getDraftKey());
-    });
-
-    window.addEventListener('beforeunload', (e) => {
-      if (isDirty) e.preventDefault();
-    });
-
-    // 儲存草稿
-    document.getElementById('save-draft-btn')?.addEventListener('click', () => {
-      if (draft) draft.checked = true;
-      clearTimeout(saveTimeout);
-      void triggerSave({ mode: 'save' });
-    });
-
-    // 更新文章
-    document.getElementById('update-btn')?.addEventListener('click', () => {
-      if (draft) draft.checked = false;
-      clearTimeout(saveTimeout);
-      void triggerSave({ mode: 'save' });
-    });
-
-    // 發布文章
-    document.getElementById('publish-btn')?.addEventListener('click', () => {
-      const missing = validateForm();
-      if (missing.length > 0) {
-        showToast(`請填寫必填欄位：${missing.join('、')}`, 'error');
-        return;
-      }
-      if (!window.confirm('確定要發布這篇文章嗎？')) return;
-
-      if (draft) draft.checked = false;
-      clearTimeout(saveTimeout);
-
-      void triggerSave({ mode: 'publish' }).then((success) => {
-        if (success) setTimeout(() => window.location.reload(), 500);
-        else if (draft) draft.checked = true;
-      });
-    });
-
-    // 取消發布
-    document.getElementById('unpublish-btn')?.addEventListener('click', () => {
-      if (draft) draft.checked = true;
-      clearTimeout(saveTimeout);
-      void triggerSave({ mode: 'draft' }).then((success) => {
-        if (success) {
-          showToast('已退回草稿！即將重新載入頁面...', 'success');
-          setTimeout(() => window.location.reload(), 1000);
-        } else draft && (draft.checked = true);
-      });
-    });
-  </script>
+  <PostEditor
+    client:load
+    post={postData}
+    isEditing={isEditing}
+    defaultDate={defaultDate}
+    previewUrl={previewUrl}
+    allCategories={allCategories}
+    allTags={allTags}
+  />
 </AdminLayout>

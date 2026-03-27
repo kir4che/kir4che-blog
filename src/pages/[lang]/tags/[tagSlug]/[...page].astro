@@ -1,38 +1,18 @@
 ---
 export const prerender = true;
 
-import PostPreviewList from '@/components/features/post/preview/PostPreviewList.astro';
+import PostPreviewCard from '@/components/features/post/preview/PostPreviewCard.astro';
 import Pagination from '@/components/ui/Pagination.astro';
-import { DEFAULT_POSTS_PER_PAGE, SUPPORTED_LANGUAGES } from '@/config';
 import PostListLayout from '@/layouts/PostListLayout.astro';
 import { createTranslator, resolveLanguage } from '@/lib/i18n';
 import { paginate } from '@/lib/pagination';
 import { withLocalePrefix } from '@/lib/paths';
-import { getPostsInfo } from '@/lib/posts';
-import { getTagDisplayName, getTagsByPosts } from '@/lib/tags';
+import { getPostsMeta } from '@/lib/posts';
+import { getTagStaticPaths } from '@/lib/routing';
+import { getTagDisplayName } from '@/lib/tags';
 import { slugify } from '@/utils/slug';
 
-export async function getStaticPaths() {
-  const paths: { params: { lang: string; tagSlug: string; page: string | undefined } }[] = [];
-
-  for (const lang of SUPPORTED_LANGUAGES) {
-    const posts = await getPostsInfo(lang);
-    const tags = getTagsByPosts(posts, undefined, lang);
-
-    for (const tag of tags) {
-      const taggedPosts = posts.filter((post) =>
-        post.tags.some((raw) => slugify(raw) === tag.slug)
-      );
-      const totalPages = Math.ceil(taggedPosts.length / DEFAULT_POSTS_PER_PAGE) || 1;
-
-      for (let p = 1; p <= totalPages; p++) {
-        paths.push({ params: { lang, tagSlug: tag.slug, page: p === 1 ? undefined : String(p) } });
-      }
-    }
-  }
-
-  return paths;
-}
+export const getStaticPaths = getTagStaticPaths;
 
 const lang = resolveLanguage(Astro.params.lang);
 const t = createTranslator(lang, 'TagsPage');
@@ -41,7 +21,7 @@ const link = (href: string) => withLocalePrefix(href, lang);
 const tagSlug = Astro.params.tagSlug as string;
 const page = Astro.params.page ? parseInt(Astro.params.page, 10) : 1;
 
-const allPosts = await getPostsInfo(lang);
+const allPosts = await getPostsMeta(lang);
 const taggedPosts = allPosts.filter((post) => post.tags.some((raw) => slugify(raw) === tagSlug));
 
 const { items, currPage, totalPages, totalItems } = paginate(taggedPosts, page);
@@ -59,7 +39,7 @@ const tagName = getTagDisplayName(tagSlug, originalTagName, lang);
     </span>
   </h1>
   <section class="space-y-4">
-    {items.map((post) => <PostPreviewList post={post} lang={lang} />)}
+    {items.map((post) => <PostPreviewCard post={post} lang={lang} hideImage />)}
   </section>
   {
     totalPages > 1 && (

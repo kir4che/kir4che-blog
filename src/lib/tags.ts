@@ -23,8 +23,6 @@ export const getTagsByPosts = (
 
   // 逐篇文章處理
   for (const post of posts) {
-    if (!Array.isArray(post.tags)) continue;
-
     // 逐一處理文章內的標籤
     for (const rawTag of post.tags) {
       const original = rawTag?.trim();
