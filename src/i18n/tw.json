@@ -60,7 +60,7 @@
   },
   "sidebar": {
     "popularPosts": {
-      "title": "熱門文章",
+      "title": "精選文章",
       "untitledPost": "無標題文章"
     },
     "categories": "文章分類",
@@ -81,7 +81,7 @@
   "HomePage": {
     "title": "首頁",
     "description": "分享前端開發經驗與生活記錄的個人部落格，記錄我的學習歷程與日常生活點滴，歡迎閱讀。",
-    "announcement": "我的部落格已從 Next.js 搬家到 Astro 啦 🎉",
+    "announcement": "",
     "search": "搜尋文章",
     "latestPosts": "最新文章",
     "morePosts": "更多文章",
@@ -95,8 +95,9 @@
     "personalInfo": {
       "job": "👩🏻‍💻 目前是一名前端工程師",
       "mbti": "🦫 MBTI 是務實的 ISTJ（物流師）",
-      "hobby": "🎮 愛玩各種遊戲，爐石、快打、乙游...也有在看 LOL 的比賽。",
-      "hobby2": "🧶 喜歡鉤織，最近的挑戰是織背心～"
+      "hobby": "🎮 愛玩各種遊戲，爐石、快打、沙盒類遊戲...也有在看 LOL 的比賽。",
+      "hobby2": "🇯🇵 最近重拾動漫，最愛柯南、幽白、賈修、銀魂。",
+      "hobby3": "🧶 喜歡鉤織，最近的挑戰是織衣服～"
     },
     "vlogIntro": "喜歡嘗試很多事情，最近開始拍 Vlog 想要紀錄生活的每一刻。",
     "title_2": "💌 如何聯繫我："
@@ -130,7 +131,9 @@
     },
     "share": {
       "copyLink": "複製連結",
-      "native": "分享至..."
+      "native": "分享至...",
+      "copied": "✓ 已複製連結",
+      "copyFailed": "複製失敗，請手動複製網址"
     }
   },
   "CategoriesPage": {

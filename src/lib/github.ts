@@ -1,118 +1,94 @@
+import type { Language } from '@/types';
+
+import { fromBase64, toBase64 } from '@/utils/encoding';
+
 const GITHUB_API_BASE = 'https://api.github.com';
 
-const getConfig = () => {
-  const token = import.meta.env.GITHUB_TOKEN;
-  const owner = import.meta.env.GITHUB_OWNER;
-  const repo = import.meta.env.GITHUB_REPO;
-  const branch = import.meta.env.GITHUB_BRANCH || 'main';
+let _config: { token: string; owner: string; repo: string; branch: string } | null = null;
 
-  if (!token || !owner || !repo)
+const getConfig = () => {
+  if (_config) return _config;
+
+  const { GITHUB_TOKEN, GITHUB_OWNER, GITHUB_REPO, GITHUB_BRANCH = 'main' } = import.meta.env;
+
+  if (!GITHUB_TOKEN || !GITHUB_OWNER || !GITHUB_REPO)
     throw new Error('缺少必要的 GitHub 環境變數: GITHUB_TOKEN, GITHUB_OWNER, GITHUB_REPO');
 
-  return { token, owner, repo, branch };
+  return (_config = {
+    token: GITHUB_TOKEN,
+    owner: GITHUB_OWNER,
+    repo: GITHUB_REPO,
+    branch: GITHUB_BRANCH,
+  });
 };
 
-const githubHeaders = (token: string) => ({
-  Authorization: `token ${token}`,
+const getHeaders = (token: string) => ({
+  Authorization: `Bearer ${token}`,
   Accept: 'application/vnd.github.v3+json',
   'Content-Type': 'application/json',
 });
 
-export interface GithubFile {
-  name: string;
-  path: string;
-  sha: string;
-  content: string;
-}
+export const getGithubFilePath = (lang: Language, slug: string) =>
+  `src/content/blog/${lang}/${slug}.mdx`;
 
-export interface GithubDirEntry {
-  name: string;
-  path: string;
-  sha: string;
-  type: 'file' | 'dir';
-}
-
-// 解碼 GitHub 的 Base64 內容
-const decodeBase64 = (encoded: string): string =>
-  Buffer.from(encoded.replace(/\n/g, ''), 'base64').toString('utf-8');
-
-// GET
-export const getGithubFile = async (filePath: string): Promise<GithubFile | null> => {
+const githubRequest = async (path: string, options: RequestInit = {}) => {
   const { token, owner, repo, branch } = getConfig();
-  const res = await fetch(
-    `${GITHUB_API_BASE}/repos/${owner}/${repo}/contents/${filePath}?ref=${branch}`,
-    { headers: githubHeaders(token) }
-  );
+
+  const url = new URL(`${GITHUB_API_BASE}/repos/${owner}/${repo}/contents/${path}`);
+
+  if (!options.method || options.method === 'GET') url.searchParams.set('ref', branch);
+
+  const res = await fetch(url.toString(), {
+    ...options,
+    headers: { ...getHeaders(token), ...options.headers },
+  });
 
   if (res.status === 404) return null;
 
-  if (!res.ok)
-    throw new Error(`GitHub GET 請求失敗 (${filePath}): ${res.status} ${await res.text()}`);
+  if (!res.ok) throw new Error(`GitHub ${options.method || 'GET'} 失敗 (${path}): ${res.status}`);
+
+  return res;
+};
+
+// 讀取單一檔案
+export const getGithubFile = async (filePath: string) => {
+  const res = await githubRequest(filePath);
+  if (!res) return null;
 
   const data = await res.json();
+
   return {
-    name: data.name,
-    path: data.path,
-    sha: data.sha,
-    content: decodeBase64(data.content),
+    ...data,
+    content: fromBase64(data.content),
   };
 };
 
-// 取得目錄列表
-export const listGithubDir = async (dirPath: string): Promise<GithubDirEntry[]> => {
-  const { token, owner, repo, branch } = getConfig();
-  const res = await fetch(
-    `${GITHUB_API_BASE}/repos/${owner}/${repo}/contents/${dirPath}?ref=${branch}`,
-    { headers: githubHeaders(token) }
-  );
-
-  if (res.status === 404) return [];
-  if (!res.ok) throw new Error(`GitHub LIST 請求失敗 (${dirPath}): ${res.status}`);
-
-  return res.json();
+export const listGithubDir = async (dirPath: string) => {
+  const res = await githubRequest(dirPath);
+  return res ? await res.json() : [];
 };
 
-// PUT
+// 新增或更新檔案
 export const putGithubFile = async (
   filePath: string,
   content: string,
-  commitMessage: string,
+  message: string,
   sha?: string
-): Promise<void> => {
-  const { token, owner, repo, branch } = getConfig();
+) => {
+  const { branch } = getConfig();
 
-  const body: Record<string, unknown> = {
-    message: commitMessage,
-    content: Buffer.from(content, 'utf-8').toString('base64'),
-    branch,
-  };
-
-  if (sha) body.sha = sha;
-
-  const res = await fetch(`${GITHUB_API_BASE}/repos/${owner}/${repo}/contents/${filePath}`, {
+  await githubRequest(filePath, {
     method: 'PUT',
-    headers: githubHeaders(token),
-    body: JSON.stringify(body),
+    body: JSON.stringify({ message, content: toBase64(content), branch, sha }),
   });
-
-  if (!res.ok)
-    throw new Error(`GitHub PUT 請求失敗 (${filePath}): ${res.status} ${await res.text()}`);
 };
 
-// DELETE
-export const deleteGithubFile = async (
-  filePath: string,
-  commitMessage: string,
-  sha: string
-): Promise<void> => {
-  const { token, owner, repo, branch } = getConfig();
+// 刪除檔案
+export const deleteGithubFile = async (filePath: string, message: string, sha: string) => {
+  const { branch } = getConfig();
 
-  const res = await fetch(`${GITHUB_API_BASE}/repos/${owner}/${repo}/contents/${filePath}`, {
+  await githubRequest(filePath, {
     method: 'DELETE',
-    headers: githubHeaders(token),
-    body: JSON.stringify({ message: commitMessage, sha, branch }),
+    body: JSON.stringify({ message, sha, branch }),
   });
-
-  if (!res.ok)
-    throw new Error(`GitHub DELETE 請求失敗 (${filePath}): ${res.status} ${await res.text()}`);
 };

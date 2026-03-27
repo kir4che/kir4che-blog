@@ -1,85 +1,81 @@
 ---
-export const prerender = true;
-
-export function getStaticPaths() {
-  return [{ params: { lang: 'tw' } }, { params: { lang: 'en' } }];
-}
+export const prerender = false;
 
 import Announcement from '@/components/ui/Announcement.astro';
 import SiteLayout from '@/layouts/SiteLayout.astro';
-import { createTranslator, resolveLanguage } from '@/lib/i18n';
+import { createTranslator, isSupportedLanguage, resolveLanguage } from '@/lib/i18n';
 import { paginate } from '@/lib/pagination';
 import { withLocalePrefix } from '@/lib/paths';
-import { getSidebarData } from '@/lib/sidebar';
+import { getPostsMeta } from '@/lib/posts';
 // import Advertisement from '@/components/ui/Advertisement.astro';
 import PostPreviewCard from '@/components/features/post/preview/PostPreviewCard.astro';
-import PostPreviewList from '@/components/features/post/preview/PostPreviewList.astro';
 import Pagination from '@/components/ui/Pagination.astro';
 
 // const AD_INSERT_INDEX = 3;
 
+if (!isSupportedLanguage(Astro.params.lang)) return Astro.redirect('/404', 404);
 const lang = resolveLanguage(Astro.params.lang);
 const t = createTranslator(lang, 'HomePage');
 
-const link = (href: string) => withLocalePrefix(href, lang);
+const link = (href: string): string => {
+  if (href === '/') return withLocalePrefix('/', lang);
+  const pageNum = parseInt(href.replace(/^\//, ''), 10);
+  if (!isNaN(pageNum) && pageNum > 1) return `${withLocalePrefix('/', lang)}?page=${pageNum}`;
+  return withLocalePrefix(href, lang);
+};
 
-const { posts = [] } = await getSidebarData(lang);
-const visiblePosts = posts.filter((post) => !post.protected);
+const visiblePosts = await getPostsMeta(lang, { includeProtected: false });
 
-const { items: currPosts, currPage, totalPages } = paginate(visiblePosts, 1);
+const pageParam = Astro.url.searchParams.get('page');
+const page = pageParam ? Math.max(1, parseInt(pageParam, 10)) : 1;
+
+const { items: currPosts, currPage, totalPages } = paginate(visiblePosts, page);
 
 const isFirstPage = currPage === 1;
-const leftPosts = isFirstPage ? currPosts.slice(0, 2) : [];
-const highlightPosts = isFirstPage ? currPosts.slice(2, 5) : [];
-const mobileFeaturedPosts = isFirstPage ? currPosts.slice(0, 5) : [];
-const listPosts = isFirstPage ? currPosts.slice(5) : currPosts;
+const featuredPosts = isFirstPage ? currPosts.slice(0, 5) : [];
+const regularPosts = isFirstPage ? currPosts.slice(5) : currPosts;
+
+const featuredLeft = featuredPosts.slice(0, 2);
+const featuredRight = featuredPosts.slice(2);
 ---
 
 <SiteLayout title={t('title')} description={t('description')}>
   <div class="flex min-h-full flex-1 flex-col gap-6">
-    <Announcement text={t('announcement')} />
+    {t('announcement') && <Announcement text={t('announcement')} />}
     {
       currPosts.length > 0 && (
-        <section id="posts" class="flex flex-1 flex-col gap-6">
-          <div class="flex flex-col gap-6">
-            {isFirstPage ? (
+        <section id="posts" class="flex flex-1 flex-col gap-3 md:gap-5">
+          <div class="flex flex-col gap-3 md:gap-5">
+            {isFirstPage && featuredPosts.length > 0 && (
               <>
-                <div class="grid grid-cols-1 gap-2 md:hidden">
-                  {mobileFeaturedPosts.map((post, index) => (
-                    <PostPreviewCard post={post} lang={lang} priority={index < 2} />
+                <div class="grid grid-cols-1 gap-3 md:gap-5 lg:hidden">
+                  {featuredPosts.map((post, i) => (
+                    <PostPreviewCard post={post} lang={lang} priority={i < 2} />
                   ))}
                 </div>
-                <div class="hidden md:grid md:grid-cols-[5fr_4fr] md:gap-4">
-                  {leftPosts.length > 0 && (
-                    <div class="grid gap-4">
-                      {leftPosts.map((post) => (
-                        <PostPreviewCard post={post} lang={lang} priority={true} />
-                      ))}
-                    </div>
-                  )}
-                  {highlightPosts.length > 0 && (
-                    <div class="grid gap-4">
-                      {highlightPosts.map((post) => (
+                <div class="hidden gap-x-3 md:grid-cols-[48%_1fr] lg:grid xl:grid-cols-[5fr_4fr]">
+                  <div class="grid gap-y-5">
+                    {featuredLeft.map((post) => (
+                      <PostPreviewCard post={post} lang={lang} priority />
+                    ))}
+                  </div>
+                  {featuredRight.length > 0 && (
+                    <div class="grid gap-y-5">
+                      {featuredRight.map((post) => (
                         <PostPreviewCard post={post} lang={lang} />
                       ))}
                     </div>
                   )}
                 </div>
-                {listPosts.length > 0 && (
-                  <div class="grid gap-2 md:gap-4">
-                    {listPosts.map((post) => (
-                      <>
-                        <PostPreviewList post={post} lang={lang} />
-                        {/* {index === AD_INSERT_INDEX && <Advertisement />} */}
-                      </>
-                    ))}
-                  </div>
-                )}
               </>
-            ) : (
-              <div class="grid gap-2 md:gap-4">
-                {listPosts.map((post) => (
-                  <PostPreviewList post={post} lang={lang} />
+            )}
+            {regularPosts.length > 0 && (
+              <div class="grid gap-3 md:gap-5">
+                {regularPosts.map((post) => (
+                  <>
+                    <PostPreviewCard post={post} lang={lang} hideImage />
+                    {/* {index === AD_INSERT_INDEX && <Advertisement />} */}
+                  </>
                 ))}
               </div>
             )}
@@ -87,7 +83,7 @@ const listPosts = isFirstPage ? currPosts.slice(5) : currPosts;
           <Pagination
             t={t}
             link={link}
-            basePath="/page"
+            basePath=""
             page1Path="/"
             currPage={currPage}
             totalPages={totalPages}

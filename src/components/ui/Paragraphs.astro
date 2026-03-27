@@ -1,12 +1,12 @@
 ---
 import { cn } from '@/utils/cn';
 
-interface ParagraphsProps {
+interface Props {
   text: string;
   class?: string;
 }
 
-const { text, class: className } = Astro.props as ParagraphsProps;
+const { text, class: className } = Astro.props;
 
 const paragraphs = text
   .split('\n')

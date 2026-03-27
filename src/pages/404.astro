@@ -1,12 +1,13 @@
 ---
-export const prerender = false;
+export const prerender = true;
 
+import { DEFAULT_LANGUAGE } from '@/config';
 import SiteLayout from '@/layouts/SiteLayout.astro';
-import { createTranslator, getLocaleFromUrl } from '@/lib/i18n';
+import { createTranslator } from '@/lib/i18n';
 import { withLocalePrefix } from '@/lib/paths';
 import { ArrowLeft } from '@lucide/astro';
 
-const lang = getLocaleFromUrl(Astro.url);
+const lang = DEFAULT_LANGUAGE;
 const homeHref = withLocalePrefix('/', lang);
 
 const t = createTranslator(lang, 'NotFoundPage');

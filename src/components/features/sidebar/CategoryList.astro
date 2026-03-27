@@ -1,35 +1,48 @@
 ---
-import LocalizedLink from '@/components/ui/LocalizedLink.astro';
+import LocalizedLink from '@/components/ui/LocalizedLink';
 import { getCategoryStyle } from '@/lib/categories';
+import { getLocaleFromUrl } from '@/lib/i18n';
 import type { SidebarCategory, Translator } from '@/types';
 import { Folder } from '@lucide/astro';
 
-interface CategoryListProps {
+interface Props {
   t: Translator;
   categories: SidebarCategory[];
 }
 
-const { t, categories } = Astro.props as CategoryListProps;
+const { t, categories } = Astro.props;
+const lang = getLocaleFromUrl(Astro.url);
 if (!t || categories.length === 0) return null;
+
+const rotations = [
+  'rotate-1',
+  '-rotate-1',
+  'rotate-[0.5deg]',
+  '-rotate-[1.2deg]',
+  'rotate-[0.8deg]',
+  '-rotate-[0.5deg]',
+];
 ---
 
 <section>
-  <h3 class="text-gradient mb-3 flex items-center gap-x-2 uppercase">
-    <Folder size={16} class="text-primary" aria-hidden="true" />
-    {t('categories')}
+  <h3 class="mb-3 flex items-center gap-x-1.5 text-lg text-pink-700 uppercase dark:text-pink-300">
+    <Folder size={16} aria-hidden="true" />
+    <span class="text-gradient">{t('categories')}</span>
   </h3>
-  <ul class="flex flex-wrap items-center gap-2">
+  <ul class="flex flex-wrap gap-2">
     {
-      categories.map(({ slug, name, color, postCount }) => (
-        <li style={getCategoryStyle(color)}>
+      categories.map(({ slug, name, color, postCount }, index) => (
+        <li
+          style={getCategoryStyle(color)}
+          class={`${rotations[index % rotations.length]} transition-transform duration-200 hover:rotate-0`}
+        >
           <LocalizedLink
             href={`/categories/${encodeURIComponent(slug)}`}
-            class="text-foreground-primary transition-color flex items-center gap-x-0.5 text-sm hover:text-(--category-color) dark:hover:text-(--category-color-dark)"
+            lang={lang}
+            className="inline-flex items-center gap-x-1 rounded-sm bg-surface-secondary/70 px-2.5 py-1 text-sm font-medium shadow-sm ring-1 ring-inset ring-(--category-color)/40 text-(--category-color) hover:bg-white dark:ring-(--category-color-dark)/40 dark:text-(--category-color-dark) dark:hover:bg-gray-700/70"
           >
             <span>{name}</span>
-            <span class="text-xs tracking-widest text-pink-700 dark:text-pink-200">
-              ({postCount})
-            </span>
+            <span class="text-xs opacity-65">({postCount})</span>
           </LocalizedLink>
         </li>
       ))

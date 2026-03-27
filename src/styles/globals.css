@@ -1,4 +1,6 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/dm-sans/wght.css';
+@import '@fontsource-variable/noto-sans-tc/wght.css';
 @import './mdx-content.css';
 
 @plugin 'daisyui' {
@@ -51,8 +53,8 @@
   --breakpoint-xs: 30rem;
   --breakpoint-2xl: 90rem;
 
-  --font-dm-sans: 'DM Sans';
-  --font-noto-tc: 'Noto Sans TC';
+  --font-dm-sans: 'DM Sans Variable', system-ui, sans-serif;
+  --font-noto-tc: 'Noto Sans TC Variable', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
   --font-main: var(--font-dm-sans), var(--font-noto-tc);
 
   --color-primary: var(--color-pink-700);
@@ -67,15 +69,38 @@
   --color-scroll-thumb: var(--color-gray-300);
   --color-scroll-track: var(--color-gray-100);
 
-  --animate-skeleton-fade-in: skeletonFadeIn 350ms ease-out forwards;
-
-  @keyframes skeletonFadeIn {
+  --animate-blob: blob-anim 30s infinite;
+  @keyframes blob-anim {
     0%,
-    50% {
-      opacity: 0;
-    }
     100% {
-      opacity: 1;
+      border-radius: 30% 70% 70% 30% / 30% 52% 48% 70%;
+    }
+    10% {
+      border-radius: 50% 50% 20% 80% / 25% 80% 20% 75%;
+    }
+    20% {
+      border-radius: 67% 33% 47% 53% / 37% 20% 80% 63%;
+    }
+    30% {
+      border-radius: 39% 61% 47% 53% / 37% 40% 60% 63%;
+    }
+    40% {
+      border-radius: 39% 61% 82% 18% / 74% 40% 60% 26%;
+    }
+    50% {
+      border-radius: 100%;
+    }
+    60% {
+      border-radius: 50% 50% 53% 47% / 72% 69% 31% 28%;
+    }
+    70% {
+      border-radius: 50% 50% 53% 47% / 26% 22% 78% 74%;
+    }
+    80% {
+      border-radius: 50% 50% 53% 47% / 26% 69% 31% 74%;
+    }
+    90% {
+      border-radius: 20% 80% 20% 80% / 20% 80% 20% 80%;
     }
   }
 }
@@ -91,15 +116,19 @@
 
       --color-foreground-primary: var(--color-gray-100);
       --color-foreground-secondary: var(--color-gray-800);
-      --color-gray-400: var(--color-gray-400);
 
-      --color-scroll-thumb: var(--color-gray-500);
-      --color-scroll-track: transparent;
+      --color-scroll-thumb: var(--color-gray-300);
+      --color-scroll-track: var(--color-gray-900);
     }
   }
 }
 
 @layer base {
+  body.preload,
+  body.preload * {
+    transition: none !important;
+  }
+
   *,
   *::before,
   *::after {
@@ -117,7 +146,7 @@
     }
 
     &::-webkit-scrollbar-track {
-      background: transparent;
+      background: var(--color-scroll-track);
     }
 
     &::-webkit-scrollbar-thumb {
@@ -133,7 +162,11 @@
   a,
   button,
   select {
-    @apply cursor-pointer focus:outline-none disabled:cursor-not-allowed;
+    cursor: pointer;
+
+    &:disabled {
+      cursor: not-allowed;
+    }
   }
 
   h1 {
@@ -170,16 +203,8 @@
   }
 
   mark p {
-    @apply m-0! inline!;
-  }
-
-  input:not([type='file']),
-  select {
-    @apply px-1.5!;
-  }
-
-  textarea {
-    @apply p-1.5!;
+    margin: 0 !important;
+    display: inline !important;
   }
 }
 
@@ -189,21 +214,22 @@
   }
 
   .utterances {
-    @apply m-0! max-w-full!;
+    margin: 0 !important;
+    max-width: 100% !important;
   }
 
   .scrollable {
     @apply relative flex-1 overflow-y-auto py-4 pr-2 pl-4;
 
-    scrollbar-color: var(--color-gray-300) var(--color-surface-primary);
+    scrollbar-color: var(--color-scroll-thumb) var(--color-surface-primary);
 
     &::-webkit-scrollbar-thumb {
-      background: rgb(209 213 219);
+      background: var(--color-scroll-thumb);
       border-radius: 6px;
     }
 
     &::-webkit-scrollbar-thumb:hover {
-      background: rgb(156 163 175);
+      background: var(--color-gray-400);
     }
   }
 }
@@ -217,6 +243,94 @@
     [style*='--subcategory-color'] {
       color: var(--subcategory-color-dark) !important;
     }
+  }
+
+  .tbtn {
+    padding: 2px 7px;
+    font-size: 11px;
+    line-height: 1.5;
+    color: #d1d5db;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+      background-color 100ms,
+      color 100ms;
+  }
+  .tbtn:hover {
+    background: #4b5563;
+    color: #fff;
+  }
+  .tbtn:active {
+    background: #374151;
+  }
+
+  #tb-tooltip {
+    min-width: 210px;
+    max-width: 390px;
+    background: #0f172a;
+    border: 1px solid #2d3f55;
+    border-radius: 8px;
+    box-shadow: 0 10px 36px rgba(0, 0, 0, 0.65);
+    font-size: 12px;
+    color: #e2e8f0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  #tb-tooltip .tt-head {
+    padding: 8px 12px 6px;
+    border-bottom: 1px solid #1e293b;
+  }
+  #tb-tooltip .tt-name {
+    font-weight: 700;
+    font-size: 13px;
+    color: #f8fafc;
+  }
+  #tb-tooltip .tt-desc {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 2px;
+  }
+  #tb-tooltip .tt-props {
+    padding: 6px 12px 4px;
+  }
+  #tb-tooltip .tt-prop-row {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: 6px;
+    align-items: baseline;
+    padding: 2px 0;
+    font-family: ui-monospace, monospace;
+    font-size: 11px;
+  }
+  #tb-tooltip .tt-pname {
+    color: #93c5fd;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #tb-tooltip .tt-req {
+    color: #fca5a5;
+    font-size: 10px;
+    margin-left: 1px;
+  }
+  #tb-tooltip .tt-pinfo {
+    color: #6ee7b7;
+  }
+  #tb-tooltip .tt-pdefault {
+    color: #64748b;
+    margin-left: 5px;
+  }
+  #tb-tooltip .tt-code {
+    margin: 0;
+    padding: 6px 12px 8px;
+    border-top: 1px solid #1e293b;
+    background: #020617;
+    font-family: ui-monospace, monospace;
+    font-size: 11px;
+    color: #94a3b8;
+    white-space: pre;
+    line-height: 1.65;
+    overflow-x: auto;
   }
 }
 
@@ -238,4 +352,8 @@
 
 @utility scrollbar-none {
   scrollbar-width: none;
+}
+
+astro-island {
+  display: block;
 }

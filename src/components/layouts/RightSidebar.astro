@@ -1,34 +1,41 @@
 ---
 import CategoryList from '@/components/features/sidebar/CategoryList.astro';
-import DonateBtns from '@/components/features/sidebar/DonateBtns.astro';
+import LineStickersCTA from '@/components/features/sidebar/LineStickersCTA.astro';
 import MyWebsites from '@/components/features/sidebar/MyWebsites.astro';
 import PopularPosts from '@/components/features/sidebar/PopularPosts.astro';
-import SearchBar from '@/components/features/sidebar/SearchBar.astro';
 import TagCloud from '@/components/features/sidebar/TagCloud.astro';
-import type { Category, LinkBuilder, PostMeta, TagBadgeInfo, Translator } from '@/types';
+import type { PostMeta, SidebarCategory, TagBadgeInfo, Translator } from '@/types';
 // import Advertisement from '@/components/ui/Advertisement.astro';
-import LineStickersCTA from '@/components/features/sidebar/LineStickersCTA.astro';
 
-interface RightSidebarProps {
-  tSearch: Translator;
+interface Props {
   tSidebar: Translator;
-  link: LinkBuilder;
-  categories: Category[];
+  categories: SidebarCategory[];
   tags: TagBadgeInfo[];
   popularPosts: Array<Pick<PostMeta, 'slug' | 'title' | 'date'>>;
 }
 
-const { tSearch, tSidebar, link, categories, tags, popularPosts } =
-  Astro.props as RightSidebarProps;
+const { tSidebar: t, categories, tags, popularPosts } = Astro.props;
 ---
 
-<aside class="w-68 space-y-6 pt-6 pb-4 max-lg:hidden">
-  <SearchBar t={tSearch} link={link} />
-  {popularPosts.length > 0 && <PopularPosts t={tSidebar} posts={popularPosts} />}
-  {categories.length > 0 && <CategoryList t={tSidebar} categories={categories} />}
-  {tags.length > 0 && <TagCloud t={tSidebar} tags={tags} />}
-  <!-- <Advertisement /> -->
-  <MyWebsites t={tSidebar} />
-  <LineStickersCTA t={tSidebar} />
-  <DonateBtns />
+<aside
+  id="right-sidebar"
+  class:list={[
+    'z-50 flex h-dvh w-72 shrink-0 flex-col xl:h-auto',
+    'fixed inset-y-0 right-0 xl:sticky xl:top-0 xl:self-start',
+    'bg-surface-primary px-4 xl:bg-transparent xl:px-0',
+    'scrollbar-none overflow-x-hidden overflow-y-auto',
+    'transition-all duration-300 ease-in-out',
+    'translate-x-full group-data-[sidebar-open=true]/layout:translate-x-0',
+    'xl:translate-x-0 xl:opacity-100',
+  ]}
+>
+  <div class="max-xl:bg-surface-primary flex shrink-0 flex-col gap-6 py-5 xl:gap-8 xl:py-7">
+    {popularPosts.length > 0 && <PopularPosts t={t} posts={popularPosts} />}
+    {categories.length > 0 && <CategoryList t={t} categories={categories} />}
+    {tags.length > 0 && <TagCloud t={t} tags={tags} />}
+    <!-- <Advertisement /> -->
+    <MyWebsites t={t} />
+    <LineStickersCTA t={t} />
+    <!-- <DonateBtns /> -->
+  </div>
 </aside>

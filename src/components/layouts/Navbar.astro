@@ -1,14 +1,17 @@
 ---
-import LocalizedLink from '@/components/ui/LocalizedLink.astro';
+import LocalizedLink from '@/components/ui/LocalizedLink';
+import { getLocaleFromUrl } from '@/lib/i18n';
 import { stripLocalePrefix } from '@/lib/paths';
 import type { Translator } from '@/types';
+import { cn } from '@/utils/cn';
 import { normalizePathname } from '@/utils/path';
 
-interface NavbarProps {
+interface Props {
   t: Translator;
 }
 
-const { t } = Astro.props as NavbarProps;
+const { t } = Astro.props;
+const lang = getLocaleFromUrl(Astro.url);
 
 const isActive = (href: string) => {
   const currPath = normalizePathname(stripLocalePrefix(Astro.url.pathname));
@@ -26,7 +29,7 @@ const navItems = [
 ---
 
 <nav class="ml-auto">
-  <ul class="flex gap-4">
+  <ul class="-mb-0.5 flex items-center gap-3 sm:gap-4">
     {
       navItems
         .filter((item) => item.label)
@@ -34,12 +37,13 @@ const navItems = [
           <li>
             <LocalizedLink
               href={href}
-              class:list={[
-                'hover:text-primary inline-block text-sm',
-                {
-                  'text-primary font-medium': isActive(href),
-                },
-              ]}
+              lang={lang}
+              className={cn(
+                'hover:text-primary relative inline-block pb-1 text-sm transition-colors',
+                isActive(href)
+                  ? 'text-primary font-medium after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:rounded-full after:bg-pink-500 dark:after:bg-pink-400'
+                  : 'after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:scale-x-0 after:rounded-full after:bg-pink-400/60 after:transition-transform hover:after:scale-x-100'
+              )}
               aria-current={isActive(href) ? 'page' : undefined}
             >
               {label}

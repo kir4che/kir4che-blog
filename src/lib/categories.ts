@@ -62,8 +62,6 @@ const calculatePostCounts = (
   const counts: PostCountMap = {};
 
   for (const post of posts) {
-    if (!Array.isArray(post.categories)) continue;
-
     // 同一篇文章中，避免同分類被算兩次
     const slugsForPost = new Set<string>();
 
@@ -232,15 +230,6 @@ export const normalizeCategories = (rawCategories: string[] = []): CategoryInfo[
 
     const info = getCategoryInfoBySlug(slug);
     if (!info || seen.has(info.slug)) continue;
-
-    // 有的話先加入父分類
-    if (info.parentSlug && !seen.has(info.parentSlug)) {
-      const parent = getCategoryInfoBySlug(info.parentSlug);
-      if (parent) {
-        seen.add(parent.slug);
-        result.push(parent);
-      }
-    }
 
     seen.add(info.slug);
     result.push(info);

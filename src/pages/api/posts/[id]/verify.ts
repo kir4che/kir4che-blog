@@ -3,10 +3,10 @@ export const prerender = false;
 import type { APIRoute } from 'astro';
 import { z } from 'zod';
 
-import { errorResponse, jsonResponse } from '@/lib/api';
 import { resolveLanguage } from '@/lib/i18n';
 import { getPostPassword, verifyPostPassword } from '@/lib/post-passwords';
 import { getPostMetaBySlug, getPostUnlockCookieName } from '@/lib/posts';
+import { errorResponse, jsonResponse } from '@/utils/api';
 
 const MAX_ATTEMPTS = 3;
 const LOCK_SECONDS = 60;
@@ -18,9 +18,10 @@ interface AttemptRecord {
   lastAttempt: number;
 }
 
+// 存放所有請求紀錄
 const attemptStore = new Map<string, AttemptRecord>();
 
-// 取得 client key（IP + slug 組合）
+// 取得每個使用者的 Client Key
 const getClientKey = (request: Request, slug: string): string => {
   const ip =
     request.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
@@ -29,7 +30,7 @@ const getClientKey = (request: Request, slug: string): string => {
   return `${ip}:${slug}`;
 };
 
-// 清除過期的嘗試紀錄
+// 定期清理過期的嘗試紀錄
 const cleanAttemptStore = () => {
   const now = Date.now();
   for (const [key, record] of attemptStore.entries()) {
@@ -37,15 +38,18 @@ const cleanAttemptStore = () => {
   }
 };
 
+// 檢查該用戶是否還處於「鎖定狀態」
 const checkLock = (clientKey: string): number => {
   const now = Date.now();
   const record = attemptStore.get(clientKey);
   if (!record) return 0;
+
+  // 還在鎖定中的話，回傳剩餘的鎖定秒數。
   if (record.lockUntil > now) return Math.ceil((record.lockUntil - now) / 1000);
   return 0;
 };
 
-// 記錄一次嘗試，並回傳是否被鎖定以及剩餘鎖定秒數。
+// 記錄用戶嘗試次數及鎖定狀態
 const recordAttempt = (clientKey: string): { locked: boolean; lockSeconds: number } => {
   const now = Date.now();
   const record = attemptStore.get(clientKey) ?? { count: 0, lockUntil: 0, lastAttempt: now };
@@ -55,9 +59,10 @@ const recordAttempt = (clientKey: string): { locked: boolean; lockSeconds: numbe
     record.lockUntil = 0;
   }
 
-  record.count += 1;
-  record.lastAttempt = now;
+  record.count += 1; // 增加次數
+  record.lastAttempt = now; // 更新最後一次嘗試時間
 
+  // 次數達到上限
   if (record.count >= MAX_ATTEMPTS) {
     record.lockUntil = now + LOCK_SECONDS * 1000;
     record.count = 0;
@@ -65,10 +70,12 @@ const recordAttempt = (clientKey: string): { locked: boolean; lockSeconds: numbe
     return { locked: true, lockSeconds: LOCK_SECONDS };
   }
 
+  // 還沒到上限，就單純寫回紀錄。
   attemptStore.set(clientKey, record);
   return { locked: false, lockSeconds: 0 };
 };
 
+// 驗證請求內容
 const verifyPayloadSchema = z.object({
   slug: z.string().optional(),
   lang: z.string().min(1, 'Missing lang'),
@@ -76,7 +83,7 @@ const verifyPayloadSchema = z.object({
 });
 
 export const POST: APIRoute = async ({ request, params }) => {
-  // 先清理過期紀錄
+  // 先清理過期的紀錄
   cleanAttemptStore();
 
   const body = await request.json().catch(() => ({}));
@@ -86,6 +93,7 @@ export const POST: APIRoute = async ({ request, params }) => {
 
   const { lang: langParam, password } = parsed.data;
 
+  // 取得要看的是哪篇文章
   const slugFromParams = typeof params.id === 'string' ? params.id.trim() : '';
   const slug = slugFromParams || (parsed.data.slug?.trim() ?? '');
   if (!slug) return errorResponse('Missing slug', 400);
@@ -95,11 +103,12 @@ export const POST: APIRoute = async ({ request, params }) => {
   const lockSeconds = checkLock(clientKey);
   if (lockSeconds > 0) return errorResponse('Too many attempts', 429, { lockSeconds });
 
-  // 取得文章
+  // 確保這篇文章存在且語系正確
   const lang = resolveLanguage(langParam);
   const meta = await getPostMetaBySlug(lang, slug);
   if (!meta?.protected) return errorResponse('Not found', 404);
 
+  // 取得密碼
   const storedPassword = getPostPassword(`${lang}/${slug}`);
   if (!storedPassword) return errorResponse('Not found', 404);
 
@@ -117,10 +126,8 @@ export const POST: APIRoute = async ({ request, params }) => {
   const cookieName = getPostUnlockCookieName(slug);
   const headers = new Headers();
   const secure = import.meta.env.PROD ? '; Secure' : '';
-  headers.append(
-    'Set-Cookie',
-    `${cookieName}=1; Path=/; Max-Age=86400; SameSite=Lax; HttpOnly${secure}`
-  );
+  // 設定解鎖 cookie（1 天有效）
+  headers.append('Set-Cookie', `${cookieName}=1; Path=/; Max-Age=86400; SameSite=Lax${secure}`);
 
   return jsonResponse({ ok: true }, { status: 200, headers });
 };

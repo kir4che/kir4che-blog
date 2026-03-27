@@ -83,7 +83,7 @@ const tagStyle: CSSProperties = {
   fontWeight: '600',
 };
 
-export function OgImage({ siteName, title, tags, lang }: OgImageProps) {
+export const OgImage = ({ siteName, title, tags, lang }: OgImageProps) => {
   const safeTitle =
     title.length > MAX_TITLE_LENGTH ? `${title.slice(0, MAX_TITLE_LENGTH - 1)}…` : title;
 
@@ -124,4 +124,4 @@ export function OgImage({ siteName, title, tags, lang }: OgImageProps) {
       </div>
     </div>
   );
-}
+};

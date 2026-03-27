@@ -6,27 +6,25 @@ import type { Language, PostMeta } from '@/types';
 import { getLocalizedPostPath } from '@/lib/paths';
 import { cn } from '@/utils/cn';
 
-const {
-  post,
-  lang,
-  priority = false,
-  class: className,
-} = Astro.props as {
+interface Props {
   post: PostMeta;
   lang: Language;
   priority?: boolean;
+  hideImage?: boolean;
   class?: string;
-};
+}
 
+const { post, lang, priority = false, hideImage = false, class: className } = Astro.props;
 const href = getLocalizedPostPath({ lang, slug: post.slug });
+const showCover = Boolean(post.coverImage) && !hideImage;
 ---
 
 <a
   href={href}
   class={cn(
-    'rounded-lg transition hover:-translate-y-1  overflow-hidden h-full block',
-    'shadow-[1px_2px_4px_rgba(247,126,157,0.15)] hover:shadow-[1px_3px_5px_rgba(233,92,133,0.30)] dark:shadow-[0_0_12px_rgba(255,214,224,0.15)] dark:hover:shadow-[0_0_18px_rgba(254,196,209,0.30)]',
-    !post.coverImage && 'bg-surface-secondary',
+    'rounded-2xl transition-all duration-300 hover:-translate-y-1 overflow-hidden h-full block',
+    'shadow-[1px_2px_8px_rgba(247,126,157,0.18)] hover:shadow-[1px_4px_12px_rgba(233,92,133,0.28)] dark:shadow-[0_0_12px_rgba(255,214,224,0.12)] dark:hover:shadow-[0_0_20px_rgba(254,196,209,0.25)]',
+    !showCover && 'bg-surface-secondary',
     className
   )}
   aria-label={`Read post: ${post.title}`}
@@ -35,15 +33,15 @@ const href = getLocalizedPostPath({ lang, slug: post.slug });
     <LockOverlay isLocked={Boolean(post.protected)} />
     <div
       class:list={[
-        'group relative flex w-full flex-col overflow-hidden rounded-lg',
+        'group relative flex w-full flex-col overflow-hidden rounded-2xl',
         {
-          'min-h-56': post.coverImage,
-          'bg-white dark:bg-gray-800': !post.coverImage,
+          'min-h-52': showCover,
+          'min-h-40 bg-white dark:bg-gray-800': !showCover,
         },
       ]}
     >
       {
-        post.coverImage && (
+        showCover && (
           <img
             src={post.coverImage}
             alt={post.title}
@@ -59,7 +57,7 @@ const href = getLocalizedPostPath({ lang, slug: post.slug });
         class:list={[
           'flex h-full flex-col p-4',
           {
-            'absolute inset-0 z-10': post.coverImage,
+            'absolute inset-0 z-10': showCover,
           },
         ]}
       >
@@ -68,9 +66,9 @@ const href = getLocalizedPostPath({ lang, slug: post.slug });
             class:list={[
               'mb-2 line-clamp-2 text-xl',
               {
-                'text-white drop-shadow-md': post.coverImage,
+                'text-white drop-shadow-md': showCover,
                 'text-gray-900 group-hover:text-pink-700 dark:text-white dark:group-hover:text-pink-400':
-                  !post.coverImage,
+                  !showCover,
               },
             ]}
           >
@@ -82,8 +80,8 @@ const href = getLocalizedPostPath({ lang, slug: post.slug });
                 class:list={[
                   'mb-2 line-clamp-3 text-sm/5.5',
                   {
-                    'text-gray-100 drop-shadow': post.coverImage,
-                    'text-gray-500 dark:text-gray-400': !post.coverImage,
+                    'text-gray-100 drop-shadow': showCover,
+                    'text-gray-500 dark:text-gray-400': !showCover,
                   },
                 ]}
               >
@@ -96,10 +94,10 @@ const href = getLocalizedPostPath({ lang, slug: post.slug });
           <CategoryBadge
             lang={lang}
             categories={post.categories ?? []}
-            useDarkColor={Boolean(post.coverImage)}
+            useDarkColor={showCover}
             class:list={[
               {
-                'rounded-full bg-black/35 px-2.5 py-0.5 backdrop-blur': post.coverImage,
+                'rounded-full bg-black/35 px-2.5 py-0.5 backdrop-blur': showCover,
               },
             ]}
           />
@@ -110,14 +108,14 @@ const href = getLocalizedPostPath({ lang, slug: post.slug });
             class:list={[
               'ml-auto',
               {
-                'text-gray-300': post.coverImage,
+                'text-gray-200': showCover,
               },
             ]}
           />
         </div>
       </div>
       {
-        post.coverImage && (
+        showCover && (
           <div
             class="absolute inset-0"
             style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.35), rgba(0,0,0,0.5))' }}

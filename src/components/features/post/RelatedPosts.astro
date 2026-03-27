@@ -3,28 +3,38 @@ import { CalendarDays } from '@lucide/astro';
 
 import { createTranslator, resolveLanguage } from '@/lib/i18n';
 import { getLocalizedPostPath } from '@/lib/paths';
-import { getPostsInfo } from '@/lib/posts';
+import { getPostsMeta } from '@/lib/posts';
 import type { Language, PostMeta } from '@/types';
 import { createDateFormatter } from '@/utils/date';
 
-interface RelatedPostsProps {
+interface Props {
   lang: Language;
   currSlug: string;
   categories: string[];
+  tags?: string[];
 }
 
-const { lang, currSlug, categories } = Astro.props as RelatedPostsProps;
+const { lang, currSlug, categories, tags = [] } = Astro.props;
 
 const t = createTranslator(lang, 'PostPage');
 const locale = resolveLanguage(lang);
 const formatDate = createDateFormatter(locale, 'short');
 
 const categorySet = new Set(categories.map((c) => c?.trim()).filter(Boolean));
-const posts = categorySet.size > 0 ? await getPostsInfo(lang) : [];
+const tagSet = new Set(tags.map((t) => t?.trim()).filter(Boolean));
+const posts = categorySet.size > 0 || tagSet.size > 0 ? await getPostsMeta(lang) : [];
 
-const relatedPosts: PostMeta[] = posts.filter(
-  (post) => post.slug !== currSlug && post.categories?.some((c) => categorySet.has(c?.trim()))
-);
+const relatedPosts: PostMeta[] = posts
+  .map((post) => {
+    if (post.slug === currSlug) return { post, score: -1 };
+    const sharedCategories = post.categories?.filter((c) => categorySet.has(c?.trim())).length ?? 0;
+    const sharedTags = post.tags?.filter((t) => tagSet.has(t?.trim())).length ?? 0;
+    return { post, score: sharedCategories * 2 + sharedTags };
+  })
+  .filter(({ score }) => score > 0)
+  .sort((a, b) => b.score - a.score || +new Date(b.post.date) - +new Date(a.post.date))
+  .map(({ post }) => post)
+  .slice(0, 3);
 ---
 
 {
@@ -48,11 +58,16 @@ const relatedPosts: PostMeta[] = posts.filter(
             <div class="group bg-surface-secondary dark:bg-surface-secondary/50 w-55 shrink-0 snap-start rounded-md p-4 sm:w-62.5 md:w-70">
               <div class="mb-3 aspect-video">
                 <img
-                  src={post.coverImage ?? '/images/cover-fallback_lg.webp'}
+                  src={post.coverImage ?? `/og/${lang}/${post.slug}.png`}
                   alt={post.title}
                   loading="lazy"
                   decoding="async"
-                  class="size-full rounded object-cover"
+                  width="800"
+                  height="420"
+                  sizes="280px"
+                  draggable="false"
+                  onerror="this.onerror=null;this.src='/images/cover-fallback_lg.webp';"
+                  class="size-full object-cover transition-transform duration-300 select-none group-hover:scale-105"
                 />
               </div>
               <a href={getLocalizedPostPath({ lang, slug: post.slug })} class="mb-1 block">

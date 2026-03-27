@@ -2,11 +2,12 @@ export const prerender = false;
 
 import type { APIRoute } from 'astro';
 
-import { isAuthenticated, saveAdminPostToGithub } from '@/lib/admin';
-import { errorResponse, jsonResponse, unknownError } from '@/lib/api';
+import { saveAdminPostToGithub } from '@/lib/admin';
+import { isAuthenticated } from '@/lib/auth';
 import { isSupportedLanguage } from '@/lib/i18n';
 import { updateAdminPostSchema } from '@/lib/validations/post';
 import type { Language } from '@/types';
+import { errorResponse, jsonResponse, unknownError } from '@/utils/api';
 
 const parseId = (rawId?: string): { lang: Language; slug: string } | null => {
   const [lang, slug] = decodeURIComponent(rawId ?? '').split('/');

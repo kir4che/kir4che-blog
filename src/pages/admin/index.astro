@@ -1,21 +1,26 @@
 ---
 export const prerender = false;
 
-import { LogOut, Plus, Search } from '@lucide/astro';
+import {
+  LogOut,
+  Plus,
+  Search,
+  Pencil,
+  Trash2,
+  X,
+  ChevronDown,
+  ChevronRight,
+  Download,
+} from '@lucide/astro';
 
 import { DEFAULT_LANGUAGE } from '@/config';
 import type { Language } from '@/types';
-import {
-  getAdminPosts,
-  getAdminPost,
-  getNextCopySlug,
-  saveAdminPost,
-  deleteAdminPost,
-  isAuthenticated,
-  clearAdminSessionCookie,
-} from '@/lib/admin';
+import { deleteAdminPost, getAdminPosts } from '@/lib/admin';
+import { isAuthenticated, clearAdminSessionCookie } from '@/lib/auth';
 import AdminLayout from '@/layouts/AdminLayout.astro';
 import AdminPostListSection from '@/components/features/admin/AdminPostListSection.astro';
+import TaxonomyManager from '@/components/features/admin/TaxonomyManager';
+import { categoryMap, tagMap } from '@/config/taxonomy';
 
 if (!(await isAuthenticated(Astro.cookies))) return Astro.redirect('/admin/login');
 
@@ -32,27 +37,6 @@ if (Astro.request.method === 'POST') {
     if (id) await deleteAdminPost(id);
     return Astro.redirect('/admin');
   }
-  if (action === 'duplicate') {
-    const id = data.get('id') as string;
-    if (id) {
-      const post = await getAdminPost(id);
-      if (post) {
-        const posts = await getAdminPosts();
-        const sameLangSlugs = posts
-          .filter((item) => item.lang === post.lang)
-          .map((item) => item.slug);
-        const nextSlug = getNextCopySlug(post.slug, sameLangSlugs);
-
-        await saveAdminPost(
-          post.lang,
-          nextSlug,
-          { ...post.meta, draft: true, date: new Date().toISOString() },
-          post.content
-        );
-      }
-    }
-    return Astro.redirect('/admin');
-  }
 }
 
 const posts = await getAdminPosts();
@@ -66,6 +50,9 @@ for (const post of posts) {
 }
 
 const sortedLangEntries = Array.from(postsByLang).sort(([a], [b]) => a.localeCompare(b));
+
+const initialCategories = categoryMap;
+const initialTags = tagMap;
 ---
 
 <AdminLayout title="文章管理">
@@ -111,7 +98,6 @@ const sortedLangEntries = Array.from(postsByLang).sort(([a], [b]) => a.localeCom
               <option value="draft">草稿 ({draftCount})</option>
             </select>
             <select data-lang-select class="border px-1 py-0.5">
-              <option value="all">全部語系</option>
               {
                 sortedLangEntries.map(([lang, langPosts]) => (
                   <option value={lang} selected={lang === DEFAULT_LANGUAGE}>
@@ -129,54 +115,72 @@ const sortedLangEntries = Array.from(postsByLang).sort(([a], [b]) => a.localeCom
         }
         {posts.length === 0 && <p class="py-10 text-center text-gray-500">尚無文章</p>}
       </div>
+      <div class="bg-surface-secondary rounded p-5 shadow">
+        <TaxonomyManager
+          client:load
+          initialCategories={initialCategories}
+          initialTags={initialTags}
+        />
+      </div>
     </div>
   </div>
   <script>
-    const defaultLang =
-      document.querySelector<HTMLElement>('[data-default-lang]')?.dataset.defaultLang || '';
+    const defaultRoot = document.querySelector('[data-default-lang]') as HTMLElement | null;
+    const defaultLang = defaultRoot?.dataset.defaultLang || '';
 
-    const searchInput = document.querySelector<HTMLInputElement>('[data-search-input]');
-    const statusSelect = document.querySelector<HTMLSelectElement>('[data-status-select]');
-    const langSelect = document.querySelector<HTMLSelectElement>('[data-lang-select]');
+    const searchInput = document.querySelector('[data-search-input]') as HTMLInputElement | null;
+    const statusSelect = document.querySelector('[data-status-select]') as HTMLSelectElement | null;
+    const langSelect = document.querySelector('[data-lang-select]') as HTMLSelectElement | null;
 
-    // 合併選取篩選項目，減少 DOM 查詢次數。
-    const filterableItems = document.querySelectorAll<HTMLElement>(
-      '[data-post-row], [data-post-card]'
-    );
-    const sections = document.querySelectorAll<HTMLElement>('[data-lang-section]');
+    const sections = document.querySelectorAll('[data-lang-section]') as NodeListOf<HTMLElement>;
 
     if (langSelect && defaultLang) langSelect.value = defaultLang;
 
     const applyFilters = () => {
       const query = (searchInput?.value || '').trim().toLowerCase();
       const status = statusSelect?.value || 'all';
-      const lang = langSelect?.value || 'all';
+      const lang = langSelect?.value || defaultLang;
 
-      // 1. 進行篩選
-      filterableItems.forEach((el) => {
-        const matchQuery = !query || (el.dataset.search || '').includes(query);
-        const matchStatus = status === 'all' || el.dataset.status === status;
-        const matchLang = lang === 'all' || el.dataset.lang === lang;
-        el.classList.toggle('hidden', !(matchQuery && matchStatus && matchLang));
-      });
-
-      // 2. 顯示 / 隱藏語系區塊
+      // 先篩選「所選語系」的文章
       sections.forEach((sec) => {
-        if (lang !== 'all' && sec.dataset.langSection !== lang) {
+        if (sec.dataset.langSection !== lang) {
           sec.classList.add('hidden');
-        } else {
-          const hasVisibleItems = sec.querySelector(
-            '[data-post-row]:not(.hidden), [data-post-card]:not(.hidden)'
-          );
-          sec.classList.toggle('hidden', !hasVisibleItems);
+          return;
         }
+
+        // 再針對「所選語系」的文章進行篩選
+        let hasVisibleItems = false;
+        const items = sec.querySelectorAll(
+          '[data-post-row], [data-post-card]'
+        ) as NodeListOf<HTMLElement>;
+
+        items.forEach((el) => {
+          const matchQuery = !query || (el.dataset.search || '').includes(query);
+          const matchStatus = status === 'all' || el.dataset.status === status;
+          const isVisible = matchQuery && matchStatus;
+
+          el.classList.toggle('hidden', !isVisible);
+          if (isVisible) hasVisibleItems = true;
+        });
+
+        sec.classList.toggle('hidden', !hasVisibleItems);
       });
     };
 
-    [searchInput, statusSelect, langSelect].forEach((el) => {
-      el?.addEventListener('input', applyFilters);
+    const inputs = [searchInput, statusSelect, langSelect].filter(Boolean) as HTMLElement[];
+    inputs.forEach((el) => {
+      el.addEventListener('input', applyFilters);
     });
 
     applyFilters();
   </script>
 </AdminLayout>
+
+<template data-icon-pencil><Pencil size={14} aria-hidden="true" /></template>
+<template data-icon-trash><Trash2 size={14} aria-hidden="true" /></template>
+<template data-icon-x><X size={14} aria-hidden="true" /></template>
+<template data-icon-plus><Plus size={14} aria-hidden="true" /></template>
+<template data-icon-chevron-down><ChevronDown size={14} aria-hidden="true" /></template>
+<template data-icon-chevron-right><ChevronRight size={14} aria-hidden="true" /></template>
+<template data-icon-search><Search size={14} aria-hidden="true" /></template>
+<template data-icon-download><Download size={14} aria-hidden="true" /></template>

@@ -1,16 +1,17 @@
 ---
-export const prerender = false;
+export const prerender = true;
 
 import PostLayout from '@/layouts/PostLayout.astro';
-import { isAuthenticated } from '@/lib/admin';
 import { resolveLanguage } from '@/lib/i18n';
 import {
   getPost,
   getPostAvailableLangs,
   getPostExtraComponents,
   getPostMetaBySlug,
-  getPostUnlockCookieName,
 } from '@/lib/posts';
+import { getSlugStaticPaths } from '@/lib/routing';
+
+export const getStaticPaths = getSlugStaticPaths;
 
 const { lang: rawLang, slug } = Astro.params as { lang: string; slug: string };
 const lang = resolveLanguage(rawLang);
@@ -20,16 +21,8 @@ if (!slug) return Astro.redirect('/404', 404);
 const postMeta = await getPostMetaBySlug(lang, slug);
 if (!postMeta) return Astro.redirect('/404', 404);
 
-let isLocked = !!postMeta.protected;
-
-if (isLocked) {
-  const cookieName = getPostUnlockCookieName(slug);
-  const hasUnlock = Astro.cookies.has(cookieName);
-  const isAdmin = await isAuthenticated(Astro.cookies);
-  if (hasUnlock || isAdmin) isLocked = false;
-}
-
-const post = isLocked ? null : await getPost(lang, slug);
+const isProtected = !!postMeta.protected;
+const post = await getPost(lang, slug);
 const availableLangs = await getPostAvailableLangs(slug);
 const otherLangs = availableLangs.filter((l) => l !== lang);
 const displayPost = post ?? postMeta;
@@ -41,7 +34,7 @@ const extraComponents = await getPostExtraComponents(displayPost.slug);
   lang={lang}
   post={displayPost}
   otherLangs={otherLangs}
-  isLocked={isLocked}
+  isProtected={isProtected}
   content={postContent}
   headings={post?.headings ?? []}
   extraComponents={extraComponents}

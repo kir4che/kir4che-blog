@@ -5,14 +5,14 @@ import { cn } from '@/utils/cn';
 import { formatDateYmd } from '@/utils/date';
 import { CalendarDays, Pencil } from '@lucide/astro';
 
-interface PostMetaInfoProps {
+interface Props {
   lang: Language;
   date?: string | null;
   wordCount?: number;
   class?: string;
 }
 
-const { lang, date, wordCount, class: className } = Astro.props as PostMetaInfoProps;
+const { lang, date, wordCount, class: className } = Astro.props;
 
 const t = createTranslator(lang, 'common');
 

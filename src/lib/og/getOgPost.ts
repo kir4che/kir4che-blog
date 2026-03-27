@@ -9,7 +9,7 @@ export type OgPostData = {
   lang: Language;
 };
 
-export async function getOgPostBySlug(contentSlug: string): Promise<OgPostData | null> {
+export const getOgPostBySlug = async (contentSlug: string): Promise<OgPostData | null> => {
   const entries = await getCollection('blog');
   const entry = entries.find((item: CollectionEntry<'blog'>) => item.id === contentSlug);
   if (!entry) return null;
@@ -24,4 +24,4 @@ export async function getOgPostBySlug(contentSlug: string): Promise<OgPostData |
     tags: resolvedTags,
     lang,
   };
-}
+};

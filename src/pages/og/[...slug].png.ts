@@ -1,10 +1,11 @@
-export const prerender = false;
+export const prerender = true;
+
+import type { APIRoute } from 'astro';
 
 import { CONFIG, DEFAULT_LANGUAGE } from '@/config';
 import { OgImage } from '@/lib/og/OgImage';
 import { getOgPostBySlug } from '@/lib/og/getOgPost';
 import { ImageResponse } from '@vercel/og';
-import type { APIRoute } from 'astro';
 
 export const GET: APIRoute = async ({ params, url }) => {
   const slugParam = params.slug;
@@ -17,8 +18,6 @@ export const GET: APIRoute = async ({ params, url }) => {
 
   const siteName =
     CONFIG.siteInfo.blog.siteName[post.lang] ?? CONFIG.siteInfo.blog.siteName[DEFAULT_LANGUAGE];
-
-  const origin = url.origin;
 
   try {
     const image = new ImageResponse(
@@ -40,7 +39,7 @@ export const GET: APIRoute = async ({ params, url }) => {
       },
     });
   } catch {
-    const fallbackResponse = await fetch(`${origin}/images/default-og.jpg`);
+    const fallbackResponse = await fetch(new URL('/images/default-og.jpg', url));
     const fallbackBuffer = Buffer.from(await fallbackResponse.arrayBuffer());
 
     return new Response(fallbackBuffer, {

@@ -2,13 +2,6 @@ export type MediaType = 'image' | 'video';
 
 export type ObjectPosition = 'top' | 'center' | 'bottom';
 
-export interface ImageMeta {
-  src: string;
-  blurDataURL: string;
-  originalWidth?: number;
-  originalHeight?: number;
-}
-
 export type MediaItem =
   | {
       type?: 'image';
@@ -19,9 +12,6 @@ export type MediaItem =
       className?: string;
       width?: string | number;
       height?: string | number;
-      originalWidth?: number;
-      originalHeight?: number;
-      blurDataURL?: string;
       objPos?: ObjectPosition;
     }
   | {
@@ -34,7 +24,7 @@ export type MediaItem =
       height?: string | number;
       poster?: string;
       controls?: boolean;
-      autoplay?: boolean;
+      autoPlay?: boolean;
       loop?: boolean;
       muted?: boolean;
     };

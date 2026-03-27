@@ -1,8 +1,13 @@
-import type { AstroCookies } from 'astro';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 
 import { SUPPORTED_LANGUAGES } from '@/config';
-import { deleteGithubFile, getGithubFile, listGithubDir, putGithubFile } from '@/lib/github';
+import {
+  deleteGithubFile,
+  getGithubFile,
+  getGithubFilePath,
+  listGithubDir,
+  putGithubFile,
+} from '@/lib/github';
 import { isSupportedLanguage } from '@/lib/i18n';
 import {
   getPostPassword,
@@ -10,147 +15,76 @@ import {
   renamePostPassword,
   setPostPassword,
 } from '@/lib/post-passwords';
-import type { AdminPost, Language, PostMeta } from '@/types';
+import type { AdminPost, Language, PostMeta, TripPlace } from '@/types';
 import { parseToISODate } from '@/utils/date';
+import { resolveUpdatedAt, toStringArray } from '@/utils/post-meta';
 
-// 解析 YAML frontmatter
+// 解析文章 Frontmatter
 const parseFrontmatter = (source: string): { data: Record<string, any>; content: string } => {
   const match = source.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
   if (!match) return { data: {}, content: source };
   return { data: (parseYaml(match[1]) as Record<string, any>) ?? {}, content: match[2] };
 };
 
-// 將內容與 metadata 組合成帶 frontmatter 的字串
+// 將文章內容與 Frontmatter 組合成完整的 Markdown 文字
 const stringifyFrontmatter = (content: string, data: Record<string, any>): string =>
   `---\n${stringifyYaml(data)}---\n${content}`;
 
-const ADMIN_COOKIE_NAME = 'admin_session';
-const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
-const SESSION_MAX_AGE_MS = SESSION_MAX_AGE_SECONDS * 1000;
 const POST_EXTENSION = '.mdx';
 
-// GitHub 文章路徑格式
-const getGithubFilePath = (lang: Language, slug: string): string =>
-  `src/content/blog/${lang}/${slug}${POST_EXTENSION}`;
-
-const utf8 = new TextEncoder();
-const utf8Decode = (b: Uint8Array) => new TextDecoder().decode(b);
-
-const encodeBase64Url = (bytes: Uint8Array): string =>
-  btoa(String.fromCharCode(...bytes))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '');
-
-const encodeBase64UrlStr = (input: string): string => encodeBase64Url(utf8.encode(input));
-
-const decodeBase64UrlStr = (input: string): string => {
-  const base64 = input.replace(/-/g, '+').replace(/_/g, '/');
-  const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=');
-  return utf8Decode(Uint8Array.from(atob(padded), (c) => c.charCodeAt(0)));
-};
-
-const timingSafeEqual = (a: string, b: string): boolean => {
-  const bytesA = utf8.encode(a);
-  const bytesB = utf8.encode(b);
-  if (bytesA.length !== bytesB.length) return false;
-  let diff = 0;
-  for (let i = 0; i < bytesA.length; i++) diff |= bytesA[i] ^ bytesB[i];
-  return diff === 0;
-};
-
-const hmacSign = async (secret: string, payload: string): Promise<string> => {
-  const key = await crypto.subtle.importKey(
-    'raw',
-    utf8.encode(secret),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign']
-  );
-  const sig = await crypto.subtle.sign('HMAC', key, utf8.encode(payload));
-  return encodeBase64Url(new Uint8Array(sig));
-};
-
-// 取得 session 簽章用的 secret
-const getSessionSecret = (): string => {
-  if (import.meta.env.SESSION_SECRET) return import.meta.env.SESSION_SECRET;
-  throw new Error('缺少 SESSION_SECRET');
-};
-
-// 驗證 admin 帳密
-export const verifyAdminCredentials = (username?: string, password?: string): boolean => {
-  if (!username || !password || !import.meta.env.ADMIN_USERNAME || !import.meta.env.ADMIN_PASSWORD)
-    return false;
-  return (
-    timingSafeEqual(username, import.meta.env.ADMIN_USERNAME) &&
-    timingSafeEqual(password, import.meta.env.ADMIN_PASSWORD)
-  );
-};
-
-// 建立簽章後的 session cookie
-const signSessionCookie = async (): Promise<string> => {
-  const payload = JSON.stringify({ authenticated: true, exp: Date.now() + SESSION_MAX_AGE_MS });
-  const hmac = await hmacSign(getSessionSecret(), payload);
-  return `${encodeBase64UrlStr(payload)}.${hmac}`;
-};
-
-// 驗證 session cookie
-const verifySessionCookie = async (cookieValue?: string | null): Promise<boolean> => {
-  if (!cookieValue) return false;
-  const [payloadB64, signature] = cookieValue.split('.');
-  if (!payloadB64 || !signature) return false;
-
-  try {
-    const payload = decodeBase64UrlStr(payloadB64);
-    const expectedSignature = await hmacSign(getSessionSecret(), payload);
-    if (!timingSafeEqual(signature, expectedSignature)) return false;
-    const parsed = JSON.parse(payload);
-    return parsed.authenticated === true && parsed.exp > Date.now();
-  } catch {
-    return false;
-  }
-};
-
-// 是否已登入後台
-export const isAuthenticated = (cookies: AstroCookies): Promise<boolean> =>
-  verifySessionCookie(cookies.get(ADMIN_COOKIE_NAME)?.value);
-
-// 設定 admin session cookie
-export const setAdminSessionCookie = async (cookies: AstroCookies) => {
-  cookies.set(ADMIN_COOKIE_NAME, await signSessionCookie(), {
-    path: '/',
-    httpOnly: true,
-    secure: import.meta.env.PROD,
-    sameSite: 'lax',
-    maxAge: SESSION_MAX_AGE_SECONDS,
-  });
-};
-
-// 清除 admin session cookie
-export const clearAdminSessionCookie = (cookies: AstroCookies) => {
-  cookies.delete(ADMIN_COOKIE_NAME, { path: '/' });
-};
-
-// 驗證路徑 segment
+// 確認路徑只包含允許的字元
 const sanitizeSegment = (input: string): string => {
   if (!/^[a-z0-9-_]+$/i.test(input)) throw new Error('無效的路徑片段');
   return input;
 };
 
-// 檢查是否為支援的語系
+// 確認是否為支援語系
 const sanitizeLanguage = (input: string): Language => {
   const sanitized = sanitizeSegment(input);
-  if (!isSupportedLanguage(sanitized)) throw new Error('不支援的語言');
+  if (!isSupportedLanguage(sanitized)) throw new Error('不支援的語系');
   return sanitized;
 };
 
-// 把不確定格式的 tags/categories 轉為乾淨的字串陣列
-const toStringArray = (value: unknown): string[] =>
-  Array.isArray(value)
-    ? value.filter((i): i is string => typeof i === 'string' && i.trim().length > 0)
-    : [];
+// 將不穩定的原始資料轉換成標準且安全的 PostMeta 格式
+const parseCoordPair = (raw: string): { lat: number; lng: number } | null => {
+  const [latRaw, lngRaw, extra] = raw.split(',').map((part) => part.trim());
+  if (!latRaw || !lngRaw || extra) return null;
 
-// 統一建立 metadata
+  const lat = Number(latRaw);
+  const lng = Number(lngRaw);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+
+  return { lat, lng };
+};
+
+const normalizePlaces = (value: unknown): TripPlace[] => {
+  if (!Array.isArray(value)) return [];
+
+  return value.flatMap((item) => {
+    if (typeof item !== 'object' || item === null) return [];
+
+    const lat = Number((item as { lat?: unknown }).lat);
+    const lng = Number((item as { lng?: unknown }).lng);
+    const coord = (item as { coord?: unknown }).coord;
+    const icon = (item as { icon?: unknown }).icon;
+    if (typeof icon !== 'string') return [];
+
+    const trimmedIcon = icon.trim();
+    if (!trimmedIcon) return [];
+
+    if (Number.isFinite(lat) && Number.isFinite(lng)) return [{ lat, lng, icon: trimmedIcon }];
+
+    if (typeof coord === 'string') {
+      const parsed = parseCoordPair(coord);
+      if (!parsed) return [];
+
+      return [{ lat: parsed.lat, lng: parsed.lng, icon: trimmedIcon }];
+    }
+
+    return [];
+  });
+};
+
 const buildMeta = (data: any = {}, slug: string, lang: Language): PostMeta => ({
   slug,
   lang,
@@ -163,55 +97,16 @@ const buildMeta = (data: any = {}, slug: string, lang: Language): PostMeta => ({
   featured: !!data.featured,
   protected: !!data.protected,
   coverImage: typeof data.coverImage === 'string' ? data.coverImage : undefined,
+  places: normalizePlaces(data.places),
   showUpdatedAt: !!data.showUpdatedAt,
-  updatedAt: typeof data.updatedAt === 'string' ? data.updatedAt : undefined,
+  updatedAt: resolveUpdatedAt(data.updatedAt),
 });
 
-// 把檔名最後的 .mdx 拿掉，只留文章 slug。
+// 去除副檔名
 const stripPostExtension = (filename: string): string =>
   filename.endsWith(POST_EXTENSION) ? filename.slice(0, -POST_EXTENSION.length) : filename;
 
-// 從 GitHub 遞迴取得所有文章路徑
-async function fetchAllPostPathsFromGithub(): Promise<{ lang: Language; slug: string }[]> {
-  const allPaths: { lang: Language; slug: string }[] = [];
-
-  for (const lang of SUPPORTED_LANGUAGES) {
-    try {
-      const files = await listGithubDir(`src/content/blog/${lang}`);
-
-      if (Array.isArray(files)) {
-        files.forEach((file) => {
-          if (file.name.endsWith(POST_EXTENSION))
-            allPaths.push({
-              lang,
-              slug: stripPostExtension(file.name),
-            });
-        });
-      }
-    } catch (e) {
-      console.error(`無法讀取 GitHub 中的 ${lang} 資料夾:`, e);
-    }
-  }
-  return allPaths;
-}
-
-// 取得所有文章
-export const getAdminPosts = async (): Promise<AdminPost[]> => {
-  const postPaths = await fetchAllPostPathsFromGithub();
-
-  const posts = await Promise.all(
-    postPaths.map(async ({ lang, slug }) => {
-      const id = `${lang}/${slug}`;
-      return await getAdminPost(id);
-    })
-  );
-
-  return posts
-    .filter((p): p is AdminPost => p !== null)
-    .sort((a, b) => b.meta.date.localeCompare(a.meta.date));
-};
-
-// 解析文章的 ID
+// 從後台的 ID 格式（zh-tw/my-post）拆解並驗證出「語系、slug」
 const parseAdminPostId = (id: string) => {
   const parts = id.split('/');
   return parts.length === 2
@@ -219,7 +114,90 @@ const parseAdminPostId = (id: string) => {
     : null;
 };
 
-// 取得單篇文章
+const preparePostContent = (
+  meta: Partial<PostMeta>,
+  content: string,
+  existingMeta: Record<string, any>,
+  safeLang: Language,
+  safeSlug: string,
+  safeOldSlug?: string
+): string => {
+  const baseMeta = buildMeta(existingMeta, safeSlug, safeLang);
+  const showUpdatedAt = meta.showUpdatedAt ?? baseMeta.showUpdatedAt;
+  const isRenaming = !!safeOldSlug && safeOldSlug !== safeSlug;
+  const postId = `${safeLang}/${safeSlug}`;
+
+  const finalMeta: Record<string, any> = {
+    ...existingMeta,
+    title: meta.title?.trim() || baseMeta.title,
+    description: meta.description ?? baseMeta.description,
+    date: meta.date ? (parseToISODate(meta.date) ?? new Date().toISOString()) : baseMeta.date,
+    tags: meta.tags ? toStringArray(meta.tags) : baseMeta.tags,
+    categories: meta.categories ? toStringArray(meta.categories) : baseMeta.categories,
+    draft: meta.draft ?? baseMeta.draft,
+    featured: meta.featured ?? baseMeta.featured,
+    showUpdatedAt,
+  };
+
+  // 處理文章密碼鎖邏輯
+  if (meta.protected === true) {
+    if (!getPostPassword(postId) && import.meta.env.DEFAULT_POST_PASSWORD?.trim()) {
+      setPostPassword(postId, import.meta.env.DEFAULT_POST_PASSWORD.trim());
+    }
+    finalMeta.protected = true;
+  } else if (meta.protected === false) {
+    removePostPassword(postId);
+    delete finalMeta.protected;
+  } else {
+    if (isRenaming && safeOldSlug) renamePostPassword(`${safeLang}/${safeOldSlug}`, postId);
+    if (baseMeta.protected) finalMeta.protected = true;
+    else delete finalMeta.protected;
+  }
+
+  if (meta.coverImage !== undefined) {
+    if (meta.coverImage.trim()) finalMeta.coverImage = meta.coverImage.trim();
+    else delete finalMeta.coverImage;
+  }
+  if (isRenaming && finalMeta.coverImage === `https://cdn.kir4che.com/${safeOldSlug}/cover.webp`) {
+    finalMeta.coverImage = `https://cdn.kir4che.com/${safeSlug}/cover.webp`;
+  }
+
+  if (showUpdatedAt) finalMeta.updatedAt = new Date().toISOString();
+  else delete finalMeta.updatedAt;
+
+  return stringifyFrontmatter(content, finalMeta);
+};
+
+// 遍歷並讀取 GitHub 文章目錄，取得所有文章的語系、slug。
+const fetchAllPostPathsFromGithub = async (): Promise<{ lang: Language; slug: string }[]> => {
+  const results = await Promise.allSettled(
+    SUPPORTED_LANGUAGES.map((lang) =>
+      listGithubDir(`src/content/blog/${lang}`).then((files) =>
+        (files as { name: string }[])
+          .filter((f) => f.name.endsWith(POST_EXTENSION))
+          .map((f) => ({ lang, slug: stripPostExtension(f.name) }))
+      )
+    )
+  );
+
+  return results.flatMap((result) => {
+    if (result.status === 'rejected') return [];
+    return result.value;
+  });
+};
+
+// 取得後台文章列表的所有文章資料，並根據日期由新到舊排序。
+export const getAdminPosts = async (): Promise<AdminPost[]> => {
+  const postPaths = await fetchAllPostPathsFromGithub();
+  const posts = await Promise.all(
+    postPaths.map(({ lang, slug }) => getAdminPost(`${lang}/${slug}`))
+  );
+  return posts
+    .filter((p): p is AdminPost => p !== null)
+    .sort((a, b) => b.meta.date.localeCompare(a.meta.date));
+};
+
+// 從 GitHub 讀取單篇後台文章的完整內容
 export const getAdminPost = async (id: string): Promise<AdminPost | null> => {
   const ids = parseAdminPostId(id);
   if (!ids) return null;
@@ -239,92 +217,13 @@ export const getAdminPost = async (id: string): Promise<AdminPost | null> => {
   };
 };
 
-// 儲存文章
-export const saveAdminPost = async (
-  lang: string,
-  slug: string,
-  meta: Partial<PostMeta>,
-  content: string,
-  oldSlug?: string
-) => {
-  const safeLang = sanitizeLanguage(lang);
-  const safeSlug = sanitizeSegment(slug);
-  const newFullPath = getPostFilePath(safeLang, safeSlug);
-  const isRenaming = oldSlug && oldSlug !== slug;
-  const safeOldSlug = isRenaming ? sanitizeSegment(oldSlug) : undefined;
-  const targetReadPath = isRenaming ? getPostFilePath(safeLang, safeOldSlug!) : newFullPath;
-
-  const existingFile = await getGithubFile(sourceGithubPath);
-  const existingMeta: Record<string, any> = existingFile
-    ? parseFrontmatter(existingFile.content).data
-    : {};
-
-  const baseMeta = buildMeta(existingMeta, safeSlug, safeLang);
-  const showUpdatedAt = meta.showUpdatedAt ?? baseMeta.showUpdatedAt;
-
-  const finalMeta: Record<string, any> = {
-    ...existingMeta,
-    title: meta.title?.trim() || baseMeta.title,
-    description: meta.description ?? baseMeta.description,
-    date: meta.date ? (parseToISODate(meta.date) ?? new Date().toISOString()) : baseMeta.date,
-    tags: meta.tags ? toStringArray(meta.tags) : baseMeta.tags,
-    categories: meta.categories ? toStringArray(meta.categories) : baseMeta.categories,
-    draft: meta.draft ?? baseMeta.draft,
-    featured: meta.featured ?? baseMeta.featured,
-    showUpdatedAt,
-  };
-
-  // 文章密碼保護
-  const postId = `${safeLang}/${safeSlug}`;
-  if (meta.protected === true) {
-    if (!getPostPassword(postId) && import.meta.env.DEFAULT_POST_PASSWORD?.trim()) {
-      setPostPassword(postId, import.meta.env.DEFAULT_POST_PASSWORD.trim());
-    }
-    finalMeta.protected = true;
-  } else if (meta.protected === false) {
-    removePostPassword(postId);
-    delete finalMeta.protected;
-  } else {
-    if (isRenaming && safeOldSlug) renamePostPassword(`${safeLang}/${safeOldSlug}`, postId);
-    if (baseMeta.protected) finalMeta.protected = true;
-    else delete finalMeta.protected;
-  }
-
-  // 設定新的封面圖片
-  if (meta.coverImage !== undefined) {
-    if (meta.coverImage.trim()) {
-      finalMeta.coverImage = meta.coverImage.trim();
-    } else {
-      delete finalMeta.coverImage;
-    }
-  }
-
-  // 處理改名時同步修改 CDN 封面 URL (如果封面圖剛好指向舊的 slug)
-  if (
-    isRenaming &&
-    safeOldSlug &&
-    finalMeta.coverImage === `https://cdn.kir4che.com/${safeOldSlug}/cover.webp`
-  ) {
-    finalMeta.coverImage = `https://cdn.kir4che.com/${safeSlug}/cover.webp`;
-  }
-
-  if (showUpdatedAt) finalMeta.updatedAt = new Date().toISOString();
-  else delete finalMeta.updatedAt;
-
-  const finalContent = stringifyFrontmatter(content, finalMeta);
-
-  if (isRenaming && safeOldSlug) {
-    await fs.rm(targetReadPath, { force: true });
-  }
-};
-
-// 刪除文章
+// 從 GitHub 刪除文章
 export const deleteAdminPost = async (id: string) => {
   const ids = parseAdminPostId(id);
   if (ids) {
     const path = getGithubFilePath(ids.safeLang, ids.safeSlug);
     const existingFile = await getGithubFile(path);
-    if (existingFile) await deleteGithubFile(path, `chore: delete post ${id}`, existingFile.sha);
+    if (existingFile) await deleteGithubFile(path, `🗑️ delete post ${id}`, existingFile.sha);
   }
 };
 
@@ -338,91 +237,38 @@ export const saveAdminPostToGithub = async (
 ): Promise<void> => {
   const safeLang = sanitizeLanguage(lang);
   const safeSlug = sanitizeSegment(slug);
+  const safeOldSlug = oldSlug && oldSlug !== slug ? sanitizeSegment(oldSlug) : undefined;
+
   const newGithubPath = getGithubFilePath(safeLang, safeSlug);
-  const isRenaming = oldSlug && oldSlug !== slug;
-  const safeOldSlug = isRenaming ? sanitizeSegment(oldSlug) : undefined;
-  const sourceGithubPath = isRenaming ? getGithubFilePath(safeLang, safeOldSlug!) : newGithubPath;
+  const sourceGithubPath = safeOldSlug ? getGithubFilePath(safeLang, safeOldSlug) : newGithubPath;
 
   const existingFile = await getGithubFile(sourceGithubPath);
-  const existingMeta: Record<string, any> = existingFile ? matter(existingFile.content).data : {};
+  const existingMeta = existingFile ? parseFrontmatter(existingFile.content).data : {};
 
-  const baseMeta = buildMeta(existingMeta, safeSlug, safeLang);
-  const showUpdatedAt = meta.showUpdatedAt ?? baseMeta.showUpdatedAt;
+  const finalContent = preparePostContent(
+    meta,
+    content,
+    existingMeta,
+    safeLang,
+    safeSlug,
+    safeOldSlug
+  );
 
-  const finalMeta: Record<string, any> = {
-    ...existingMeta,
-    title: meta.title?.trim() || baseMeta.title,
-    description: meta.description ?? baseMeta.description,
-    date: meta.date ? (parseToISODate(meta.date) ?? new Date().toISOString()) : baseMeta.date,
-    tags: meta.tags ? toStringArray(meta.tags) : baseMeta.tags,
-    categories: meta.categories ? toStringArray(meta.categories) : baseMeta.categories,
-    draft: meta.draft ?? baseMeta.draft,
-    featured: meta.featured ?? baseMeta.featured,
-    showUpdatedAt,
-  };
-
-  const postId = `${safeLang}/${safeSlug}`;
-  if (meta.protected === true) {
-    if (!getPostPassword(postId) && import.meta.env.DEFAULT_POST_PASSWORD?.trim()) {
-      setPostPassword(postId, import.meta.env.DEFAULT_POST_PASSWORD.trim());
-    }
-    finalMeta.protected = true;
-  } else if (meta.protected === false) {
-    removePostPassword(postId);
-    delete finalMeta.protected;
-  } else {
-    if (isRenaming && safeOldSlug) renamePostPassword(`${safeLang}/${safeOldSlug}`, postId);
-    if (baseMeta.protected) finalMeta.protected = true;
-    else delete finalMeta.protected;
-  }
-
-  if (meta.coverImage !== undefined) {
-    if (meta.coverImage.trim()) finalMeta.coverImage = meta.coverImage.trim();
-    else delete finalMeta.coverImage;
-  }
-
-  if (
-    isRenaming &&
-    safeOldSlug &&
-    finalMeta.coverImage === `https://cdn.kir4che.com/${safeOldSlug}/cover.webp`
-  )
-    finalMeta.coverImage = `https://cdn.kir4che.com/${safeSlug}/cover.webp`;
-
-  if (showUpdatedAt) finalMeta.updatedAt = new Date().toISOString();
-  else delete finalMeta.updatedAt;
-
-  const finalContent = matter.stringify(content, finalMeta);
-
-  if (isRenaming && safeOldSlug && existingFile) {
+  if (safeOldSlug && existingFile) {
     await deleteGithubFile(
       sourceGithubPath,
-      `chore: rename ${safeLang}/${safeOldSlug} → ${safeSlug}`,
+      `🔄 rename ${safeLang}/${safeOldSlug} → ${safeSlug}`,
       existingFile.sha
     );
-    await putGithubFile(newGithubPath, finalContent, `feat: add post ${safeLang}/${safeSlug}`);
-  } else
+    await putGithubFile(newGithubPath, finalContent, `✨ add post ${safeLang}/${safeSlug}`);
+  } else {
     await putGithubFile(
       newGithubPath,
       finalContent,
       existingFile
-        ? `chore: update post ${safeLang}/${safeSlug}`
-        : `feat: add post ${safeLang}/${safeSlug}`,
+        ? `✏️ update post ${safeLang}/${safeSlug}`
+        : `✨ add post ${safeLang}/${safeSlug}`,
       existingFile?.sha
     );
-};
-
-// 取得下一個文章 slug
-export const getNextCopySlug = (slug: string, existingSlugs: string[]): string => {
-  const baseSlug = slug.replace(/-copy-\d+$/i, '');
-  const matcher = new RegExp(
-    `^${baseSlug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}-copy-(\\d+)$`,
-    'i'
-  );
-  const maxSuffix = existingSlugs.reduce((max, candidate) => {
-    const match = candidate.match(matcher);
-    // 找出目前最大的是 -copy- 多少
-    return match ? Math.max(max, parseInt(match[1], 10) || 0) : max;
-  }, 0);
-
-  return `${baseSlug}-copy-${maxSuffix + 1}`;
+  }
 };

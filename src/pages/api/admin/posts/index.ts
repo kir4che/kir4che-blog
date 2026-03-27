@@ -2,9 +2,10 @@ export const prerender = false;
 
 import type { APIRoute } from 'astro';
 
-import { isAuthenticated, saveAdminPostToGithub } from '@/lib/admin';
-import { errorResponse, jsonResponse, unknownError } from '@/lib/api';
+import { saveAdminPostToGithub } from '@/lib/admin';
+import { isAuthenticated } from '@/lib/auth';
 import { adminPostSchema } from '@/lib/validations/post';
+import { errorResponse, jsonResponse, unknownError } from '@/utils/api';
 import { slugify } from '@/utils/slug';
 
 export const POST: APIRoute = async ({ request, cookies }) => {

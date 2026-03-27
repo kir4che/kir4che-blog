@@ -1,11 +1,11 @@
 ---
 import { Heart } from '@lucide/astro';
 
-interface AnnouncementProps {
+interface Props {
   text: string;
 }
 
-const { text } = Astro.props as AnnouncementProps;
+const { text } = Astro.props;
 ---
 
 <div

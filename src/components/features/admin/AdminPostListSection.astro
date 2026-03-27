@@ -1,5 +1,5 @@
 ---
-import { Copy, Pencil, X } from '@lucide/astro';
+import { Pencil, X } from '@lucide/astro';
 
 import type { Language, AdminPost } from '@/types';
 import { createDateFormatter } from '@/utils/date';
@@ -55,13 +55,6 @@ const toDateText = (date: string) => formatDate(date)?.display ?? '';
                   >
                     <Pencil size={16} aria-hidden="true" />
                   </a>
-                  <form method="POST" class="inline">
-                    <input type="hidden" name="action" value="duplicate" />
-                    <input type="hidden" name="id" value={post.id} />
-                    <button type="submit" class="btn btn-xs btn-link p-0" aria-label="複製文章">
-                      <Copy size={16} aria-hidden="true" />
-                    </button>
-                  </form>
                   <form
                     method="POST"
                     onsubmit="return confirm('確定要刪除這篇文章嗎？');"

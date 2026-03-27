@@ -5,11 +5,12 @@ import { getCategoryStyle, normalizeCategories } from '@/lib/categories';
 import type { Language } from '@/types';
 import { cn } from '@/utils/cn';
 
-interface CategoryBadgeProps {
+interface Props {
   lang: Language;
   categories?: string[];
   useDarkColor?: boolean;
   class?: string;
+  asLink?: boolean;
 }
 
 const {
@@ -17,29 +18,37 @@ const {
   categories = [],
   useDarkColor = false,
   class: className,
-} = Astro.props as CategoryBadgeProps;
+  asLink = false,
+} = Astro.props;
 
 const resolvedCategories = normalizeCategories(categories);
 ---
 
 {
   resolvedCategories.length > 0 && (
-    <div class={cn('flex flex-wrap items-center gap-x-2', className)}>
-      {resolvedCategories.map((info) => (
-        <span
-          class:list={[
-            'flex items-center gap-x-1 text-sm hover:opacity-85',
-            {
-              'text-(--category-color-dark)': useDarkColor,
-              'text-(--category-color) dark:text-(--category-color-dark)': !useDarkColor,
-            },
-          ]}
-          style={getCategoryStyle(info.color)}
-        >
-          <Circle size={8} fill="currentColor" aria-hidden="true" />
-          {info.name[lang]}
-        </span>
-      ))}
+    <div class={cn('flex flex-wrap items-center gap-x-2 text-sm', className)}>
+      {resolvedCategories.map((info) => {
+        const itemClasses = [
+          'flex items-center gap-x-1 hover:opacity-85',
+          {
+            'text-(--category-color-dark)': useDarkColor,
+            'text-(--category-color) dark:text-(--category-color-dark)': !useDarkColor,
+          },
+        ];
+        const itemStyle = getCategoryStyle(info.color);
+
+        return asLink ? (
+          <a href={`/${lang}/categories/${info.slug}/`} class:list={itemClasses} style={itemStyle}>
+            <Circle size={8} fill="currentColor" aria-hidden="true" />
+            {info.name[lang]}
+          </a>
+        ) : (
+          <span class:list={itemClasses} style={itemStyle}>
+            <Circle size={8} fill="currentColor" aria-hidden="true" />
+            {info.name[lang]}
+          </span>
+        );
+      })}
     </div>
   )
 }

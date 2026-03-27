@@ -1,77 +1,96 @@
-article {
-  & hr {
+@layer base {
+  :root {
+    --hl-yellow: 255, 218, 139; /* #ffda8b */
+    --hl-green: 184, 255, 175; /* #b8ffaf */
+    --hl-pink: 255, 178, 197; /* #ffb2c5 */
+    --hl-blue: 175, 215, 255; /* #afd7ff */
+  }
+
+  .dark {
+    --hl-yellow: 153, 115, 0;
+    --hl-green: 40, 100, 45;
+    --hl-pink: 160, 50, 80;
+    --hl-blue: 35, 75, 135;
+  }
+
+  article hr {
     @apply mx-auto my-8 w-24 text-gray-300 dark:text-gray-700;
   }
 }
 
-.mdx-content {
-  @apply text-base/7;
+@layer components {
+  .mdx-content {
+    @apply text-base/7.5;
 
-  & > p,
-  & > ul,
-  & > ol,
-  & > blockquote {
-    @apply my-3 lg:my-4;
-  }
-
-  & p > a + a {
-    @apply ml-2;
-  }
-
-  & img {
-    @apply rounded-md;
-  }
-
-  & > img {
-    @apply mx-auto my-6 lg:my-8;
-  }
-
-  & p img {
-    @apply inline-block rounded-md align-middle;
-  }
-
-  & ul,
-  & ol {
-    @apply pl-4 leading-8;
-  }
-
-  & ul {
-    @apply list-disc;
-
-    & ul {
-      @apply list-[square];
+    > p,
+    > ul,
+    > ol,
+    > blockquote {
+      @apply my-3 lg:my-4;
     }
-  }
 
-  & ol {
-    @apply list-decimal;
-
-    & ol {
-      @apply list-[lower-alpha];
+    p > a + a {
+      @apply ml-2;
     }
-  }
 
-  & blockquote {
-    @apply border-l-6 border-pink-600 bg-pink-100/80 py-2 pl-4 dark:bg-pink-700/20;
-  }
-
-  & code {
-    @apply font-mono text-sm;
-
-    &:not(pre code) {
-      @apply bg-gray-100/80 px-1 text-pink-900 dark:bg-gray-300/20 dark:text-pink-300;
+    img {
+      @apply rounded-md;
     }
-  }
 
-  & .expressive-code + .expressive-code {
-    @apply mt-4;
-  }
+    > img,
+    > figure {
+      @apply mx-auto my-6;
+    }
 
-  & li .expressive-code {
-    @apply my-3;
-  }
+    p img {
+      @apply inline-block align-middle;
+    }
 
-  & li .expressive-code + .expressive-code {
-    @apply mt-4;
+    ul,
+    ol {
+      @apply pl-4 leading-8;
+    }
+
+    ul {
+      @apply list-disc;
+
+      ul {
+        @apply list-[square];
+      }
+    }
+
+    ol {
+      @apply list-decimal;
+
+      ol {
+        @apply list-[lower-alpha];
+      }
+    }
+
+    blockquote {
+      @apply border-l-6 border-pink-600 bg-pink-100/80 py-2 pl-4 dark:bg-pink-700/20;
+    }
+
+    code {
+      @apply font-mono text-sm;
+
+      &:not(pre code) {
+        @apply bg-gray-100 px-1 text-pink-900 dark:bg-gray-300/20 dark:text-pink-400;
+      }
+    }
+
+    .expressive-code + .expressive-code {
+      @apply mt-4;
+    }
+
+    li {
+      .expressive-code {
+        @apply my-3;
+
+        & + .expressive-code {
+          @apply mt-4;
+        }
+      }
+    }
   }
 }

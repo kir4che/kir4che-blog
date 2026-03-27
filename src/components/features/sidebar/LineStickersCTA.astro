@@ -1,20 +1,20 @@
 ---
-import { MessageCircle, MessageCircleHeart } from '@lucide/astro';
+import ExternalLink from '@/components/ui/ExternalLink';
 import type { Translator } from '@/types';
-import ExternalLink from '@/components/ui/ExternalLink.astro';
+import { MessageCircle, MessageCircleHeart } from '@lucide/astro';
 
-interface LineStickersCTAProps {
+interface Props {
   t: Translator;
 }
 
-const { t } = Astro.props as LineStickersCTAProps;
+const { t } = Astro.props;
 ---
 
 <ExternalLink
   href="https://store.line.me/stickershop/author/3784299/"
-  class="group flex-center gap-x-2 rounded-full border border-pink-200 bg-linear-to-br from-pink-50/80 via-white to-white px-5 py-3 text-sm font-medium text-pink-600 shadow shadow-pink-900/15 transition-all duration-300 hover:from-pink-100/50 hover:to-pink-100/80 hover:text-pink-700 dark:border-pink-400/20 dark:from-pink-900/40 dark:via-pink-900/30 dark:to-pink-900/50 dark:text-pink-50 dark:hover:from-pink-800/60 dark:hover:to-pink-800/70 dark:hover:text-white"
+  className="group flex-center w-full gap-x-2 rounded-full border border-pink-200 bg-linear-to-br from-pink-50/80 via-white to-white px-5 py-3 text-sm font-medium text-pink-600 shadow shadow-pink-900/15 transition-all duration-300 hover:from-pink-100/50 hover:to-pink-100/80 hover:text-pink-700 dark:border-pink-400/20 dark:from-pink-900/40 dark:via-pink-900/30 dark:to-pink-900/50 dark:text-pink-50 dark:hover:from-pink-800/60 dark:hover:to-pink-800/70 dark:hover:text-white"
   noline
-  ariaLabel={t('lineStickersCta')}
+  aria-label={t('lineStickersCta')}
 >
   <MessageCircle size={20} aria-hidden="true" class="group-hover:hidden" />
   <MessageCircleHeart size={20} aria-hidden="true" class="hidden group-hover:block" />
