@@ -1,15 +1,51 @@
 ---
-title: 為什麼我要用 Astro 重構部落格？
-description: ''
-date: '2026-03-23T14:08:00.000Z'
+title: 為什麼我要改用 Astro 重構部落格？
+description: 這篇文章記錄了我將部落格從 Next.js 搬家到 Astro 的心得。Astro「預設零
+  JS」的設計讓我能把效能用在刀口上，重構後不僅移除了多餘的 JS 負擔，PageSpeed 分數也能大幅提升。
+date: 2026-03-23T00:00:00.000Z
 tags:
   - Astro
-  - React
   - Next.js
   - Frontend
 categories:
   - Frontend
-draft: true
+draft: false
 featured: false
 showUpdatedAt: false
 ---
+## 為什麼選擇 Astro？
+
+其實最初代的部落格是用 Hugo，但它的學習曲線偏高，很快我就改用自己比較熟悉的 Next.js，但確實 Next.js 開發一個以「內容為主」的部落格有點大材小用，又看到很多人都把自己的部落格轉到 Astro，我稍微研究了一下，發現 Astro 非常適合我的需求，最終決定搬家。主要原因有以下幾點：
+
+- 學習曲線低
+- 完美相容 React
+- 效能對比 Next.js 有大大的提升
+- 與 Markdown / MDX 深度綁定
+- 部署到 Vercel 一樣方便
+
+
+## 效能提升
+
+Astro 的核心理念是：
+
+<Highlight color="yellow">預設不送任何 JavaScript 到瀏覽器，只有明確標記為互動的元件（島嶼）才會 hydrate。</Highlight>
+
+這讓我重新思考了什麼東西才需要用到 React：
+
+- **版面、頁面、靜態 UI** → `.astro`（零 JavaScript）
+- **主題切換、搜尋** → React（需要瀏覽器端互動）
+- **後台編輯器** → React（因為有大量狀態管理、即時預覽）
+
+這是我覺得 Astro 最讚的地方，我將文章中的自訂元件（ex. Rating、Highlight）寫成 React 元件，這樣在後台編輯器裡可以即時渲染；但在前台頁面，因為我沒加 `client:*`，Astro build 時就會自動把它們轉成純靜態的 HTML 標籤！
+
+在重構的過程中，我也移除了原本寫的一些不必要的腳本，讓部落格輕很多。現在前台的文章頁面幾乎沒有多餘的 JS 負擔，PageSpeed 分數也有了明顯提升。
+
+<Image src="https://cdn.kir4che.com/why-rebuild-my-blog-with-astro/kir4che-blog-nextjs-pagespeed-mobile.webp" alt="Next.js 部落格行動版 PageSpeed 測試結果截圖（Performance 49 分、SEO 83 分）" title="Next.js 部落格行動版 PageSpeed 測試" />
+
+<Image src='https://cdn.kir4che.com/why-rebuild-my-blog-with-astro/kir4che-blog-astro-pagespeed-mobile.webp' alt="Astro 部落格行動版 PageSpeed 測試結果截圖（Performance 99 分，SEO 得分 100 分）" title="Astro 部落格行動版 PageSpeed 測試" />
+
+## 結論
+
+> 框架沒有好壞，只有適不適合。
+
+Next.js 是一個很棒的框架，如果需要大量的動態功能，它的 Server Actions、Route Handlers、ISR 都很有用；但一個以靜態內容為主的個人部落格，Astro 的「靜態優先、按需加入互動」更符合需求。
