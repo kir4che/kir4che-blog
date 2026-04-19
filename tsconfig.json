@@ -3,6 +3,7 @@
   "include": ["src", "env.d.ts", "./worker-configuration.d.ts", "src/middleware.ts"],
   "exclude": ["dist"],
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "verbatimModuleSyntax": true,

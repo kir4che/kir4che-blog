@@ -4,17 +4,17 @@ kir4che 的個人技術部落格，以 Astro 建置，支援繁體中文（預�
 
 ## 技術堆疊
 
-| 技術 | 版本 |
-|------|------|
-| Astro | ^6.0.6 |
-| React | ^19.2.4 |
-| TypeScript | ^5.9.3 |
-| Tailwind CSS | ^4.2.2 |
-| DaisyUI | ^5.5.19 |
-| Vite | ^8.0.1 |
-| pnpm | 10.29.1 |
-| @astrojs/mdx | ^5.0.2 |
-| @astrojs/vercel | ^10.0.2 |
+| 技術                  | 版本    |
+| --------------------- | ------- |
+| Astro                 | ^6.0.6  |
+| React                 | ^19.2.4 |
+| TypeScript            | ^5.9.3  |
+| Tailwind CSS          | ^4.2.2  |
+| DaisyUI               | ^5.5.19 |
+| Vite                  | ^8.0.1  |
+| pnpm                  | 10.29.1 |
+| @astrojs/mdx          | ^5.0.2  |
+| @astrojs/vercel       | ^10.0.2 |
 | astro-expressive-code | ^0.41.7 |
 
 ## 常用指令
@@ -67,17 +67,17 @@ src/
 
 ```yaml
 ---
-title: string           # 必填
-description: string     # 選填
-date: Date              # 必填，可接受日期字串
-categories: string[]    # 選填，預設 []
-tags: string[]          # 選填，預設 []
-featured: boolean       # 選填，預設 false
-draft: boolean          # 選填，預設 false（true 時不公開）
-protected: boolean      # 選填，預設 false（true 時需登入）
-coverImage: string      # 選填，封面圖片路徑
-updatedAt: string       # 選填，更新日期
-showUpdatedAt: boolean  # 選填，預設 false
+title: string # 必填
+description: string # 選填
+date: Date # 必填，可接受日期字串
+categories: string[] # 選填，預設 []
+tags: string[] # 選填，預設 []
+featured: boolean # 選填，預設 false
+draft: boolean # 選填，預設 false（true 時不公開）
+protected: boolean # 選填，預設 false（true 時需登入）
+coverImage: string # 選填，封面圖片路徑
+updatedAt: string # 選填，更新日期
+showUpdatedAt: boolean # 選填，預設 false
 ---
 ```
 
