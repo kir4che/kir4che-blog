@@ -5,14 +5,15 @@ import { createTranslator, getLocaleFromUrl } from '@/lib/i18n';
 import { withLocalePrefix } from '@/lib/paths';
 import { getSidebarData } from '@/lib/sidebar';
 
+import ProfileCard from '@/components/features/sidebar/ProfileCard.astro';
 import SearchBar from '@/components/features/sidebar/SearchBar.tsx';
-import Footer from '@/components/layouts/Footer.astro';
-import Header from '@/components/layouts/Header.astro';
-import LeftSidebar from '@/components/layouts/LeftSidebar.astro';
+import { CONFIG } from '@/config';
 import Navbar from '@/components/layouts/Navbar.astro';
 import RightSidebar from '@/components/layouts/RightSidebar.astro';
 import StructuredData from '@/components/seo/StructuredData.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import GlobalLangMenu from '@/components/ui/GlobalLangMenu.astro';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 const { title, description, canonical, image, noindex } = Astro.props;
 
@@ -21,6 +22,7 @@ const tSearch = createTranslator(lang, 'common.search');
 const tNav = createTranslator(lang, 'nav');
 const tProfile = createTranslator(lang, 'profile');
 const tSidebar = createTranslator(lang, 'sidebar');
+const tSettings = createTranslator(lang, 'settings');
 const link = (href: string) => withLocalePrefix(href, lang);
 
 const { categories = [], tags = [], popularPosts = [] } = await getSidebarData(lang);
@@ -32,19 +34,21 @@ const simplifiedTags = tags.map(({ name, slug }) => ({ name, slug }));
   <div
     id="layout-container"
     data-sidebar-open="false"
-    class="group/layout mx-auto flex max-w-screen-2xl flex-1 px-5 max-md:flex-col sm:px-6"
+    class="group/layout mx-auto flex max-w-7xl flex-1 px-5 max-md:flex-col sm:px-6"
   >
     <div
       id="sidebar-backdrop"
       class="pointer-events-none fixed inset-0 z-40 bg-gray-900/60 opacity-0 transition-opacity duration-300 group-data-[sidebar-open=true]/layout:pointer-events-auto group-data-[sidebar-open=true]/layout:opacity-100 xl:hidden"
     >
     </div>
-    <LeftSidebar t={tProfile} lang={lang} />
-    <div id="main-content-wrapper" class="flex w-full min-w-0 flex-1 xl:gap-x-10">
+    <div id="main-content-wrapper" class="flex w-full min-w-0 flex-1 lg:gap-x-10 xl:gap-x-16">
       <div class="flex min-h-dvh min-w-0 flex-1 flex-col">
-        <Header>
-          <div class="flex w-full flex-col">
-            <div class="flex w-full items-center gap-3 max-sm:flex-wrap sm:gap-4">
+        <header class="pt-4 pb-2.5">
+          <div class="mb-2 lg:hidden">
+            <ProfileCard tProfile={tProfile} lang={lang} />
+          </div>
+          <div class="flex-between">
+            <div class="flex w-full items-center gap-3 sm:gap-4">
               <Navbar t={tNav} />
               <div>
                 <SearchBar
@@ -76,7 +80,8 @@ const simplifiedTags = tags.map(({ name, slug }) => ({ name, slug }));
               </button>
             </div>
           </div>
-        </Header>
+          <div id="mobile-search-portal" class="w-full"></div>
+        </header>
         <main class="flex-1">
           <slot />
         </main>
@@ -90,6 +95,8 @@ const simplifiedTags = tags.map(({ name, slug }) => ({ name, slug }));
         </footer>
       </div>
       <RightSidebar
+        tProfile={tProfile}
+        lang={lang}
         tSidebar={tSidebar}
         categories={categories}
         tags={simplifiedTags}
@@ -107,15 +114,39 @@ const simplifiedTags = tags.map(({ name, slug }) => ({ name, slug }));
 
     if (!toggleBtn || !container || toggleBtn.dataset.initialized === 'true') return;
     toggleBtn.dataset.initialized = 'true';
+    toggleBtn.setAttribute('aria-expanded', 'false');
+    toggleBtn.setAttribute('aria-controls', 'right-sidebar');
+
+    const syncBodyOverflow = (isOpen: boolean) => {
+      document.body.style.overflow = isOpen && window.innerWidth < 1280 ? 'hidden' : '';
+    };
+
+    const setSidebarState = (isOpen: boolean) => {
+      container.dataset.sidebarOpen = String(isOpen);
+      toggleBtn.setAttribute('aria-expanded', String(isOpen));
+      syncBodyOverflow(isOpen);
+    };
+
+    const closeSidebar = () => setSidebarState(false);
 
     const toggleMenu = () => {
       const isOpen = container.dataset.sidebarOpen === 'true';
-      container.dataset.sidebarOpen = String(!isOpen);
-      document.body.style.overflow = !isOpen && window.innerWidth < 1280 ? 'hidden' : '';
+      setSidebarState(!isOpen);
+    };
+
+    const handleResize = () => {
+      if (window.innerWidth >= 1280) closeSidebar();
+      else syncBodyOverflow(container.dataset.sidebarOpen === 'true');
+    };
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeSidebar();
     };
 
     toggleBtn.addEventListener('click', toggleMenu);
-    if (backdrop) backdrop.addEventListener('click', toggleMenu);
+    if (backdrop) backdrop.addEventListener('click', closeSidebar);
+    window.addEventListener('resize', handleResize);
+    document.addEventListener('keydown', handleEscape);
   };
 
   setupSidebar();

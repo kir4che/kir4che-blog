@@ -9,6 +9,7 @@ interface ThemeToggleProps {
     light: string;
     dark: string;
   };
+  iconOnly?: boolean;
 }
 
 const getInitialTheme = (): Theme => {
@@ -23,7 +24,7 @@ const applyTheme = (theme: Theme) => {
   document.documentElement.classList.toggle('dark', theme === 'dark');
 };
 
-const ThemeToggle = ({ translations }: ThemeToggleProps) => {
+const ThemeToggle = ({ translations, iconOnly = false }: ThemeToggleProps) => {
   const [theme, setTheme] = useState<Theme>('light');
   const [mounted, setMounted] = useState(false);
 
@@ -62,7 +63,7 @@ const ThemeToggle = ({ translations }: ThemeToggleProps) => {
         <span className="opacity-0">
           <Sun size={16} aria-hidden="true" />
         </span>
-        <span className="opacity-0 max-md:hidden">{translations.dark}</span>
+        {!iconOnly && <span className="opacity-0 max-md:hidden">{translations.dark}</span>}
       </button>
     );
 
@@ -79,7 +80,7 @@ const ThemeToggle = ({ translations }: ThemeToggleProps) => {
       <span className={cn({ hidden: !isDark })}>
         <MoonStar size={16} aria-hidden="true" />
       </span>
-      <span className="max-md:hidden">{nextLabel}</span>
+      {!iconOnly && <span className="max-md:hidden">{nextLabel}</span>}
     </button>
   );
 };

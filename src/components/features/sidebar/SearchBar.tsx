@@ -1,5 +1,6 @@
 import { Search } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import { cn } from '@/utils/cn';
 
@@ -30,8 +31,11 @@ const SearchBar = ({
   const [posts, setPosts] = useState<Post[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!collapsible);
+  const [isMobile, setIsMobile] = useState(false);
+  const [portalTarget, setPortalTarget] = useState<Element | null>(null);
 
   const rootRef = useRef<HTMLDivElement>(null);
+  const portalRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -58,10 +62,26 @@ const SearchBar = ({
     };
   }, [base]);
 
-  // 點擊外部關閉
+  // 偵測是否為 sm 以下的裝置寬度
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 639px)');
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  // 尋找 mobile portal 目標節點
+  useEffect(() => {
+    setPortalTarget(document.getElementById('mobile-search-portal'));
+  }, []);
+
+  // 點擊外部關閉（同時檢查 portal ref）
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (!rootRef.current?.contains(e.target as Node)) {
+      const inRoot = rootRef.current?.contains(e.target as Node);
+      const inPortal = portalRef.current?.contains(e.target as Node);
+      if (!inRoot && !inPortal) {
         setIsOpen(false);
         if (collapsible) {
           setIsExpanded(false);
@@ -73,10 +93,10 @@ const SearchBar = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [collapsible]);
 
-  // 展開狀態改變時 focus input
+  // 展開狀態或模式改變時 focus input
   useEffect(() => {
     if (isExpanded && collapsible) inputRef.current?.focus();
-  }, [isExpanded, collapsible]);
+  }, [isExpanded, collapsible, isMobile]);
 
   const filteredResults = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -97,13 +117,35 @@ const SearchBar = ({
     });
   }, [query, posts]);
 
+  const useMobilePortal = collapsible && isMobile && !!portalTarget;
+
+  const inputEl = (
+    <div className="bg-surface-secondary flex w-full items-center gap-2 rounded-full px-3 py-1.5 shadow focus-within:ring-2 focus-within:ring-pink-500">
+      <Search size={16} className="shrink-0 opacity-70" />
+      <input
+        ref={inputRef}
+        type="search"
+        autoComplete="off"
+        placeholder={placeholder}
+        value={query}
+        onFocus={() => {
+          fetchPosts();
+          setIsOpen(true);
+        }}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setIsOpen(e.target.value.trim().length > 0);
+        }}
+        className="min-w-0 flex-1 bg-transparent text-[13px] outline-none lg:text-sm [&::-webkit-search-cancel-button]:cursor-pointer [&::-webkit-search-cancel-button]:opacity-80 [&::-webkit-search-cancel-button]:brightness-0 dark:[&::-webkit-search-cancel-button]:invert"
+      />
+    </div>
+  );
+
   return (
     <div
       ref={rootRef}
       className={cn(
-        collapsible
-          ? 'max-sm:contents sm:relative sm:flex sm:items-center'
-          : 'xs:w-[50vw] relative sm:w-full',
+        collapsible ? 'relative flex min-h-9 min-w-7 items-center' : 'xs:w-[50vw] relative w-full',
         className
       )}
     >
@@ -115,64 +157,85 @@ const SearchBar = ({
           }}
           aria-label={placeholder}
           className={cn(
-            'shrink-0 transition-colors duration-200 hover:text-pink-500',
-            isExpanded && 'sm:hidden'
+            'flex-center absolute left-0 z-0 transition-all duration-300 hover:text-pink-500',
+            isExpanded
+              ? 'pointer-events-none scale-75 opacity-0'
+              : 'scale-100 opacity-100 delay-100'
           )}
         >
           <Search size={18} aria-hidden="true" />
         </button>
       )}
-      <div
-        className={cn(
-          'transition-[width,max-height,opacity] duration-300 ease-in-out',
-          collapsible
-            ? cn(
-                'max-sm:order-last max-sm:w-full',
-                isExpanded
-                  ? 'relative opacity-100 max-sm:max-h-12 sm:w-52'
-                  : 'opacity-0 max-sm:max-h-0 max-sm:overflow-hidden sm:w-0 sm:overflow-hidden'
-              )
-            : 'relative w-full'
-        )}
-      >
-        <div className="bg-surface-secondary flex w-full items-center gap-2 rounded-full px-3 py-1.5 shadow focus-within:ring-2 focus-within:ring-pink-500">
-          <Search size={16} className="shrink-0 opacity-70" />
-          <input
-            ref={inputRef}
-            type="search"
-            autoComplete="off"
-            placeholder={placeholder}
-            value={query}
-            onFocus={() => {
-              fetchPosts();
-              setIsOpen(true);
-            }}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setIsOpen(e.target.value.trim().length > 0);
-            }}
-            className="min-w-0 flex-1 bg-transparent py-0.5 text-sm outline-none [&::-webkit-search-cancel-button]:cursor-pointer [&::-webkit-search-cancel-button]:opacity-80 [&::-webkit-search-cancel-button]:brightness-0 dark:[&::-webkit-search-cancel-button]:invert"
-          />
+      {!useMobilePortal && (
+        <div
+          className={cn(
+            'relative z-10 transition-[width,opacity] duration-300 ease-in-out',
+            collapsible
+              ? isExpanded
+                ? 'w-full opacity-100 sm:w-52'
+                : 'w-0 overflow-hidden opacity-0'
+              : 'w-full'
+          )}
+        >
+          {inputEl}
+          {isOpen && query.trim() !== '' && (
+            <ul
+              className={cn(
+                'bg-surface-secondary scrollbar-none absolute z-50 max-h-60 w-full min-w-52 overflow-y-auto rounded-md p-1 text-[13px] shadow-xl',
+                collapsible ? 'top-0 left-full ml-2' : 'top-full left-0 mt-1'
+              )}
+            >
+              {filteredResults.length > 0 ? (
+                filteredResults.map((p) => (
+                  <li key={p.slug}>
+                    <a
+                      href={`${base}/${p.slug}`}
+                      className="block w-full rounded-md px-3 py-2 font-medium transition-colors hover:bg-pink-50 hover:text-pink-700 dark:hover:bg-pink-950/30"
+                    >
+                      {p.title || p.slug}
+                    </a>
+                  </li>
+                ))
+              ) : (
+                <li className="p-4 text-center text-sm opacity-50">{noResultsText}</li>
+              )}
+            </ul>
+          )}
         </div>
-        {isOpen && query.trim() !== '' && (
-          <ul className="bg-surface-secondary scrollbar-none absolute top-full z-50 mt-2 max-h-60 w-full overflow-y-auto rounded-md p-1 text-[13px] shadow-xl">
-            {filteredResults.length > 0 ? (
-              filteredResults.map((p) => (
-                <li key={p.slug}>
-                  <a
-                    href={`${base}/${p.slug}`}
-                    className="block w-full rounded-md px-3 py-2 font-medium transition-colors hover:bg-pink-50 hover:text-pink-700 dark:hover:bg-pink-950/30"
-                  >
-                    {p.title || p.slug}
-                  </a>
-                </li>
-              ))
-            ) : (
-              <li className="p-4 text-center text-sm opacity-50">{noResultsText}</li>
+      )}
+      {useMobilePortal &&
+        portalTarget &&
+        createPortal(
+          <div ref={portalRef} className="mt-2">
+            <div
+              className={cn(
+                'transition-[max-height,opacity] duration-300 ease-in-out',
+                isExpanded ? 'max-h-14 opacity-100' : 'pointer-events-none max-h-0 opacity-0'
+              )}
+            >
+              <div className="pb-1.5">{inputEl}</div>
+            </div>
+            {isExpanded && isOpen && query.trim() !== '' && (
+              <ul className="bg-surface-secondary scrollbar-none mt-1 max-h-60 w-full overflow-y-auto rounded-md p-1 text-[13px] shadow-xl">
+                {filteredResults.length > 0 ? (
+                  filteredResults.map((p) => (
+                    <li key={p.slug}>
+                      <a
+                        href={`${base}/${p.slug}`}
+                        className="block w-full rounded-md px-3 py-2 font-medium transition-colors hover:bg-pink-50 hover:text-pink-700 dark:hover:bg-pink-950/30"
+                      >
+                        {p.title || p.slug}
+                      </a>
+                    </li>
+                  ))
+                ) : (
+                  <li className="p-4 text-center text-sm opacity-50">{noResultsText}</li>
+                )}
+              </ul>
             )}
-          </ul>
+          </div>,
+          portalTarget
         )}
-      </div>
     </div>
   );
 };
