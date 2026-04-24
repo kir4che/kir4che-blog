@@ -1,0 +1,73 @@
+---
+import GithubIcon from '@/assets/icons/github.svg';
+import YoutubeIcon from '@/assets/icons/youtube.svg';
+import { Mail } from '@lucide/astro';
+import AvatarImage from '@/assets/images/avatar.webp';
+import ExternalLink from '@/components/ui/ExternalLink';
+import LocalizedLink from '@/components/ui/LocalizedLink';
+import { CONFIG } from '@/config';
+import type { Language, Translator } from '@/types';
+
+interface Props {
+  tProfile: Translator;
+  lang: Language;
+}
+
+const { tProfile, lang } = Astro.props;
+
+const socialLinks = [
+  {
+    label: 'Email',
+    href: `mailto:${CONFIG.siteInfo.email}`,
+    Icon: Mail,
+  },
+  {
+    label: 'GitHub',
+    href: CONFIG.siteInfo.socialLinks.github,
+    Icon: GithubIcon,
+  },
+  {
+    label: 'YouTube',
+    href: CONFIG.siteInfo.socialLinks.youtube,
+    Icon: YoutubeIcon,
+  },
+];
+---
+
+<div class="flex gap-4 lg:flex-col">
+  <div class="avatar relative size-16 lg:size-28">
+    <LocalizedLink href="/" lang={lang}>
+      <div
+        class="animate-blob relative size-full overflow-hidden rounded-[30%_70%_53%_47%/26%_46%_54%_74%] will-change-[border-radius]"
+      >
+        <img
+          src={AvatarImage.src}
+          alt="Avatar"
+          width={96}
+          height={96}
+          onerror="this.onerror=null;this.src='/images/cover-fallback_sm.webp';"
+        />
+      </div>
+    </LocalizedLink>
+  </div>
+  <div class="w-full">
+    <div class="flex-between mt-2 gap-3">
+      <h1 class="text-xl font-semibold tracking-wide">{tProfile('name')}</h1>
+      <ul class="flex gap-x-3">
+        {
+          socialLinks.map(({ label, href, Icon }) => (
+            <li>
+              <ExternalLink href={href} title={label}>
+                <Icon class="text-primary size-5.5 hover:text-pink-800 dark:hover:text-pink-400" />
+                <span class="sr-only">{label}</span>
+              </ExternalLink>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <p class="text-[13px]/8 font-medium tracking-wide text-gray-400 dark:text-gray-500">
+      {tProfile('subtitle')}
+    </p>
+  </div>
+</div>

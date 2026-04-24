@@ -37,9 +37,8 @@ const buildPostHref = (l: Language) => {
 <div id={id} class={cn('dropdown dropdown-hover', directionClass, className)} data-lang-menu>
   <button
     type="button"
-    class="flex items-center gap-x-1.5 hover:bg-inherit"
+    class="flex items-center gap-x-1.5 text-sm hover:bg-inherit"
     aria-expanded="false"
-    aria-controls={id}
     data-lang-menu-toggle
   >
     <Languages size={16} aria-hidden="true" />
@@ -47,7 +46,6 @@ const buildPostHref = (l: Language) => {
     <ChevronDown size={16} aria-hidden="true" />
   </button>
   <ul
-    id={id}
     role="menu"
     class={cn(
       'dropdown-content menu bg-surface-secondary w-24 rounded pt-1.5 shadow-md md:w-32',
@@ -64,7 +62,7 @@ const buildPostHref = (l: Language) => {
             aria-checked={l === lang}
             data-lang-menu-item
             class:list={[
-              'p-2 hover:bg-pink-100/80 md:px-3 dark:hover:bg-pink-900/20',
+              'p-2 text-sm hover:bg-pink-100/80 md:px-3 dark:hover:bg-pink-900/20',
               {
                 'font-semibold text-pink-700 dark:text-pink-200': l === lang,
               },

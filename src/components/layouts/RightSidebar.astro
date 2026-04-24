@@ -2,34 +2,40 @@
 import CategoryList from '@/components/features/sidebar/CategoryList.astro';
 import LineStickersCTA from '@/components/features/sidebar/LineStickersCTA.astro';
 import MyWebsites from '@/components/features/sidebar/MyWebsites.astro';
+import ProfileCard from '@/components/features/sidebar/ProfileCard.astro';
 import PopularPosts from '@/components/features/sidebar/PopularPosts.astro';
 import TagCloud from '@/components/features/sidebar/TagCloud.astro';
-import type { PostMeta, SidebarCategory, TagBadgeInfo, Translator } from '@/types';
+import type { Language, PostMeta, SidebarCategory, TagBadgeInfo, Translator } from '@/types';
 // import Advertisement from '@/components/ui/Advertisement.astro';
 
 interface Props {
+  tProfile: Translator;
+  lang: Language;
   tSidebar: Translator;
   categories: SidebarCategory[];
   tags: TagBadgeInfo[];
   popularPosts: Array<Pick<PostMeta, 'slug' | 'title' | 'date'>>;
 }
 
-const { tSidebar: t, categories, tags, popularPosts } = Astro.props;
+const { tProfile, lang, tSidebar: t, categories, tags, popularPosts } = Astro.props;
 ---
 
 <aside
   id="right-sidebar"
   class:list={[
-    'z-50 flex h-dvh w-72 shrink-0 flex-col xl:h-auto',
-    'fixed inset-y-0 right-0 xl:sticky xl:top-0 xl:self-start',
-    'bg-surface-primary px-4 xl:bg-transparent xl:px-0',
+    'z-50 flex h-dvh w-72 shrink-0 flex-col lg:h-auto',
+    'fixed inset-y-0 right-0 lg:sticky lg:top-0 lg:self-start',
+    'bg-surface-primary px-4 lg:bg-transparent lg:px-0',
     'scrollbar-none overflow-x-hidden overflow-y-auto',
     'transition-all duration-300 ease-in-out',
     'translate-x-full group-data-[sidebar-open=true]/layout:translate-x-0',
-    'xl:translate-x-0 xl:opacity-100',
+    'lg:translate-x-0 lg:opacity-100',
   ]}
 >
-  <div class="max-xl:bg-surface-primary flex shrink-0 flex-col gap-6 py-5 xl:gap-8 xl:py-7">
+  <div class="max-lg:bg-surface-primary flex shrink-0 flex-col gap-6 pt-4 pb-8 lg:gap-8">
+    <div class="max-lg:hidden">
+      <ProfileCard tProfile={tProfile} lang={lang} />
+    </div>
     {popularPosts.length > 0 && <PopularPosts t={t} posts={popularPosts} />}
     {categories.length > 0 && <CategoryList t={t} categories={categories} />}
     {tags.length > 0 && <TagCloud t={t} tags={tags} />}
