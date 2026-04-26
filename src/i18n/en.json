@@ -3,6 +3,13 @@
     "all": "All",
     "allPosts": "All Posts",
     "readMore": "Read More",
+    "error": {
+      "title": "Error",
+      "message": "Something went wrong while loading this content. Please refresh the page.",
+      "editorFailed": "Editor failed to load",
+      "editorMessage": "Please refresh the page or go back and try again",
+      "backToAdmin": "Back to admin"
+    },
     "unit": {
       "posts": "posts",
       "words": "words",
