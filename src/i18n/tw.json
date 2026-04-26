@@ -3,6 +3,10 @@
     "all": "全部",
     "allPosts": "所有文章",
     "readMore": "閱讀更多",
+    "error": {
+      "title": "發生錯誤",
+      "message": "載入此內容時出現問題，請重新整理頁面。"
+    },
     "unit": {
       "posts": "篇",
       "words": "字",
