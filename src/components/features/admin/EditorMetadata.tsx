@@ -91,12 +91,12 @@ const EditorMetadata = ({
   // 點擊外部區域時關閉 dropdown
   useEffect(() => {
     if (!isOpen) return;
-    const handleClick = (e: MouseEvent) => {
+    const handleMouseDown = (e: MouseEvent) => {
       if (!dropdownRef.current?.contains(e.target as Node)) setIsOpen(false);
     };
-    document.addEventListener('click', handleClick);
+    document.addEventListener('mousedown', handleMouseDown);
     return () => {
-      document.removeEventListener('click', handleClick);
+      document.removeEventListener('mousedown', handleMouseDown);
     };
   }, [isOpen]);
 
@@ -152,7 +152,8 @@ const EditorMetadata = ({
               </legend>
               <select
                 value={lang}
-                onChange={(e) => setLang(e.target.value)}
+                onChange={() => {}}
+                onInput={(e) => setLang((e.target as HTMLSelectElement).value)}
                 required
                 className="w-fit border px-2 py-1.5"
               >
