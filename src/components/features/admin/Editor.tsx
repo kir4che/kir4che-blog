@@ -517,7 +517,10 @@ const Editor = ({
                 >
                   <span className={cn(isSaving && 'hidden')}>發布文章</span>
                   <span
-                    className={cn('loading loading-spinner loading-xs', !isSaving && 'hidden')}
+                    className={cn(
+                      'loading loading-spinner loading-xs text-primary',
+                      !isSaving && 'hidden'
+                    )}
                   />
                 </button>
               </>
@@ -531,7 +534,10 @@ const Editor = ({
                 >
                   <span className={cn(isSaving && 'hidden')}>更新</span>
                   <span
-                    className={cn('loading loading-spinner loading-xs', !isSaving && 'hidden')}
+                    className={cn(
+                      'loading loading-spinner loading-xs text-primary',
+                      !isSaving && 'hidden'
+                    )}
                   />
                 </button>
                 <button
