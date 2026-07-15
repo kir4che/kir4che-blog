@@ -20,7 +20,7 @@
 
 @layer components {
   .mdx-content {
-    @apply text-base leading-[1.8];
+    @apply text-base leading-[1.85];
 
     > p,
     > ul,
@@ -87,7 +87,7 @@
     }
 
     blockquote {
-      @apply border-l-6 border-pink-600 bg-pink-100/80 py-2 pl-4 dark:bg-pink-700/20;
+      @apply border-l-6 border-pink-500 bg-pink-100/60 py-2 pl-4 dark:bg-pink-700/20;
     }
 
     code {

@@ -9,7 +9,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "new-post": "bash scripts/new-post.sh"
   },
   "dependencies": {
     "@astrojs/mdx": "^5.0.3",

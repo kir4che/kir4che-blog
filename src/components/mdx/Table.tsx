@@ -1,17 +1,22 @@
-type InlinePart = { type: 'code'; value: string } | { type: 'text'; value: string };
+type InlinePart =
+  | { type: 'bold'; value: string }
+  | { type: 'code'; value: string }
+  | { type: 'text'; value: string };
 
 type TableData = {
   headers: string[];
   rows: Array<Array<string | undefined>>;
 };
 
-const parseInlineCode = (content: string): InlinePart[] =>
+const parseInline = (content: string): InlinePart[] =>
   content
-    .split(/(`[^`]+`)/g)
+    .split(/(`[^`]+`|\*\*[^*]+\*\*)/g)
     .filter(Boolean)
     .map((part) => {
       if (part.startsWith('`') && part.endsWith('`'))
         return { type: 'code', value: part.slice(1, -1) };
+      if (part.startsWith('**') && part.endsWith('**'))
+        return { type: 'bold', value: part.slice(2, -2) };
       return { type: 'text', value: part };
     });
 
@@ -33,18 +38,19 @@ const mergeCols = (row: Array<string | undefined>) => {
 };
 
 const renderInline = (text: string) =>
-  parseInlineCode(text).map((part, i) =>
-    part.type === 'code' ? (
-      <code
-        key={i}
-        className="bg-pink-100/80 px-1.5 py-0.5 text-sm text-pink-800 dark:bg-pink-800/30 dark:text-pink-200"
-      >
-        {part.value}
-      </code>
-    ) : (
-      part.value
-    )
-  );
+  parseInline(text).map((part, i) => {
+    if (part.type === 'bold') return <strong key={i}>{part.value}</strong>;
+    if (part.type === 'code')
+      return (
+        <code
+          key={i}
+          className="bg-pink-100/80 px-1.5 py-0.5 text-sm text-pink-800 dark:bg-pink-800/30 dark:text-pink-200"
+        >
+          {part.value}
+        </code>
+      );
+    return part.value;
+  });
 
 export const Table = ({ data }: { data: TableData }) => {
   if (!data) return null;
@@ -54,7 +60,7 @@ export const Table = ({ data }: { data: TableData }) => {
       <thead>
         <tr>
           {data.headers.map((header, i) => (
-            <th key={i} className="border border-pink-400 dark:border-pink-600/50">
+            <th key={i} className="border border-pink-400 text-sm dark:border-pink-600/50">
               {renderInline(header)}
             </th>
           ))}
@@ -67,7 +73,7 @@ export const Table = ({ data }: { data: TableData }) => {
               <td
                 key={ci}
                 colSpan={cell.colSpan}
-                className="border border-pink-400 text-base/6.5 first:whitespace-nowrap dark:border-pink-600/50"
+                className="border border-pink-400 text-sm/6 first:whitespace-nowrap dark:border-pink-600/50"
               >
                 {renderInline(cell.content)}
               </td>
