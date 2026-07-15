@@ -32,12 +32,6 @@ importers:
       '@fontsource-variable/noto-sans-tc':
         specifier: ^5.2.10
         version: 5.2.10
-      '@fontsource/dm-sans':
-        specifier: ^5.2.8
-        version: 5.2.8
-      '@fontsource/noto-sans-tc':
-        specifier: ^5.2.9
-        version: 5.2.9
       '@formatjs/intl-localematcher':
         specifier: ^0.8.2
         version: 0.8.4
@@ -95,9 +89,6 @@ importers:
       rehype-slug:
         specifier: ^6.0.0
         version: 6.0.0
-      rehype-stringify:
-        specifier: ^10.0.1
-        version: 10.0.1
       rehype-unwrap-images:
         specifier: ^1.0.0
         version: 1.0.0
@@ -107,24 +98,12 @@ importers:
       remark-gfm:
         specifier: ^4.0.1
         version: 4.0.1
-      remark-images:
-        specifier: ^4.1.0
-        version: 4.1.0
       remark-ins:
         specifier: ^1.2.3
         version: 1.2.4(unified@11.0.5)
       remark-mark-highlight:
         specifier: ^0.1.1
         version: 0.1.1
-      remark-mdx:
-        specifier: ^3.1.1
-        version: 3.1.1
-      remark-parse:
-        specifier: ^11.0.0
-        version: 11.0.0
-      remark-rehype:
-        specifier: ^11.1.2
-        version: 11.1.2
       sharp:
         specifier: ^0.34.5
         version: 0.34.5
@@ -137,9 +116,6 @@ importers:
       turndown:
         specifier: ^7.2.4
         version: 7.2.4
-      unified:
-        specifier: ^11.0.5
-        version: 11.0.5
       yaml:
         specifier: ^2.8.3
         version: 2.8.3
@@ -550,12 +526,6 @@ packages:
 
   '@fontsource-variable/noto-sans-tc@5.2.10':
     resolution: {integrity: sha512-COVssWiIp9VVfdGuHpbrcH8u9H5JK4Lm6U7oee2BD6aLwKzPshj49KGmmQe/r3Fcp4e4SSuCaqyN/BtDKxHOGQ==}
-
-  '@fontsource/dm-sans@5.2.8':
-    resolution: {integrity: sha512-tlovG42m9ESG28WiHpLq3F5umAlm64rv0RkqTbYowRn70e9OlRr5a3yTJhrhrY+k5lftR/OFJjPzOLQzk8EfCA==}
-
-  '@fontsource/noto-sans-tc@5.2.9':
-    resolution: {integrity: sha512-Z+pXTvXYrip79lPV9X1lCYO3UTys55P25VqcifDStIzdZ86I4R6t8dz+NhGd09YdbvHWvOCB5Icw1m7glKHPNQ==}
 
   '@formatjs/fast-memoize@3.1.2':
     resolution: {integrity: sha512-vPnriihkfK0lzoQGaXq+qXH23VsYyansRTkTgo2aTG0k1NjLFyZimFVdfj4C9JkSE5dm7CEngcQ5TTc1yAyBfQ==}
@@ -1788,9 +1758,6 @@ packages:
     resolution: {integrity: sha512-+Pgi+vMuUNkJyExiMBt5IlFoMyKnr5zhJ4Uspz58WOhBF5QoIZkFyNHIbBAtHwzVAgk5RtndVNsDRN61/mmDqg==}
     engines: {node: '>=12'}
 
-  is-url@1.2.4:
-    resolution: {integrity: sha512-ITvGim8FhRiYe4IQ5uHSkj7pVaPDrCTkNd3yq3cV7iZAcJdHTUMPMEHcqSOy9xZ9qFenQCvi+2wjH9a1nXqHww==}
-
   is-wsl@3.1.1:
     resolution: {integrity: sha512-e6rvdUCiQCAuumZslxRJWR/Doq4VpPR82kqclvcS0efgt430SlGIk05vdCN58+VrzgtIcfNODjozVielycD4Sw==}
     engines: {node: '>=16'}
@@ -2427,9 +2394,6 @@ packages:
 
   remark-gfm@4.0.1:
     resolution: {integrity: sha512-1quofZ2RQ9EWdeN34S79+KExV1764+wCUGop5CPL1WGdD0ocPpu91lzPGbwWMECpEpd42kJGQwzRfyov9j4yNg==}
-
-  remark-images@4.1.0:
-    resolution: {integrity: sha512-16D81wwqssfexLeYXTHiw05rEbvt7K0dOef8Fjx86hbTwPEHDgzt610Z2l0TDeybdU42M6szvQzf/PtmiQC/Pw==}
 
   remark-ins@1.2.4:
     resolution: {integrity: sha512-ZVGiyuAB2dIGCgOly2ikI+CjT63N84z7OG3tdpZyrAMF8xSAR1HiVGpYg/BQlIQizu2SCfdemC9hYIl/7kKr8w==}
@@ -3461,10 +3425,6 @@ snapshots:
   '@fontsource-variable/dm-sans@5.2.8': {}
 
   '@fontsource-variable/noto-sans-tc@5.2.10': {}
-
-  '@fontsource/dm-sans@5.2.8': {}
-
-  '@fontsource/noto-sans-tc@5.2.9': {}
 
   '@formatjs/fast-memoize@3.1.2': {}
 
@@ -4785,8 +4745,6 @@ snapshots:
 
   is-plain-obj@4.1.0: {}
 
-  is-url@1.2.4: {}
-
   is-wsl@3.1.1:
     dependencies:
       is-inside-container: 1.0.0
@@ -5636,14 +5594,6 @@ snapshots:
       unified: 11.0.5
     transitivePeerDependencies:
       - supports-color
-
-  remark-images@4.1.0:
-    dependencies:
-      '@types/mdast': 4.0.4
-      collapse-white-space: 2.1.0
-      is-url: 1.2.4
-      unist-util-position: 5.0.0
-      unist-util-visit-parents: 6.0.2
 
   remark-ins@1.2.4(unified@11.0.5):
     dependencies:

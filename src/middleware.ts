@@ -9,41 +9,51 @@ const linkHeader =
 export const onRequest = defineMiddleware(async (context, next) => {
   const { url, cookies, redirect, request } = context;
 
-  if (url.pathname.startsWith('/admin') && !url.pathname.startsWith('/admin/login')) {
-    if (!(await isAuthenticated(cookies))) return redirect('/admin/login');
-  }
+  if (
+    url.pathname.startsWith('/admin') &&
+    !url.pathname.startsWith('/admin/login') &&
+    !(await isAuthenticated(cookies))
+  )
+    return redirect('/admin/login');
 
-  if (url.pathname.startsWith('/api/admin')) {
-    if (!(await isAuthenticated(cookies))) return new Response('Unauthorized', { status: 401 });
-  }
+  if (url.pathname.startsWith('/api/admin') && !(await isAuthenticated(cookies)))
+    return new Response('Unauthorized', { status: 401 });
 
-  const accept = request.headers.get('accept') || '';
-
+  // 只在非 API 路徑 + Accept header 包含 text/markdown 時，將 HTML 轉換為 Markdown。
   const isPageRequest = !url.pathname.startsWith('/api') && !url.pathname.startsWith('/admin');
 
-  if (accept.includes('text/markdown') && isPageRequest) {
-    const response = await next();
-
-    const contentType = response.headers.get('content-type') || '';
-
-    if (contentType.includes('text/html')) {
-      const html = await response.text();
-
-      const mainContent = extractMain(html);
-
-      const markdown = turndown.turndown(mainContent);
-
-      return new Response(markdown, {
-        status: 200,
-        headers: {
-          'Content-Type': 'text/markdown; charset=utf-8',
-          Link: linkHeader,
-          Vary: 'Accept',
-        },
-      });
+  if (isPageRequest) {
+    let accept = '';
+    try {
+      accept = request.headers.get('accept') || '';
+    } catch {
+      // headers 在 prerendering 時不可用
     }
 
-    return response;
+    if (accept.includes('text/markdown')) {
+      const response = await next();
+
+      const contentType = response.headers.get('content-type') || '';
+
+      if (contentType.includes('text/html')) {
+        const html = await response.text();
+
+        const mainContent = extractMain(html);
+
+        const markdown = turndown.turndown(mainContent);
+
+        return new Response(markdown, {
+          status: 200,
+          headers: {
+            'Content-Type': 'text/markdown; charset=utf-8',
+            Link: linkHeader,
+            Vary: 'Accept',
+          },
+        });
+      }
+
+      return response;
+    }
   }
 
   const response = await next();
