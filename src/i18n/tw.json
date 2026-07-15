@@ -36,7 +36,7 @@
   },
   "profile": {
     "name": "Molly",
-    "subtitle": "前端工程師"
+    "subtitle": "前端菜鳥"
   },
   "settings": {
     "theme": {
@@ -93,18 +93,19 @@
   },
   "AboutPage": {
     "title": "關於我",
-    "description": "嗨，我是 Molly，一名前端工程師，專注於網頁介面開發，同時熱愛遊戲與生活紀錄，分享工作與日常的點滴。",
+    "description": "嗨，我是 Molly，一名迷茫中的前端菜鳥，熱愛嘗試各種新事物，喜歡分享學習過程中的點滴與生活中的小確幸。",
     "intro": "嗨，我是 Molly 🍒",
     "coverImageAlt": "關於我的封面圖片",
     "personalInfo": {
-      "job": "👩🏻‍💻 目前是一名前端工程師",
+      "job": "👩🏻‍💻 目前是一名前端菜鳥",
       "mbti": "🦫 MBTI 是務實的 ISTJ（物流師）",
       "hobby": "🎮 愛玩各種遊戲，爐石、快打、沙盒類遊戲...也有在看 LOL 的比賽。",
       "hobby2": "🇯🇵 最近重拾動漫，最愛柯南、幽白、賈修、銀魂。",
       "hobby3": "🧶 喜歡鉤織，最近的挑戰是織衣服～"
     },
     "vlogIntro": "喜歡嘗試很多事情，最近開始拍 Vlog 想要紀錄生活的每一刻。",
-    "title_2": "💌 如何聯繫我："
+    "title_2": "🖥️ 線上簡歷 & 作品集",
+    "title_3": "💌 如何聯繫我："
   },
   "ArchivePage": {
     "title": "文章列表",

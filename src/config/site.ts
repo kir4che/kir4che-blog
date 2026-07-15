@@ -30,6 +30,7 @@ export const CONFIG = {
         en: `kir4che's Blog`,
       },
     },
+    resumeLink: 'https://portfolio.kir4che.com',
     socialLinks: {
       youtube: 'https://www.youtube.com/@kir4che',
       github: 'https://github.com/kir4che',

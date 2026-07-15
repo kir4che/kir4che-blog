@@ -1,6 +1,8 @@
 ---
 export const prerender = true;
 
+import { Link } from '@lucide/astro';
+
 import { CONFIG } from '@/config';
 import youtubes from '@/data/youtubes';
 import { createTranslator, getLangStaticPaths, resolveLanguage } from '@/lib/i18n';
@@ -12,8 +14,6 @@ import SiteLayout from '@/layouts/SiteLayout.astro';
 
 import aboutImg from '@/assets/images/about-illustration.webp';
 import arrowsImg from '@/assets/images/arrows-illustration.webp';
-import butterflyImg2 from '@/assets/images/butterfly-illustration-2.webp';
-import butterflyImg1 from '@/assets/images/butterfly-illustration.webp';
 import booImg from '@/assets/images/cat-boo.webp';
 import huamiAndBooImg from '@/assets/images/cat-huami-and-boo.webp';
 import huamiImg from '@/assets/images/cat-huami.webp';
@@ -27,18 +27,13 @@ const videos = Object.values(youtubes);
 
 <SiteLayout title={t('title')} description={t('description')}>
   <div class="bg-surface-secondary relative rounded-xl pb-10 shadow lg:pb-24">
-    <DecorativeImage src={butterflyImg1.src} class="absolute top-8 right-0 z-10 w-40 xl:right-8" />
-    <DecorativeImage
-      src={butterflyImg2.src}
-      class="absolute right-5 bottom-150 z-10 w-32 md:right-12 lg:right-60 lg:bottom-165 2xl:right-72"
-    />
     <DecorativeImage
       src={aboutImg.src}
       class="absolute -right-8 -bottom-8 z-30 w-[50vw] md:-right-4 md:w-80"
     />
-    <div class="relative z-20 space-y-6 px-8 py-6">
+    <div class="relative z-20 px-8 py-6">
       <h2>{t('title')}</h2>
-      <section class="space-y-4">
+      <section class="mt-6 space-y-4">
         <h3 class="heading -ml-8">{t('intro')}</h3>
         <ul class="list-inside list-disc leading-7">
           <li>{t('personalInfo.job')}</li>
@@ -83,8 +78,14 @@ const videos = Object.values(youtubes);
           </section>
         </div>
       </section>
-      <section class="relative space-y-2.5">
-        <h3 class="heading -ml-8">{t('title_2')}</h3>
+      <section class="mt-10 space-y-4">
+        <h3 class="heading -ml-8 flex items-center gap-2">
+          {t('title_2')}
+          <ExternalLink href={CONFIG.siteInfo.resumeLink} noline><Link size={18} /></ExternalLink>
+        </h3>
+      </section>
+      <section class="relative mt-10 space-y-2.5">
+        <h3 class="heading -ml-8">{t('title_3')}</h3>
         <ExternalLink
           href={`mailto:${CONFIG.siteInfo.email}`}
           className="relative inline-block text-xl font-medium text-pink-600 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 after:ease-out hover:after:scale-x-100 dark:text-pink-300"
@@ -106,7 +107,7 @@ const videos = Object.values(youtubes);
           </div>
         </div>
       </section>
-      <section class="space-y-4">
+      <section class="mt-10 space-y-4">
         <h3 class="heading -ml-8">曬貓</h3>
         <p>家裡養了兩隻貓貓－花咪、小晡，霹靂可愛 (*´∀`)~🩷</p>
         <Images
