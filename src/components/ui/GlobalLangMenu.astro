@@ -3,7 +3,7 @@ import { ChevronDown, Languages } from '@lucide/astro';
 
 import { SUPPORTED_LANGUAGES } from '@/config';
 import { createTranslator, getLocaleFromUrl } from '@/lib/i18n';
-import { swapLocaleInPath } from '@/lib/paths';
+import { getLanguageBasePath, swapLocaleInPath } from '@/lib/paths';
 import type { Language } from '@/types';
 import { cn } from '@/utils/cn';
 
@@ -32,6 +32,10 @@ const buildPostHref = (l: Language) => {
   const path = swapLocaleInPath(Astro.url.pathname, l);
   return `${encodeURI(path)}${Astro.url.search}`;
 };
+
+const langBasePaths = Object.fromEntries(
+  SUPPORTED_LANGUAGES.map((l) => [l, getLanguageBasePath(l)])
+);
 ---
 
 <div id={id} class={cn('dropdown dropdown-hover', directionClass, className)} data-lang-menu>
@@ -75,3 +79,26 @@ const buildPostHref = (l: Language) => {
     }
   </ul>
 </div>
+
+<script is:inline define:vars={{ langBasePaths }}>
+  document.querySelector('[data-lang-menu]')?.addEventListener('click', async (e) => {
+    const anchor = e.target.closest('[data-lang-menu-item]');
+    if (!anchor) return;
+
+    e.preventDefault();
+    const href = anchor.getAttribute('href');
+    if (!href) return;
+
+    try {
+      const res = await fetch(href, { method: 'HEAD' });
+      if (res.ok) {
+        location.href = href;
+      } else {
+        const lang = Object.entries(langBasePaths).find(([, base]) => href.startsWith(base))?.[0];
+        location.href = lang ? langBasePaths[lang] : href;
+      }
+    } catch {
+      location.href = href;
+    }
+  });
+</script>
