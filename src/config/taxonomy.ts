@@ -263,6 +263,13 @@ export const tagMap: Record<string, TagDefinition> = {
     },
     slug: 'musings',
   },
+  notes: {
+    name: {
+      tw: '筆記',
+      en: 'Notes',
+    },
+    slug: 'notes',
+  },
   pokemon: {
     name: {
       tw: 'Pokemon',
@@ -283,6 +290,13 @@ export const tagMap: Record<string, TagDefinition> = {
       en: 'React',
     },
     slug: 'react',
+  },
+  security: {
+    name: {
+      tw: '資訊安全',
+      en: 'Security',
+    },
+    slug: 'security',
   },
   seo: {
     name: {
