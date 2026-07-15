@@ -10,6 +10,7 @@ import { loadEnv } from 'vite';
 
 import ecConfig from './ec.config.mjs';
 
+import rehypeExternalLinks from 'rehype-external-links';
 import rehypeSlug from 'rehype-slug';
 import rehypeUnwrapImages from 'rehype-unwrap-images';
 import remarkCustomHeaderId from 'remark-custom-header-id';
@@ -70,7 +71,11 @@ export default defineConfig({
   integrations: [react(), expressiveCode(ecConfig), mdx(), sitemap()],
   markdown: {
     remarkPlugins: [remarkGfm, remarkIns, remarkMark, remarkCustomHeaderId, remarkImages],
-    rehypePlugins: [rehypeUnwrapImages, rehypeSlug],
+    rehypePlugins: [
+      rehypeUnwrapImages,
+      rehypeSlug,
+      [rehypeExternalLinks, { target: '_blank', rel: ['noopener', 'noreferrer'] }],
+    ],
   },
   image: {
     remotePatterns: [{ protocol: 'https', hostname: 'cdn.kir4che.com' }],
