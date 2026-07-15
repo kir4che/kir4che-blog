@@ -3,7 +3,13 @@ import { ChevronDown, Languages } from '@lucide/astro';
 
 import { SUPPORTED_LANGUAGES } from '@/config';
 import { createTranslator, getLocaleFromUrl } from '@/lib/i18n';
-import { getLanguageBasePath, swapLocaleInPath } from '@/lib/paths';
+import {
+  getLocalizedPostPath,
+  stripLocalePrefix,
+  swapLocaleInPath,
+  withLocalePrefix,
+} from '@/lib/paths';
+import { getPostAvailableLangs, getPostMetaBySlug } from '@/lib/posts';
 import type { Language } from '@/types';
 import { cn } from '@/utils/cn';
 
@@ -28,17 +34,25 @@ const marginClass =
 const lang = getLocaleFromUrl(Astro.url);
 const t = createTranslator(lang, 'settings');
 
+const strippedPath = stripLocalePrefix(Astro.url.pathname);
+const slugCandidate = strippedPath === '/' ? null : strippedPath.replace(/^\/+|\/+$/g, '');
+const currentPostMeta = slugCandidate ? await getPostMetaBySlug(lang, slugCandidate) : null;
+const availablePostLangs = currentPostMeta ? await getPostAvailableLangs(currentPostMeta.slug) : [];
+
 const buildPostHref = (l: Language) => {
+  if (currentPostMeta) {
+    if (availablePostLangs.includes(l))
+      return getLocalizedPostPath({ lang: l, slug: currentPostMeta.slug });
+
+    return withLocalePrefix('/', l);
+  }
+
   const path = swapLocaleInPath(Astro.url.pathname, l);
   return `${encodeURI(path)}${Astro.url.search}`;
 };
-
-const langBasePaths = Object.fromEntries(
-  SUPPORTED_LANGUAGES.map((l) => [l, getLanguageBasePath(l)])
-);
 ---
 
-<div class="dropdown dropdown-bottom dropdown-end" data-lang-menu>
+<div id={id} class={cn('dropdown', directionClass, className)} data-lang-menu>
   <button
     type="button"
     class="flex items-center gap-x-1.5 text-sm hover:bg-inherit"
@@ -51,7 +65,10 @@ const langBasePaths = Object.fromEntries(
   </button>
   <ul
     role="menu"
-    class="dropdown-content menu bg-surface-secondary z-10 mt-1.5 hidden w-24 rounded shadow-md md:w-32"
+    class={cn(
+      'dropdown-content menu bg-surface-secondary z-10 hidden w-24 rounded shadow-md md:w-32',
+      marginClass
+    )}
     data-lang-menu-list
   >
     {
@@ -76,26 +93,3 @@ const langBasePaths = Object.fromEntries(
     }
   </ul>
 </div>
-
-<script is:inline define:vars={{ langBasePaths }}>
-  document.querySelector('[data-lang-menu]')?.addEventListener('click', async (e) => {
-    const anchor = e.target.closest('[data-lang-menu-item]');
-    if (!anchor) return;
-
-    e.preventDefault();
-    const href = anchor.getAttribute('href');
-    if (!href) return;
-
-    try {
-      const res = await fetch(href, { method: 'HEAD' });
-      if (res.ok) {
-        location.href = href;
-      } else {
-        const lang = Object.entries(langBasePaths).find(([, base]) => href.startsWith(base))?.[0];
-        location.href = lang ? langBasePaths[lang] : href;
-      }
-    } catch {
-      location.href = href;
-    }
-  });
-</script>
