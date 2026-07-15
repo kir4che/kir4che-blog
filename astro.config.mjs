@@ -35,7 +35,6 @@ export default defineConfig({
     inlineStylesheets: 'always',
   },
   vite: {
-    // @ts-expect-error
     plugins: [tailwindcss()],
     resolve: {
       alias: {
@@ -43,9 +42,9 @@ export default defineConfig({
       },
     },
     server: {
+      port: process.env.ADMIN_DEV ? 4322 : 4321,
       watch: {
-        // 防止後台自動儲存寫入內容檔時觸發 HMR 整頁重整
-        ignored: ['**/src/content/blog/**'],
+        ...(process.env.ADMIN_DEV ? { ignored: ['**/src/content/blog/**'] } : {}),
       },
     },
     ssr: {
