@@ -26,54 +26,69 @@ const categoryBasePath = withLocalePrefix('/categories', lang);
 ---
 
 <SiteLayout title={t('title')}>
-  <h1 class="mb-4">{t('title')}</h1>
   {
     categories.length === 0 ? (
-      <p class="text-foreground-primary/80 text-sm">{t('noCategories')}</p>
+      <div class="bg-surface-secondary rounded-[1.75rem] border border-dashed border-black/10 px-6 py-10 text-center dark:border-white/10">
+        <p class="text-foreground-primary/70 text-sm tracking-[0.18em] uppercase">
+          {t('noCategories')}
+        </p>
+      </div>
     ) : (
-      <div class="xs:grid-cols-2 grid grid-cols-1 gap-4 xl:grid-cols-4">
+      <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3 xl:gap-4">
         {categories.map(({ name, slug, color, postCount = 0, subcategories }) => {
           const categoryName = name[lang] ?? name.en ?? Object.values(name)[0];
+          const categorySubcategories = subcategories ? Object.entries(subcategories) : [];
 
           return (
-            <div
-              class="bg-surface-secondary flex flex-col rounded-lg border-2 border-(--category-color) p-3 transition-colors duration-300 dark:border-(--category-color-dark)"
+            <article
+              class="bg-surface-secondary group relative overflow-hidden rounded-3xl border border-(--category-color)/20 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-(--category-color)/45 hover:shadow-[1px_4px_12px_rgba(233,92,133,0.16)] dark:border-(--category-color-dark)/25 dark:hover:border-(--category-color-dark)/45 dark:hover:shadow-[0_0_16px_rgba(255,214,224,0.12)]"
               style={getCategoryStyle(color)}
             >
-              <h2 class="mb-4 flex flex-wrap items-baseline justify-between text-xl text-(--category-color) dark:text-(--category-color-dark)">
-                <a
-                  href={`${categoryBasePath}/${slug}`}
-                  class="block transition-transform hover:scale-[1.02]"
-                  aria-label={`${categoryName} (${postCount} posts)`}
-                >
-                  {categoryName}
-                </a>
-                <span class="text-foreground-primary/80 xs:text-sm text-xs font-normal">
-                  {t('postCount', { count: postCount })}
-                </span>
-              </h2>
-              {subcategories && Object.keys(subcategories).length > 0 && (
-                <div class="flex flex-wrap gap-1.5">
-                  {Object.entries(subcategories!).map(([subSlug, sub]) => {
-                    const subName = sub.name[lang] ?? sub.name.en ?? Object.values(sub.name)[0];
-
-                    return (
+              <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,var(--category-color-glow),transparent_34%)] opacity-55 transition duration-300 group-hover:opacity-85 dark:bg-[radial-gradient(circle_at_top_right,var(--category-color-dark-glow),transparent_38%)]" />
+              <div class="relative z-10 flex h-full flex-col gap-4">
+                <div class="flex-between gap-3">
+                  <div class="min-w-0 space-y-2">
+                    <h2 class="text-xl leading-tight text-(--category-color) dark:text-(--category-color-dark)">
                       <a
-                        href={`${categoryBasePath}/${subSlug}`}
-                        class="rounded-full border border-(--subcategory-color)/50 bg-(--subcategory-color)/10 px-2.5 py-1 text-xs font-medium text-(--subcategory-color) transition-transform hover:scale-[1.02] dark:border-(--subcategory-color-dark)/80 dark:bg-(--subcategory-color-dark)/20 dark:text-(--subcategory-color-dark)"
-                        style={{
-                          '--subcategory-color': sub.color.light,
-                          '--subcategory-color-dark': sub.color.dark,
-                        }}
-                        aria-label={`${subName} (${sub.postCount ?? 0} posts)`}
+                        href={`${categoryBasePath}/${slug}`}
+                        class="inline-flex items-center gap-2 transition duration-300 group-hover:translate-x-0.5"
+                        aria-label={`${categoryName} (${postCount} posts)`}
                       >
-                        {subName}
+                        {categoryName}
+                        <span class="text-foreground-primary/35 text-base transition duration-300 group-hover:text-(--category-color) dark:group-hover:text-(--category-color-dark)">
+                          ↗
+                        </span>
                       </a>
-                    );
-                  })}
+                    </h2>
+                  </div>
+                  <div class="bg-background/80 flex-center size-7 rounded-full border border-black/5 dark:border-white/10">
+                    <div class="text-foreground-primary text-sm leading-none">{postCount}</div>
+                  </div>
                 </div>
-              )}
-            </div>
+                {categorySubcategories.length > 0 && (
+                  <div class="flex flex-wrap gap-2">
+                    {categorySubcategories.map(([subSlug, sub]) => {
+                      const subName = sub.name[lang] ?? sub.name.en ?? Object.values(sub.name)[0];
+
+                      return (
+                        <a
+                          href={`${categoryBasePath}/${subSlug}`}
+                          class="rounded-full border border-(--subcategory-color)/50 bg-(--subcategory-color)/10 px-2.5 py-1 text-xs font-medium text-(--subcategory-color) transition-transform hover:scale-[1.02] dark:border-(--subcategory-color-dark)/80 dark:bg-(--subcategory-color-dark)/20 dark:text-(--subcategory-color-dark)"
+                          style={{
+                            '--subcategory-color': sub.color.light,
+                            '--subcategory-color-dark': sub.color.dark,
+                          }}
+                          aria-label={`${subName} (${sub.postCount ?? 0} posts)`}
+                        >
+                          {subName}
+                          <span class="ml-1 text-[10px] opacity-70">{sub.postCount ?? 0}</span>
+                        </a>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </article>
           );
         })}
       </div>
