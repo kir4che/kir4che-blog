@@ -31,6 +31,11 @@ export interface SidebarCategory {
   postCount: number;
 }
 
+export interface TagDefinition {
+  name: Partial<Record<Language, string>>;
+  slug: string;
+}
+
 export interface TagBadgeInfo {
   slug: string;
   name: string;

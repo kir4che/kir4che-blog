@@ -293,39 +293,65 @@ const TaxonomyManager = ({ initialCategories, initialTags }: TaxonomyManagerProp
 
   // 組合目前 categories + tags 並轉成 TypeScript 檔案下載
   const handleDownload = useCallback(() => {
-    const ind = (n: number) => '  '.repeat(n);
     const esc = (s?: string) => (s || '').replace(/'/g, "\\'");
     const lines: string[] = [
-      "import type { Category, Language } from '@/types';\n",
+      "import type { Category, CategoryColorScheme, Language, TagDefinition } from '@/types';\n",
+      '// ── helpers ──',
+      'const mono = (c: string): CategoryColorScheme => ({ light: c, dark: c });',
+      'const dual = (l: string, d: string): CategoryColorScheme => ({ light: l, dark: d });',
+      '',
+      'const cat = (',
+      '  slug: string,',
+      '  tw: string,',
+      '  en: string,',
+      '  color: CategoryColorScheme,',
+      '): Category => ({ name: { tw, en }, slug, color });',
+      '',
+      'const tag = (slug: string, tw: string, en: string): TagDefinition => ({',
+      '  name: { tw, en },',
+      '  slug,',
+      '});',
+      '',
+      '// ── categories ──',
       'export const categoryMap: Record<string, Category> = {',
     ];
 
     for (const [slug, cat] of Object.entries(categories)) {
-      lines.push(
-        `${ind(1)}${slug}: {\n${ind(2)}name: {\n${ind(3)}tw: '${esc(cat.name.tw)}',\n${ind(3)}en: '${esc(cat.name.en)}',\n${ind(2)}},\n${ind(2)}slug: '${slug}',\n${ind(2)}color: {\n${ind(3)}light: '${cat.color.light}',\n${ind(3)}dark: '${cat.color.dark}',\n${ind(2)}},`
-      );
+      const color =
+        cat.color.light === cat.color.dark
+          ? `mono('${cat.color.light}')`
+          : `dual('${cat.color.light}', '${cat.color.dark}')`;
+
+      const catLine = `  ${slug}: cat('${slug}', '${esc(cat.name.tw)}', '${esc(cat.name.en)}', ${color}),`;
 
       if (cat.subcategories && Object.keys(cat.subcategories).length > 0) {
-        lines.push(`${ind(2)}subcategories: {`);
+        lines.push(`  ${slug}: {`);
+        lines.push(
+          `    ...cat('${slug}', '${esc(cat.name.tw)}', '${esc(cat.name.en)}', ${color}),`
+        );
+        lines.push('    subcategories: {');
         for (const [subSlug, sub] of Object.entries(cat.subcategories)) {
+          const subColor =
+            sub.color.light === sub.color.dark
+              ? `mono('${sub.color.light}')`
+              : `dual('${sub.color.light}', '${sub.color.dark}')`;
           lines.push(
-            `${ind(3)}${subSlug}: {\n${ind(4)}name: {\n${ind(5)}tw: '${esc(sub.name.tw)}',\n${ind(5)}en: '${esc(sub.name.en)}',\n${ind(4)}},\n${ind(4)}slug: '${subSlug}',\n${ind(4)}color: {\n${ind(5)}light: '${sub.color.light}',\n${ind(5)}dark: '${sub.color.dark}',\n${ind(4)}},\n${ind(3)}},`
+            `      ${subSlug}: { name: { tw: '${esc(sub.name.tw)}', en: '${esc(sub.name.en)}' }, slug: '${subSlug}', color: ${subColor} },`
           );
         }
-        lines.push(`${ind(2)}},`);
+        lines.push('    },');
+        lines.push('  },');
+      } else {
+        lines.push(catLine);
       }
-      lines.push(`${ind(1)}},`);
     }
 
-    lines.push(
-      '};\n\ninterface TagDefinition {\n  name: Record<Language, string>;\n  slug: string;\n}\n'
-    );
+    lines.push('};\n');
+    lines.push('// ── tags ──');
     lines.push('export const tagMap: Record<string, TagDefinition> = {');
 
-    for (const [slug, tag] of Object.entries(tags).sort(([a], [b]) => a.localeCompare(b))) {
-      lines.push(
-        `${ind(1)}${slug}: {\n${ind(2)}name: {\n${ind(3)}tw: '${esc(tag.name.tw)}',\n${ind(3)}en: '${esc(tag.name.en)}',\n${ind(2)}},\n${ind(2)}slug: '${slug}',\n${ind(1)}},`
-      );
+    for (const [slug, tg] of Object.entries(tags).sort(([a], [b]) => a.localeCompare(b))) {
+      lines.push(`  ${slug}: tag('${slug}', '${esc(tg.name.tw)}', '${esc(tg.name.en)}'),`);
     }
     lines.push('};\n');
 
