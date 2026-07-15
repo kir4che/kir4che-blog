@@ -11,23 +11,23 @@ tags:
 
 ## Cookie
 
-Cookie 是伺服器發送到瀏覽器的一小段資料，會在後續的每次 HTTP 請求中自動附加到 header，用於與伺服器交互。簡單來說，它是一種**瀏覽器的存儲機制**，可幫助伺服器辨識用戶狀態，如：在登入網站後，伺服器可透過 Cookie 記住你的身份，讓後續請求保持登入狀態。
+Cookie 是伺服器發送到瀏覽器的一小段資料，會在後續的每次 HTTP 請求中自動附加到 header，用於與伺服器交互。簡單來說，它是一種**瀏覽器的儲存機制**，可幫助伺服器辨識使用者狀態 ex. 在登入網站後，伺服器可透過 Cookie 記住你的身份，讓後續請求保持登入狀態。
 
 - **存放位置**：儲存在瀏覽器（Client 端）並自動傳輸至伺服器
 - **存取方式**：使用 `document.cookie` 進行存取與修改
 - **容量限制**：單一 Cookie 的大小約為 4KB
 - **安全性**：可設定 HttpOnly、Secure 和 SameSite 等屬性來提高安全性
 
-根據生命週期分爲：
+根據生命週期分為：
 
-- **會話 Cookie（Session Cookie）**：被儲存在瀏覽器的資料僅在當前會話（用戶打開瀏覽器到關閉瀏覽器的這段時間）有效，關閉瀏覽器後即被刪除。
-- **永久 Cookie（Persistent Cookie）**：可設定 `expires` 或 `max-age` 屬性，資料將保存至指定時間或至用戶手動刪除。
+- **會話 Cookie（Session Cookie）**：被儲存在瀏覽器的資料僅在當前會話（使用者打開瀏覽器到關閉瀏覽器的這段時間）有效，關閉瀏覽器後即被刪除。
+- **永久 Cookie（Persistent Cookie）**：可設定 `expires` 或 `max-age` 屬性，資料將保存至指定時間或至使用者手動刪除。
 
 > 現代瀏覽器可能會保存會話（重啟瀏覽器會恢復標籤頁），此情況下 Cookie 可能會被保留。
 
 ### 缺點
 
-- **容量小**：大小限制約爲 4KB，無法儲存大量資料。
+- **容量小**：大小限制約為 4KB，無法儲存大量資料。
 - **佔用網路流量**：Cookie 會附加在每個 HTTP 請求，增加了傳輸流量，若資料太多會影響效能。
 - **資料安全性低**：Cookie 是夾帶在 header 一起被傳送（明文傳遞），沒有另外加密，除非用超文字傳輸安全協定。
 
@@ -41,24 +41,24 @@ Cookie 是伺服器發送到瀏覽器的一小段資料，會在後續的每次 
 
 1. 瀏覽器向伺服器發出請求
 2. 伺服器在請求中透過 Set-Cookie header 傳遞 Cookie 給瀏覽器
-3. 瀏覽器將 Cookie 儲存起來，並按照設定的屬性（如：expires、max-age）管理。
+3. 瀏覽器將 Cookie 儲存起來，並按照設定的屬性（ex. expires、max-age）管理。
 4. 瀏覽器再次向相同伺服器發出請求時，會自動將該 Cookie 附加到 header，供伺服器識別及使用。
 
 ### 適用場景
 
-- 儲存伺服器需要的資料，如：Session ID 或身份驗證 Token。
+- 儲存伺服器需要的資料 ex. Session ID 或身份驗證 Token
 - 需要跨瀏覽器分頁同步的資料
-- 儲存用戶偏好，如：語言設定或主題模式。
+- 儲存使用者偏好 ex. 語言設定或主題模式
 
 ---
 
 ## WebStorage
 
-WebStorage 是一種由瀏覽器提供 Client 端的存儲機制，包含 LocalStorage 和 SessionStorage，相較於 Cookie，具有以下優勢：
+WebStorage 是一種由瀏覽器提供 Client 端的儲存機制，包含 LocalStorage 和 SessionStorage，相較於 Cookie，具有以下優勢：
 
 - **容量提升**：通常約 **5MB**，相較於 Cookie 的 **4KB** 空間更大。
-- **降低網路負擔**：數據不隨 HTTP 請求自動傳送，減少不必要的流量。
-- **易於使用**：提供簡易的 API（如 setItem、getItem）便於操作數據
+- **降低網路負擔**：資料不隨 HTTP 請求自動傳送，減少不必要的流量。
+- **易於使用**：提供簡易的 API（ex. setItem、getItem）便於操作資料
 
 ## LocalStorage vs SessionStorage
 
@@ -67,21 +67,21 @@ WebStorage 是一種由瀏覽器提供 Client 端的存儲機制，包含 LocalS
     headers: ['特性', 'LocalStorage（本地儲存）', 'SessionStorage（會話儲存）'],
     rows: [
       [
-        '存儲期限',
-        '永久保存，除非用戶手動或程式刪除，否則會一直存在於瀏覽器中。',
+        '儲存期限',
+        '永久保存，除非使用者手動或程式刪除，否則會一直存在於瀏覽器中。',
         '僅在當前會話有效，關閉瀏覽器後即刪除。',
       ],
       ['跨會話存取', '✅（同一網域下）', '❌'],
       [
         '存放位置',
-        '僅存在於 Client 端，不隨 HTTP 請求傳送到伺服器，但可手動傳輸（如透過 AJAX）。',
-        '僅存在於 Client 端，不隨 HTTP 請求傳送到伺服器，但可手動傳輸（如透過 AJAX）。',
+        '僅存在於 Client 端，不隨 HTTP 請求傳送到伺服器，但可手動傳輸 ex. 透過 AJAX。',
+        '僅存在於 Client 端，不隨 HTTP 請求傳送到伺服器，但可手動傳輸 ex. 透過 AJAX。',
       ],
       ['容量限制', '約 5MB（視瀏覽器而定）', '約 5MB（視瀏覽器而定）'],
-      ['安全性', '易受 XSS 攻擊，不適合存儲敏感資訊。', '易受 XSS 攻擊，不適合存儲敏感資訊。'],
+      ['安全性', '易受 XSS 攻擊，不適合儲存敏感資訊。', '易受 XSS 攻擊，不適合儲存敏感資訊。'],
       [
         '適用場景',
-        '長期使用或需跨分頁同步的非敏感數據，如使用者偏好、暫存應用數據等，且取代 Cookie 儲存購物車資訊。',
+        '長期使用或需跨分頁同步的非敏感資料，如使用者偏好、暫存應用資料等，且取代 Cookie 儲存購物車資訊。',
         '短期、不跨頁的臨時性資料，如表單資料暫存或頁面內的狀態保存。',
       ],
     ],
@@ -94,9 +94,9 @@ WebStorage 是一種由瀏覽器提供 Client 端的存儲機制，包含 LocalS
 
 ## Session
 
-Session 是伺服器端的一種狀態管理技術，用於實現**用戶與伺服器之間的狀態保持**，特別是在 HTTP 這種無狀態協定中。
+Session 是伺服器端的一種狀態管理技術，用於實現**使用者與伺服器之間的狀態保持**，特別是在 HTTP 這種無狀態協定中。
 
-- **儲存位置**：Session 資料存儲在伺服器端，而 Client 端只需保存 Session ID（通常透過 Cookie 或 URL 傳遞）。
+- **儲存位置**：Session 資料儲存在伺服器端，而 Client 端只需保存 Session ID（通常透過 Cookie 或 URL 傳遞）。
 - **生命週期**
   - 預設為瀏覽器關閉後失效，但伺服器可設定特定時間以控制 Session 的存留時間。
   - 若搭配 Cookie 使用則會受到 Cookie 的有效期影響。
@@ -110,17 +110,16 @@ Session 是伺服器端的一種狀態管理技術，用於實現**用戶與伺�
 
 - 定期更新 Session ID，降低 Session 劫持風險（Session Fixation 攻擊）。
 - 使用伺服器端加密或驗證，確保 Session 的完整性與合法性。
-- 如果發現用戶異常登錄（如多地同時登錄），可以強制使舊的 Session 失效。
+- 如果發現使用者異常登入 ex.多地同時登入，可以強制使舊的 Session 失效。
 
 ### Session 與 Cookie 的協作
 
-Session 本身不直接依賴 Cookie，但通常會用 Cookie 存放 Session ID，以實現伺服器端的會話管理，如：用戶登入後，伺服器生成 Session，將 Session ID 回傳給瀏覽器存放於 Cookie
-中。後續請求中，瀏覽器自動攜帶該 Cookie，伺服器根據 Session ID 確認用戶身份。
+Session 本身不直接依賴 Cookie，但通常會用 Cookie 存放 Session ID，以實現伺服器端的會話管理 ex. 使用者登入後，伺服器生成 Session，將 Session ID 回傳給瀏覽器存放於 Cookie 中。後續請求中，瀏覽器自動攜帶該 Cookie，伺服器根據 Session ID 確認使用者身份。
 
-> 若只選用其中一個就會有一些問題，如 :
+> 若只選用其中一個就會有一些問題 ex.
 >
-> - 只用 Session : Session ID 儲存在 Client 端，一旦瀏覽器或分頁關閉，Session ID 就會不見。
-> - 只用 Cookie : 所有資訊存於 Client 端，空間受限且若電腦遭駭，資料易被竊取。
+> - 只用 Session：Session ID 儲存在 Client 端，一旦瀏覽器或分頁關閉，Session ID 就會不見。
+> - 只用 Cookie：所有資訊存於 Client 端，空間受限且若電腦遭駭，資料易被竊取。
 
 ---
 

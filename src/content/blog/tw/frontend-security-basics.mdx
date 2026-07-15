@@ -171,7 +171,7 @@ location.href = userInput            // javascript: URL 攻擊
 ## 內容安全政策 (Content Security Policy, CSP)
 CSP 透過 HTTP Header 告訴瀏覽器「這個頁面可以載入哪些資源」，是一種深度防禦機制，專門防範 XSS 和資料注入攻擊。
 
-> ⚠️ CSP 不是萬靈丹，是最後一道防線，就算你的 XSS 防護有漏洞，CSP 還有機會補救。
+> ⚠️ CSP 擋不住所有攻擊，它是最後一道防線，就算 XSS 防護有漏洞，CSP 還有機會補救。
 
 ### 如何設定？
 ```bash
@@ -220,7 +220,7 @@ Content-Security-Policy: script-src 'nonce-abc123'
 # 使用 hash：允許內容 hash 匹配的內聯腳本
 Content-Security-Policy: script-src 'sha256-xxxxx'
 ```
-### CSP 報到模式（Report-Only）
+### CSP 報告模式（Report-Only）
 先在「純記錄」模式下測試規則，確定不會誤傷正常功能後再正式啟用：
 ```bash
 Content-Security-Policy-Report-Only: default-src 'self'; report-uri /csp-violation-report
@@ -274,7 +274,7 @@ Set-Cookie: session=abc123; SameSite=Lax; Secure; HttpOnly
 ### 為什麼需要 CORS？
 SOP 預設禁止跨源讀取，但現代 Web 開發中，前端（`https://app.com`）經常需要「呼叫後端 API（`https://api.com`）」，而 CORS 就是讓伺服器可以**選擇性地放寬** SOP 限制的機制。
 
-> CORS 不是攻擊，也不是漏洞，它是一個需要「伺服器明確授權」的放寬機制。
+> CORS 只是一種放寬機制，要伺服器明確授權，才允許跨源讀取，本身既不是攻擊也不是漏洞。
 
 ### 簡單請求 vs 預檢請求
 #### 簡單請求（Simple Request）
@@ -298,7 +298,7 @@ HTTP/1.1 204 No Content
 Access-Control-Allow-Origin: https://app.com
 Access-Control-Allow-Methods: GET, POST, DELETE
 Access-Control-Allow-Headers: X-Custom-Header
-Access-Control-Max-Age: 86400  # preflight 結果可快取幾秒
+Access-Control-Max-Age: 86400  # preflight 結果可快取 1 天 (86400 秒)
 ```
 
 ### 核心 Header
