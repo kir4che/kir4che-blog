@@ -108,7 +108,7 @@ export const Images = ({
   return (
     <div
       className={cn(
-        'my-6 w-full max-w-full min-w-0 space-y-2 overflow-hidden md:max-w-(--gallery-max-width) lg:my-8',
+        'images w-full max-w-full min-w-0 space-y-2 overflow-hidden md:max-w-(--gallery-max-width)',
         column
       )}
       style={containerStyle}

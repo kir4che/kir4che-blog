@@ -67,7 +67,7 @@ const Toc = ({ headings, title, expandLabel, collapseLabel }: TocProps) => {
     <div data-toc-root>
       <div
         className={cn(
-          'bg-surface-secondary fixed top-32 right-0 z-60 flex max-h-[70vh] w-72 transform flex-col rounded-bl-md shadow-md transition-transform duration-300',
+          'fixed top-32 right-0 z-1001 flex max-h-[70vh] w-72 transform flex-col rounded-bl-lg bg-white shadow-lg ring-1 ring-gray-200/50 transition-transform duration-300 dark:bg-gray-800 dark:ring-white/5',
           isOpen ? 'translate-x-0' : 'translate-x-full'
         )}
       >
@@ -83,21 +83,21 @@ const Toc = ({ headings, title, expandLabel, collapseLabel }: TocProps) => {
         >
           <div
             className={cn(
-              'flex-center bg-surface-secondary w-8 rounded-l-xl py-3 text-pink-600 shadow-[-10px_0_16px_-10px_rgba(0,0,0,0.15)] transition-all duration-300 dark:text-pink-400',
+              'flex-center w-8 rounded-l-xl bg-white py-3 text-pink-600 shadow-sm ring-1 ring-gray-200/50 transition-all duration-300 dark:bg-gray-800 dark:text-pink-400 dark:ring-white/5',
               isOpen ? 'h-24' : 'h-32'
             )}
           >
             {isOpen ? (
-              <ChevronRight size={24} />
+              <ChevronRight size={20} />
             ) : (
-              <span className="text-sm font-bold tracking-widest [writing-mode:vertical-rl]">
+              <span className="text-xs font-bold tracking-[0.2em] [writing-mode:vertical-rl]">
                 {title}
               </span>
             )}
           </div>
         </button>
-        <div className="shrink-0 px-5 pt-5 pb-3">
-          <h2 className="text-base font-bold text-pink-700 dark:text-pink-300">{title}</h2>
+        <div className="shrink-0 border-b border-gray-100 px-4 py-3 dark:border-gray-700">
+          <h2 className="text-sm font-semibold text-pink-700 dark:text-pink-300">{title}</h2>
         </div>
         <nav className="flex min-h-0 flex-1 flex-col" role="navigation">
           <ul className="scrollable w-full">
@@ -122,8 +122,9 @@ const Toc = ({ headings, title, expandLabel, collapseLabel }: TocProps) => {
                       scrollToHeading(h.id);
                     }}
                     className={cn(
-                      'block break-all transition-colors hover:text-pink-600 hover:dark:text-pink-400',
-                      isActive && 'font-semibold text-pink-600 dark:text-pink-400'
+                      'block border-l-2 border-transparent pl-3 break-all transition-all duration-150 hover:border-pink-300 hover:text-pink-600 dark:hover:border-pink-500/60 dark:hover:text-pink-400',
+                      isActive &&
+                        'border-pink-500 font-semibold text-pink-600 dark:border-pink-400 dark:text-pink-400'
                     )}
                   >
                     {h.text}
