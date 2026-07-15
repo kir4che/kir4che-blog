@@ -1,0 +1,48 @@
+---
+import { ExternalLink as ExternalLinkIcon } from '@lucide/astro';
+import type { HTMLAttributes } from 'astro/types';
+import { cn } from '@/utils/cn';
+
+interface Props extends Omit<HTMLAttributes<'a'>, 'href'> {
+  href: string;
+  noline?: boolean;
+  showIcon?: boolean;
+  className?: string;
+}
+
+const {
+  href,
+  class: classFromProps,
+  className,
+  noline = false,
+  showIcon = false,
+  'aria-label': ariaLabel,
+  ...rest
+} = Astro.props;
+
+const resolvedClass = classFromProps || className;
+---
+
+<a
+  href={href}
+  target="_blank"
+  rel="noopener noreferrer"
+  class={cn(
+    'group text-primary inline-flex items-center gap-1',
+    !noline && 'link link-hover hover:underline-offset-4',
+    resolvedClass
+  )}
+  aria-label={ariaLabel}
+  {...rest}
+>
+  <slot />
+  {
+    showIcon && (
+      <ExternalLinkIcon
+        size={16}
+        class="opacity-70 transition-transform group-hover:-translate-y-0.5"
+        aria-hidden="true"
+      />
+    )
+  }
+</a>

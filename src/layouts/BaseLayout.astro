@@ -24,7 +24,7 @@ interface Props {
 
 const { title, description, canonical, image, noindex } = Astro.props;
 
-const siteOrigin = Astro.site!;
+const siteOrigin = Astro.site ?? new URL(Astro.url.origin);
 const currUrl = Astro.url;
 const currLang: Language = getLocaleFromUrl(currUrl);
 const seoConfig = getSeoConfig(siteOrigin, currLang, currUrl);

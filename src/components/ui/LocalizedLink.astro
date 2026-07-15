@@ -1,0 +1,17 @@
+---
+import { withLocalePrefix } from '@/lib/paths';
+import type { Language } from '@/types';
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends Omit<HTMLAttributes<'a'>, 'href' | 'lang'> {
+  href: string;
+  lang?: Language;
+  className?: string;
+}
+
+const { href, lang, class: classFromProps, className, ...rest } = Astro.props;
+const resolvedHref = lang && !href.startsWith('#') ? withLocalePrefix(href, lang) : href;
+const resolvedClass = classFromProps || className;
+---
+
+<a href={resolvedHref} class={resolvedClass} {...rest}><slot /></a>
