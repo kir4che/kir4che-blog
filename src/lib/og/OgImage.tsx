@@ -26,7 +26,6 @@ const headerStyle: CSSProperties = {
   alignItems: 'center',
   gap: 16,
   marginBottom: 40,
-  zIndex: 2,
 };
 
 const accentBarStyle: CSSProperties = {
@@ -51,7 +50,6 @@ const titleBaseStyle: CSSProperties = {
   maxWidth: '85%',
   marginBottom: 20,
   position: 'relative',
-  zIndex: 2,
 };
 
 const footerStyle: CSSProperties = {
@@ -60,7 +58,6 @@ const footerStyle: CSSProperties = {
   display: 'flex',
   alignItems: 'flex-end',
   gap: 20,
-  zIndex: 2,
 };
 
 const tagContainerStyle: CSSProperties = {
