@@ -30,6 +30,7 @@ import {
   Link,
   Rating,
   SmallText,
+  Spoiler,
   Table,
   Video,
 } from '@/components/mdx';
@@ -57,6 +58,7 @@ const MDX_PREVIEW_COMPONENTS = {
   Link,
   Rating,
   SmallText,
+  Spoiler,
   Table,
   Video,
 };
