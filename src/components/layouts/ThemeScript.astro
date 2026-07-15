@@ -1,9 +1,13 @@
 <script is:inline>
+  const clearPreload = () => document.body.classList.remove('preload');
   const theme = (() => {
     if (typeof localStorage !== 'undefined' && localStorage.getItem('theme'))
       return localStorage.getItem('theme');
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   })();
   document.documentElement.classList[theme === 'dark' ? 'add' : 'remove']('dark');
-  window.addEventListener('load', () => document.body.classList.remove('preload'), { once: true });
+  if (document.readyState === 'loading')
+    document.addEventListener('DOMContentLoaded', clearPreload, { once: true });
+  else clearPreload();
+  document.addEventListener('astro:page-load', clearPreload);
 </script>
