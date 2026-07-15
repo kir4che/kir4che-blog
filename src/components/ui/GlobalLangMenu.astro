@@ -38,7 +38,7 @@ const langBasePaths = Object.fromEntries(
 );
 ---
 
-<div id={id} class={cn('dropdown dropdown-hover', directionClass, className)} data-lang-menu>
+<div class="dropdown dropdown-bottom dropdown-end" data-lang-menu>
   <button
     type="button"
     class="flex items-center gap-x-1.5 text-sm hover:bg-inherit"
@@ -51,10 +51,7 @@ const langBasePaths = Object.fromEntries(
   </button>
   <ul
     role="menu"
-    class={cn(
-      'dropdown-content menu bg-surface-secondary w-24 rounded pt-1.5 shadow-md md:w-32',
-      marginClass
-    )}
+    class="dropdown-content menu bg-surface-secondary z-10 mt-1.5 hidden w-24 rounded shadow-md md:w-32"
     data-lang-menu-list
   >
     {

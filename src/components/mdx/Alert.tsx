@@ -45,10 +45,10 @@ export const Alert = ({ type = 'note', title, children }: AlertProps) => {
   const Icon = config.icon;
 
   return (
-    <div className={cn('my-4 rounded-md p-4 pt-3 text-sm', config.bgColor, config.borderColor)}>
-      <div className="mb-2.5 flex items-center gap-1.5">
+    <div className={cn('my-4 rounded-md p-4 text-sm', config.bgColor, config.borderColor)}>
+      <div className="mb-2 flex items-center gap-1.5">
         <Icon size={14} aria-hidden="true" className={config.textColor} />
-        <h4 className={cn('text-[13px] font-semibold', config.textColor)}>
+        <h4 className={cn('my-0 text-[13px] leading-none font-semibold', config.textColor)}>
           {title || config.defaultTitle}
         </h4>
       </div>
