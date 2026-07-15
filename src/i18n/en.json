@@ -137,10 +137,7 @@
       "collapse": "Collapse table of contents"
     },
     "share": {
-      "copyLink": "Copy link",
-      "native": "Share to…",
-      "copied": "✓ Link copied!",
-      "copyFailed": "Failed to copy, please copy manually"
+      "native": "Share to…"
     }
   },
   "CategoriesPage": {

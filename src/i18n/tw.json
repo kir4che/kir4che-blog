@@ -135,10 +135,7 @@
       "collapse": "收合目錄"
     },
     "share": {
-      "copyLink": "複製連結",
-      "native": "分享至...",
-      "copied": "✓ 已複製連結",
-      "copyFailed": "複製失敗，請手動複製網址"
+      "native": "分享至..."
     }
   },
   "CategoriesPage": {

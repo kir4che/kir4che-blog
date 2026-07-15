@@ -1,8 +1,9 @@
 ---
+import { createElement } from 'react';
 import type { MDXContent as MDXContentType } from 'astro';
 
 import type { Language, PostMeta } from '@/types';
-import { Copy, Share2 } from '@lucide/astro';
+import { Share2 } from '@lucide/astro';
 
 import PostComments from '@/components/features/post/PostComments';
 import PostLangMenu from '@/components/features/post/PostLangMenu.astro';
@@ -41,11 +42,11 @@ import Lightbox from '@/components/mdx/Lightbox';
 import CategoryBadge from '@/components/ui/CategoryBadge.astro';
 import KofiBtn from '@/components/ui/KofiBtn.astro';
 import SiteLayout from '@/layouts/SiteLayout.astro';
-import { isPostInCategory } from '@/lib/categories';
 import { createTranslator } from '@/lib/i18n';
 import { withLocalePrefix } from '@/lib/paths';
 import { normalizeTag } from '@/lib/tags';
 import { createDateFormatter, parseToISODate } from '@/utils/date';
+import { PokemonCard } from '@/components/blog/PokemonCard';
 
 interface Props {
   lang: Language;
@@ -73,6 +74,14 @@ const {
 
 const BoundLink = (props: Parameters<typeof Link>[0]) => Link({ lang, ...props });
 
+const CustomLink = (props: any) => {
+  if (props.href && props.href.startsWith('pokemon-card:')) {
+    const stage = props.href.replace('pokemon-card:', '');
+    return createElement(PokemonCard, { stage });
+  }
+  return BoundLink(props);
+};
+
 const MDX_COMPONENTS = {
   Accordion,
   Alert,
@@ -86,18 +95,28 @@ const MDX_COMPONENTS = {
   h4: H4,
   h5: H5,
   h6: H6,
-  a: BoundLink,
+  a: CustomLink,
   Highlight,
   Image,
   Images,
   ImagesItem,
   Kbd,
-  Link: BoundLink,
+  Link: CustomLink,
   Rating,
   SmallText,
   Spoiler,
   Table,
   Video,
+  Iframe: (props: any) =>
+    createElement('iframe', {
+      src: props.src,
+      height: props.height || 400,
+      title: props.title || 'Iframe Embed',
+      style: { width: '100%', border: '0' },
+      scrolling: 'no',
+      loading: 'lazy',
+      allowFullScreen: true,
+    }),
 };
 
 const tSettings = createTranslator(lang, 'settings');
@@ -114,7 +133,7 @@ const tocHeadings = headings.map((h) => ({
   level: h.depth,
 }));
 
-const isTripPost = isPostInCategory(post, { tw: '旅遊', en: 'Trip' }, 'trip');
+const shouldShowTripMap = (post.places?.length ?? 0) > 0;
 ---
 
 <SiteLayout
@@ -162,22 +181,37 @@ const isTripPost = isPostInCategory(post, { tw: '旅遊', en: 'Trip' }, 'trip');
             />
           )
         }
-        <header>
+        <header class="mb-4">
           <h1 class="mb-4">{post.title}</h1>
           <div class="flex-between flex-wrap gap-x-4 gap-y-1">
             <CategoryBadge lang={lang} categories={post.categories ?? []} />
-            <div class="flex items-center gap-2 sm:gap-3">
+            <div class="flex items-center gap-2">
               <PostMetaInfo lang={lang} date={post.date} wordCount={post.wordCount} />
-              {
-                otherLangs.length > 0 && publishedDate && (
-                  <PostLangMenu
-                    curLang={lang}
-                    currSlug={post.slug}
-                    langs={otherLangs}
-                    t={tSettings}
-                  />
-                )
-              }
+              <span class="h-4 w-px bg-gray-200 transition-colors select-none dark:bg-gray-600/80"
+              ></span>
+              <div class="flex items-center gap-2">
+                {
+                  otherLangs.length > 0 && publishedDate && (
+                    <PostLangMenu
+                      curLang={lang}
+                      currSlug={post.slug}
+                      langs={otherLangs}
+                      t={tSettings}
+                    />
+                  )
+                }
+                <button
+                  type="button"
+                  data-share-action="native"
+                  data-msg-copied={tPost('share.copied')}
+                  data-msg-copy-failed={tPost('share.copyFailed')}
+                  class="inline-flex items-center gap-1.5 text-xs font-medium text-pink-700 dark:text-pink-300"
+                  aria-label={tPost('share.native')}
+                >
+                  <Share2 size={13} aria-hidden="true" />
+                  <span>{lang === 'tw' ? '分享' : 'Share'}</span>
+                </button>
+              </div>
             </div>
           </div>
           {
@@ -190,16 +224,11 @@ const isTripPost = isPostInCategory(post, { tw: '旅遊', en: 'Trip' }, 'trip');
             )
           }
         </header>
-        {
-          isTripPost && (post.places?.length ?? 0) > 0 && (
-            <TripMap client:visible places={post.places ?? []} />
-          )
-        }
+        {shouldShowTripMap && <TripMap client:visible places={post.places ?? []} />}
         {
           content ? (
             <MDXContent
               id="post-body"
-              lang={lang}
               Content={content}
               extraComponents={{ ...MDX_COMPONENTS, ...(extraComponents ?? {}) }}
             />
@@ -234,30 +263,6 @@ const isTripPost = isPostInCategory(post, { tw: '旅遊', en: 'Trip' }, 'trip');
                 </div>
               )
             }
-            <div
-              class="flex flex-wrap items-center justify-end gap-2"
-              data-msg-copied={tPost('share.copied')}
-              data-msg-copy-failed={tPost('share.copyFailed')}
-            >
-              <button
-                type="button"
-                data-share-action="copy"
-                aria-label={tPost('share.copyLink')}
-                class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm text-pink-700 transition-all duration-200 hover:text-pink-800 dark:text-pink-300 dark:hover:text-pink-400"
-              >
-                <Copy size={15} aria-hidden="true" />
-                {tPost('share.copyLink')}
-              </button>
-              <button
-                type="button"
-                data-share-action="native"
-                aria-label={tPost('share.native')}
-                class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm text-pink-700 transition-all duration-200 hover:text-pink-800 dark:text-pink-300 dark:hover:text-pink-400"
-              >
-                <Share2 size={15} aria-hidden="true" />
-                {tPost('share.native')}
-              </button>
-            </div>
           </footer>
         </div>
       </article>
@@ -272,13 +277,14 @@ const isTripPost = isPostInCategory(post, { tw: '旅遊', en: 'Trip' }, 'trip');
     </>
   </div>
   <Lightbox client:idle />
+  <div class="hidden" aria-hidden="true">
+    <PokemonCard client:visible />
+  </div>
 </SiteLayout>
 
 <script>
   import { LIGHTBOX_EVENT } from '@/components/mdx/Lightbox';
   import { showToast } from '@/utils/toast';
-
-  let onVisibilityChange: (() => void) | null = null;
 
   // 複製網址到剪貼簿
   const copyToClipboard = async (url: string, msgCopied: string, msgCopyFailed: string) => {
@@ -290,17 +296,20 @@ const isTripPost = isPostInCategory(post, { tw: '旅遊', en: 'Trip' }, 'trip');
     }
   };
 
-  // 收集文章中所有圖片作為 lightbox slides，並標記元素。
-  let articleSlides: { src: string; alt?: string }[] = [];
+  let lightboxSlides: { src: string; alt?: string }[] = [];
 
-  const buildArticleSlides = () => {
+  // 重新掃描文章內的圖片 slides
+  const rebuildLightboxSlides = () => {
+    if (!document.querySelector('[data-lightbox-slides]')) return;
+
     const postBody = document.getElementById('post-body');
     if (!postBody) return;
 
     const allEls = Array.from(postBody.querySelectorAll<HTMLElement>('[data-lightbox-slides]'));
+    if (allEls.length === 0) return;
 
     const seen = new Set<string>();
-    articleSlides = [];
+    lightboxSlides = [];
     const elToGlobalIndex = new Map<HTMLElement, number>();
 
     for (const el of allEls) {
@@ -312,40 +321,53 @@ const isTripPost = isPostInCategory(post, { tw: '旅遊', en: 'Trip' }, 'trip');
       if (!slide) continue;
       if (!seen.has(slide.src)) {
         seen.add(slide.src);
-        articleSlides.push(slide);
+        lightboxSlides.push(slide);
       }
       elToGlobalIndex.set(
         el,
-        articleSlides.findIndex((s) => s.src === slide.src)
+        lightboxSlides.findIndex((s) => s.src === slide.src)
       );
     }
 
-    // 將 index 寫回元素，方便點擊時觸發正確的圖片。
-    for (const [el, idx] of elToGlobalIndex) {
-      el.dataset.lightboxGlobalIndex = String(idx);
+    for (const [el, idx] of elToGlobalIndex) el.dataset.lightboxGlobalIndex = String(idx);
+  };
+
+  // 單次 delegation handler
+  const handleDocumentClick = (e: MouseEvent) => {
+    const lbEl = (e.target as Element).closest('[data-lightbox-slides]') as HTMLElement | null;
+    if (lbEl) {
+      const index = Number(lbEl.dataset.lightboxGlobalIndex ?? 0);
+      window.dispatchEvent(
+        new CustomEvent(LIGHTBOX_EVENT, { detail: { slides: lightboxSlides, index } })
+      );
+      return;
+    }
+
+    const shareBtn = (e.target as Element).closest<HTMLButtonElement>('[data-share-action]');
+    if (shareBtn) {
+      const url = window.location.href;
+      const container = shareBtn.closest<HTMLElement>('[data-msg-copied]');
+      const msgCopied = container?.dataset.msgCopied ?? '';
+      const msgCopyFailed = container?.dataset.msgCopyFailed ?? '';
+
+      if (navigator.share) navigator.share({ url }).catch(() => {});
+      else void copyToClipboard(url, msgCopied, msgCopyFailed);
     }
   };
 
-  buildArticleSlides();
+  document.addEventListener('click', handleDocumentClick);
 
-  // 點擊圖片時觸發 lightbox
-  document.addEventListener('click', (e) => {
-    const el = (e.target as Element).closest('[data-lightbox-slides]') as HTMLElement | null;
-    if (!el) return;
-    const index = Number(el.dataset.lightboxGlobalIndex ?? 0);
-    window.dispatchEvent(
-      new CustomEvent(LIGHTBOX_EVENT, { detail: { slides: articleSlides, index } })
-    );
-  });
+  let onVisibilityChange: (() => void) | null = null;
 
-  // 每次頁面載入時執行
   document.addEventListener('astro:page-load', () => {
+    rebuildLightboxSlides();
+
     if (onVisibilityChange) {
       document.removeEventListener('visibilitychange', onVisibilityChange);
       onVisibilityChange = null;
     }
 
-    // 使用者切換分頁時暫停/播放影片
+    // 自動播放影片 visibility 控制
     const autoPlayVideos = document.querySelectorAll<HTMLVideoElement>(
       'video[data-auto-play="true"]'
     );
@@ -355,27 +377,5 @@ const isTripPost = isPostInCategory(post, { tw: '旅遊', en: 'Trip' }, 'trip');
       };
       document.addEventListener('visibilitychange', onVisibilityChange);
     }
-
-    // 分享、複製按鈕
-    document.querySelectorAll<HTMLButtonElement>('[data-share-action]').forEach((btn) => {
-      btn.addEventListener('click', async () => {
-        const action = btn.dataset.shareAction;
-        const url = window.location.href;
-        const container = btn.closest<HTMLElement>('[data-msg-copied]');
-        const msgCopied = container?.dataset.msgCopied ?? '';
-        const msgCopyFailed = container?.dataset.msgCopyFailed ?? '';
-
-        if (action === 'copy') {
-          await copyToClipboard(url, msgCopied, msgCopyFailed);
-        } else if (action === 'native') {
-          // 系統不支援分享時改用複製
-          if (navigator.share) {
-            try {
-              await navigator.share({ url });
-            } catch {}
-          } else await copyToClipboard(url, msgCopied, msgCopyFailed);
-        }
-      });
-    });
   });
 </script>
