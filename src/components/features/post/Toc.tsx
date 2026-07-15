@@ -57,7 +57,27 @@ const Toc = ({ headings, title, expandLabel, collapseLabel }: TocProps) => {
     const el = document.getElementById(id);
     if (!el) return;
     const targetY = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
-    window.scrollTo({ top: targetY, behavior: 'smooth' });
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      window.scrollTo(0, targetY);
+      setIsOpen(false);
+      return;
+    }
+
+    const startY = window.scrollY;
+    const distance = targetY - startY;
+    const duration = Math.min(Math.max(Math.abs(distance) * 0.45, 260), 700);
+    const startTime = performance.now();
+
+    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
+    const scroll = (now: number) => {
+      const progress = Math.min((now - startTime) / duration, 1);
+      window.scrollTo(0, startY + distance * easeOutCubic(progress));
+      if (progress < 1) requestAnimationFrame(scroll);
+    };
+
+    requestAnimationFrame(scroll);
     setIsOpen(false);
   }, []);
 
