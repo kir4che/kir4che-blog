@@ -13,9 +13,8 @@ import ecConfig from './ec.config.mjs';
 import rehypeExternalLinks from 'rehype-external-links';
 import rehypeSlug from 'rehype-slug';
 import rehypeUnwrapImages from 'rehype-unwrap-images';
-import remarkCustomHeaderId from 'remark-custom-header-id';
 import remarkGfm from 'remark-gfm';
-import remarkImages from 'remark-images';
+import remarkCustomHeaderId from 'remark-custom-header-id';
 import remarkIns from 'remark-ins';
 import { remarkMark } from 'remark-mark-highlight';
 
@@ -69,7 +68,7 @@ export default defineConfig({
   },
   integrations: [react(), expressiveCode(ecConfig), mdx(), sitemap()],
   markdown: {
-    remarkPlugins: [remarkGfm, remarkIns, remarkMark, remarkCustomHeaderId, remarkImages],
+    remarkPlugins: [remarkGfm, remarkIns, remarkMark, remarkCustomHeaderId],
     rehypePlugins: [
       rehypeUnwrapImages,
       rehypeSlug,
