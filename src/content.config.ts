@@ -52,6 +52,7 @@ const blog = defineCollection({
     featured: z.boolean().default(false),
     draft: z.boolean().default(false),
     protected: z.boolean().default(false),
+    password: z.string().optional(),
     coverImage: z.string().optional(),
     places: placesSchema,
     updatedAt: z.coerce.date().optional(),

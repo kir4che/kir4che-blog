@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { resolveLanguage } from '@/lib/i18n';
 import { getPostPassword, verifyPostPassword } from '@/lib/post-passwords';
 import { getPostMetaBySlug, getPostUnlockCookieName } from '@/lib/posts';
-import { getClientKey, rateLimiter } from '@/lib/rate-limit';
+import { checkLock, deleteRecord, getClientKey, recordAttempt } from '@/lib/rate-limit';
 import { errorResponse, jsonResponse } from '@/utils/api';
 
 // 驗證請求內容
@@ -25,13 +25,13 @@ export const POST: APIRoute = async ({ request, params }) => {
   const { lang: langParam, password } = parsed.data;
 
   // 取得要看的是哪篇文章
-  const slugFromParams = typeof params.id === 'string' ? params.id.trim() : '';
+  const slugFromParams = typeof params.slug === 'string' ? params.slug.trim() : '';
   const slug = slugFromParams || (parsed.data.slug?.trim() ?? '');
   if (!slug) return errorResponse('Missing slug', 400);
 
   // 限流檢查
   const clientKey = getClientKey(request, slug);
-  const lockSeconds = await rateLimiter.checkLock(clientKey);
+  const lockSeconds = await checkLock(clientKey);
   if (lockSeconds > 0) return errorResponse('Too many attempts', 429, { lockSeconds });
 
   // 確保這篇文章存在且語系正確
@@ -40,19 +40,19 @@ export const POST: APIRoute = async ({ request, params }) => {
   if (!meta?.protected) return errorResponse('Not found', 404);
 
   // 取得密碼
-  const storedPassword = getPostPassword(`${lang}/${slug}`);
+  const storedPassword = await getPostPassword(`${lang}/${slug}`);
   if (!storedPassword) return errorResponse('Not found', 404);
 
   // 驗證密碼
   if (!verifyPostPassword(password, storedPassword)) {
-    const attempt = await rateLimiter.recordAttempt(clientKey);
+    const attempt = await recordAttempt(clientKey);
     if (attempt.locked)
       return errorResponse('Too many attempts', 429, { lockSeconds: attempt.lockSeconds });
     return errorResponse('Incorrect password', 401);
   }
 
   // 驗證成功後清除該 Client 的嘗試次數
-  await rateLimiter.deleteRecord(clientKey);
+  await deleteRecord(clientKey);
 
   const cookieName = getPostUnlockCookieName(slug);
   const headers = new Headers();

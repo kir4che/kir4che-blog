@@ -65,8 +65,11 @@ const blogSchema = {
     defaultValue: false,
   }),
   protected: fields.checkbox({
-    label: '文章密碼',
+    label: '文章保護 (需要密碼才能查看)',
     defaultValue: false,
+  }),
+  password: fields.text({
+    label: '文章密碼',
   }),
   places: fields.array(
     fields.object({
