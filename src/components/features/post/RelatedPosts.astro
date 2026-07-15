@@ -1,11 +1,11 @@
 ---
 import { CalendarDays } from '@lucide/astro';
 
-import { createTranslator, resolveLanguage } from '@/lib/i18n';
+import { createTranslator } from '@/lib/i18n';
 import { getLocalizedPostPath } from '@/lib/paths';
 import { getPostsMeta } from '@/lib/posts';
 import type { Language, PostMeta } from '@/types';
-import { createDateFormatter } from '@/utils/date';
+import { formatDateYmd } from '@/utils/date';
 
 interface Props {
   lang: Language;
@@ -17,8 +17,6 @@ interface Props {
 const { lang, currSlug, categories, tags = [] } = Astro.props;
 
 const t = createTranslator(lang, 'PostPage');
-const locale = resolveLanguage(lang);
-const formatDate = createDateFormatter(locale, 'short');
 
 const categorySet = new Set(categories.map((c) => c?.trim()).filter(Boolean));
 const tagSet = new Set(tags.map((t) => t?.trim()).filter(Boolean));
@@ -49,9 +47,9 @@ const relatedPosts: PostMeta[] = posts
           aria-hidden="true"
         />
       </div>
-      <div class="scrollbar-none flex w-full snap-x snap-mandatory gap-4 overflow-x-auto pb-4">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
         {relatedPosts.map((post) => {
-          const date = formatDate(post.date);
+          const date = formatDateYmd(post.date);
           if (!date) return null;
 
           return (
@@ -70,16 +68,14 @@ const relatedPosts: PostMeta[] = posts
                   class="size-full object-cover select-none"
                 />
               </div>
-              <a href={getLocalizedPostPath({ lang, slug: post.slug })} class="mb-1 block">
-                <h3 class="line-clamp-2 text-base/5 font-semibold hover:text-pink-700 dark:hover:text-pink-400">
-                  {post.title}
-                </h3>
-              </a>
-              <p class="mb-2 line-clamp-3 text-[13px]/4.5 text-gray-600 dark:text-gray-400">
+              <h3 class="text-foreground-primary mb-1 line-clamp-2 text-sm/5 font-semibold transition-colors group-hover:text-pink-700 md:text-base/5 dark:group-hover:text-pink-400">
+                {post.title}
+              </h3>
+              <p class="mb-2 hidden text-[13px]/4.5 text-gray-600 md:line-clamp-3 dark:text-gray-400">
                 {post.description}
               </p>
               {date && (
-                <div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-300">
+                <div class="flex items-center gap-1 text-[11px] text-gray-400 md:text-xs md:text-gray-500 dark:text-gray-500 md:dark:text-gray-300">
                   <CalendarDays size={13} aria-hidden="true" />
                   <time datetime={date.datetime} class="tracking-wide">
                     {date.display}
