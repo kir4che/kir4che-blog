@@ -33,23 +33,34 @@ const navItems = [
     {
       navItems
         .filter((item) => item.label)
-        .map(({ href, label }) => (
-          <li>
-            <LocalizedLink
-              href={href}
-              lang={lang}
-              className={cn(
-                'hover:text-primary relative inline-block pb-1 text-sm text-nowrap transition-colors',
-                isActive(href)
-                  ? 'text-primary font-medium after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:rounded-full after:bg-pink-500 dark:after:bg-pink-400'
-                  : 'after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:scale-x-0 after:rounded-full after:bg-pink-400/60 after:transition-transform hover:after:scale-x-100'
-              )}
-              aria-current={isActive(href) ? 'page' : undefined}
-            >
-              {label}
-            </LocalizedLink>
-          </li>
-        ))
+        .map(({ href, label }) => {
+          const active = isActive(href);
+
+          return (
+            <li>
+              <LocalizedLink
+                href={href}
+                lang={lang}
+                className={cn(
+                  'hover:text-primary relative inline-block pb-1 text-sm text-nowrap transition-colors',
+                  active
+                    ? 'text-primary font-medium'
+                    : 'after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:scale-x-0 after:rounded-full after:bg-pink-400/60 after:transition-transform hover:after:scale-x-100'
+                )}
+                aria-current={active ? 'page' : undefined}
+              >
+                {label}
+                {active && (
+                  <span
+                    transition:name="nav-active-indicator"
+                    class="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-pink-500 dark:bg-pink-400"
+                    aria-hidden="true"
+                  />
+                )}
+              </LocalizedLink>
+            </li>
+          );
+        })
     }
   </ul>
 </nav>

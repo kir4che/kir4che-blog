@@ -1,5 +1,6 @@
 ---
 import type { MDXContent as MDXContentType } from 'astro';
+import { Image as AstroImage } from 'astro:assets';
 
 import type { Language, PostMeta } from '@/types';
 import { Copy, Share2 } from '@lucide/astro';
@@ -151,7 +152,7 @@ const isTripPost = isPostInCategory(post, { tw: '旅遊', en: 'Trip' }, 'trip');
       <article class="bg-surface-secondary/80 rounded p-4 transition-all duration-300 md:p-6">
         {
           post.coverImage && (
-            <img
+            <AstroImage
               src={post.coverImage}
               alt={`Cover image for ${post.title}`}
               width={1200}
@@ -159,7 +160,7 @@ const isTripPost = isPostInCategory(post, { tw: '旅遊', en: 'Trip' }, 'trip');
               loading="eager"
               fetchpriority="high"
               decoding="async"
-              draggable="false"
+              draggable={false}
               class="mb-3 h-45 w-full object-cover object-[center_70%] select-none sm:h-56 xl:h-68"
             />
           )
