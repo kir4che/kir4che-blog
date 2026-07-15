@@ -1,10 +1,13 @@
 @import 'tailwindcss';
 @import '@fontsource-variable/dm-sans/wght.css';
-@import '@fontsource-variable/noto-sans-tc/wght.css';
+@import './noto-sans-tc-critical.css';
 @import './mdx-content.css';
 
 @plugin 'daisyui' {
   themes: false;
+  include:
+    svg, properties, rootscrolllock, rootscrollgutter, rootcolor, alert, avatar, badge, button,
+    card, collapse, dropdown, input, loading, menu, toast;
   exclude: scrollbar;
 }
 

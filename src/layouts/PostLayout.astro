@@ -1,5 +1,6 @@
 ---
-import { createElement } from 'react';
+import { Image as AstroImage } from 'astro:assets';
+import { createElement, type ComponentType } from 'react';
 import type { MDXContent as MDXContentType } from 'astro';
 
 import type { Language, PostMeta } from '@/types';
@@ -46,7 +47,6 @@ import { createTranslator } from '@/lib/i18n';
 import { withLocalePrefix } from '@/lib/paths';
 import { normalizeTag } from '@/lib/tags';
 import { createDateFormatter, parseToISODate } from '@/utils/date';
-import { PokemonCard } from '@/components/blog/PokemonCard';
 
 interface Props {
   lang: Language;
@@ -56,6 +56,10 @@ interface Props {
   content?: MDXContentType;
   headings?: { depth: number; slug: string; text: string }[];
   extraComponents?: Record<string, unknown>;
+}
+
+interface PokemonCardProps {
+  stage?: string;
 }
 
 const props = Astro.props;
@@ -72,12 +76,17 @@ const {
   extraComponents,
 } = props as Props;
 
+const PokemonCardComponent =
+  typeof extraComponents?.PokemonCard === 'function'
+    ? (extraComponents.PokemonCard as ComponentType<PokemonCardProps>)
+    : null;
+
 const BoundLink = (props: Parameters<typeof Link>[0]) => Link({ lang, ...props });
 
-const CustomLink = (props: any) => {
-  if (props.href && props.href.startsWith('pokemon-card:')) {
+const CustomLink = (props: Parameters<typeof Link>[0] & { href?: string }) => {
+  if (PokemonCardComponent && props.href && props.href.startsWith('pokemon-card:')) {
     const stage = props.href.replace('pokemon-card:', '');
-    return createElement(PokemonCard, { stage });
+    return createElement(PokemonCardComponent, { stage });
   }
   return BoundLink(props);
 };
@@ -149,11 +158,6 @@ const shouldShowTripMap = (post.places?.length ?? 0) > 0;
     : undefined}
 >
   {
-    post.coverImage && !isProtected && (
-      <link slot="head" rel="preload" href={post.coverImage} as="image" fetchpriority="high" />
-    )
-  }
-  {
     isProtected && (
       <PostPasswordGate
         client:load
@@ -178,12 +182,16 @@ const shouldShowTripMap = (post.places?.length ?? 0) > 0;
       <article class="bg-surface-secondary/80 rounded p-4 transition-all duration-300 md:p-6">
         {
           post.coverImage && (
-            <img
+            <AstroImage
               src={post.coverImage}
               alt={`Cover image for ${post.title}`}
+              width={1200}
+              height={630}
+              widths={[340, 680, 896, 1200]}
+              sizes="(max-width: 767px) calc(100vw - 2.5rem), (max-width: 1279px) calc(100vw - 3rem), 896px"
               loading="eager"
               fetchpriority="high"
-              decoding="async"
+              decoding="sync"
               draggable={false}
               class="mb-4 h-45 w-full rounded object-cover object-[center_70%] select-none sm:h-56 xl:h-68"
             />
@@ -232,7 +240,7 @@ const shouldShowTripMap = (post.places?.length ?? 0) > 0;
             )
           }
         </header>
-        {shouldShowTripMap && <TripMap client:visible places={post.places ?? []} />}
+        {TripMap && <TripMap client:visible places={post.places ?? []} />}
         {
           content ? (
             <MDXContent
@@ -275,19 +283,25 @@ const shouldShowTripMap = (post.places?.length ?? 0) > 0;
         </div>
       </article>
       <RelatedPosts lang={lang} currSlug={post.slug} categories={post.categories ?? []} />
-      <Toc
-        client:idle
-        headings={tocHeadings}
-        title={tPost('toc.title')}
-        expandLabel={tPost('toc.expand')}
-        collapseLabel={tPost('toc.collapse')}
-      />
+      <div class="max-xl:hidden">
+        <Toc
+          client:media="(min-width: 1280px)"
+          headings={tocHeadings}
+          title={tPost('toc.title')}
+          expandLabel={tPost('toc.expand')}
+          collapseLabel={tPost('toc.collapse')}
+        />
+      </div>
     </>
   </div>
   <Lightbox client:idle />
-  <div class="hidden" aria-hidden="true">
-    <PokemonCard client:visible />
-  </div>
+  {
+    PokemonCardComponent && (
+      <div class="hidden" aria-hidden="true">
+        <PokemonCardComponent client:visible />
+      </div>
+    )
+  }
 </SiteLayout>
 
 <script>

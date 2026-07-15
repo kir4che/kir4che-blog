@@ -2,11 +2,21 @@ import { useEffect, useMemo, useRef } from 'react';
 
 import type { TripPlace } from '@/types';
 
-import 'leaflet/dist/leaflet.css';
+import leafletStylesUrl from 'leaflet/dist/leaflet.css?url';
 
 interface TripMapProps {
   places: TripPlace[];
 }
+
+const ensureLeafletStylesheet = () => {
+  if (document.querySelector<HTMLLinkElement>('link[data-leaflet-styles]')) return;
+
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = leafletStylesUrl;
+  link.dataset.leafletStyles = 'true';
+  document.head.append(link);
+};
 
 const sanitizeEmoji = (value: string): string =>
   value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

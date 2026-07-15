@@ -12,6 +12,7 @@ interface VideoProps {
   autoPlay?: boolean;
   loop?: boolean;
   muted?: boolean;
+  preload?: React.VideoHTMLAttributes<HTMLVideoElement>['preload'];
   poster?: string;
   style?: CSSProperties;
   className?: string;
@@ -28,6 +29,7 @@ export const Video = ({
   autoPlay = false,
   loop = false,
   muted = true,
+  preload,
   poster,
   style,
   className,
@@ -50,7 +52,7 @@ export const Video = ({
           loop={loop}
           muted={muted}
           playsInline
-          preload="auto"
+          preload={preload ?? (autoPlay ? 'auto' : 'metadata')}
           poster={poster}
           className="size-full object-cover transition-opacity duration-300"
           data-auto-play={autoPlay ? 'true' : undefined}
