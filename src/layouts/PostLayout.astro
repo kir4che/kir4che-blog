@@ -142,7 +142,8 @@ const tocHeadings = headings.map((h) => ({
   level: h.depth,
 }));
 
-const articleUrl = new URL(withLocalePrefix(`/posts/${post.slug}`, lang), Astro.site).href;
+const siteUrl = Astro.site ?? new URL(Astro.url.origin);
+const articleUrl = new URL(withLocalePrefix(`/posts/${post.slug}`, lang), siteUrl).href;
 // 每篇文章的 schema.org Article 結構化資料
 const articleSchema = {
   '@context': 'https://schema.org',
@@ -151,7 +152,7 @@ const articleSchema = {
   ...(post.description ? { description: post.description } : {}),
   ...(post.coverImage
     ? {
-        image: new URL(post.coverImage, Astro.site).href,
+        image: new URL(post.coverImage, siteUrl).href,
       }
     : {}),
   datePublished: new Date(post.date).toISOString(),
@@ -173,7 +174,7 @@ const articleSchema = {
     name: 'kir4che',
     logo: {
       '@type': 'ImageObject',
-      url: `${Astro.site}images/avatar.webp`,
+      url: new URL('images/avatar.webp', siteUrl).href,
     },
   },
   mainEntityOfPage: {

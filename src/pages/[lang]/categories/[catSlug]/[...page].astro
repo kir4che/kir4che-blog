@@ -59,11 +59,12 @@ const {
   totalItems,
 } = paginate(filteredPosts, page);
 
-const homeBreadcrumbUrl = new URL(withLocalePrefix('/', lang), Astro.site).href;
-const categoriesBreadcrumbUrl = new URL(withLocalePrefix('/categories', lang), Astro.site).href;
+const siteUrl = Astro.site ?? new URL(Astro.url.origin);
+const homeBreadcrumbUrl = new URL(withLocalePrefix('/', lang), siteUrl).href;
+const categoriesBreadcrumbUrl = new URL(withLocalePrefix('/categories', lang), siteUrl).href;
 const mainCatBreadcrumbUrl = new URL(
   withLocalePrefix(`/categories/${mainCategory.slug}`, lang),
-  Astro.site
+  siteUrl
 ).href;
 const breadcrumbItems = [
   { position: 1, name: tNav('home'), item: homeBreadcrumbUrl },
@@ -73,7 +74,7 @@ const breadcrumbItems = [
 if (hasSubCategory && subCategory) {
   const subCatBreadcrumbUrl = new URL(
     withLocalePrefix(`/categories/${subCategory.slug}`, lang),
-    Astro.site
+    siteUrl
   ).href;
   breadcrumbItems.push({ position: 4, name: subCategory.name[lang], item: subCatBreadcrumbUrl });
 }
