@@ -1,12 +1,8 @@
 import { useEffect, useRef, useState, type ComponentType, type CSSProperties } from 'react';
+// @ts-expect-error - Vite suffix import is not recognized by TypeScript
 import lightboxStylesUrl from 'yet-another-react-lightbox/styles.css?url';
 
-interface LightboxPayload {
-  slides: { src: string; alt?: string }[];
-  index: number;
-}
-
-export const LIGHTBOX_EVENT = 'open-lightbox';
+import { LIGHTBOX_EVENT, openLightbox, type LightboxPayload } from './LightboxEvents';
 
 type LoadedLightbox = ComponentType<{
   open: boolean;
@@ -16,10 +12,6 @@ type LoadedLightbox = ComponentType<{
   controller: { closeOnBackdropClick: boolean };
   styles: { root: CSSProperties & { '--yarl__color_backdrop': string } };
 }>;
-
-export const openLightbox = (detail: LightboxPayload) => {
-  window.dispatchEvent(new CustomEvent(LIGHTBOX_EVENT, { detail }));
-};
 
 // 動態載入 lightbox 的樣式表，避免在 SSR 時出現錯誤。
 const ensureLightboxStylesheet = () => {

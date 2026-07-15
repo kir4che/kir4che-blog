@@ -1,11 +1,11 @@
 ---
 import { CalendarDays } from '@lucide/astro';
 
-import { createTranslator, resolveLanguage } from '@/lib/i18n';
+import { createTranslator } from '@/lib/i18n';
 import { getLocalizedPostPath } from '@/lib/paths';
 import { getPostsMeta } from '@/lib/posts';
 import type { Language, PostMeta } from '@/types';
-import { createDateFormatter } from '@/utils/date';
+import { formatDateYmd } from '@/utils/date';
 
 interface Props {
   lang: Language;
@@ -16,15 +16,15 @@ interface Props {
 const { lang, currSlug, categories } = Astro.props;
 
 const t = createTranslator(lang, 'PostPage');
-const locale = resolveLanguage(lang);
-const formatDate = createDateFormatter(locale, 'short');
 
 const categorySet = new Set(categories.map((c) => c?.trim()).filter(Boolean));
 const posts = categorySet.size > 0 ? await getPostsMeta(lang) : [];
 
-const relatedPosts: PostMeta[] = posts.filter(
-  (post) => post.slug !== currSlug && post.categories?.some((c) => categorySet.has(c?.trim()))
-);
+const relatedPosts: PostMeta[] = posts
+  .filter(
+    (post) => post.slug !== currSlug && post.categories?.some((c) => categorySet.has(c?.trim()))
+  )
+  .slice(0, 3);
 ---
 
 {
@@ -39,14 +39,17 @@ const relatedPosts: PostMeta[] = posts.filter(
           aria-hidden="true"
         />
       </div>
-      <div class="scrollbar-none flex w-full snap-x snap-mandatory gap-4 overflow-x-auto pb-4">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
         {relatedPosts.map((post) => {
-          const date = formatDate(post.date);
+          const date = formatDateYmd(post.date);
           if (!date) return null;
 
           return (
-            <div class="group bg-surface-secondary dark:bg-surface-secondary/50 w-55 shrink-0 snap-start rounded-md p-4 sm:w-62.5 md:w-70">
-              <div class="mb-3 aspect-video overflow-hidden rounded-md">
+            <a
+              href={getLocalizedPostPath({ lang, slug: post.slug })}
+              class="group md:bg-surface-secondary md:dark:bg-surface-secondary/50 block w-full border-b border-gray-100 transition-all duration-300 last:border-b-0 md:rounded-md md:border-0 md:p-4 md:py-3 md:hover:-translate-y-1 md:hover:shadow-sm dark:border-gray-800/60"
+            >
+              <div class="hidden md:mb-3 md:block md:aspect-video md:w-full md:overflow-hidden md:rounded-md">
                 <img
                   src={post.coverImage ?? '/images/cover-fallback_lg.webp'}
                   alt={post.title}
@@ -54,28 +57,26 @@ const relatedPosts: PostMeta[] = posts.filter(
                   decoding="async"
                   width="800"
                   height="420"
-                  sizes="(max-width: 639px) 220px, (max-width: 767px) 250px, 280px"
+                  sizes="280px"
                   draggable="false"
                   class="size-full object-cover transition-transform duration-300 select-none group-hover:scale-105"
                 />
               </div>
-              <a href={getLocalizedPostPath({ lang, slug: post.slug })} class="mb-1 block">
-                <h3 class="line-clamp-2 text-base/5 font-semibold hover:text-pink-700 dark:hover:text-pink-400">
-                  {post.title}
-                </h3>
-              </a>
-              <p class="mb-2 line-clamp-3 text-[13px]/4.5 text-gray-600 dark:text-gray-400">
+              <h3 class="text-foreground-primary mb-1 line-clamp-2 text-sm/5 font-semibold transition-colors group-hover:text-pink-700 md:text-base/5 dark:group-hover:text-pink-400">
+                {post.title}
+              </h3>
+              <p class="mb-2 hidden text-[13px]/4.5 text-gray-600 md:line-clamp-3 dark:text-gray-400">
                 {post.description}
               </p>
               {date && (
-                <div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-300">
+                <div class="flex items-center gap-1 text-[11px] text-gray-400 md:text-xs md:text-gray-500 dark:text-gray-500 md:dark:text-gray-300">
                   <CalendarDays size={13} aria-hidden="true" />
                   <time datetime={date.datetime} class="tracking-wide">
                     {date.display}
                   </time>
                 </div>
               )}
-            </div>
+            </a>
           );
         })}
       </div>

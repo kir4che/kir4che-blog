@@ -345,7 +345,7 @@ const articleSchema = {
 
 <script type="application/ld+json" is:inline set:html={JSON.stringify(articleSchema)} />
 <script>
-  import { LIGHTBOX_EVENT } from '@/components/mdx/Lightbox';
+  import { LIGHTBOX_EVENT } from '@/components/mdx/LightboxEvents';
   import { showToast } from '@/utils/toast';
 
   // 複製網址到剪貼簿
@@ -421,7 +421,7 @@ const articleSchema = {
 
   let onVisibilityChange: (() => void) | null = null;
 
-  document.addEventListener('astro:page-load', () => {
+  const init = () => {
     rebuildLightboxSlides();
 
     if (onVisibilityChange) {
@@ -439,5 +439,9 @@ const articleSchema = {
       };
       document.addEventListener('visibilitychange', onVisibilityChange);
     }
-  });
+  };
+
+  init();
+
+  document.addEventListener('astro:page-load', init);
 </script>
