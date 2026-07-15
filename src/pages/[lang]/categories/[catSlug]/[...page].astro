@@ -16,6 +16,7 @@ export const getStaticPaths = getCategoryStaticPaths;
 
 const lang = resolveLanguage(Astro.params.lang);
 const t = createTranslator(lang, 'CategoriesPage');
+const tNav = createTranslator(lang, 'nav');
 
 const link = (href: string) => withLocalePrefix(href, lang);
 
@@ -57,6 +58,35 @@ const {
   totalPages,
   totalItems,
 } = paginate(filteredPosts, page);
+
+const homeBreadcrumbUrl = new URL(withLocalePrefix('/', lang), Astro.site).href;
+const categoriesBreadcrumbUrl = new URL(withLocalePrefix('/categories', lang), Astro.site).href;
+const mainCatBreadcrumbUrl = new URL(
+  withLocalePrefix(`/categories/${mainCategory.slug}`, lang),
+  Astro.site
+).href;
+const breadcrumbItems = [
+  { position: 1, name: tNav('home'), item: homeBreadcrumbUrl },
+  { position: 2, name: t('breadcrumb.categories'), item: categoriesBreadcrumbUrl },
+  { position: 3, name: mainCategory.name[lang], item: mainCatBreadcrumbUrl },
+];
+if (hasSubCategory && subCategory) {
+  const subCatBreadcrumbUrl = new URL(
+    withLocalePrefix(`/categories/${subCategory.slug}`, lang),
+    Astro.site
+  ).href;
+  breadcrumbItems.push({ position: 4, name: subCategory.name[lang], item: subCatBreadcrumbUrl });
+}
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: breadcrumbItems.map(({ position, name, item }) => ({
+    '@type': 'ListItem',
+    position,
+    name,
+    item,
+  })),
+};
 ---
 
 <PostListLayout title={pageTitle}>
@@ -134,3 +164,5 @@ const {
     )
   }
 </PostListLayout>
+
+<script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbSchema)} />

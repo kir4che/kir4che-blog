@@ -69,7 +69,21 @@ export default defineConfig({
     locales: ['tw', 'en'],
     routing: 'manual',
   },
-  integrations: [react(), expressiveCode(ecConfig), mdx(), sitemap(), keystatic()],
+  integrations: [
+    react(),
+    expressiveCode(ecConfig),
+    mdx(),
+    sitemap({
+      i18n: {
+        defaultLocale: 'tw',
+        locales: {
+          tw: 'zh-TW',
+          en: 'en-US',
+        },
+      },
+    }),
+    keystatic(),
+  ],
   markdown: {
     remarkPlugins: [remarkGfm, remarkIns, remarkMark],
     rehypePlugins: [
