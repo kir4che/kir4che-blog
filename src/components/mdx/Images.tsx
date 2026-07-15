@@ -87,6 +87,9 @@ const getItemWidth = (item: MediaItem): number | null => {
   return null;
 };
 
+const styleVal = (v: string | number | undefined): string | undefined =>
+  v === undefined ? undefined : typeof v === 'number' ? `${v}px` : v;
+
 export const Images = ({
   images = [],
   title,
@@ -97,30 +100,14 @@ export const Images = ({
   maxHeight,
   align = 'center',
 }: ImagesProps) => {
-  const normalizedHeight =
-    typeof height === 'string' && height.trim().toLowerCase() === 'auto' ? undefined : height;
-
-  const resMinWidth = toCssLength(minWidth);
-  const resHeight = normalizedHeight ? toCssLength(normalizedHeight) : undefined;
-  const resMinHeight = minHeight ? toCssLength(minHeight) : undefined;
-  const resMaxHeight = maxHeight ? toCssLength(maxHeight) : undefined;
-  const defaultMinHeight = '200px';
-  const defaultMaxHeight = '400px';
-  const effectiveMinHeight = resMinHeight ?? defaultMinHeight;
-  const effectiveMaxHeight = resMaxHeight ?? defaultMaxHeight;
-
-  const heightPx = toPixelNumber(resHeight);
-  const maxHeightPx = toPixelNumber(effectiveMaxHeight);
-
-  const finalMaxHeight =
-    resHeight || effectiveMaxHeight
-      ? heightPx !== null && maxHeightPx !== null
-        ? heightPx >= maxHeightPx
-          ? resHeight
-          : effectiveMaxHeight
-        : (resHeight ?? effectiveMaxHeight)
+  const resolvedHeight =
+    height !== undefined
+      ? typeof height === 'string' && height.trim().toLowerCase() === 'auto'
+        ? undefined
+        : styleVal(height)
       : undefined;
 
+  const resMinWidth = toCssLength(minWidth);
   const galleryMinWidthPx = toPixelNumber(resMinWidth);
 
   const singleColumn =
@@ -170,9 +157,9 @@ export const Images = ({
             item={item}
             singleColumn={singleColumn}
             resolvedMinWidth={resMinWidth}
-            resolvedHeight={resHeight}
-            resolvedMinHeight={effectiveMinHeight}
-            resolvedMaxHeight={finalMaxHeight}
+            resolvedHeight={resolvedHeight}
+            resolvedMinHeight={styleVal(minHeight) || '200px'}
+            resolvedMaxHeight={styleVal(maxHeight) ?? resolvedHeight ?? undefined}
             lightboxSlides={item.type !== 'video' && slideIndexMap[i] >= 0 ? slidesJson : undefined}
             lightboxIndex={slideIndexMap[i] >= 0 ? slideIndexMap[i] : 0}
           />
