@@ -57,10 +57,10 @@ let publishedCache: Promise<PostEntry[]> | null = null;
 const getPublishedBlogEntries = async (): Promise<PostEntry[]> => {
   if (publishedCache) return publishedCache;
 
-  const cachePromise = getCollection('blog', (entry: PostEntry) => {
-    if (isProd && entry.data.draft) return false;
-    return true;
-  }).then((entries: PostEntry[] | null) => entries ?? []);
+  const cachePromise = getCollection(
+    'blog',
+    (entry: PostEntry) => !(isProd && entry.data.draft)
+  ).then((entries: PostEntry[] | null) => entries ?? []);
   publishedCache = cachePromise;
   return cachePromise;
 };

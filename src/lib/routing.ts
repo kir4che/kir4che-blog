@@ -3,7 +3,7 @@ import { getAllCategoryByPosts, getCategoryBySlug, isPostInCategory } from '@/li
 import { getPostsMeta } from '@/lib/posts';
 import { getTagsByPosts } from '@/lib/tags';
 import type { Category, CategoryInfo } from '@/types';
-import { slugify } from '@/utils/slug';
+import { slugify } from '@/utils/path';
 
 const generatePaginationPaths = (
   totalItems: number,
@@ -91,13 +91,10 @@ export const getCategoryStaticPaths = async () => {
     const posts = await getPostsMeta(lang);
     const categories = getAllCategoryByPosts(posts);
 
-    const allCatSlugs: string[] = [];
-    for (const cat of categories) {
-      allCatSlugs.push(cat.slug);
-      for (const subSlug of Object.keys(cat.subcategories ?? {})) {
-        allCatSlugs.push(subSlug);
-      }
-    }
+    const allCatSlugs = categories.flatMap((cat) => [
+      cat.slug,
+      ...Object.keys(cat.subcategories ?? {}),
+    ]);
 
     for (const catSlug of allCatSlugs) {
       const resolved = getCategoryBySlug(catSlug, posts, 'all');

@@ -1,5 +1,4 @@
 import { CONFIG, LANGUAGE_TO_LOCALE_MAP } from '@/config';
-import { resolveLanguage } from '@/lib/i18n';
 import { stripLocalePrefix, withLocalePrefix } from '@/lib/paths';
 import type { Language } from '@/types';
 import { ensurePathname } from '@/utils/path';
@@ -109,7 +108,7 @@ export const getSeoConfig = (siteUrl: URL, lang: Language, url?: URL | string): 
       title: blogTitle,
       description: blogDescription,
       siteName: blogSiteName,
-      locale: resolveLanguage(lang),
+      locale: lang,
       ...(openGraphLocaleAlternates.length ? { localeAlternates: openGraphLocaleAlternates } : {}),
       images: [baseImage],
     },

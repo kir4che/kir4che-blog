@@ -7,7 +7,20 @@ import { resolveLanguage } from '@/lib/i18n';
 import { getPostPassword, verifyPostPassword } from '@/lib/post-passwords';
 import { getPostMetaBySlug, getPostUnlockCookieName } from '@/lib/posts';
 import { checkLock, deleteRecord, getClientKey, recordAttempt } from '@/lib/rate-limit';
-import { errorResponse, jsonResponse } from '@/utils/api';
+const buildHeaders = (headers?: HeadersInit): HeadersInit => {
+  const merged = new Headers(headers);
+  if (!merged.has('Content-Type')) merged.set('Content-Type', 'application/json');
+  return merged;
+};
+
+const jsonResponse = (data: unknown, init: ResponseInit = {}): Response =>
+  new Response(JSON.stringify(data), { ...init, headers: buildHeaders(init.headers) });
+
+const errorResponse = (
+  message: string,
+  status: number,
+  extra?: Record<string, unknown>
+): Response => jsonResponse({ message, ...(extra ?? {}) }, { status });
 
 // 驗證請求內容
 const verifyPayloadSchema = z.object({
