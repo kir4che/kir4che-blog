@@ -22,6 +22,12 @@ const rotations = [
   'rotate-[0.8deg]',
   '-rotate-[0.5deg]',
 ];
+
+const MAX_VISIBLE = 15;
+const filteredCategories = categories.filter((c) => c.slug !== 'uncategorized');
+const visibleCategories = filteredCategories.slice(0, MAX_VISIBLE);
+const hasMore = filteredCategories.length > MAX_VISIBLE;
+const remainingCount = filteredCategories.length - MAX_VISIBLE;
 ---
 
 <section>
@@ -29,9 +35,9 @@ const rotations = [
     <Folder size={16} aria-hidden="true" />
     <span class="text-gradient">{t('categories')}</span>
   </h3>
-  <ul class="flex flex-wrap gap-2">
+  <ul class="flex flex-wrap gap-x-2 gap-y-3">
     {
-      categories.map(({ slug, name, color, postCount }, index) => (
+      visibleCategories.map(({ slug, name, color, postCount }, index) => (
         <li
           style={getCategoryStyle(color)}
           class={`${rotations[index % rotations.length]} transition-transform duration-200 hover:rotate-0`}
@@ -46,6 +52,19 @@ const rotations = [
           </LocalizedLink>
         </li>
       ))
+    }
+    {
+      hasMore && (
+        <li>
+          <LocalizedLink
+            href="/categories"
+            lang={lang}
+            className="inline-flex items-center gap-x-1 rounded-sm bg-surface-secondary/70 px-2.5 py-1 text-sm font-medium text-foreground-primary/60 shadow-sm ring-1 ring-inset ring-black/10 hover:bg-white dark:ring-white/10 dark:hover:bg-gray-700/70"
+          >
+            +{remainingCount} more
+          </LocalizedLink>
+        </li>
+      )
     }
   </ul>
 </section>

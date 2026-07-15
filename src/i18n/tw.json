@@ -159,7 +159,7 @@
     "backToTags": "返回標籤列表"
   },
   "NotFoundPage": {
-    "title": "糟糕！找不到這個頁面",
+    "title": "找不到這個頁面",
     "description": "您訪問的頁面可能已被移除、名稱已更改或暫時無法使用",
     "backHome": "返回首頁"
   }
