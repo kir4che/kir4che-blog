@@ -35,7 +35,7 @@ const simplifiedTags = tags.map(({ name, slug }) => ({ name, slug }));
   <div
     id="layout-container"
     data-sidebar-open="false"
-    class="group/layout mx-auto flex max-w-7xl flex-1 px-5 max-md:flex-col sm:px-6"
+    class="group/layout mx-auto flex max-w-7xl flex-1 px-4 max-md:flex-col sm:px-6"
   >
     <div
       id="sidebar-backdrop"
@@ -44,7 +44,7 @@ const simplifiedTags = tags.map(({ name, slug }) => ({ name, slug }));
     </div>
     <div id="main-content-wrapper" class="flex w-full min-w-0 flex-1 lg:gap-x-10 xl:gap-x-16">
       <div class="flex min-h-dvh min-w-0 flex-1 flex-col">
-        <header class="pt-4 pb-2.5">
+        <header class="mb-0 pt-4 sm:mb-2">
           <div class="mb-2 lg:hidden">
             <ProfileCard tProfile={tProfile} lang={lang} />
           </div>
