@@ -54,7 +54,7 @@ const blog = defineCollection({
     protected: z.boolean().default(false),
     coverImage: z.string().optional(),
     places: placesSchema,
-    updatedAt: z.string().optional(),
+    updatedAt: z.coerce.date().optional(),
     showUpdatedAt: z.boolean().default(false),
   }),
 });

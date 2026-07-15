@@ -1,42 +1,69 @@
-import { isAuthenticated } from '@/lib/auth';
 import { defineMiddleware } from 'astro:middleware';
 import TurndownService from 'turndown';
 
 const turndown = new TurndownService();
-const linkHeader =
-  '</sitemap-index.xml>; rel="sitemap", </docs>; rel="service-doc", </rss.xml>; rel="alternate"; type="application/rss+xml"';
+const linkHeader = '</sitemap-index.xml>; rel="sitemap"';
+
+const readAcceptHeader = (request: Request, isPrerendered: boolean): string => {
+  if (isPrerendered) return '';
+
+  try {
+    return request.headers.get('accept') || '';
+  } catch (err) {
+    if (err instanceof TypeError) return '';
+    throw err;
+  }
+};
 
 export const onRequest = defineMiddleware(async (context, next) => {
-  const { url, cookies, redirect, request } = context;
+  const { url, request } = context;
 
-  if (
-    url.pathname.startsWith('/admin') &&
-    !url.pathname.startsWith('/admin/login') &&
-    !(await isAuthenticated(cookies))
-  )
-    return redirect('/admin/login');
+  // 修正 Keystatic OAuth redirect_uri 避免 Proxy 將網址變成 localhost
+  // Workaround for https://github.com/Thinkmill/keystatic/issues/1022
+  const isOAuthRoute =
+    url.pathname.includes('/github/oauth/') || url.pathname.includes('/github/login');
 
-  if (url.pathname.startsWith('/api/admin') && !(await isAuthenticated(cookies)))
-    return new Response('Unauthorized', { status: 401 });
+  if (isOAuthRoute) {
+    const forwardedHost = request.headers.get('x-forwarded-host');
+    const forwardedProto = request.headers.get('x-forwarded-proto');
+
+    if (forwardedHost && forwardedProto) {
+      const correctUrl = new URL(url);
+      correctUrl.protocol = forwardedProto;
+      correctUrl.host = forwardedHost;
+
+      const newRequest = new Request(correctUrl.toString(), {
+        method: request.method,
+        headers: request.headers,
+        body: request.body,
+        // @ts-ignore
+        duplex: 'half',
+      });
+
+      Object.defineProperty(context, 'url', {
+        value: correctUrl,
+        writable: false,
+      });
+
+      Object.defineProperty(context, 'request', {
+        value: newRequest,
+        writable: false,
+      });
+    }
+  }
 
   // 只在非 API 路徑 + Accept header 包含 text/markdown 時，將 HTML 轉換為 Markdown。
-  const isPageRequest = !url.pathname.startsWith('/api') && !url.pathname.startsWith('/admin');
+  const isPageRequest = !url.pathname.startsWith('/api') && !url.pathname.startsWith('/keystatic');
 
   if (isPageRequest) {
-    let accept = '';
-    try {
-      accept = request.headers.get('accept') || '';
-    } catch {
-      // headers 在 prerendering 時不可用
-    }
+    const accept = readAcceptHeader(request, context.isPrerendered);
 
     if (accept.includes('text/markdown')) {
-      const response = await next();
-
-      const contentType = response.headers.get('content-type') || '';
+      const res = await next();
+      const contentType = res.headers.get('content-type') || '';
 
       if (contentType.includes('text/html')) {
-        const html = await response.text();
+        const html = await res.text();
 
         const mainContent = extractMain(html);
 
@@ -52,7 +79,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
         });
       }
 
-      return response;
+      return res;
     }
   }
 

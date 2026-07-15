@@ -2,7 +2,7 @@ import { AlertCircle, Pencil, Lightbulb, AlertTriangle } from 'lucide-react';
 import type { PropsWithChildren } from 'react';
 import { cn } from '@/utils/cn';
 
-type AlertType = 'tip' | 'note' | 'warning';
+type AlertType = 'tip' | 'note' | 'warning' | 'error';
 
 interface AlertProps extends PropsWithChildren {
   type?: AlertType;

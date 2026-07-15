@@ -7,5 +7,5 @@ export const toStringArray = (value: unknown, defaultValue: string[] = []): stri
 };
 
 // 解析 updatedAt
-export const resolveUpdatedAt = (raw: unknown): string | undefined =>
-  typeof raw === 'string' && raw.trim() ? raw.trim() : undefined;
+export const resolveUpdatedAt = (raw: unknown): Date | undefined =>
+  raw instanceof Date && !Number.isNaN(raw.getTime()) ? raw : undefined;

@@ -1,6 +1,12 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "include": ["src", "env.d.ts", "./worker-configuration.d.ts", "src/middleware.ts"],
+  "include": [
+    "src",
+    "env.d.ts",
+    "./worker-configuration.d.ts",
+    "src/middleware.ts",
+    "keystatic.config.tsx"
+  ],
   "exclude": ["dist"],
   "compilerOptions": {
     "ignoreDeprecations": "6.0",
