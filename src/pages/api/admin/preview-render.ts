@@ -64,7 +64,7 @@ const MDX_PREVIEW_COMPONENTS = {
 };
 
 export const POST = async ({ request, cookies }: APIContext) => {
-  if (!isAuthenticated(cookies)) return new Response('Unauthorized', { status: 401 });
+  if (!(await isAuthenticated(cookies))) return new Response('Unauthorized', { status: 401 });
 
   let content: string;
   try {
