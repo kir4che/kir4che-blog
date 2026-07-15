@@ -128,6 +128,17 @@ export const categoryMap: Record<string, Category> = {
       dark: '#538DD5',
     },
   },
+  devops: {
+    name: {
+      tw: 'DevOps',
+      en: 'DevOps',
+    },
+    slug: 'devops',
+    color: {
+      light: '#0d7377',
+      dark: '#14a8ad',
+    },
+  },
   tools: {
     name: {
       tw: '工具',
@@ -137,30 +148,6 @@ export const categoryMap: Record<string, Category> = {
     color: {
       light: '#666666',
       dark: '#CCCCCC',
-    },
-    subcategories: {
-      git: {
-        name: {
-          tw: 'Git',
-          en: 'Git',
-        },
-        slug: 'git',
-        color: {
-          light: '#E53621',
-          dark: '#fc5d49',
-        },
-      },
-      gitlab: {
-        name: {
-          tw: 'Gitlab',
-          en: 'Gitlab',
-        },
-        slug: 'gitlab',
-        color: {
-          light: '#F45419',
-          dark: '#f76834',
-        },
-      },
     },
   },
   uncategorized: {
@@ -243,6 +230,13 @@ export const tagMap: Record<string, TagDefinition> = {
       en: 'NodeJS',
     },
     slug: 'nodejs',
+  },
+  musings: {
+    name: {
+      tw: '隨筆',
+      en: 'Musings',
+    },
+    slug: 'musings',
   },
   pokemon: {
     name: {

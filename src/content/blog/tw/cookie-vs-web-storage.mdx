@@ -112,10 +112,7 @@ Session 是伺服器端的一種狀態管理技術，用於實現**用戶與伺�
 
 ### Session 與 Cookie 的協作
 
-Session 本身不直接依賴 Cookie，但通常會用 Cookie 存放 Session ID，以實現伺服器端的會話管理，如：
-
-<br />
-用戶登入後，伺服器生成 Session，將 Session ID 回傳給瀏覽器存放於 Cookie
+Session 本身不直接依賴 Cookie，但通常會用 Cookie 存放 Session ID，以實現伺服器端的會話管理，如：用戶登入後，伺服器生成 Session，將 Session ID 回傳給瀏覽器存放於 Cookie
 中。後續請求中，瀏覽器自動攜帶該 Cookie，伺服器根據 Session ID 確認用戶身份。
 
 > 若只選用其中一個就會有一些問題，如 :
