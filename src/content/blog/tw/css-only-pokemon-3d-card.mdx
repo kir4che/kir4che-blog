@@ -3,15 +3,14 @@ title: 只使用 CSS！拆解寶可夢 3D 閃卡特效
 date: 2025-09-22T00:00:00.000Z
 description: '學習只使用 CSS 製作寶可夢 3D 閃卡特效'
 categories:
-  - CSS
+  - css
 tags:
-  - CSS
-  - Pokemon
+  - css
+  - pokemon
   - notes
 featured: true
 ---
 
-import { PokemonCard } from '@/components/blog/PokemonCard';
 
 在網路上看到 [pokemon-cards-css](https://github.com/simeydotme/pokemon-cards-css) 把寶可夢卡牌的 3D 及閃膜用純 CSS 做出來，真的超帥！這篇整理我理解原始碼並自己實作的過程。
 
@@ -62,7 +61,7 @@ import { PokemonCard } from '@/components/blog/PokemonCard';
 
 這樣一來，我們的卡片就已經具備了 3D 的基礎，雖然現在看起來還不會動。
 
-<PokemonCard stage='structure' />
+[寶可夢卡牌 - 結構](pokemon-card:structure)
 
 ---
 
@@ -139,9 +138,9 @@ const onMouseLeave = () => {
     '--rotator-transition': '600ms',
   });
 };
-````
+```
 
-<PokemonCard stage='interactive' client:visible />
+[寶可夢卡牌 - 互動](pokemon-card:interactive)
 
 ---
 
@@ -199,21 +198,16 @@ const onMouseLeave = () => {
 };
 ```
 
-<PokemonCard stage='final' client:visible />
+[寶可夢卡牌 - 最終](pokemon-card:final)
 
 ---
 
 ## 完整程式碼
 
-<iframe
+<Iframe
+  src="https://codepen.io/kir4che/embed/bNVjNKd?default-tab=html%2Cresult"
   height={400}
-  style={{ width: '100%' }}
-  scrolling='no'
-  title='Pokémon Card CSS Common Effect'
-  src='https://codepen.io/kir4che/embed/bNVjNKd?default-tab=html%2Cresult'
-  frameBorder='0'
-  loading='lazy'
-  allowFullScreen
+  title="Pokémon Card CSS Common Effect"
 />
 
 這篇會再持續學習並更新其他閃卡特效～

@@ -85,7 +85,7 @@ draft: true
 
 ---
 
-<code>npm install</code>
+`npm install`
 
 > 這是一段引用文字。
 
@@ -95,14 +95,14 @@ draft: true
 
 ~~這是一段被刪除線劃掉的文字~~
 
-<ins>這是一段新插入的文字</ins>
+++這是一段新插入的文字++
 
 這是一段有上標的文字^1^（暫時沒有完成）
 
-<pre>
+```
 const x = 10;
 if (x > 5) console.log(x);
-</pre>
+```
 
 ---
 
@@ -247,18 +247,16 @@ function demo() {
 
 ## Card（卡片）
 
-<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-  <Card
-    title="受控元件"
-    subtitle="Controlled Component"
-    description="每次輸入都更新 state，React 掌握資料的『真相』。"
-  />
-  <Card
-    title="非受控元件"
-    subtitle="Uncontrolled Component"
-    description="資料留在 DOM 裡，需要時才用 ref 去取值。"
-  />
-</div>
+<Card
+  title="受控元件"
+  subtitle="Controlled Component"
+  description="每次輸入都更新 state，React 掌握資料的『真相』。"
+/>
+<Card
+  title="非受控元件"
+  subtitle="Uncontrolled Component"
+  description="資料留在 DOM 裡，需要時才用 ref 去取值。"
+/>
 
 ---
 
@@ -304,15 +302,6 @@ function demo() {
 
 ---
 
-## FigureShell（圖形容器）
-
-<FigureShell title="使用 FigureShell 包裝內容">
-  <div className="bg-blue-100 dark:bg-blue-900 p-4 rounded-lg text-center">
-    這是被 FigureShell 包裝的內容區域
-  </div>
-</FigureShell>
-
----
 
 ## ImagesItem（圖片項目）
 

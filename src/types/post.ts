@@ -23,7 +23,7 @@ export interface PostMeta {
   coverImage?: string;
   places?: TripPlace[];
   wordCount?: number;
-  updatedAt?: string;
+  updatedAt?: Date;
   showUpdatedAt?: boolean;
 }
 

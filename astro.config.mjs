@@ -5,6 +5,7 @@ import sitemap from '@astrojs/sitemap';
 import vercel from '@astrojs/vercel';
 import tailwindcss from '@tailwindcss/vite';
 import expressiveCode from 'astro-expressive-code';
+import keystatic from '@keystatic/astro';
 import { defineConfig } from 'astro/config';
 import { loadEnv } from 'vite';
 
@@ -14,7 +15,6 @@ import rehypeExternalLinks from 'rehype-external-links';
 import rehypeSlug from 'rehype-slug';
 import rehypeUnwrapImages from 'rehype-unwrap-images';
 import remarkGfm from 'remark-gfm';
-import remarkCustomHeaderId from 'remark-custom-header-id';
 import remarkIns from 'remark-ins';
 import { remarkMark } from 'remark-mark-highlight';
 
@@ -41,12 +41,11 @@ export default defineConfig({
       },
     },
     server: {
-      port: process.env.ADMIN_DEV ? 4322 : 4321,
-      watch: {
-        ...(process.env.ADMIN_DEV ? { ignored: ['**/src/content/blog/**'] } : {}),
-      },
+      port: 4321,
     },
     ssr: {
+      target: 'node',
+      noExternal: ['daisyui'],
       external: ['node:crypto', 'node:fs', 'node:fs/promises', 'node:path', 'fs', 'path'],
     },
     optimizeDeps: {
@@ -70,9 +69,9 @@ export default defineConfig({
     locales: ['tw', 'en'],
     routing: 'manual',
   },
-  integrations: [react(), expressiveCode(ecConfig), mdx(), sitemap()],
+  integrations: [react(), expressiveCode(ecConfig), mdx(), sitemap(), keystatic()],
   markdown: {
-    remarkPlugins: [remarkGfm, remarkIns, remarkMark, remarkCustomHeaderId],
+    remarkPlugins: [remarkGfm, remarkIns, remarkMark],
     rehypePlugins: [
       rehypeUnwrapImages,
       rehypeSlug,
