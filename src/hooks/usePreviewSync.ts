@@ -49,6 +49,28 @@ export const usePreviewSync = (
     return () => iframe.removeEventListener('load', handleIframeLoad);
   }, [iframeRef, handleIframeLoad]);
 
+  // mount 後若有初始內容，立即觸發一次 SSR 渲染
+  useEffect(() => {
+    if (!content) return;
+    setSyncState('ssr-pending');
+    fetch('/api/admin/preview-render', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content }),
+    })
+      .then((res) => (res.ok ? res.json() : Promise.reject()))
+      .then(({ html }: { html: string }) => {
+        lastHashRef.current = hashString(content);
+        if (iframeRef.current && iframeReadyRef.current)
+          sendToIframe(iframeRef.current, html, false);
+        else pendingHtmlRef.current = html;
+        setSyncState('idle');
+      })
+      .catch(() => setSyncState('idle'));
+    // 只在 mount 時執行一次
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     if (!isMountedRef.current) {
       isMountedRef.current = true;
