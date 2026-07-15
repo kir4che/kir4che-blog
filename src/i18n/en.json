@@ -107,7 +107,23 @@
       "hobby3": "🧶 Crocheting—currently challenging myself to make a vest."
     },
     "vlogIntro": "I love trying new things, and recently started vlogging to document every moment of life.",
-    "title_3": "💌 How to reach me:"
+    "title_2": "🖥️ Online Resume & Portfolio",
+    "title_3": "💌 How to reach me:",
+    "cats": {
+      "title": "My Cats 🐈",
+      "description": "I have two cats—Huami and Boo, they are super cute (*´AV`)~🩷",
+      "huami": {
+        "alt": "Photo of Huami",
+        "title": "Huami"
+      },
+      "boo": {
+        "alt": "Photo of Boo",
+        "title": "Boo"
+      },
+      "both": {
+        "alt": "Photo of Huami and Boo"
+      }
+    }
   },
   "ArchivePage": {
     "title": "Archives",
@@ -137,7 +153,8 @@
       "collapse": "Collapse table of contents"
     },
     "share": {
-      "native": "Share to…"
+      "native": "Share to…",
+      "label": "Share"
     }
   },
   "CategoriesPage": {
