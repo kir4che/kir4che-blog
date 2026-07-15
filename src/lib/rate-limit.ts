@@ -10,7 +10,7 @@ interface AttemptRecord {
 
 const attemptStore = new Map<string, AttemptRecord>();
 
-export const checkLock = async (clientKey: string): Promise<number> => {
+export const checkLock = (clientKey: string): number => {
   const record = attemptStore.get(clientKey);
   if (!record) return 0;
 
@@ -23,9 +23,7 @@ export const checkLock = async (clientKey: string): Promise<number> => {
   return 0;
 };
 
-export const recordAttempt = async (
-  clientKey: string
-): Promise<{ locked: boolean; lockSeconds: number }> => {
+export const recordAttempt = (clientKey: string): { locked: boolean; lockSeconds: number } => {
   const now = Date.now();
   let record = attemptStore.get(clientKey);
 
@@ -47,7 +45,7 @@ export const recordAttempt = async (
   return { locked: false, lockSeconds: 0 };
 };
 
-export const deleteRecord = async (clientKey: string): Promise<void> => {
+export const deleteRecord = (clientKey: string): void => {
   attemptStore.delete(clientKey);
 };
 

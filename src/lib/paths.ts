@@ -1,7 +1,6 @@
 import { CONFIG } from '@/config';
 import type { Language } from '@/types';
-import { ensurePathname, normalizePathname } from '@/utils/path';
-import { normalizePathSlug } from '@/utils/slug';
+import { ensurePathname, normalizePathname, normalizePathSlug } from '@/utils/path';
 
 // 取得指定語言的基礎路徑
 export const getLanguageBasePath = (lang: Language): string =>

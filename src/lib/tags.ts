@@ -1,6 +1,6 @@
 import { DEFAULT_LANGUAGE, tagMap } from '@/config';
 import type { Language, PostMeta, SidebarTag, TagBadgeInfo } from '@/types';
-import { slugify } from '@/utils/slug';
+import { slugify } from '@/utils/path';
 
 // 依據 slug、語系，取得最後顯示用的標籤名稱。
 export const getTagDisplayName = (slug: string, originalName: string, lang: Language): string => {
