@@ -19,17 +19,17 @@ const href = getLocalizedPostPath({ lang, slug: post.slug });
 const showCover = Boolean(post.coverImage) && !hideImage;
 ---
 
-<a
-  href={href}
+<article
   class={cn(
-    'rounded-2xl transition-all duration-300 hover:-translate-y-1 overflow-hidden h-full block',
+    'relative rounded-2xl transition-all duration-300 hover:-translate-y-1 overflow-hidden h-full block',
     'shadow-[1px_2px_8px_rgba(247,126,157,0.18)] hover:shadow-[1px_4px_12px_rgba(233,92,133,0.28)] dark:shadow-[0_0_12px_rgba(255,214,224,0.12)] dark:hover:shadow-[0_0_20px_rgba(254,196,209,0.25)]',
     !showCover && 'bg-surface-secondary',
     className
   )}
-  aria-label={`Read post: ${post.title}`}
 >
-  <article class="group relative flex h-full">
+  <a href={href} class="absolute inset-0 z-30 rounded-2xl" aria-label={`Read post: ${post.title}`}
+  ></a>
+  <div class="group relative flex h-full">
     <LockOverlay isLocked={Boolean(post.protected)} />
     <div
       class:list={[
@@ -49,7 +49,8 @@ const showCover = Boolean(post.coverImage) && !hideImage;
             fetchpriority={priority ? 'high' : 'auto'}
             decoding={priority ? 'sync' : 'async'}
             onerror="this.onerror=null;this.src='/images/cover-fallback_lg.webp';"
-            class="absolute inset-0 h-full w-full object-cover brightness-[0.85] transition-all duration-500 group-hover:scale-110 group-hover:brightness-105"
+            draggable="false"
+            class="absolute inset-0 z-0 h-full w-full object-cover brightness-[0.85] transition-all duration-500 select-none group-hover:scale-110 group-hover:brightness-105"
           />
         )
       }
@@ -57,7 +58,7 @@ const showCover = Boolean(post.coverImage) && !hideImage;
         class:list={[
           'flex h-full flex-col p-4',
           {
-            'absolute inset-0 z-10': showCover,
+            'absolute inset-0 z-20': showCover,
           },
         ]}
       >
@@ -67,7 +68,7 @@ const showCover = Boolean(post.coverImage) && !hideImage;
               'mb-2 line-clamp-2 text-xl',
               {
                 'text-white drop-shadow-md': showCover,
-                'text-gray-900 group-hover:text-pink-700 dark:text-white dark:group-hover:text-pink-400':
+                'dark:text-foreground-primary text-gray-900 group-hover:text-pink-700 dark:group-hover:text-pink-400':
                   !showCover,
               },
             ]}
@@ -78,7 +79,7 @@ const showCover = Boolean(post.coverImage) && !hideImage;
             post.description && (
               <p
                 class:list={[
-                  'mb-2 line-clamp-3 text-sm/5.5',
+                  'mb-4 line-clamp-3 text-sm/6',
                   {
                     'text-gray-100 drop-shadow': showCover,
                     'text-gray-500 dark:text-gray-400': !showCover,
@@ -96,6 +97,7 @@ const showCover = Boolean(post.coverImage) && !hideImage;
             categories={post.categories ?? []}
             useDarkColor={showCover}
             class:list={[
+              'relative z-40',
               {
                 'rounded-full bg-black/35 px-2.5 py-0.5 backdrop-blur': showCover,
               },
@@ -117,11 +119,11 @@ const showCover = Boolean(post.coverImage) && !hideImage;
       {
         showCover && (
           <div
-            class="absolute inset-0"
+            class="absolute inset-0 z-10"
             style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.35), rgba(0,0,0,0.5))' }}
           />
         )
       }
     </div>
-  </article>
-</a>
+  </div>
+</article>

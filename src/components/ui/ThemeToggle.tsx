@@ -56,7 +56,7 @@ const ThemeToggle = ({ translations, iconOnly = false }: ThemeToggleProps) => {
     return (
       <button
         type="button"
-        className="hover:text-foreground-primary flex w-fit items-center gap-x-1.5 bg-transparent text-sm text-gray-700 dark:text-white/80"
+        className="hover:text-foreground-primary dark:text-foreground-primary/80 flex w-fit items-center gap-x-1.5 bg-transparent text-sm text-gray-700"
         aria-label={translations.dark}
         disabled
       >
@@ -71,7 +71,7 @@ const ThemeToggle = ({ translations, iconOnly = false }: ThemeToggleProps) => {
     <button
       type="button"
       onClick={toggleTheme}
-      className="hover:text-foreground-primary flex w-fit items-center gap-x-1.5 bg-transparent text-sm text-gray-700 dark:text-white/80"
+      className="hover:text-foreground-primary dark:text-foreground-primary/80 flex w-fit items-center gap-x-1.5 bg-transparent text-sm text-gray-700"
       aria-label={nextLabel}
     >
       <span className={cn({ hidden: isDark })}>

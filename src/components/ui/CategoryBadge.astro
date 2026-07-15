@@ -10,16 +10,9 @@ interface Props {
   categories?: string[];
   useDarkColor?: boolean;
   class?: string;
-  asLink?: boolean;
 }
 
-const {
-  lang,
-  categories = [],
-  useDarkColor = false,
-  class: className,
-  asLink = false,
-} = Astro.props;
+const { lang, categories = [], useDarkColor = false, class: className } = Astro.props;
 
 const resolvedCategories = normalizeCategories(categories);
 ---
@@ -37,16 +30,11 @@ const resolvedCategories = normalizeCategories(categories);
         ];
         const itemStyle = getCategoryStyle(info.color);
 
-        return asLink ? (
+        return (
           <a href={`/${lang}/categories/${info.slug}/`} class:list={itemClasses} style={itemStyle}>
             <Circle size={8} fill="currentColor" aria-hidden="true" />
             {info.name[lang]}
           </a>
-        ) : (
-          <span class:list={itemClasses} style={itemStyle}>
-            <Circle size={8} fill="currentColor" aria-hidden="true" />
-            {info.name[lang]}
-          </span>
         );
       })}
     </div>

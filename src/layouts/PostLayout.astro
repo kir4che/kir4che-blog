@@ -157,7 +157,8 @@ const isTripPost = isPostInCategory(post, { tw: '旅遊', en: 'Trip' }, 'trip');
               loading="eager"
               fetchpriority="high"
               decoding="async"
-              class="mb-3 h-45 w-full rounded-t object-cover object-[center_70%] sm:h-56 xl:h-68"
+              draggable="false"
+              class="mb-3 h-45 w-full object-cover object-[center_70%] select-none sm:h-56 xl:h-68"
             />
           )
         }
@@ -181,7 +182,7 @@ const isTripPost = isPostInCategory(post, { tw: '旅遊', en: 'Trip' }, 'trip');
           </div>
           {
             post.showUpdatedAt && updatedAt?.datetime && (
-              <div class="flex justify-end text-xs text-gray-600 dark:text-white/70">
+              <div class="dark:text-foreground-primary/70 flex justify-end text-xs text-gray-600">
                 <time datetime={updatedAt.datetime}>
                   {tCommon('unit.updatedAt')} {updatedAt.display}
                 </time>
