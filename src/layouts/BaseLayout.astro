@@ -1,5 +1,6 @@
 ---
 import type { Language } from '@/types';
+import { LANGUAGE_TO_LOCALE_MAP } from '@/config';
 import { getSeoConfig } from '@/lib/seo';
 import { getLocaleFromUrl } from '@/lib/i18n';
 import Toast from '@/components/ui/Toast.astro';
@@ -37,16 +38,18 @@ const canonicalUrl = canonical
 const fallbackImage = seoConfig.openGraph.images[0] ?? null;
 const resolvedImage = image ?? fallbackImage;
 const shouldIndex = noindex ? 'noindex,nofollow' : seoConfig.robots;
+const locale = LANGUAGE_TO_LOCALE_MAP[currLang] || currLang;
 ---
 
 <!doctype html>
-<html lang={currLang}>
+<html lang={locale}>
   <head>
     <ThemeScript />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://cdn.kir4che.com" crossorigin />
     <title>
       {title ? seoConfig.title.template.replace('%s', title) : seoConfig.title.default}
@@ -55,6 +58,28 @@ const shouldIndex = noindex ? 'noindex,nofollow' : seoConfig.robots;
     {keywords && <meta name="keywords" content={keywords} />}
     <meta name="robots" content={shouldIndex} />
     <link rel="canonical" href={canonicalUrl} />
+    <!-- Open Graph -->
+    <meta property="og:title" content={title ?? seoConfig.openGraph.title} />
+    <meta property="og:description" content={description ?? seoConfig.openGraph.description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:type" content={seoConfig.openGraph.type} />
+    <meta property="og:site_name" content={seoConfig.openGraph.siteName} />
+    <meta property="og:locale" content={seoConfig.openGraph.locale} />
+    {
+      seoConfig.openGraph.localeAlternates?.map((alt) => (
+        <meta property="og:locale:alternate" content={alt} />
+      ))
+    }
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content={seoConfig.twitter.card} />
+    <meta name="twitter:title" content={title ?? seoConfig.twitter.title} />
+    <meta name="twitter:description" content={description ?? seoConfig.twitter.description} />
+    <!-- Hreflang -->
+    {
+      Object.entries(seoConfig.alternates).map(([locale, url]) => (
+        <link rel="alternate" hreflang={locale} href={url} />
+      ))
+    }
     {
       resolvedImage && (
         <>
