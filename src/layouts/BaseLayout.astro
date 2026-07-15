@@ -41,10 +41,11 @@ const shouldIndex = noindex ? 'noindex,nofollow' : seoConfig.robots;
 <!doctype html>
 <html lang={currLang} transition:animate="none">
   <head>
+    <ThemeScript />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <ThemeScript />
     <title>
       {title ? seoConfig.title.template.replace('%s', title) : seoConfig.title.default}
     </title>
@@ -58,6 +59,13 @@ const shouldIndex = noindex ? 'noindex,nofollow' : seoConfig.robots;
   <body class="preload">
     <Toast />
     <slot />
+    <script>
+      const clearPreload = () => document.body.classList.remove('preload');
+      if (document.readyState === 'loading')
+        document.addEventListener('DOMContentLoaded', clearPreload, { once: true });
+      else clearPreload();
+      document.addEventListener('astro:page-load', clearPreload);
+    </script>
     <script>
       const root = '[data-lang-menu]';
       const toggle = '[data-lang-menu-toggle]';
