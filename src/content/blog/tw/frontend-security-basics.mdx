@@ -1,0 +1,334 @@
+---
+title: 前端安全入門：SOP、XSS、CSP、CSRF 與 CORS
+description: 'SOP、XSS、CSP、CSRF、CORS 等瀏覽器安全機制整理，含攻擊原理與實務防禦做法。'
+date: '2026-06-05T16:47:53.000Z'
+tags: ['security', 'notes']
+categories: ['frontend']
+---
+
+## 為什麼需要了解前端安全？
+前端程式碼執行在使用者的瀏覽器中，**任何人都能檢視、修改**你的前端程式碼。
+攻擊者不需要駭進伺服器，只要在使用者身上找到漏洞，就能竊取資料或偽造操作。
+
+> 前端安全控制是 **輔助防線**，真正的驗證永遠必須在伺服器端執行。
+
+---
+## 同源政策 (Same-Origin Policy, SOP)
+> 瀏覽器不讓你的網頁隨便讀取「其他網站」的資料，就像你的日記不能被隔壁同學偷看。
+
+### 什麼是「同源」？
+兩個 URL 的「**Protocol（協定）** + **Domain（域名）** + **Port（埠號）**」完全一致才算同源
+
+<Table
+  data={{
+    headers: ['比較對象', 'https://example.com:443/page'],
+    rows: [
+      [
+        '`https://example.com:443/api`',
+        '✅ 同源（path 不同不算跨源）',
+      ],
+      [
+        '`https://example.com:443/page`',
+        '✅ 同源（完全一致）',
+      ],
+      [
+        '`http://example.com`',
+        '❌ Protocol 不同',
+      ],
+      [
+        '`https://sub.example.com`',
+        '❌ Domain 不同',
+      ],
+      [
+        '`https://example.com:8443`',
+        '❌ Port 不同',
+      ],
+    ],
+  }}
+/>
+
+> 想像你的瀏覽器裡住了好幾個「國家的護照檢查員」：
+> `https://bank.com` 的檢查員只認 `bank.com` 的證件。當 `https://evil.com` 的網頁想偷看 `https://bank.com` 的資料時，檢查員會說：「不行，你不是我們國家的」。
+
+### SOP 做了什麼？
+SOP 是瀏覽器的**預設行為**，讓一個來源的網站不能任意讀取另一個來源的資料。
+除了可以正常引用 iframe、圖片等跨源資源，JS 無法讀取跨源的：
+
+- DOM
+- AJAX 請求的回應內容（可能送出，但回應會被擋）
+- `localStorage`、`Cookie`、`IndexedDB`
+
+> ⚠️ SOP 不是「禁止請求」，而是「**禁止讀取回應**」。請求還是會發出去，只是瀏覽器不讓 JS 看到回傳的內容。
+
+### 如果沒有 SOP？
+- iframe 裡的機密資訊被任意讀取
+- 更加肆意地進行 CSRF
+- 介面被第三方濫用
+### SOP 可以被繞過嗎？
+嚴格來說 SOP 是瀏覽器強制執行的，**沒有真正的繞過方式**，但仍可讓其形同虛設：
+
+<Table
+  data={{
+    headers: ['情況', '怎麼發生的？', '責任'],
+    rows: [
+      [
+        '**CORS 設太寬**',
+        '伺服器設 `Access-Control-Allow-Origin: *` 或直接回寫 Origin 不驗證',
+        '後端工程師',
+      ],
+      [
+        '**利用 SOP 例外**',
+        '<form> 可跨源提交、<script> 可載入跨源 JS（不是漏洞，是刻意設計）',
+        '瀏覽器設計',
+      ],
+      [
+        '**後端 Proxy 沒驗證來源**',
+        '前端請求送到自己的後端，後端直接轉給內部 API，沒檢查來源。',
+        '後端工程師',
+      ],
+      [
+        '**Universal XSS**',
+        '瀏覽器本身的漏洞，讓攻擊者繞過 SOP 執行跨源腳本（罕見但嚴重）。',
+        '瀏覽器廠商',
+      ],
+    ],
+  }}
+/>
+
+---
+
+## 跨站腳本攻擊 (Cross-Site Scripting, XSS)
+> 攻擊者把你的網頁當成舞台，在上面演他自己的劇本。
+
+攻擊者在目標網站中「注入惡意 JS」，當其他使用者瀏覽該頁面時，腳本在使用者瀏覽器中執行，竊取 Cookie、Token 或進行其他操作。
+
+### 三種類型
+
+<Table
+  data={{
+    headers: ['類型', '一句話', '惡意碼放哪？'],
+    rows: [
+      ['**儲存型 Stored**', '攻擊者把 script 存進資料庫，所有人瀏覽時中招。', '伺服器（資料庫）'],
+      ['**反射型 Reflected**', '誘導點擊特製連結，URL 參數被伺服器貼回頁面。', '**URL 參數**'],
+      ['**DOM-based**', 'JS 沒檢查就拿 URL 參數塞進 DOM，伺服器無關。', '瀏覽器（前端 JS）'],
+    ],
+  }}
+/>
+其中 **DOM-based XSS** 對前端開發者最重要，因為漏洞完全出在前端：
+```js
+// ❌ 危險寫法
+const name = new URLSearchParams(location.search).get('name')
+document.getElementById('greeting').innerHTML = `你好，${name}`
+
+// 攻擊者訪問：/profile?name=<img src=x onerror="alert(1)">
+```
+> 儲存型 vs 反射型差在惡意碼存在「資料庫」還是「URL 參數」
+
+### 防禦方式
+#### 輸出編碼 ⭐️
+把使用者輸入「轉義」再輸出，瀏覽器就會當成**純文字**顯示，不會執行。
+```html
+<!-- 使用者輸入：<script>alert('XSS')</script> -->
+<!-- ❌ 直接輸出：瀏覽器執行 -->
+<p><script>alert('XSS')</script></p>
+
+<!-- ✅ 轉義後輸出：純文字顯示 -->
+<p>&lt;script&gt;alert('XSS')&lt;/script&gt;</p>
+```
+> React / Vue 的 `{}`、`{{ }}` 會自動轉義，是安全的，但 `innerHTML`、`dangerouslySetInnerHTML`、`v-html` 不會自動轉義，需要特別注意。
+
+#### 內容清理（只在需要 HTML 時用）
+當你需要讓使用者輸入 HTML（文章編輯器等），不能轉義，請用 DOMPurify 過濾。
+```ts
+import DOMPurify from 'dompurify'
+
+const clean = DOMPurify.sanitize(userInput)  // 砍掉 <script>、onerror 等
+element.innerHTML = clean                     // 只留安全標籤
+```
+#### HttpOnly Cookie（後端設定，減少萬一損失）
+即使 XSS 成功，攻擊者也讀不到設了 `HttpOnly` 的 Cookie。
+```bash
+Set-Cookie: token=abc123; HttpOnly; Secure; SameSite=Lax
+```
+#### CSP（瀏覽器層級的防火牆）
+透過 HTTP Header 限制頁面可以執行哪些腳本，下一節詳細說明。
+```bash
+Content-Security-Policy: script-src 'self'
+```
+#### 避開這些危險寫法
+```ts
+// ❌ 這些都等於在歡迎攻擊者
+element.innerHTML = userInput        // 直接注入 HTML
+element.outerHTML = userInput
+document.write(userInput)            // 直接寫入文件
+eval(userInput)                      // 把字串當程式碼執行
+new Function(userInput)()            // 同上
+setTimeout(userInput, 1000)          // 字串參數等同 eval
+location.href = userInput            // javascript: URL 攻擊
+```
+
+---
+## 內容安全政策 (Content Security Policy, CSP)
+CSP 透過 HTTP Header 告訴瀏覽器「這個頁面可以載入哪些資源」，是一種深度防禦機制，專門防範 XSS 和資料注入攻擊。
+
+> ⚠️ CSP 不是萬靈丹，是最後一道防線，就算你的 XSS 防護有漏洞，CSP 還有機會補救。
+
+### 如何設定？
+```bash
+# HTTP Response Header ⭐️
+Content-Security-Policy: default-src 'self'; script-src 'self' cdn.example.com; style-src 'self' 'unsafe-inline'
+
+# 或在 HTML 中設定（不支援所有 directive）
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'">
+```
+### 常用 Directive
+
+<Table
+  data={{
+    headers: ['Directive', '控制對象', '範例'],
+    rows: [
+      ['`default-src`', '所有資源的預設值，可被其他 directive 覆蓋', "`'self'`"],
+      ['`script-src`', 'JavaScript 來源', "`'self'` cdn.example.com"],
+      ['`style-src`', 'CSS 來源', "`'self'` `'unsafe-inline'`"],
+      ['`img-src`', '圖片來源', "`'self'` data:"],
+      ['`font-src`', '字型來源', "`'self'` fonts.gstatic.com"],
+      ['`connect-src`', 'fetch / XHR / WebSocket 連接目標', "`'self'` api.example.com"],
+      ['`frame-src`', 'iframe 來源', "`'self'`"],
+      ['`frame-ancestors`', '誰可以嵌入此頁面（防 Clickjacking）', "`'self'`"],
+      ['`form-action`', '表單提交目標', "`'self'`"],
+    ],
+  }}
+/>
+### `script-src` 進階設定
+```bash
+# 嚴格 CSP：禁止所有內聯腳本，只允許特定來源。
+Content-Security-Policy: script-src 'self' trusted-cdn.com
+
+# 使用 nonce：允許帶有特定 nonce 值的內聯腳本
+Content-Security-Policy: script-src 'nonce-abc123'
+```
+```html
+<!-- 只有帶正確 nonce 的 script 能執行 -->
+<script nonce="abc123">
+  // 此腳本可以執行
+</script>
+<script>
+  // 此腳本會被瀏覽器阻擋
+</script>
+```
+```bash
+# 使用 hash：允許內容 hash 匹配的內聯腳本
+Content-Security-Policy: script-src 'sha256-xxxxx'
+```
+### CSP 報到模式（Report-Only）
+先在「純記錄」模式下測試規則，確定不會誤傷正常功能後再正式啟用：
+```bash
+Content-Security-Policy-Report-Only: default-src 'self'; report-uri /csp-violation-report
+```
+> 正式環境應盡量避免 `'unsafe-inline'`、`'unsafe-eval'`，它們讓 CSP 失去大部分防護效果。
+
+---
+## 跨站請求偽造（Cross-Site Request Forgery, CSRF）
+> 你沒有想按確認，瀏覽器卻幫你送了確認。
+
+攻擊者利用「瀏覽器自動帶上 Cookie」的特性，在攻擊者控制的網站上，誘導使用者送出非自願的請求。
+```
+使用者登入 bank.com（取得 session cookie）
+   ↓
+使用者瀏覽 attacker.com
+   ↓
+attacker.com 偷偷送出：
+  <form action="https://bank.com/transfer" method="POST">
+    <input name="to" value="attacker">
+    <input name="amount" value="1000000">
+  </form>
+   ↓
+瀏覽器自動帶上 bank.com 的 cookie → 轉帳成功
+```
+CSRF 的關鍵條件是「攻擊者不需要看到回應內容，只需要觸發請求」，因此 SOP 無法防禦。
+### 防禦方式
+
+<Table
+  data={{
+    headers: ['方式', '怎麼做', '注意'],
+    rows: [
+      ['**SameSite Cookie**', 'Cookie 設 `SameSite=Lax`', '瀏覽器預設 `Lax`，最簡單的防線。'],
+      ['**CSRF Token**', '表單附隨機 token，伺服器驗證', '舊標準，建議當第二層保險。'],
+      ['**檢查 Origin**', '伺服器比對請求的 `Origin` header', '有效但某些環境不發，不當唯一防線。'],
+      ['**Custom Header**', "API 要求帶 `X-Requested-With` 等自訂 header", '瀏覽器會先發 preflight，純 `<form>` 無法加。'],
+    ],
+  }}
+/>
+
+```bash
+# SameSite 設定範例
+Set-Cookie: session=abc123; SameSite=Lax; Secure; HttpOnly
+```
+> 對新專案來說，設定 `SameSite=Lax` + 檢查 Origin Header 已足夠，關鍵操作（付款、刪除帳號）再加 CSRF Token 作為保險。
+
+---
+## 跨來源資源共享 (Cross-Origin Resource Sharing, CORS)
+
+> 你的網頁想跟別人的後端借資料，必須在對方的「歡迎名單」中。
+
+### 為什麼需要 CORS？
+SOP 預設禁止跨源讀取，但現代 Web 開發中，前端（`https://app.com`）經常需要「呼叫後端 API（`https://api.com`）」，而 CORS 就是讓伺服器可以**選擇性地放寬** SOP 限制的機制。
+
+> CORS 不是攻擊，也不是漏洞，它是一個需要「伺服器明確授權」的放寬機制。
+
+### 簡單請求 vs 預檢請求
+#### 簡單請求（Simple Request）
+直接送出，不需要先問對方，但必須同時滿足：
+
+- Method 是 `GET`、`POST`、`HEAD` 之一
+- Header 只包含 `Accept`、`Accept-Language`、`Content-Language`、`Content-Type`（值限 `application/x-www-form-urlencoded`、`multipart/form-data`、`text/plain`）
+
+#### 預檢請求（Preflight Request）
+送實際請求前，先發一個 `OPTIONS` 請求問伺服器「我可以這樣做嗎？」。
+
+```bash
+# Preflight 請求
+OPTIONS /api/data HTTP/1.1
+Origin: https://app.com
+Access-Control-Request-Method: DELETE
+Access-Control-Request-Headers: X-Custom-Header
+
+# Preflight 回應
+HTTP/1.1 204 No Content
+Access-Control-Allow-Origin: https://app.com
+Access-Control-Allow-Methods: GET, POST, DELETE
+Access-Control-Allow-Headers: X-Custom-Header
+Access-Control-Max-Age: 86400  # preflight 結果可快取幾秒
+```
+
+### 核心 Header
+
+<Table
+  data={{
+    headers: ['Header', '方向', '用途'],
+    rows: [
+      ['`Origin`', '請求', '瀏覽器自動帶上，標示請求來源。'],
+      ['`Access-Control-Allow-Origin`', '回應', '指定允許的來源，`*` 或特定域名。'],
+      ['`Access-Control-Allow-Credentials`', '回應', '設為 `true` 時允許跨源攜帶 Cookie'],
+      ['`Access-Control-Expose-Headers`', '回應', '預設只有少數 header 可被 JS 讀取，以此擴充白名單。'],
+    ],
+  }}
+/>
+
+### 帶 Credentials 的 CORS
+當請求需要帶上 Cookie 或 Authorization Header 時：
+
+```js
+fetch('https://api.com/data', {
+  credentials: 'include'  // 跨源時也帶 Cookie
+})
+```
+
+伺服器必須回傳：
+
+```bash
+Access-Control-Allow-Origin: https://app.com  # 不能是 *
+Access-Control-Allow-Credentials: true
+```
+
+> ⚠️ 帶 credentials 時，`Access-Control-Allow-Origin` **不能設為 `*`**，必須明確指定單一來源。
