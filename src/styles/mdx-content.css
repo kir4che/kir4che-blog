@@ -20,13 +20,28 @@
 
 @layer components {
   .mdx-content {
-    @apply text-base leading-relaxed;
+    @apply text-base leading-[1.8];
 
     > p,
     > ul,
     > ol,
     > blockquote {
-      @apply my-5 lg:my-6;
+      @apply my-5;
+    }
+
+    h1,
+    h2 {
+      @apply mt-10 mb-4 -ml-4 border-l-4 border-pink-700 pl-3 md:-ml-6 md:pl-5 dark:border-pink-500;
+    }
+
+    h3,
+    h4 {
+      @apply mt-8 mb-3;
+    }
+
+    h5,
+    h6 {
+      @apply mt-6 mb-2;
     }
 
     p > a + a {
@@ -48,10 +63,10 @@
 
     ul,
     ol {
-      @apply pl-4 leading-8;
+      @apply pl-4;
 
-      li + li {
-        @apply mt-2;
+      > li {
+        @apply my-2;
       }
     }
 
