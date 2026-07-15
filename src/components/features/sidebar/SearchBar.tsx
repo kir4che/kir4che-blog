@@ -1,5 +1,5 @@
 import { Search } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { cn } from '@/utils/cn';
@@ -17,6 +17,30 @@ interface SearchPost extends Post {
 }
 
 const postsCache = new Map<string, SearchPost[]>();
+
+const normalizePosts = (items: Post[]): SearchPost[] =>
+  items.map((post) => ({
+    ...post,
+    searchableText: [
+      post.title,
+      post.description,
+      post.slug,
+      ...(post.tags || []),
+      ...(post.categories || []),
+    ]
+      .join(' ')
+      .toLowerCase(),
+  }));
+
+const tokenizeSearchString = (value: string): string[] => {
+  const normalized = value.trim().toLowerCase();
+  if (!normalized) return [];
+
+  const latinTokens = normalized.match(/[a-z0-9-]+/g) ?? [];
+  const cjkTokens = normalized.match(/[\u3400-\u4dbf\u4e00-\u9fff]/g) ?? [];
+
+  return [...latinTokens, ...cjkTokens];
+};
 
 interface SearchBarProps {
   basePath: string;
@@ -43,25 +67,10 @@ const SearchBar = ({
   const rootRef = useRef<HTMLDivElement>(null);
   const portalRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const abortControllerRef = useRef<AbortController | null>(null);
 
   const base = basePath.replace(/\/$/, '');
 
-  const normalizePosts = (items: Post[]): SearchPost[] =>
-    items.map((post) => ({
-      ...post,
-      searchableText: [
-        post.title,
-        post.description,
-        post.slug,
-        ...(post.tags || []),
-        ...(post.categories || []),
-      ]
-        .join(' ')
-        .toLowerCase(),
-    }));
-
-  const fetchPosts = () => {
+  const fetchPosts = useCallback(() => {
     if (posts.length > 0) return;
 
     const cached = postsCache.get(base);
@@ -70,34 +79,15 @@ const SearchBar = ({
       return;
     }
 
-    if (abortControllerRef.current) return;
-
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
-
-    fetch(`${base}/search.json`, { signal: controller.signal })
+    fetch(`${base}/search.json`)
       .then((res) => (res.ok ? res.json() : []))
       .then((items: Post[]) => {
         const normalized = normalizePosts(items);
         postsCache.set(base, normalized);
         setPosts(normalized);
       })
-      .catch((err: unknown) => {
-        if (err instanceof DOMException && err.name === 'AbortError') return;
-        setPosts([]);
-      })
-      .finally(() => {
-        abortControllerRef.current = null;
-      });
-  };
-
-  // 語系變更或元件卸載時，中斷 fetch 並清空狀態。
-  useEffect(() => {
-    return () => {
-      abortControllerRef.current?.abort();
-      abortControllerRef.current = null;
-    };
-  }, [base]);
+      .catch(() => setPosts([]));
+  }, [base, posts.length]);
 
   // 偵測是否為 sm 以下的裝置寬度
   useEffect(() => {
@@ -139,7 +129,30 @@ const SearchBar = ({
     const q = query.trim().toLowerCase();
     if (!q) return [];
 
-    return posts.filter((p) => p.searchableText.includes(q));
+    const tokens = tokenizeSearchString(q);
+    if (tokens.length === 0) return [];
+
+    return posts
+      .filter(
+        (p) =>
+          p.searchableText.includes(q) || tokens.every((token) => p.searchableText.includes(token))
+      )
+      .sort((a, b) => {
+        const aTitle = a.title.toLowerCase();
+        const bTitle = b.title.toLowerCase();
+        const aSlug = a.slug.toLowerCase();
+        const bSlug = b.slug.toLowerCase();
+
+        const aTitleMatch = Number(aTitle.includes(q));
+        const bTitleMatch = Number(bTitle.includes(q));
+        if (aTitleMatch !== bTitleMatch) return bTitleMatch - aTitleMatch;
+
+        const aSlugMatch = Number(aSlug.includes(q));
+        const bSlugMatch = Number(bSlug.includes(q));
+        if (aSlugMatch !== bSlugMatch) return bSlugMatch - aSlugMatch;
+
+        return aTitle.localeCompare(bTitle);
+      });
   }, [query, posts]);
 
   const useMobilePortal = collapsible && isMobile && !!portalTarget;

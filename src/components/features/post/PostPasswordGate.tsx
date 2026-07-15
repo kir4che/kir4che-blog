@@ -101,8 +101,9 @@ const PostPasswordGate = ({ slug, lang, backHref, texts }: PostPasswordGateProps
       localStorage.setItem(lockKey, String(Date.now() + lockDuration));
       localStorage.removeItem(attemptsKey);
       setLockRemain(Math.ceil(lockDuration / 1000));
-    } catch {
-      showToast(texts.error, 'error');
+    } catch (err) {
+      const networkError = err instanceof TypeError && err.message === 'Failed to fetch';
+      showToast(networkError ? `${texts.error}\n（網路異常，請稍後再試）` : texts.error, 'error');
     } finally {
       setIsLoading(false);
       setPassword('');
