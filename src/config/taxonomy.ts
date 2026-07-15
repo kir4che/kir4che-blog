@@ -139,6 +139,17 @@ export const categoryMap: Record<string, Category> = {
       dark: '#14a8ad',
     },
   },
+  gamedev: {
+    name: {
+      tw: '遊戲開發',
+      en: 'Game Dev',
+    },
+    slug: 'gamedev',
+    color: {
+      light: '#9146ff',
+      dark: '#a970ff',
+    },
+  },
   tools: {
     name: {
       tw: '工具',
@@ -168,6 +179,13 @@ interface TagDefinition {
 }
 
 export const tagMap: Record<string, TagDefinition> = {
+  'astral-vows': {
+    name: {
+      tw: 'Astral Vows',
+      en: 'Astral Vows',
+    },
+    slug: 'astral-vows',
+  },
   bundler: {
     name: {
       tw: '打包工具',
@@ -181,6 +199,13 @@ export const tagMap: Record<string, TagDefinition> = {
       en: 'CSS',
     },
     slug: 'css',
+  },
+  gamedev: {
+    name: {
+      tw: '遊戲開發',
+      en: 'Game Dev',
+    },
+    slug: 'gamedev',
   },
   deployment: {
     name: {
