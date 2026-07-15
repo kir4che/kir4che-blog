@@ -105,7 +105,22 @@
     },
     "vlogIntro": "喜歡嘗試很多事情，最近開始拍 Vlog 想要紀錄生活的每一刻。",
     "title_2": "🖥️ 線上簡歷 & 作品集",
-    "title_3": "💌 如何聯繫我："
+    "title_3": "💌 如何聯繫我：",
+    "cats": {
+      "title": "曬貓",
+      "description": "家裡養了兩隻貓貓－花咪、小晡，霹靂可愛 (*´∀`)~🩷",
+      "huami": {
+        "alt": "花咪的照片",
+        "title": "花咪"
+      },
+      "boo": {
+        "alt": "小晡的照片",
+        "title": "小晡"
+      },
+      "both": {
+        "alt": "花咪和小晡的照片"
+      }
+    }
   },
   "ArchivePage": {
     "title": "文章列表",
@@ -135,7 +150,8 @@
       "collapse": "收合目錄"
     },
     "share": {
-      "native": "分享至..."
+      "native": "分享至...",
+      "label": "分享"
     }
   },
   "CategoriesPage": {
