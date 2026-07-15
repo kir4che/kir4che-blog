@@ -174,11 +174,11 @@
   }
 
   h2 {
-    @apply text-[1.375rem]/8 font-semibold md:text-2xl;
+    @apply text-[1.375rem]/8 font-bold md:text-[1.5rem];
   }
 
   h3 {
-    @apply text-xl font-medium;
+    @apply text-xl font-semibold;
   }
 
   h4 {
