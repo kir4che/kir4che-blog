@@ -32,16 +32,18 @@ const { tProfile, lang, tSidebar: t, categories, tags, popularPosts } = Astro.pr
     'lg:translate-x-0 lg:opacity-100',
   ]}
 >
-  <div class="max-lg:bg-surface-primary flex shrink-0 flex-col gap-6 pt-4 pb-8 lg:gap-8">
+  <div class="max-lg:bg-surface-primary pt-4 pb-8">
     <div class="max-lg:hidden">
       <ProfileCard tProfile={tProfile} lang={lang} />
     </div>
-    {popularPosts.length > 0 && <PopularPosts t={t} posts={popularPosts} />}
-    {categories.length > 0 && <CategoryList t={t} categories={categories} />}
-    {tags.length > 0 && <TagCloud t={t} tags={tags} />}
-    <!-- <Advertisement /> -->
-    <MyWebsites t={t} />
-    <LineStickersCTA t={t} />
-    <!-- <DonateBtns /> -->
+    <div class="mt-4 space-y-8">
+      {popularPosts.length > 0 && <PopularPosts t={t} posts={popularPosts} />}
+      {categories.length > 0 && <CategoryList t={t} categories={categories} />}
+      {tags.length > 0 && <TagCloud t={t} tags={tags} />}
+      <!-- <Advertisement /> -->
+      <MyWebsites t={t} />
+      <LineStickersCTA t={t} />
+      <!-- <DonateBtns /> -->
+    </div>
   </div>
 </aside>

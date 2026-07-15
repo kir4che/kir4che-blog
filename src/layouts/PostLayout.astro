@@ -1,6 +1,5 @@
 ---
 import type { MDXContent as MDXContentType } from 'astro';
-import { Image as AstroImage } from 'astro:assets';
 
 import type { Language, PostMeta } from '@/types';
 import { Copy, Share2 } from '@lucide/astro';
@@ -152,16 +151,14 @@ const isTripPost = isPostInCategory(post, { tw: '旅遊', en: 'Trip' }, 'trip');
       <article class="bg-surface-secondary/80 rounded p-4 transition-all duration-300 md:p-6">
         {
           post.coverImage && (
-            <AstroImage
+            <img
               src={post.coverImage}
               alt={`Cover image for ${post.title}`}
-              width={1200}
-              height={640}
               loading="eager"
               fetchpriority="high"
               decoding="async"
               draggable={false}
-              class="mb-3 h-45 w-full object-cover object-[center_70%] select-none sm:h-56 xl:h-68"
+              class="mb-4 h-45 w-full rounded object-cover object-[center_70%] select-none sm:h-56 xl:h-68"
             />
           )
         }
@@ -210,10 +207,11 @@ const isTripPost = isPostInCategory(post, { tw: '旅遊', en: 'Trip' }, 'trip');
         }
         <div class="pt-8">
           <PostComments client:visible slug={post.slug} hasPassword={isProtected} />
-          <hr />
           <footer>
-            <div class="space-y-4">
-              <p>{tPost('thanks')}</p>
+            <div class="rounded-xl bg-pink-50 p-5 text-center dark:bg-pink-900/10">
+              <p class="mb-3 text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                {tPost('thanks')}
+              </p>
               <KofiBtn label={tCommon('kofiButton')} />
             </div>
             {
@@ -226,7 +224,7 @@ const isTripPost = isPostInCategory(post, { tw: '旅遊', en: 'Trip' }, 'trip');
                     return (
                       <a
                         href={withLocalePrefix(`/tags/${normalizedTag.slug}`, lang)}
-                        class="text-primary text-sm text-nowrap"
+                        class="inline-flex items-center rounded-full bg-pink-100/60 px-3 py-1 text-sm text-pink-700 transition-colors hover:bg-pink-200/70 dark:bg-pink-900/20 dark:text-pink-300 dark:hover:bg-pink-800/30"
                         aria-label={`#${normalizedTag.name}`}
                       >
                         #{normalizedTag.name}
@@ -237,7 +235,7 @@ const isTripPost = isPostInCategory(post, { tw: '旅遊', en: 'Trip' }, 'trip');
               )
             }
             <div
-              class="flex flex-wrap items-center justify-end gap-2 text-sm text-pink-700 dark:text-pink-200"
+              class="flex flex-wrap items-center justify-end gap-2"
               data-msg-copied={tPost('share.copied')}
               data-msg-copy-failed={tPost('share.copyFailed')}
             >
@@ -245,18 +243,18 @@ const isTripPost = isPostInCategory(post, { tw: '旅遊', en: 'Trip' }, 'trip');
                 type="button"
                 data-share-action="copy"
                 aria-label={tPost('share.copyLink')}
-                class="flex items-center gap-1 rounded border border-pink-200 px-3 py-1 transition-colors hover:border-pink-400 dark:border-pink-300/40 dark:hover:border-pink-200/70"
+                class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm text-pink-700 transition-all duration-200 hover:text-pink-800 dark:text-pink-300 dark:hover:text-pink-400"
               >
-                <Copy size={16} aria-hidden="true" />
+                <Copy size={15} aria-hidden="true" />
                 {tPost('share.copyLink')}
               </button>
               <button
                 type="button"
                 data-share-action="native"
                 aria-label={tPost('share.native')}
-                class="flex items-center gap-1 rounded border border-pink-200 px-3 py-1 transition-colors hover:border-pink-400 dark:border-pink-300/40 dark:hover:border-pink-200/70"
+                class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm text-pink-700 transition-all duration-200 hover:text-pink-800 dark:text-pink-300 dark:hover:text-pink-400"
               >
-                <Share2 size={16} aria-hidden="true" />
+                <Share2 size={15} aria-hidden="true" />
                 {tPost('share.native')}
               </button>
             </div>
