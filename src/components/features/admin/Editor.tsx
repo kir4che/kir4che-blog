@@ -1,4 +1,4 @@
-import { ChevronLeft, Eye, Link as LinkIcon } from 'lucide-react';
+import { ChevronLeft, Link as LinkIcon } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { usePreviewSync } from '@/hooks/usePreviewSync';
@@ -76,7 +76,9 @@ const Editor = ({
   const [content, setContent] = useState(post?.content || '');
   const [isDraft, setIsDraft] = useState(post?.draft !== false);
   const [currentId, setCurrentId] = useState(post?.id || '');
-  const [currentPreviewUrl, setCurrentPreviewUrl] = useState(initialPreviewUrl);
+  const [currentPreviewUrl, setCurrentPreviewUrl] = useState(
+    initialPreviewUrl || '/admin/preview-standalone'
+  );
 
   const [sync, setSync] = useState<{ state: SyncState; text: string }>({
     state: 'success',
@@ -84,7 +86,7 @@ const Editor = ({
   });
   const [isSaving, setIsSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
-  const [enablePreviewSync, setEnablePreviewSync] = useState(false);
+  const [enablePreviewSync, setEnablePreviewSync] = useState(!initialPreviewUrl);
   const [editorWidth, setEditorWidth] = useState(40);
   const [isDragging, setIsDragging] = useState(false);
   const isMac = useMemo(() => /Mac|iPhone|iPad|iPod/i.test(navigator.userAgent), []);
@@ -598,28 +600,20 @@ const Editor = ({
           />
           <div className="relative flex-1 bg-white dark:bg-gray-900">
             <SyncIndicator state={previewSyncState} />
-            {currentPreviewUrl ? (
-              <iframe
-                ref={iframeRef}
-                src={currentPreviewUrl}
-                className="size-full border-none transition-opacity duration-300"
-                style={{
-                  opacity:
-                    previewSyncState === 'ssr-pending'
-                      ? 0.85
-                      : previewSyncState === 'typing'
-                        ? 0.92
-                        : 1,
-                  pointerEvents: isDragging ? 'none' : 'auto',
-                }}
-              />
-            ) : (
-              <div className="flex-center absolute inset-0 flex-col space-y-4 p-8 text-center text-gray-400">
-                <Eye size={48} aria-hidden="true" />
-                <h3>預覽準備就緒</h3>
-                <p className="mt-2 text-sm">請輸入標題或內容自動保存為草稿以加載預覽</p>
-              </div>
-            )}
+            <iframe
+              ref={iframeRef}
+              src={currentPreviewUrl}
+              className="size-full border-none transition-opacity duration-300"
+              style={{
+                opacity:
+                  previewSyncState === 'ssr-pending'
+                    ? 0.85
+                    : previewSyncState === 'typing'
+                      ? 0.92
+                      : 1,
+                pointerEvents: isDragging ? 'none' : 'auto',
+              }}
+            />
           </div>
         </div>
       </form>
