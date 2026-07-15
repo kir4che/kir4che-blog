@@ -1,357 +1,97 @@
-import type { Category, Language } from '@/types';
+import type { Category, CategoryColorScheme, TagDefinition } from '@/types';
+
+const mono = (c: string): CategoryColorScheme => ({ light: c, dark: c });
+const dual = (l: string, d: string): CategoryColorScheme => ({ light: l, dark: d });
+
+const cat = (slug: string, tw: string, en: string, color: CategoryColorScheme): Category => ({
+  name: { tw, en },
+  slug,
+  color,
+});
+
+const tag = (slug: string, tw: string, en: string): TagDefinition => ({
+  name: { tw, en },
+  slug,
+});
 
 export const categoryMap: Record<string, Category> = {
-  backend: {
-    name: {
-      tw: '後端',
-      en: 'Backend',
-    },
-    slug: 'backend',
-    color: {
-      light: '#132951',
-      dark: '#5C7CCC',
-    },
-    subcategories: {
-      java: {
-        name: {
-          tw: 'Java',
-          en: 'Java',
-        },
-        slug: 'java',
-        color: {
-          light: '#F89820',
-          dark: '#F89820',
-        },
-      },
-      nodejs: {
-        name: {
-          tw: 'NodeJS',
-          en: 'NodeJS',
-        },
-        slug: 'nodejs',
-        color: {
-          light: '#78b42d',
-          dark: '#78b42d',
-        },
-      },
-    },
-  },
   frontend: {
-    name: {
-      tw: '前端',
-      en: 'Frontend',
-    },
-    slug: 'frontend',
-    color: {
-      light: '#42B5F9',
-      dark: '#6AC5FB',
-    },
+    ...cat('frontend', '前端', 'Frontend', dual('#3B82F6', '#60A5FA')),
     subcategories: {
-      css: {
-        name: {
-          tw: 'CSS',
-          en: 'CSS',
-        },
-        slug: 'css',
-        color: {
-          light: '#264de4',
-          dark: '#3572b5',
-        },
-      },
+      css: { name: { tw: 'CSS', en: 'CSS' }, slug: 'css', color: dual('#264de4', '#6B8FE8') },
       javascript: {
-        name: {
-          tw: 'JavaScript',
-          en: 'JavaScript',
-        },
+        name: { tw: 'JavaScript', en: 'JavaScript' },
         slug: 'javascript',
-        color: {
-          light: '#F0DB4F',
-          dark: '#F4E47A',
-        },
+        color: dual('#E5B20D', '#F4E47A'),
       },
-      react: {
-        name: {
-          tw: 'React',
-          en: 'React',
-        },
-        slug: 'react',
-        color: {
-          light: '#61DAFB',
-          dark: '#61DAFB',
-        },
+      astro: {
+        name: { tw: 'Astro', en: 'Astro' },
+        slug: 'astro',
+        color: dual('#BC52EE', '#D16DF5'),
       },
-    },
-  },
-  language: {
-    name: {
-      tw: '語言',
-      en: 'Language',
-    },
-    slug: 'language',
-    color: {
-      light: '#8772AD',
-      dark: '#B1A0CE',
-    },
-  },
-  life: {
-    name: {
-      tw: '生活',
-      en: 'Life',
-    },
-    slug: 'life',
-    color: {
-      light: '#F77E9D',
-      dark: '#FB9CB4',
-    },
-    subcategories: {
-      trip: {
-        name: {
-          tw: '旅遊',
-          en: 'Trip',
-        },
-        slug: 'trip',
-        color: {
-          light: '#32cd32',
-          dark: '#6cd867',
-        },
+      bundler: {
+        name: { tw: '打包工具', en: 'Bundler' },
+        slug: 'bundler',
+        color: dual('#CB3837', '#DB5656'),
       },
-    },
-  },
-  resource: {
-    name: {
-      tw: '資源',
-      en: 'Resource',
-    },
-    slug: 'resource',
-    color: {
-      light: '#2b66af',
-      dark: '#538DD5',
-    },
-  },
-  devops: {
-    name: {
-      tw: 'DevOps',
-      en: 'DevOps',
-    },
-    slug: 'devops',
-    color: {
-      light: '#0d7377',
-      dark: '#14a8ad',
-    },
-  },
-  gamedev: {
-    name: {
-      tw: '遊戲開發',
-      en: 'Game Dev',
-    },
-    slug: 'gamedev',
-    color: {
-      light: '#9146ff',
-      dark: '#a970ff',
+      'web-security': {
+        name: { tw: '網頁安全', en: 'Web Security' },
+        slug: 'web-security',
+        color: dual('#059669', '#34D399'),
+      },
     },
   },
   tools: {
-    name: {
-      tw: '工具',
-      en: 'Tool',
-    },
-    slug: 'tools',
-    color: {
-      light: '#666666',
-      dark: '#CCCCCC',
+    ...cat('tools', '工具', 'Tools', dual('#6B7280', '#9CA3AF')),
+    subcategories: {
+      git: { name: { tw: 'Git', en: 'Git' }, slug: 'git', color: dual('#F05032', '#F27D5E') },
     },
   },
-  uncategorized: {
-    name: {
-      tw: '未分類',
-      en: 'Uncategorized',
-    },
-    slug: 'uncategorized',
-    color: {
-      light: '#9CA3AF',
-      dark: '#6B7280',
+  'side-project': cat('side-project', 'Side Project', 'Side Project', dual('#DC2626', '#F87171')),
+  life: {
+    ...cat('life', '生活', 'Life', dual('#F77E9D', '#FB9CB4')),
+    subcategories: {
+      trip: { name: { tw: '旅遊', en: 'Trip' }, slug: 'trip', color: dual('#32cd32', '#6cd867') },
     },
   },
+  'language-learning': cat(
+    'language-learning',
+    '語言學習',
+    'Language Learning',
+    dual('#8772AD', '#B1A0CE')
+  ),
+  uncategorized: cat('uncategorized', '未分類', 'Uncategorized', dual('#9CA3AF', '#D1D5DB')),
 };
-interface TagDefinition {
-  name: Record<Language, string>;
-  slug: string;
-}
 
 export const tagMap: Record<string, TagDefinition> = {
-  'astral-vows': {
-    name: {
-      tw: 'Astral Vows',
-      en: 'Astral Vows',
-    },
-    slug: 'astral-vows',
-  },
-  bundler: {
-    name: {
-      tw: '打包工具',
-      en: 'Bundler',
-    },
-    slug: 'bundler',
-  },
-  css: {
-    name: {
-      tw: 'CSS',
-      en: 'CSS',
-    },
-    slug: 'css',
-  },
-  gamedev: {
-    name: {
-      tw: '遊戲開發',
-      en: 'Game Dev',
-    },
-    slug: 'gamedev',
-  },
-  deployment: {
-    name: {
-      tw: '部署',
-      en: 'Deployment',
-    },
-    slug: 'deployment',
-  },
-  express: {
-    name: {
-      tw: 'Express',
-      en: 'Express',
-    },
-    slug: 'express',
-  },
-  git: {
-    name: {
-      tw: 'Git',
-      en: 'Git',
-    },
-    slug: 'git',
-  },
-  gitlab: {
-    name: {
-      tw: 'Gitlab',
-      en: 'Gitlab',
-    },
-    slug: 'gitlab',
-  },
-  japan: {
-    name: {
-      tw: '日本',
-      en: 'Japan',
-    },
-    slug: 'japan',
-  },
-  korea: {
-    name: {
-      tw: '韓國',
-      en: 'Korea',
-    },
-    slug: 'korea',
-  },
-  nodejs: {
-    name: {
-      tw: 'NodeJS',
-      en: 'NodeJS',
-    },
-    slug: 'nodejs',
-  },
-  musings: {
-    name: {
-      tw: '隨筆',
-      en: 'Musings',
-    },
-    slug: 'musings',
-  },
-  notes: {
-    name: {
-      tw: '筆記',
-      en: 'Notes',
-    },
-    slug: 'notes',
-  },
-  pokemon: {
-    name: {
-      tw: 'Pokemon',
-      en: 'Pokemon',
-    },
-    slug: 'pokemon',
-  },
-  pokmon: {
-    name: {
-      tw: '寶可夢',
-      en: 'Pokemon',
-    },
-    slug: 'pokmon',
-  },
-  react: {
-    name: {
-      tw: 'React',
-      en: 'React',
-    },
-    slug: 'react',
-  },
-  security: {
-    name: {
-      tw: '資訊安全',
-      en: 'Security',
-    },
-    slug: 'security',
-  },
-  seo: {
-    name: {
-      tw: 'SEO',
-      en: 'SEO',
-    },
-    slug: 'seo',
-  },
-  t1: {
-    name: {
-      tw: 'T1',
-      en: 'T1',
-    },
-    slug: 't1',
-  },
-  tool: {
-    name: {
-      tw: '工具',
-      en: 'Tools',
-    },
-    slug: 'tool',
-  },
-  trip: {
-    name: {
-      tw: '旅遊',
-      en: 'Trip',
-    },
-    slug: 'trip',
-  },
-  typescript: {
-    name: {
-      tw: 'TypeScript',
-      en: 'TypeScript',
-    },
-    slug: 'typescript',
-  },
-  vercel: {
-    name: {
-      tw: 'Vercel',
-      en: 'Vercel',
-    },
-    slug: 'vercel',
-  },
-  vite: {
-    name: {
-      tw: 'Vite',
-      en: 'Vite',
-    },
-    slug: 'vite',
-  },
-  webpack: {
-    name: {
-      tw: 'Webpack',
-      en: 'Webpack',
-    },
-    slug: 'webpack',
-  },
+  astro: tag('astro', 'Astro', 'Astro'),
+  'astral-vows': tag('astral-vows', 'Astral Vows', 'Astral Vows'),
+  bundler: tag('bundler', '打包工具', 'Bundler'),
+  css: tag('css', 'CSS', 'CSS'),
+  deployment: tag('deployment', '部署', 'Deployment'),
+  express: tag('express', 'Express', 'Express'),
+  gamedev: tag('gamedev', '遊戲開發', 'Game Dev'),
+  git: tag('git', 'Git', 'Git'),
+  gitlab: tag('gitlab', 'Gitlab', 'Gitlab'),
+  ink: tag('ink', 'Ink', 'Ink'),
+  javascript: tag('javascript', 'JavaScript', 'JavaScript'),
+  japan: tag('japan', '日本', 'Japan'),
+  korea: tag('korea', '韓國', 'Korea'),
+  nodejs: tag('nodejs', 'NodeJS', 'NodeJS'),
+  musings: tag('musings', '隨筆', 'Musings'),
+  'next-js': tag('next-js', 'Next.js', 'Next.js'),
+  notes: tag('notes', '筆記', 'Notes'),
+  pokemon: tag('pokemon', 'Pokemon', 'Pokemon'),
+  pokmon: tag('pokmon', '寶可夢', 'Pokemon'),
+  react: tag('react', 'React', 'React'),
+  security: tag('security', '資訊安全', 'Security'),
+  seo: tag('seo', 'SEO', 'SEO'),
+  t1: tag('t1', 'T1', 'T1'),
+  tool: tag('tool', '工具', 'Tools'),
+  trip: tag('trip', '旅遊', 'Trip'),
+  typescript: tag('typescript', 'TypeScript', 'TypeScript'),
+  vercel: tag('vercel', 'Vercel', 'Vercel'),
+  vite: tag('vite', 'Vite', 'Vite'),
+  'web-storage': tag('web-storage', 'Web Storage', 'Web Storage'),
+  webpack: tag('webpack', 'Webpack', 'Webpack'),
 };
