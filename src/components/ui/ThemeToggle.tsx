@@ -19,27 +19,21 @@ const getInitialTheme = (): Theme => {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 };
 
-const applyTheme = (theme: Theme) => {
-  if (typeof document === 'undefined') return;
-  document.documentElement.classList.toggle('dark', theme === 'dark');
-};
-
 const ThemeToggle = ({ translations, iconOnly = false }: ThemeToggleProps) => {
-  const [theme, setTheme] = useState<Theme>('light');
-  const [mounted, setMounted] = useState(false);
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
 
   useEffect(() => {
-    const initial = getInitialTheme();
-    setTheme(initial);
-    applyTheme(initial);
-    setMounted(true);
+    const stored = localStorage.getItem('theme');
+    if (!stored) return;
+    if (stored === 'dark' || stored === 'light') {
+      document.documentElement.classList.toggle('dark', stored === 'dark');
+    }
   }, []);
 
   useEffect(() => {
-    if (!mounted) return;
-    applyTheme(theme);
+    document.documentElement.classList.toggle('dark', theme === 'dark');
     localStorage.setItem('theme', theme);
-  }, [theme, mounted]);
+  }, [theme]);
 
   const toggleTheme = useCallback(() => {
     setTheme((prev) => {
@@ -51,21 +45,6 @@ const ThemeToggle = ({ translations, iconOnly = false }: ThemeToggleProps) => {
 
   const isDark = theme === 'dark';
   const nextLabel = isDark ? translations.light : translations.dark;
-
-  if (!mounted)
-    return (
-      <button
-        type="button"
-        className="hover:text-foreground-primary dark:text-foreground-primary/80 flex w-fit items-center gap-x-1.5 bg-transparent text-sm text-gray-700"
-        aria-label={translations.dark}
-        disabled
-      >
-        <span className="opacity-0">
-          <Sun size={16} aria-hidden="true" />
-        </span>
-        {!iconOnly && <span className="opacity-0 max-md:hidden">{translations.dark}</span>}
-      </button>
-    );
 
   return (
     <button

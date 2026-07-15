@@ -38,7 +38,7 @@ const simplifiedTags = tags.map(({ name, slug }) => ({ name, slug }));
   >
     <div
       id="sidebar-backdrop"
-      class="pointer-events-none fixed inset-0 z-40 bg-gray-900/60 opacity-0 transition-opacity duration-300 group-data-[sidebar-open=true]/layout:pointer-events-auto group-data-[sidebar-open=true]/layout:opacity-100 xl:hidden"
+      class="pointer-events-none fixed inset-0 z-50 bg-gray-900/60 opacity-0 transition-opacity duration-300 group-data-[sidebar-open=true]/layout:pointer-events-auto group-data-[sidebar-open=true]/layout:opacity-100 xl:hidden"
     >
     </div>
     <div id="main-content-wrapper" class="flex w-full min-w-0 flex-1 lg:gap-x-10 xl:gap-x-16">
@@ -73,7 +73,7 @@ const simplifiedTags = tags.map(({ name, slug }) => ({ name, slug }));
               </div>
               <button
                 id="right-sidebar-toggle"
-                class="hover:text-primary transition-colors xl:hidden"
+                class="hover:text-primary transition-colors lg:hidden"
                 aria-label="Toggle Right Sidebar"
               >
                 <TextAlignJustify size={18} aria-hidden="true" />
