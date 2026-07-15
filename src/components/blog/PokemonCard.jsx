@@ -80,7 +80,12 @@ export const PokemonCard = ({ stage = 'final' }) => {
           className={styles.rotator}
           data-stage={stage}
         >
-          <img src={images.small} alt={`Front of ${name} Pokemon Card`} />
+          <img
+            src={images.small}
+            alt={`Front of ${name} Pokemon Card`}
+            draggable="false"
+            className="select-none"
+          />
           {showEffects ? <div className={styles.glare} /> : null}
         </div>
       </div>

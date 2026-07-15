@@ -179,7 +179,12 @@ const EditorMetadata = ({
           <legend className="fieldset-legend">封面圖片</legend>
           {coverUrl && (
             <div className="relative mb-1.5">
-              <img src={coverUrl} alt="封面預覽" className="h-24 w-full rounded object-cover" />
+              <img
+                src={coverUrl}
+                alt="封面預覽"
+                draggable={false}
+                className="h-24 w-full rounded object-cover select-none"
+              />
               <button
                 type="button"
                 className="btn btn-xs btn-link text-surface-secondary absolute top-1 right-1"

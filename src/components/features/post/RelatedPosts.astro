@@ -52,7 +52,8 @@ const relatedPosts: PostMeta[] = posts.filter(
                   alt={post.title}
                   loading="lazy"
                   decoding="async"
-                  class="size-full rounded object-cover"
+                  draggable="false"
+                  class="size-full rounded object-cover select-none"
                 />
               </div>
               <a href={getLocalizedPostPath({ lang, slug: post.slug })} class="mb-1 block">
