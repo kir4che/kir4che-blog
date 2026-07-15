@@ -139,6 +139,14 @@ const shouldShowTripMap = (post.places?.length ?? 0) > 0;
 <SiteLayout
   title={isProtected ? tPost('passwordGate.title') : post.title}
   description={isProtected ? tPost('passwordGate.description') : post.description}
+  image={!isProtected
+    ? {
+        url: `/og/${lang}/${post.slug}.png`,
+        width: 1200,
+        height: 630,
+        type: 'image/png',
+      }
+    : undefined}
 >
   {
     post.coverImage && !isProtected && (

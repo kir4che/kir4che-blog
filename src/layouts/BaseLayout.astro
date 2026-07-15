@@ -35,6 +35,8 @@ const canonicalUrl = canonical
     ? canonical
     : `${siteOrigin}${canonical}`
   : seoConfig.canonical;
+const fallbackImage = seoConfig.openGraph.images[0] ?? null;
+const resolvedImage = image ?? fallbackImage;
 const shouldIndex = noindex ? 'noindex,nofollow' : seoConfig.robots;
 ---
 
@@ -53,6 +55,36 @@ const shouldIndex = noindex ? 'noindex,nofollow' : seoConfig.robots;
     {keywords && <meta name="keywords" content={keywords} />}
     <meta name="robots" content={shouldIndex} />
     <link rel="canonical" href={canonicalUrl} />
+    {
+      resolvedImage && (
+        <>
+          <meta
+            property="og:image"
+            content={
+              resolvedImage.url.startsWith('http')
+                ? resolvedImage.url
+                : new URL(resolvedImage.url, siteOrigin).href
+            }
+          />
+          {resolvedImage.alt && <meta property="og:image:alt" content={resolvedImage.alt} />}
+          {resolvedImage.width && (
+            <meta property="og:image:width" content={String(resolvedImage.width)} />
+          )}
+          {resolvedImage.height && (
+            <meta property="og:image:height" content={String(resolvedImage.height)} />
+          )}
+          {resolvedImage.type && <meta property="og:image:type" content={resolvedImage.type} />}
+          <meta
+            name="twitter:image"
+            content={
+              resolvedImage.url.startsWith('http')
+                ? resolvedImage.url
+                : new URL(resolvedImage.url, siteOrigin).href
+            }
+          />
+        </>
+      )
+    }
     <ClientRouter />
     <slot name="head" />
   </head>
