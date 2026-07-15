@@ -81,8 +81,14 @@ const tagStyle: CSSProperties = {
 };
 
 export const OgImage = ({ siteName, title, tags, lang }: OgImageProps) => {
+  const decoded = title
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>');
   const safeTitle =
-    title.length > MAX_TITLE_LENGTH ? `${title.slice(0, MAX_TITLE_LENGTH - 1)}…` : title;
+    decoded.length > MAX_TITLE_LENGTH ? `${decoded.slice(0, MAX_TITLE_LENGTH - 1)}…` : decoded;
 
   const fontFamily =
     lang === 'tw'
