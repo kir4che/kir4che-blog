@@ -12,6 +12,12 @@ interface Post {
   categories?: string[];
 }
 
+interface SearchPost extends Post {
+  searchableText: string;
+}
+
+const postsCache = new Map<string, SearchPost[]>();
+
 interface SearchBarProps {
   basePath: string;
   noResultsText: string;
@@ -28,7 +34,7 @@ const SearchBar = ({
   className,
 }: SearchBarProps) => {
   const [query, setQuery] = useState('');
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<SearchPost[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!collapsible);
   const [isMobile, setIsMobile] = useState(false);
@@ -41,7 +47,29 @@ const SearchBar = ({
 
   const base = basePath.replace(/\/$/, '');
 
+  const normalizePosts = (items: Post[]): SearchPost[] =>
+    items.map((post) => ({
+      ...post,
+      searchableText: [
+        post.title,
+        post.description,
+        post.slug,
+        ...(post.tags || []),
+        ...(post.categories || []),
+      ]
+        .join(' ')
+        .toLowerCase(),
+    }));
+
   const fetchPosts = () => {
+    if (posts.length > 0) return;
+
+    const cached = postsCache.get(base);
+    if (cached) {
+      setPosts(cached);
+      return;
+    }
+
     if (abortControllerRef.current) return;
 
     const controller = new AbortController();
@@ -49,8 +77,18 @@ const SearchBar = ({
 
     fetch(`${base}/search.json`, { signal: controller.signal })
       .then((res) => (res.ok ? res.json() : []))
-      .then(setPosts)
-      .catch(() => setPosts([]));
+      .then((items: Post[]) => {
+        const normalized = normalizePosts(items);
+        postsCache.set(base, normalized);
+        setPosts(normalized);
+      })
+      .catch((err: unknown) => {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        setPosts([]);
+      })
+      .finally(() => {
+        abortControllerRef.current = null;
+      });
   };
 
   // 語系變更或元件卸載時，中斷 fetch 並清空狀態。
@@ -58,7 +96,6 @@ const SearchBar = ({
     return () => {
       abortControllerRef.current?.abort();
       abortControllerRef.current = null;
-      setPosts([]);
     };
   }, [base]);
 
@@ -102,19 +139,7 @@ const SearchBar = ({
     const q = query.trim().toLowerCase();
     if (!q) return [];
 
-    return posts.filter((p) => {
-      const searchableString = [
-        p.title,
-        p.description,
-        p.slug,
-        ...(p.tags || []),
-        ...(p.categories || []),
-      ]
-        .join(' ')
-        .toLowerCase();
-
-      return searchableString.includes(q);
-    });
+    return posts.filter((p) => p.searchableText.includes(q));
   }, [query, posts]);
 
   const useMobilePortal = collapsible && isMobile && !!portalTarget;
@@ -182,7 +207,7 @@ const SearchBar = ({
             <ul
               className={cn(
                 'bg-surface-secondary scrollbar-none absolute z-50 max-h-60 w-full min-w-52 overflow-y-auto rounded-md p-1 text-[13px] shadow-xl',
-                collapsible ? 'top-0 left-full ml-2' : 'top-full left-0 mt-1'
+                'top-full left-0 mt-1'
               )}
             >
               {filteredResults.length > 0 ? (

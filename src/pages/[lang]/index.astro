@@ -1,39 +1,32 @@
 ---
-export const prerender = false;
+export const prerender = true;
 
 import Announcement from '@/components/ui/Announcement.astro';
 import SiteLayout from '@/layouts/SiteLayout.astro';
-import { createTranslator, isSupportedLanguage, resolveLanguage } from '@/lib/i18n';
+import { createTranslator, getLangStaticPaths, resolveLanguage } from '@/lib/i18n';
 import { paginate } from '@/lib/pagination';
 import { withLocalePrefix } from '@/lib/paths';
 import { getPostsMeta } from '@/lib/posts';
-// import Advertisement from '@/components/ui/Advertisement.astro';
 import PostPreviewCard from '@/components/features/post/preview/PostPreviewCard.astro';
 import Pagination from '@/components/ui/Pagination.astro';
 
-// const AD_INSERT_INDEX = 3;
+export const getStaticPaths = getLangStaticPaths;
 
-if (!isSupportedLanguage(Astro.params.lang)) return Astro.redirect('/404', 404);
 const lang = resolveLanguage(Astro.params.lang);
 const t = createTranslator(lang, 'HomePage');
 
 const link = (href: string): string => {
   if (href === '/') return withLocalePrefix('/', lang);
   const pageNum = parseInt(href.replace(/^\//, ''), 10);
-  if (!isNaN(pageNum) && pageNum > 1) return `${withLocalePrefix('/', lang)}?page=${pageNum}`;
+  if (!isNaN(pageNum) && pageNum > 1) return withLocalePrefix(`/page/${pageNum}`, lang);
   return withLocalePrefix(href, lang);
 };
 
 const visiblePosts = await getPostsMeta(lang, { includeProtected: false });
+const { items: currPosts, currPage, totalPages } = paginate(visiblePosts, 1);
 
-const pageParam = Astro.url.searchParams.get('page');
-const page = pageParam ? Math.max(1, parseInt(pageParam, 10)) : 1;
-
-const { items: currPosts, currPage, totalPages } = paginate(visiblePosts, page);
-
-const isFirstPage = currPage === 1;
-const featuredPosts = isFirstPage ? currPosts.slice(0, 5) : [];
-const regularPosts = isFirstPage ? currPosts.slice(5) : currPosts;
+const featuredPosts = currPosts.slice(0, 5);
+const regularPosts = currPosts.slice(5);
 
 const featuredLeft = featuredPosts.slice(0, 2);
 const featuredRight = featuredPosts.slice(2);
@@ -46,7 +39,7 @@ const featuredRight = featuredPosts.slice(2);
       currPosts.length > 0 && (
         <section id="posts" class="flex flex-1 flex-col gap-3 md:gap-5">
           <div class="flex flex-col gap-3 md:gap-5">
-            {isFirstPage && featuredPosts.length > 0 && (
+            {featuredPosts.length > 0 && (
               <>
                 <div class="grid grid-cols-1 gap-3 md:hidden md:gap-5">
                   {featuredPosts.map((post, i) => (
@@ -72,10 +65,7 @@ const featuredRight = featuredPosts.slice(2);
             {regularPosts.length > 0 && (
               <div class="grid gap-3 md:gap-5">
                 {regularPosts.map((post) => (
-                  <>
-                    <PostPreviewCard post={post} lang={lang} hideImage />
-                    {/* {index === AD_INSERT_INDEX && <Advertisement />} */}
-                  </>
+                  <PostPreviewCard post={post} lang={lang} hideImage />
                 ))}
               </div>
             )}

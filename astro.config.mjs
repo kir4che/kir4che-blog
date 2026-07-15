@@ -61,6 +61,10 @@ export default defineConfig({
       exclude: [],
     },
   },
+  prefetch: {
+    prefetchAll: true,
+    defaultStrategy: 'hover',
+  },
   i18n: {
     defaultLocale: 'tw',
     locales: ['tw', 'en'],

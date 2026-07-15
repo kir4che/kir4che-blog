@@ -26,6 +26,16 @@ const generatePaginationPaths = (
   return paths;
 };
 
+// 產生首頁分頁路徑 (/[lang]/ 第 1 頁、/[lang]/page/[N] 第 2 頁起)
+export const getHomeStaticPaths = async () => {
+  const paths: { params: Record<string, string | undefined> }[] = [];
+  for (const lang of SUPPORTED_LANGUAGES) {
+    const posts = await getPostsMeta(lang, { includeProtected: false });
+    paths.push(...generatePaginationPaths(posts.length, { lang }));
+  }
+  return paths;
+};
+
 // 產生給 og image 用的所有文章路徑
 export const getPostStaticPaths = async () => {
   const paths = [];
