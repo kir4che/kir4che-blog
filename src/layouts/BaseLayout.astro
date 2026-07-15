@@ -1,5 +1,4 @@
 ---
-import { ClientRouter } from 'astro:transitions';
 import type { Language } from '@/types';
 import { getSeoConfig } from '@/lib/seo';
 import { getLocaleFromUrl } from '@/lib/i18n';
@@ -41,13 +40,14 @@ const shouldIndex = noindex ? 'noindex,nofollow' : seoConfig.robots;
 ---
 
 <!doctype html>
-<html lang={currLang} transition:animate="none">
+<html lang={currLang}>
   <head>
     <ThemeScript />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="preconnect" href="https://cdn.kir4che.com" crossorigin />
     <title>
       {title ? seoConfig.title.template.replace('%s', title) : seoConfig.title.default}
     </title>
@@ -85,7 +85,6 @@ const shouldIndex = noindex ? 'noindex,nofollow' : seoConfig.robots;
         </>
       )
     }
-    <ClientRouter />
     <slot name="head" />
   </head>
   <body class="preload">

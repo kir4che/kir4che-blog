@@ -31,7 +31,7 @@ export default defineConfig({
   site: env.PUBLIC_SITE_URL || 'https://kir4che.com',
   adapter: vercel(),
   build: {
-    inlineStylesheets: 'always',
+    inlineStylesheets: 'never',
   },
   vite: {
     plugins: [tailwindcss()],

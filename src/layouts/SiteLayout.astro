@@ -30,6 +30,7 @@ const simplifiedTags = tags.map(({ name, slug }) => ({ name, slug }));
 ---
 
 <BaseLayout {title} {description} {canonical} {image} {noindex}>
+  <slot name="head" slot="head" />
   <StructuredData />
   <div
     id="layout-container"

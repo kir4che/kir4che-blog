@@ -30,9 +30,16 @@ const regularPosts = currPosts.slice(5);
 
 const featuredLeft = featuredPosts.slice(0, 2);
 const featuredRight = featuredPosts.slice(2);
+// 提前載入第一篇有 coverImage 的精選文章
+const lcpPost = featuredPosts.find((post) => Boolean(post.coverImage));
 ---
 
 <SiteLayout title={t('title')} description={t('description')}>
+  {
+    lcpPost?.coverImage && (
+      <link slot="head" rel="preload" href={lcpPost.coverImage} as="image" fetchpriority="high" />
+    )
+  }
   <div class="flex min-h-full flex-1 flex-col gap-6">
     {t('announcement') && <Announcement text={t('announcement')} />}
     {
@@ -43,13 +50,13 @@ const featuredRight = featuredPosts.slice(2);
               <>
                 <div class="grid grid-cols-1 gap-3 md:hidden md:gap-5">
                   {featuredPosts.map((post, i) => (
-                    <PostPreviewCard post={post} lang={lang} priority={i < 2} />
+                    <PostPreviewCard post={post} lang={lang} priority={i === 0} />
                   ))}
                 </div>
                 <div class="hidden gap-x-3 md:grid md:grid-cols-[48%_1fr] xl:grid-cols-[5fr_4fr]">
                   <div class="grid gap-y-5">
-                    {featuredLeft.map((post) => (
-                      <PostPreviewCard post={post} lang={lang} priority />
+                    {featuredLeft.map((post, i) => (
+                      <PostPreviewCard post={post} lang={lang} priority={i === 0} />
                     ))}
                   </div>
                   {featuredRight.length > 0 && (

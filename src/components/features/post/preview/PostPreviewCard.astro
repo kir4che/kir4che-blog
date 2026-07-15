@@ -27,8 +27,6 @@ const showCover = Boolean(post.coverImage) && !hideImage;
     className
   )}
 >
-  <a href={href} class="absolute inset-0 z-30 rounded-2xl" aria-label={`Read post: ${post.title}`}
-  ></a>
   <div class="group relative flex h-full">
     <LockOverlay isLocked={Boolean(post.protected)} />
     <div
@@ -48,6 +46,9 @@ const showCover = Boolean(post.coverImage) && !hideImage;
             loading={priority ? 'eager' : 'lazy'}
             fetchpriority={priority ? 'high' : 'auto'}
             decoding={priority ? 'sync' : 'async'}
+            width="1200"
+            height="630"
+            sizes="(max-width: 767px) calc(100vw - 2.5rem), (max-width: 1279px) 45vw, 560px"
             onerror="this.onerror=null;this.src='/images/cover-fallback_lg.webp';"
             draggable="false"
             class="absolute inset-0 z-0 h-full w-full object-cover brightness-[0.85] transition-all duration-500 select-none group-hover:scale-110 group-hover:brightness-105"
@@ -73,7 +74,17 @@ const showCover = Boolean(post.coverImage) && !hideImage;
               },
             ]}
           >
-            {post.title}
+            <a
+              href={href}
+              class:list={[
+                'rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-pink-700 dark:focus-visible:outline-pink-300',
+                {
+                  'text-white': showCover,
+                },
+              ]}
+            >
+              {post.title}
+            </a>
           </h2>
           {
             post.description && (

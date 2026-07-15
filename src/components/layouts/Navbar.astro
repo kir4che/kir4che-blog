@@ -29,7 +29,7 @@ const navItems = [
 ---
 
 <nav>
-  <ul class="-mb-0.5 flex items-center gap-3 sm:gap-4">
+  <ul class="flex items-center gap-3 sm:gap-4">
     {
       navItems
         .filter((item) => item.label)
@@ -42,9 +42,9 @@ const navItems = [
                 href={href}
                 lang={lang}
                 className={cn(
-                  'hover:text-primary relative inline-block pb-1 text-sm text-nowrap transition-colors',
+                  'relative inline-block pb-1 text-sm text-nowrap text-gray-700 transition-colors hover:text-pink-800 dark:text-gray-200 dark:hover:text-pink-300',
                   active
-                    ? 'text-primary font-medium'
+                    ? 'font-semibold text-pink-800 dark:text-pink-300'
                     : 'after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:scale-x-0 after:rounded-full after:bg-pink-400/60 after:transition-transform hover:after:scale-x-100'
                 )}
                 aria-current={active ? 'page' : undefined}
