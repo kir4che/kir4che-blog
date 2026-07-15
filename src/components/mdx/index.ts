@@ -14,5 +14,6 @@ export { Link } from './Link';
 export { default as MDXContent } from './MDXContent.astro';
 export { Rating } from './Rating';
 export { SmallText } from './SmallText';
+export { Spoiler } from './Spoiler';
 export { Table } from './Table';
 export { Video } from './Video';

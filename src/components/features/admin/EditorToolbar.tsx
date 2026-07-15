@@ -143,9 +143,15 @@ const items: Record<string, Item> = {
     template: '<SmallText>{|}</SmallText>',
     wrap: { before: '<SmallText>', after: '</SmallText>' },
   },
+  spoiler: {
+    label: 'Spoiler',
+    desc: '模糊遮蔽文字，滑鼠移過才顯示。',
+    template: '<Spoiler>{|}</Spoiler>',
+    wrap: { before: '<Spoiler>', after: '</Spoiler>' },
+  },
   correction: {
     label: 'Correction',
-    desc: '勘誤標注：隱藏錯誤文字，並顯示正確文字',
+    desc: '隱藏錯誤文字，並顯示正確文字',
     props: [
       { name: 'wrong', type: 'string', required: true, desc: '錯誤文字（點擊可展開查看）' },
       { name: 'correct', type: 'string', required: true, desc: '正確文字' },
@@ -247,6 +253,7 @@ const BUTTONS: { id: string; label: string; className?: string }[] = [
   { id: 'highlight', label: 'Highlight' },
   { id: 'kbd', label: 'Kbd' },
   { id: 'small-text', label: 'SmallText' },
+  { id: 'spoiler', label: 'Spoiler' },
   { id: 'correction', label: 'Correction' },
   { id: '__sep3', label: '' },
   { id: 'accordion', label: 'Accordion' },
