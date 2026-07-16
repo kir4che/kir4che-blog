@@ -7,6 +7,7 @@ import tailwindcss from '@tailwindcss/vite';
 import expressiveCode from 'astro-expressive-code';
 import keystatic from '@keystatic/astro';
 import { defineConfig } from 'astro/config';
+import { unified } from '@astrojs/markdown-remark';
 import { loadEnv } from 'vite';
 
 import ecConfig from './ec.config.mjs';
@@ -38,6 +39,7 @@ export default defineConfig({
     resolve: {
       alias: {
         '@': srcDir,
+        daisyui: 'daisyui/index.js',
       },
     },
     server: {
@@ -85,12 +87,14 @@ export default defineConfig({
     keystatic(),
   ],
   markdown: {
-    remarkPlugins: [remarkGfm, remarkIns, remarkMark],
-    rehypePlugins: [
-      rehypeUnwrapImages,
-      rehypeSlug,
-      [rehypeExternalLinks, { target: '_blank', rel: ['noopener', 'noreferrer'] }],
-    ],
+    processor: unified({
+      remarkPlugins: [remarkGfm, remarkIns, remarkMark],
+      rehypePlugins: [
+        rehypeUnwrapImages,
+        rehypeSlug,
+        [rehypeExternalLinks, { target: '_blank', rel: ['noopener', 'noreferrer'] }],
+      ],
+    }),
   },
   image: {
     remotePatterns: [{ protocol: 'https', hostname: 'cdn.kir4che.com' }],
