@@ -15,7 +15,7 @@ interface SidebarData {
   }>;
 }
 
-const cache = new Map<Language, SidebarData>();
+const cache = new Map<Language, Promise<SidebarData>>();
 const isProd = import.meta.env.PROD;
 
 // 建立側邊欄資料
@@ -57,9 +57,7 @@ export const getSidebarData = async (lang: Language = DEFAULT_LANGUAGE): Promise
     if (cached) return cached;
   }
 
-  const data = await buildSidebarData(lang);
-
-  if (isProd) cache.set(lang, data);
-
-  return data;
+  const promise = buildSidebarData(lang);
+  if (isProd) cache.set(lang, promise);
+  return promise;
 };

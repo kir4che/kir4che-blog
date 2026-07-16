@@ -7,7 +7,7 @@ type PostCountMap = Record<string, number>;
 let categoryNameToSlugMap: ReadonlyMap<string, string> | null = null;
 
 // 建立「分類名稱 / slug → slug」
-export const createCategoryNameToSlugMap = (): ReadonlyMap<string, string> => {
+const createCategoryNameToSlugMap = (): ReadonlyMap<string, string> => {
   if (categoryNameToSlugMap) return categoryNameToSlugMap;
 
   const entries: [string, string][] = [];
@@ -135,7 +135,7 @@ export const getAllCategoryByPosts = (posts: PostMeta[], limit?: number): Catego
 };
 
 // 依 slug 取得單一分類資訊（主分類或子分類）
-export const getCategoryInfoBySlug = (slug: string): CategoryInfo | null => {
+const getCategoryInfoBySlug = (slug: string): CategoryInfo | null => {
   // 主分類
   const main = categoryMap[slug];
   if (main) {
@@ -172,7 +172,7 @@ export const getCategoryBySlug = (
 
   const categories = getAllCategoryByPosts(posts);
   const main = categories.find((category) => category.slug === slug);
-  if (main && scope !== 'sub') return main;
+  if (scope !== 'sub' && main) return main;
   if (scope === 'main') return null;
 
   for (const category of categories) {

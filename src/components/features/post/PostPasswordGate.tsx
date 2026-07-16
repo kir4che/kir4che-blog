@@ -27,8 +27,8 @@ const PostPasswordGate = ({ slug, lang, backHref, texts }: PostPasswordGateProps
   const [lockRemain, setLockRemain] = useState(0); // > 0 就代表鎖定中
   const [isUnlocked, setIsUnlocked] = useState(false);
 
-  const lockKey = `lock:${slug}`;
-  const attemptsKey = `attempts:${slug}`;
+  const lockKey = `lock:${slug}`; // 解鎖 timestamp（localStorage）
+  const attemptsKey = `attempts:${slug}`; // 已嘗試次數（localStorage）
 
   const unlock = useCallback(() => {
     setIsUnlocked(true);
@@ -38,7 +38,13 @@ const PostPasswordGate = ({ slug, lang, backHref, texts }: PostPasswordGateProps
   }, []);
 
   useEffect(() => {
-    // 檢查是否有解鎖 Cookie
+    // 文章密碼保護邏輯：
+    // 1. Cookie postUnlock-${slug} → server 設定，已解鎖直接跳過。
+    // 2. localStorage lock:${slug} → 鎖定到期時間戳，>0 代表鎖定中。
+    // 3. localStorage attempts:${slug} → 剩餘嘗試次數，超過 3 次觸發鎖定。
+    // 每秒 tick 推算剩餘秒數，到期自動清除。
+
+    // 檢查是否有成功解鎖標記（server 設定）
     if (document.cookie.includes(`postUnlock-${slug}=`)) {
       unlock();
       return;

@@ -46,6 +46,7 @@ const DefaultFallback = ({
   );
 };
 
+// 用 inline render prop 判斷：有傳 fallback prop 就客製，否則用內建 DefaultFallback。
 const ErrorBoundary = ({ children, fallback, translations, onReset }: CustomErrorBoundaryProps) => (
   <ReactErrorBoundary
     FallbackComponent={({ error, resetErrorBoundary }) =>

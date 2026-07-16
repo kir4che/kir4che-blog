@@ -46,6 +46,7 @@ const getPageNumbers = (): PageItem[] => {
 
 const pages = getPageNumbers();
 
+// 第 1 頁用 page1Path 或 basePath（無 /page/1 後綴），其餘用 basePath/N。
 const buildPageHref = (page: number): string =>
   link(page === 1 ? (page1Path ?? basePath) : `${basePath}/${page}`);
 ---

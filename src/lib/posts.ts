@@ -10,12 +10,8 @@ type ParsedEntry = { lang: Language | null; slug: string };
 
 const isProd = import.meta.env.PROD;
 
-// 取得文章的完整檔案路徑
-export const getPostFilePath = (lang: Language, slug: string): string =>
-  `${process.cwd()}/src/content/blog/${lang}/${slug}.mdx`;
-
 // 計算文章字數
-export const countWordsFromMarkdown = (markdown: string): number => {
+const countWordsFromMarkdown = (markdown: string): number => {
   if (!markdown?.trim()) return 0;
   const cleanText = markdown
     .replace(/^#+\s+/gm, '')

@@ -81,14 +81,12 @@ const PokemonCardComponent =
     ? (extraComponents.PokemonCard as ComponentType<PokemonCardProps>)
     : null;
 
-const BoundLink = (props: Parameters<typeof Link>[0]) => Link({ lang, ...props });
-
 const CustomLink = (props: Parameters<typeof Link>[0] & { href?: string }) => {
   if (PokemonCardComponent && props.href && props.href.startsWith('pokemon-card:')) {
     const stage = props.href.replace('pokemon-card:', '');
     return createElement(PokemonCardComponent, { stage });
   }
-  return BoundLink(props);
+  return Link({ lang, ...props });
 };
 
 const MDX_COMPONENTS = {
@@ -360,7 +358,7 @@ const articleSchema = {
 
   let lightboxSlides: { src: string; alt?: string }[] = [];
 
-  // 重新掃描文章內的圖片 slides
+  // 掃描文章內所有 lightbox 圖片，去重後建立全域 slides 陣列。
   const rebuildLightboxSlides = () => {
     if (!document.querySelector('[data-lightbox-slides]')) return;
 
@@ -370,6 +368,7 @@ const articleSchema = {
     const allEls = Array.from(postBody.querySelectorAll<HTMLElement>('[data-lightbox-slides]'));
     if (allEls.length === 0) return;
 
+    // 去重：多個 Images 元件可能引用同一張圖，以 src 為 key 只保留第一筆
     const seen = new Set<string>();
     lightboxSlides = [];
     const elToGlobalIndex = new Map<HTMLElement, number>();
@@ -391,10 +390,12 @@ const articleSchema = {
       );
     }
 
+    // 將去重後的全域 index 寫回 DOM，點擊時 dispatch 正確的 slide 位置。
     for (const [el, idx] of elToGlobalIndex) el.dataset.lightboxGlobalIndex = String(idx);
   };
 
-  // 單次 delegation handler
+  // 單一 delegation 監聽器：捕獲 lightbox 圖片點擊 → 自訂事件
+  // 同時處理分享按鈕：Web Share API（行動裝置優先）→ 降級為複製連結
   const handleDocumentClick = (e: MouseEvent) => {
     const lbEl = (e.target as Element).closest('[data-lightbox-slides]') as HTMLElement | null;
     if (lbEl) {
@@ -421,6 +422,7 @@ const articleSchema = {
 
   let onVisibilityChange: (() => void) | null = null;
 
+  // Astro SPA 換頁時重新初始化，先清除舊 visibility listener 避免重複綁定。
   const init = () => {
     rebuildLightboxSlides();
 

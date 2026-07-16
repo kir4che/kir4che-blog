@@ -35,8 +35,7 @@ const canonicalUrl = canonical
     ? canonical
     : `${siteOrigin}${canonical}`
   : seoConfig.canonical;
-const fallbackImage = seoConfig.openGraph.images[0] ?? null;
-const resolvedImage = image ?? fallbackImage;
+const resolvedImage = image ?? seoConfig.openGraph.images[0] ?? null;
 const shouldIndex = noindex ? 'noindex,nofollow' : seoConfig.robots;
 const locale = LANGUAGE_TO_LOCALE_MAP[currLang] || currLang;
 ---
@@ -116,6 +115,7 @@ const locale = LANGUAGE_TO_LOCALE_MAP[currLang] || currLang;
     <Toast />
     <slot />
     <script>
+      // 移除 preload class 以啟用 CSS transition，避免首次渲染閃爍。
       const clearPreload = () => document.body.classList.remove('preload');
       if (document.readyState === 'loading')
         document.addEventListener('DOMContentLoaded', clearPreload, { once: true });
@@ -129,9 +129,10 @@ const locale = LANGUAGE_TO_LOCALE_MAP[currLang] || currLang;
       const item = '[data-lang-menu-item]';
       const hoverAttr = 'data-lang-menu-hover';
 
-      const initMenu = (menu: HTMLElement & { __langMenuBound?: boolean }) => {
-        if (menu.__langMenuBound) return;
-        menu.__langMenuBound = true;
+      // 以 dataset 標記避免 astro:page-load 重複綁定事件到同一個 menu 元素
+      const initMenu = (menu: HTMLElement) => {
+        if (menu.dataset.langMenuBound === 'true') return;
+        menu.dataset.langMenuBound = 'true';
 
         const btn = menu.querySelector<HTMLElement>(toggle);
         const panel = menu.querySelector<HTMLElement>(list);
@@ -188,6 +189,7 @@ const locale = LANGUAGE_TO_LOCALE_MAP[currLang] || currLang;
         document.querySelectorAll<HTMLElement>(root).forEach(initMenu);
       };
 
+      // window 單例：全域 click/Escape 監聽器只註冊一次，跨 Astro SPA 頁面共用。
       const win = window as Window & { __langMenuInit?: boolean };
       if (!win.__langMenuInit) {
         win.__langMenuInit = true;

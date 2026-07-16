@@ -59,7 +59,7 @@ const PostComments = ({ slug, hasPassword = false }: PostCommentsProps) => {
     }
   }, [isLocked, mountUtterances, resolveTheme]);
 
-  //  監聽 theme 變化
+  //  監聽 theme 變化，並透過 postMessage 通知 Utterances iframe 變更主題。
   useEffect(() => {
     if (isLocked) return;
 

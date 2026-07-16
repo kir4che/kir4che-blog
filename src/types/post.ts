@@ -50,12 +50,3 @@ export interface PaginationData<T> {
   start: number;
   end: number;
 }
-
-export interface AdminPost {
-  id: string;
-  lang: Language;
-  slug: string;
-  meta: PostMeta;
-  content: string;
-  fullPath: string;
-}

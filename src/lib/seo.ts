@@ -47,7 +47,6 @@ type SeoConfig = {
   };
 };
 
-// 依語系取得對應文字，若無則 fallback 到第一個可用值。
 const getLocalizedValue = <T extends Record<Language, string>>(
   map: T,
   lang: Language
