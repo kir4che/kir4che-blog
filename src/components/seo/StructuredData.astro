@@ -9,6 +9,7 @@ const locale = resolveLanguage(lang);
 
 const siteUrl = Astro.site ?? new URL(Astro.url.origin);
 
+// 取得社群連結，為了讓 Google 知道部落格與這些連結的關聯。
 const sameAs = Object.values(CONFIG.siteInfo.socialLinks).filter(Boolean) as string[];
 
 const alternateName =
@@ -36,6 +37,7 @@ const websiteEntry: JsonLd = {
 };
 
 const entries: JsonLd[] = [
+  // Organization（供 Google Knowledge Panel 用）
   {
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -46,6 +48,7 @@ const entries: JsonLd[] = [
     logo: `${siteUrl}/images/avatar.webp`,
     sameAs,
   },
+  // Person
   {
     '@context': 'https://schema.org',
     '@type': 'Person',
@@ -55,6 +58,7 @@ const entries: JsonLd[] = [
     sameAs,
   },
   websiteEntry,
+  // WebPage（綁定到 WebSite）
   {
     '@context': 'https://schema.org',
     '@type': 'WebPage',

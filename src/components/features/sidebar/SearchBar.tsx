@@ -16,8 +16,10 @@ interface SearchPost extends Post {
   searchableText: string;
 }
 
+// 快取各語系的 search.json
 const postsCache = new Map<string, SearchPost[]>();
 
+// 將原始資料展開成可檢索的字串（title + description + slug + tags + categories）
 const normalizePosts = (items: Post[]): SearchPost[] =>
   items.map((post) => ({
     ...post,
@@ -32,6 +34,7 @@ const normalizePosts = (items: Post[]): SearchPost[] =>
       .toLowerCase(),
   }));
 
+// 將搜尋字串拆成 token：拉丁字母/數字分詞 + CJK 逐字分詞
 const tokenizeSearchString = (value: string): string[] => {
   const normalized = value.trim().toLowerCase();
   if (!normalized) return [];
@@ -89,8 +92,8 @@ const SearchBar = ({
       .catch(() => setPosts([]));
   }, [base, posts.length]);
 
-  // 偵測是否為 sm 以下的裝置寬度
   useEffect(() => {
+    // 偵測是否為 sm 以下的裝置寬度
     const mq = window.matchMedia('(max-width: 639px)');
     setIsMobile(mq.matches);
     const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
@@ -103,7 +106,7 @@ const SearchBar = ({
     setPortalTarget(document.getElementById('mobile-search-portal'));
   }, []);
 
-  // 點擊外部關閉（同時檢查 portal ref）
+  // 點擊外部關閉搜尋面板（同時檢查 root 與 mobile portal ref）
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const inRoot = rootRef.current?.contains(e.target as Node);
@@ -125,6 +128,7 @@ const SearchBar = ({
     if (isExpanded && collapsible) inputRef.current?.focus();
   }, [isExpanded, collapsible, isMobile]);
 
+  // token 全部命中才視為匹配，搜尋結果依 title/slug 命中與否排序。
   const filteredResults = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return [];

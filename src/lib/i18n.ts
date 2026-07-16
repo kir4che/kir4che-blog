@@ -20,9 +20,7 @@ export const getLangStaticPaths = () => SUPPORTED_LANGUAGES.map((lang) => ({ par
 export const isSupportedLanguage = (value: unknown): value is Language =>
   typeof value === 'string' && (SUPPORTED_LANGUAGES as readonly string[]).includes(value);
 
-/**
- * 解析語系（不合法時回退預設）
- */
+// 解析語系（不合法時回退預設）
 export const resolveLanguage = (value: unknown): Language =>
   isSupportedLanguage(value) ? value : DEFAULT_LANGUAGE;
 

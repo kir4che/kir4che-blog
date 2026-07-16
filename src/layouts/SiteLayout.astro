@@ -108,7 +108,7 @@ const simplifiedTags = tags.map(({ name, slug }) => ({ name, slug }));
 </BaseLayout>
 
 <script>
-  const setupSidebar = () => {
+  const initSidebar = () => {
     const toggleBtn = document.getElementById('right-sidebar-toggle');
     const container = document.getElementById('layout-container');
     const backdrop = document.getElementById('sidebar-backdrop');
@@ -118,14 +118,14 @@ const simplifiedTags = tags.map(({ name, slug }) => ({ name, slug }));
     toggleBtn.setAttribute('aria-expanded', 'false');
     toggleBtn.setAttribute('aria-controls', 'right-sidebar');
 
-    const syncBodyOverflow = (isOpen: boolean) => {
+    const lockBodyScroll = (isOpen: boolean) => {
       document.body.style.overflow = isOpen && window.innerWidth < 1280 ? 'hidden' : '';
     };
 
     const setSidebarState = (isOpen: boolean) => {
       container.dataset.sidebarOpen = String(isOpen);
       toggleBtn.setAttribute('aria-expanded', String(isOpen));
-      syncBodyOverflow(isOpen);
+      lockBodyScroll(isOpen);
     };
 
     const closeSidebar = () => setSidebarState(false);
@@ -137,7 +137,7 @@ const simplifiedTags = tags.map(({ name, slug }) => ({ name, slug }));
 
     const handleResize = () => {
       if (window.innerWidth >= 1280) closeSidebar();
-      else syncBodyOverflow(container.dataset.sidebarOpen === 'true');
+      else lockBodyScroll(container.dataset.sidebarOpen === 'true');
     };
 
     const handleEscape = (e: KeyboardEvent) => {
@@ -150,7 +150,7 @@ const simplifiedTags = tags.map(({ name, slug }) => ({ name, slug }));
     document.addEventListener('keydown', handleEscape);
   };
 
-  setupSidebar();
+  initSidebar();
 
-  document.addEventListener('astro:page-load', setupSidebar);
+  document.addEventListener('astro:page-load', initSidebar);
 </script>

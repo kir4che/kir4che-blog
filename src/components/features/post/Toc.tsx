@@ -53,11 +53,13 @@ const Toc = ({ headings, title, expandLabel, collapseLabel }: TocProps) => {
     return () => document.removeEventListener('click', handleClick);
   }, [isOpen]);
 
+  // 自訂平滑滾動：手寫 easing + rAF，不用 scrollIntoView，因為自適應 duration（距離越遠滾越久），且支援 prefers-reduced-motion 直接跳轉。
   const scrollToHeading = useCallback((id: string) => {
     const el = document.getElementById(id);
     if (!el) return;
     const targetY = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
 
+    // 使用者偏好減少動畫 → 直接跳轉
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       window.scrollTo(0, targetY);
       setIsOpen(false);

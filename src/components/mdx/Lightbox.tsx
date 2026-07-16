@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, type ComponentType, type CSSProperties } from 'react';
-// @ts-expect-error - Vite suffix import is not recognized by TypeScript
 import lightboxStylesUrl from 'yet-another-react-lightbox/styles.css?url';
 
 import { LIGHTBOX_EVENT, openLightbox, type LightboxPayload } from './LightboxEvents';

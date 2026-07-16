@@ -8,6 +8,7 @@ interface TripMapProps {
   places: TripPlace[];
 }
 
+// 確保 leaflet.css 只被注入一次（使用 data-leaflet-styles 標記）
 const ensureLeafletStylesheet = () => {
   if (document.querySelector<HTMLLinkElement>('link[data-leaflet-styles]')) return;
 
@@ -27,6 +28,7 @@ const TripMap = ({ places }: TripMapProps) => {
   const mapRef = useRef<import('leaflet').Map | null>(null);
   const layerRef = useRef<import('leaflet').LayerGroup | null>(null);
 
+  // 篩掉不完整座標或 icon 為空的景點
   const validPlaces = useMemo(
     () =>
       places.filter(
@@ -39,7 +41,7 @@ const TripMap = ({ places }: TripMapProps) => {
     [places]
   );
 
-  // 初始化地圖
+  // 延遲載入 leaflet（避免 SSG bundle），初始化地圖與 tile layer。
   useEffect(() => {
     if (!containerRef.current || validPlaces.length === 0) return;
 
@@ -108,6 +110,7 @@ const TripMap = ({ places }: TripMapProps) => {
     };
   }, [validPlaces]);
 
+  // unmount 時銷毀 leaflet 地圖實例
   useEffect(() => {
     return () => {
       if (mapRef.current) {

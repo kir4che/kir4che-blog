@@ -67,8 +67,9 @@ import { X } from '@lucide/astro';
       let timeoutId; // 宣告變數來存計時器 ID
 
       const remove = () => {
+        // dataset.removing 防止重複觸發關閉
         if (node.dataset.removing) return;
-        node.dataset.removing = 'true'; // 防止重複執行標記
+        node.dataset.removing = 'true';
         node.classList.add('opacity-0');
 
         if (timeoutId) clearTimeout(timeoutId); // 清除原本的自動關閉計時器
@@ -76,7 +77,8 @@ import { X } from '@lucide/astro';
         setTimeout(() => node.remove(), 300);
       };
 
-      node.dismiss = remove; // 將 remove 函式賦值給 node 的 dismiss，讓外部也能呼叫。
+      // 把 remove 掛到 node.dismiss 上，讓外部（overflow 管理、測試）也能直接關閉。
+      node.dismiss = remove;
       if (close instanceof HTMLButtonElement) close.addEventListener('click', remove);
 
       const duration = DURATIONS[v];
@@ -95,12 +97,11 @@ import { X } from '@lucide/astro';
       });
 
       if (toast) {
-        // 找出所有「還沒被標記為移除中」的 Toast
+        // 計數 active toast（排除已標記移除中的），超出上限就關閉最舊的。
         const activeToasts = Array.from(root.children).filter(
           (child) => child.dataset.removing !== 'true'
         );
 
-        // 如果超過數量，呼叫最舊的那個 Toast 的 dismiss() 方法，並用 while 確保如果瞬間塞入過多，能正確清空舊的。
         let overLimitCount = activeToasts.length - MAX_TOASTS;
         for (let i = 0; i < overLimitCount; i++) {
           if (activeToasts[i] && typeof activeToasts[i].dismiss === 'function') {
@@ -108,7 +109,7 @@ import { X } from '@lucide/astro';
           }
         }
 
-        root.appendChild(toast); // 將新的 Toast 加入畫面
+        root.appendChild(toast);
       }
     });
   })();

@@ -6,7 +6,6 @@ import ProfileCard from '@/components/features/sidebar/ProfileCard.astro';
 import PopularPosts from '@/components/features/sidebar/PopularPosts.astro';
 import TagCloud from '@/components/features/sidebar/TagCloud.astro';
 import type { Language, PostMeta, SidebarCategory, TagBadgeInfo, Translator } from '@/types';
-// import Advertisement from '@/components/ui/Advertisement.astro';
 
 interface Props {
   tProfile: Translator;
@@ -40,10 +39,8 @@ const { tProfile, lang, tSidebar: t, categories, tags, popularPosts } = Astro.pr
       {popularPosts.length > 0 && <PopularPosts t={t} posts={popularPosts} />}
       {categories.length > 0 && <CategoryList t={t} categories={categories} />}
       {tags.length > 0 && <TagCloud t={t} tags={tags} />}
-      <!-- <Advertisement /> -->
       <MyWebsites t={t} />
       <LineStickersCTA t={t} />
-      <!-- <DonateBtns /> -->
     </div>
   </div>
 </aside>
