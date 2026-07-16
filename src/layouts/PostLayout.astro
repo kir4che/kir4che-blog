@@ -29,7 +29,7 @@ import {
   Highlight,
   Image,
   Images,
-  ImagesItem,
+  GalleryItem,
   Kbd,
   Link,
   MDXContent,
@@ -106,7 +106,7 @@ const MDX_COMPONENTS = {
   Highlight,
   Image,
   Images,
-  ImagesItem,
+  GalleryItem,
   Kbd,
   Link: CustomLink,
   Rating,
@@ -133,6 +133,7 @@ const tPost = createTranslator(lang, 'PostPage');
 const publishedDate = post.date ? parseToISODate(post.date) : null;
 const dateFormatter = createDateFormatter(lang);
 const updatedAt = post.updatedAt ? dateFormatter(post.updatedAt) : null;
+const hasPlaces = (post.places ?? []).length > 0;
 
 const tocHeadings = headings.map((h) => ({
   id: h.slug,
@@ -277,7 +278,7 @@ const articleSchema = {
             )
           }
         </header>
-        {TripMap && <TripMap client:visible places={post.places ?? []} />}
+        {hasPlaces && <TripMap client:visible places={post.places ?? []} />}
         {
           content ? (
             <MDXContent
