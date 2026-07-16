@@ -13,6 +13,9 @@ export type MediaItem =
       width?: string | number;
       height?: string | number;
       objPos?: ObjectPosition;
+      spoiler?: boolean;
+      spoilerText?: string;
+      spoilerBtnText?: string;
     }
   | {
       type: 'video';
@@ -27,4 +30,7 @@ export type MediaItem =
       autoPlay?: boolean;
       loop?: boolean;
       muted?: boolean;
+      spoiler?: boolean;
+      spoilerText?: string;
+      spoilerBtnText?: string;
     };

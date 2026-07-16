@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 
 import { FigureShell } from './FigureShell';
+import { MediaSpoiler } from './MediaSpoiler';
 
 interface VideoProps {
   src: string;
@@ -16,6 +17,9 @@ interface VideoProps {
   poster?: string;
   style?: CSSProperties;
   className?: string;
+  spoiler?: boolean;
+  spoilerText?: string;
+  spoilerBtnText?: string;
   [key: string]: unknown;
 }
 
@@ -33,9 +37,31 @@ export const Video = ({
   poster,
   style,
   className,
+  spoiler = false,
+  spoilerText = '內含劇透',
+  spoilerBtnText = '點擊查看',
   ...rest
 }: VideoProps) => {
-  const shouldShowControls = controls !== undefined ? controls : !loop;
+  const shouldAutoPlay = spoiler ? false : autoPlay;
+  const effectivePreload = preload ?? (shouldAutoPlay ? 'auto' : 'metadata');
+
+  const video = (
+    <div className="relative size-full overflow-hidden">
+      <video
+        src={src}
+        controls={controls !== undefined ? controls : !loop}
+        autoPlay={shouldAutoPlay}
+        loop={loop}
+        muted={muted}
+        playsInline
+        preload={effectivePreload}
+        poster={poster}
+        className="size-full object-cover transition-opacity duration-300"
+        data-auto-play={shouldAutoPlay ? 'true' : undefined}
+        {...(rest as React.VideoHTMLAttributes<HTMLVideoElement>)}
+      />
+    </div>
+  );
 
   return (
     <FigureShell
@@ -44,21 +70,14 @@ export const Video = ({
       style={{ height: height || 'auto', width: width || '100%', ...style } as CSSProperties}
       className={className}
     >
-      <div className="relative size-full overflow-hidden">
-        <video
-          src={src}
-          controls={shouldShowControls}
-          autoPlay={autoPlay}
-          loop={loop}
-          muted={muted}
-          playsInline
-          preload={preload ?? (autoPlay ? 'auto' : 'metadata')}
-          poster={poster}
-          className="size-full object-cover transition-opacity duration-300"
-          data-auto-play={autoPlay ? 'true' : undefined}
-          {...(rest as React.VideoHTMLAttributes<HTMLVideoElement>)}
-        />
-      </div>
+      <MediaSpoiler
+        enabled={spoiler}
+        text={spoilerText}
+        btnText={spoilerBtnText}
+        className="size-full"
+      >
+        {video}
+      </MediaSpoiler>
     </FigureShell>
   );
 };

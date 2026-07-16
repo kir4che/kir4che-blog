@@ -3,6 +3,8 @@ import type { CSSProperties } from 'react';
 import type { MediaItem } from '@/types';
 import { cn } from '@/utils/cn';
 
+import { GalleryItem } from './GalleryItem';
+
 type ParsedCssLength = {
   raw: string;
   unit: string | null;
@@ -48,8 +50,6 @@ const toPixelNumber = (
   return res?.unit === 'px' ? res.value : fallback;
 };
 
-import { ImagesItem } from './ImagesItem';
-
 interface ImagesProps {
   images?: MediaItem[];
   title?: string;
@@ -59,6 +59,9 @@ interface ImagesProps {
   minHeight?: string | number;
   maxHeight?: string | number;
   align?: 'left' | 'center' | 'right';
+  spoiler?: boolean;
+  spoilerText?: string;
+  spoilerBtnText?: string;
 }
 
 type Alignment = 'left' | 'center' | 'right';
@@ -99,6 +102,9 @@ export const Images = ({
   minHeight,
   maxHeight,
   align = 'center',
+  spoiler = false,
+  spoilerText,
+  spoilerBtnText,
 }: ImagesProps) => {
   const resolvedHeight =
     height !== undefined
@@ -125,10 +131,12 @@ export const Images = ({
     .map((item) => ({ src: item.src, alt: 'alt' in item ? item.alt : undefined }));
   const slidesJson = JSON.stringify(imageSlides);
 
-  const slideIndexMap = images.reduce<number[]>((acc, item, i) => {
-    acc[i] = item.type !== 'video' ? imageSlides.findIndex((s) => s.src === item.src) : -1;
-    return acc;
-  }, []);
+  let imageSlideIndex = -1;
+  const slideIndexMap = images.map((item) => {
+    if (item.type === 'video') return -1;
+    imageSlideIndex += 1;
+    return imageSlideIndex;
+  });
 
   const containerStyle: CSSProperties = {
     ['--gallery-max-width' as string]: width,
@@ -152,7 +160,7 @@ export const Images = ({
         })}
       >
         {images.map((item, i) => (
-          <ImagesItem
+          <GalleryItem
             key={i}
             item={item}
             singleColumn={singleColumn}
@@ -162,6 +170,9 @@ export const Images = ({
             resolvedMaxHeight={styleVal(maxHeight) ?? resolvedHeight ?? undefined}
             lightboxSlides={item.type !== 'video' && slideIndexMap[i] >= 0 ? slidesJson : undefined}
             lightboxIndex={slideIndexMap[i] >= 0 ? slideIndexMap[i] : 0}
+            spoiler={item.spoiler ?? spoiler}
+            spoilerText={item.spoilerText ?? spoilerText}
+            spoilerBtnText={item.spoilerBtnText ?? spoilerBtnText}
           />
         ))}
       </div>

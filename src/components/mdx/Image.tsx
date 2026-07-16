@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react';
 
 import { cn } from '@/utils/cn';
 import { FigureShell } from './FigureShell';
+import { MediaSpoiler } from './MediaSpoiler';
 
 interface ImageProps {
   src: string;
@@ -17,6 +18,9 @@ interface ImageProps {
   noLightbox?: boolean;
   lightboxSlides?: string;
   lightboxIndex?: number;
+  spoiler?: boolean;
+  spoilerText?: string;
+  spoilerBtnText?: string;
   [key: string]: unknown;
 }
 
@@ -34,6 +38,9 @@ export const Image = ({
   noLightbox = false,
   lightboxSlides,
   lightboxIndex = 0,
+  spoiler = false,
+  spoilerText,
+  spoilerBtnText,
   ...rest
 }: ImageProps) => {
   const normalizedHeight =
@@ -78,38 +85,45 @@ export const Image = ({
       )}
       style={figureStyle}
     >
-      <div
-        className={cn(
-          'xs:max-h-(--img-max-height) relative max-h-80 w-full overflow-hidden rounded-md bg-gray-100 dark:bg-gray-800',
-          !noLightbox && 'cursor-zoom-in',
-          imgWrapClass
-        )}
-        style={imageWrapStyle}
-        {...(!noLightbox && {
-          'data-lightbox-slides': slides,
-          'data-lightbox-index': lightboxIndex,
-        })}
+      <MediaSpoiler
+        enabled={spoiler}
+        text={spoilerText}
+        btnText={spoilerBtnText}
+        className="w-full"
       >
-        <img
-          src={src}
-          alt={alt}
-          width={renderWidth}
-          height={renderHeight}
-          loading="lazy"
-          decoding="async"
-          onError={(e) => {
-            const img = e.currentTarget;
-            img.onerror = null;
-            img.src = '/images/cover-fallback_lg.webp';
-          }}
+        <div
           className={cn(
-            'size-full object-cover transition-transform duration-500 ease-out hover:scale-105',
-            objectPosition,
-            imgClass
+            'xs:max-h-(--img-max-height) relative max-h-80 w-full overflow-hidden rounded-md bg-gray-100 dark:bg-gray-800',
+            !noLightbox && 'cursor-zoom-in',
+            imgWrapClass
           )}
-          {...(rest as React.ImgHTMLAttributes<HTMLImageElement>)}
-        />
-      </div>
+          style={imageWrapStyle}
+          {...(!noLightbox && {
+            'data-lightbox-slides': slides,
+            'data-lightbox-index': lightboxIndex,
+          })}
+        >
+          <img
+            src={src}
+            alt={alt}
+            width={renderWidth}
+            height={renderHeight}
+            loading="lazy"
+            decoding="async"
+            onError={(e) => {
+              const img = e.currentTarget;
+              img.onerror = null;
+              img.src = '/images/cover-fallback_lg.webp';
+            }}
+            className={cn(
+              'size-full object-cover transition-transform duration-500 ease-out hover:scale-105',
+              objectPosition,
+              imgClass
+            )}
+            {...(rest as React.ImgHTMLAttributes<HTMLImageElement>)}
+          />
+        </div>
+      </MediaSpoiler>
     </FigureShell>
   );
 };
