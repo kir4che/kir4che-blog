@@ -68,9 +68,6 @@ const blogSchema = {
     label: '文章保護 (需要密碼才能查看)',
     defaultValue: false,
   }),
-  password: fields.text({
-    label: '文章密碼',
-  }),
   places: fields.array(
     fields.object({
       coord: fields.text({
