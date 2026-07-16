@@ -365,6 +365,42 @@
   scrollbar-width: none;
 }
 
-astro-island {
-  display: block;
+@keyframes wooden-fish-mallet-strike {
+  50% {
+    transform: rotate(-26deg);
+  }
+}
+
+@keyframes wooden-fish-hit {
+  50% {
+    transform: scale(0.96, 0.92);
+  }
+}
+
+@keyframes wooden-fish-impact-flash {
+  40% {
+    opacity: 1;
+  }
+}
+
+@keyframes wooden-fish-merit-rise {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(0.9);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-3rem) scale(1.08);
+  }
+}
+
+@keyframes wooden-fish-merit-fade {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
 }

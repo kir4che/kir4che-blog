@@ -5,7 +5,9 @@ import MyWebsites from '@/components/features/sidebar/MyWebsites.astro';
 import ProfileCard from '@/components/features/sidebar/ProfileCard.astro';
 import PopularPosts from '@/components/features/sidebar/PopularPosts.astro';
 import TagCloud from '@/components/features/sidebar/TagCloud.astro';
+import WoodenFish from '@/components/features/wooden-fish/WoodenFish';
 import type { Language, PostMeta, SidebarCategory, TagBadgeInfo, Translator } from '@/types';
+import woodenFishSoundSrc from '@/assets/sounds/wooden-fish.mp3';
 
 interface Props {
   tProfile: Translator;
@@ -40,6 +42,9 @@ const { tProfile, lang, tSidebar: t, categories, tags, popularPosts } = Astro.pr
       {categories.length > 0 && <CategoryList t={t} categories={categories} />}
       {tags.length > 0 && <TagCloud t={t} tags={tags} />}
       <MyWebsites t={t} />
+    </div>
+    <div class="flex-center -mt-8 flex-col gap-8">
+      <WoodenFish client:load soundSrc={woodenFishSoundSrc} />
       <LineStickersCTA t={t} />
     </div>
   </div>
