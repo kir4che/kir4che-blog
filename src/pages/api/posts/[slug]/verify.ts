@@ -53,7 +53,7 @@ export const POST: APIRoute = async ({ request, params }) => {
   if (!meta?.protected) return errorResponse('Not found', 404);
 
   // 取得密碼
-  const storedPassword = await getPostPassword(`${lang}/${slug}`);
+  const storedPassword = getPostPassword();
   if (!storedPassword) return errorResponse('Not found', 404);
 
   // 驗證密碼

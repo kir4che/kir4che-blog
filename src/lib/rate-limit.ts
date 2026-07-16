@@ -27,7 +27,7 @@ export const recordAttempt = (clientKey: string): { locked: boolean; lockSeconds
   const now = Date.now();
   let record = attemptStore.get(clientKey);
 
-  // 無紀錄或距離上次嘗試超過 5 分鐘，重新開始計算
+  // 無紀錄或距離上次嘗試超過 5 分鐘，重新開始計算。
   if (!record || now - record.lastAttempt > ATTEMPT_TTL_MS) {
     record = { count: 0, lockUntil: 0, lastAttempt: now };
   }
@@ -35,6 +35,7 @@ export const recordAttempt = (clientKey: string): { locked: boolean; lockSeconds
   record.count += 1;
   record.lastAttempt = now;
 
+  // 超過最大嘗試次數，鎖定 60 秒。
   if (record.count >= MAX_ATTEMPTS) {
     record.lockUntil = now + LOCK_SECONDS * 1000;
     attemptStore.set(clientKey, record);
