@@ -52,7 +52,7 @@ const buildPostHref = (l: Language) => {
 };
 ---
 
-<div id={id} class={cn('dropdown', directionClass, className)} data-lang-menu>
+<div id={id} class={cn('dropdown relative', directionClass, className)} data-lang-menu>
   <button
     type="button"
     class="flex items-center gap-x-1.5 text-sm hover:bg-inherit"
@@ -66,7 +66,7 @@ const buildPostHref = (l: Language) => {
   <ul
     role="menu"
     class={cn(
-      'dropdown-content menu bg-surface-secondary z-10 hidden w-24 rounded shadow-md md:w-32',
+      'dropdown-content menu bg-surface-secondary z-50 hidden w-24 rounded shadow-md md:w-32',
       marginClass
     )}
     data-lang-menu-list

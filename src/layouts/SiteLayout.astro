@@ -44,7 +44,7 @@ const simplifiedTags = tags.map(({ name, slug }) => ({ name, slug }));
     </div>
     <div id="main-content-wrapper" class="flex w-full min-w-0 flex-1 lg:gap-x-10 xl:gap-x-16">
       <div class="flex min-h-dvh min-w-0 flex-1 flex-col">
-        <header class="mb-0 pt-4 sm:mb-2">
+        <header class="relative z-40 mb-0 pt-4 sm:mb-2" transition:name="site-header">
           <div class="mb-2 lg:hidden">
             <ProfileCard tProfile={tProfile} lang={lang} />
           </div>
@@ -83,13 +83,13 @@ const simplifiedTags = tags.map(({ name, slug }) => ({ name, slug }));
           </div>
           <div id="mobile-search-portal" class="w-full"></div>
         </header>
-        <main class="flex-1">
+        <main class="relative z-0 flex-1">
           <slot />
         </main>
         <footer class="flex-between py-6">
           <GlobalLangMenu id="global-lang-menu-footer" class="md:hidden" direction="top" />
           <p class="text-xs text-gray-400">
-            © 2024 - {new Date().getFullYear()}
+            © 2024 - {new Date().getFullYear()}{' '}
             {CONFIG.siteInfo.name}
             <span class="text-pink-400 dark:text-pink-500">♥</span>
           </p>
