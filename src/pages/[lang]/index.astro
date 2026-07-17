@@ -53,7 +53,14 @@ const lcpPost = featuredPosts.find((post) => Boolean(post.coverImage));
                     <PostPreviewCard post={post} lang={lang} priority={i === 0} />
                   ))}
                 </div>
-                <div class="hidden gap-x-3 md:grid md:grid-cols-[48%_1fr] xl:grid-cols-[5fr_4fr]">
+                <div
+                  class:list={[
+                    'hidden gap-x-3 md:grid',
+                    featuredRight.length > 0
+                      ? 'md:grid-cols-[48%_1fr] xl:grid-cols-[5fr_4fr]'
+                      : 'md:grid-cols-1',
+                  ]}
+                >
                   <div class="grid gap-y-5">
                     {featuredLeft.map((post, i) => (
                       <PostPreviewCard post={post} lang={lang} priority={i === 0} />
