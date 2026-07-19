@@ -2,8 +2,7 @@ import { config, fields, collection } from '@keystatic/core';
 import { categoryMap, tagMap } from '@/config';
 import { mdxComponents } from '@/config/keystatic-mdx-components';
 
-const isProd = process.env.NODE_ENV === 'production';
-
+// 從 categoryMap 展開所有分類 + 子分類，產出 { label, value }[]。
 const buildCategoryOptions = (lang: 'tw' | 'en') =>
   Object.values(categoryMap).flatMap((category) => [
     { label: category.name[lang]!, value: category.slug },
@@ -13,6 +12,7 @@ const buildCategoryOptions = (lang: 'tw' | 'en') =>
     })),
   ]);
 
+// 從 tagMap 把每個 tag 轉成 { label, value }[]
 const buildTagOptions = (lang: 'tw' | 'en') =>
   Object.values(tagMap).map((tag) => ({
     label: tag.name[lang]!,
@@ -88,14 +88,15 @@ const blogSchema = {
 };
 
 export default config({
-  storage: isProd
-    ? {
-        kind: 'github',
-        repo: 'kir4che/kir4che-blog',
-      }
-    : {
-        kind: 'local',
-      },
+  storage:
+    process.env.NODE_ENV === 'production'
+      ? {
+          kind: 'github',
+          repo: 'kir4che/kir4che-blog',
+        }
+      : {
+          kind: 'local',
+        },
   collections: {
     blog_tw: collection({
       label: 'ZH-TW',

@@ -3,7 +3,7 @@ import type { Language } from '@/types';
 import { ensurePathname, normalizePathname, normalizePathSlug } from '@/utils/path';
 
 // 取得指定語言的基礎路徑
-export const getLanguageBasePath = (lang: Language): string =>
+const getLanguageBasePath = (lang: Language): string =>
   normalizePathname(CONFIG.paths.languagePaths[lang] ?? `/${lang}`);
 
 // 從 pathname 中匹配語系及其基礎路徑
@@ -22,7 +22,7 @@ export const matchLanguageBasePath = (
 export const getPostPath = (slug: string): string => ensurePathname(normalizePathSlug(slug));
 
 // 取得包含語言的文章路徑
-export const getLocalizedPostPath = ({ lang, slug }: { lang: Language; slug: string }): string => {
+export const getLocalizedPostPath = (lang: Language, slug: string): string => {
   const basePath = getLanguageBasePath(lang);
   return `${basePath}${getPostPath(slug)}`;
 };
@@ -47,3 +47,13 @@ export const withLocalePrefix = (pathname: string, lang: Language): string => {
 // 將 pathname 的語系替換為指定語系
 export const swapLocaleInPath = (pathname: string, lang: Language): string =>
   withLocalePrefix(stripLocalePrefix(pathname), lang);
+
+// 建立分頁連結 builder（轉換 Pagination 的 /N 格式為真實路由 /page/N）
+export const createPageLink =
+  (lang: Language) =>
+  (href: string): string => {
+    if (href === '/') return withLocalePrefix('/', lang);
+    const pageNum = parseInt(href.replace(/^\//, ''), 10);
+    if (!isNaN(pageNum) && pageNum > 1) return withLocalePrefix(`/page/${pageNum}`, lang);
+    return withLocalePrefix(href, lang);
+  };

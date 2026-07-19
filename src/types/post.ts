@@ -47,6 +47,4 @@ export interface PaginationData<T> {
   currPage: number;
   totalPages: number;
   totalItems: number;
-  start: number;
-  end: number;
 }

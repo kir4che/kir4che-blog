@@ -15,7 +15,7 @@ const { curLang, currSlug, langs, t } = Astro.props;
 ---
 
 <nav
-  class="relative z-10 text-xs"
+  class="group relative z-10 text-xs"
   aria-label={t('language.title')}
   data-lang-menu
   data-lang-menu-hover
@@ -33,14 +33,14 @@ const { curLang, currSlug, langs, t } = Astro.props;
   <ul
     id="post-lang-menu"
     role="menu"
-    class="bg-surface-secondary absolute left-0 z-50 mt-2 hidden min-w-24 overflow-hidden rounded shadow-md dark:bg-gray-700"
+    class="bg-surface-secondary absolute left-0 z-50 mt-2 hidden min-w-24 overflow-hidden rounded shadow-md group-focus-within:block group-hover:block dark:bg-gray-700"
     data-lang-menu-list
   >
     {
       langs.map((l) => (
         <li role="none">
           <a
-            href={getLocalizedPostPath({ lang: l, slug: currSlug })}
+            href={getLocalizedPostPath(l, currSlug)}
             role="menuitem"
             data-lang-menu-item
             class="text-foreground-primary block w-full px-3 py-2 hover:bg-pink-100/80 hover:text-pink-700 dark:hover:bg-pink-900/10 dark:hover:text-pink-200"

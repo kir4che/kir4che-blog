@@ -4,9 +4,11 @@ import type { APIRoute } from 'astro';
 import { z } from 'zod';
 
 import { resolveLanguage } from '@/lib/i18n';
-import { getPostPassword, verifyPostPassword } from '@/lib/post-passwords';
 import { getPostMetaBySlug, getPostUnlockCookieName } from '@/lib/posts';
-import { checkLock, deleteRecord, getClientKey, recordAttempt } from '@/lib/rate-limit';
+import { checkRateLimit, getClientKey } from '@/lib/rate-limit';
+
+const getPostPassword = (): string | undefined =>
+  import.meta.env.DEFAULT_POST_PASSWORD || undefined;
 const buildHeaders = (headers?: HeadersInit): HeadersInit => {
   const merged = new Headers(headers);
   if (!merged.has('Content-Type')) merged.set('Content-Type', 'application/json');
@@ -44,7 +46,7 @@ export const POST: APIRoute = async ({ request, params }) => {
 
   // 限流檢查
   const clientKey = getClientKey(request, slug);
-  const lockSeconds = await checkLock(clientKey);
+  const lockSeconds = await checkRateLimit(clientKey);
   if (lockSeconds > 0) return errorResponse('Too many attempts', 429, { lockSeconds });
 
   // 確保這篇文章存在且語系正確
@@ -57,15 +59,7 @@ export const POST: APIRoute = async ({ request, params }) => {
   if (!storedPassword) return errorResponse('Not found', 404);
 
   // 驗證密碼
-  if (!verifyPostPassword(password, storedPassword)) {
-    const attempt = await recordAttempt(clientKey);
-    if (attempt.locked)
-      return errorResponse('Too many attempts', 429, { lockSeconds: attempt.lockSeconds });
-    return errorResponse('Incorrect password', 401);
-  }
-
-  // 驗證成功後清除該 Client 的嘗試次數
-  await deleteRecord(clientKey);
+  if (password !== storedPassword) return errorResponse('Incorrect password', 401);
 
   const cookieName = getPostUnlockCookieName(slug);
   const headers = new Headers();

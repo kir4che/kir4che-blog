@@ -3,7 +3,6 @@ import type { Language } from '@/types';
 import { LANGUAGE_TO_LOCALE_MAP } from '@/config';
 import { getSeoConfig } from '@/lib/seo';
 import { getLocaleFromUrl } from '@/lib/i18n';
-import Toast from '@/components/ui/Toast.astro';
 import ThemeScript from '@/components/layouts/ThemeScript.astro';
 
 import ClientRouter from 'astro/components/ClientRouter.astro';
@@ -30,7 +29,6 @@ const currUrl = Astro.url;
 const currLang: Language = getLocaleFromUrl(currUrl);
 const seoConfig = getSeoConfig(siteOrigin, currLang, currUrl);
 
-const keywords = seoConfig.keywords.length > 0 ? seoConfig.keywords.join(', ') : null;
 const canonicalUrl = canonical
   ? canonical.startsWith('http')
     ? canonical
@@ -54,9 +52,13 @@ const locale = LANGUAGE_TO_LOCALE_MAP[currLang] || currLang;
       {title ? seoConfig.title.template.replace('%s', title) : seoConfig.title.default}
     </title>
     <meta name="description" content={description ?? seoConfig.description} />
-    {keywords && <meta name="keywords" content={keywords} />}
     <meta name="robots" content={shouldIndex} />
     <link rel="canonical" href={canonicalUrl} />
+    {
+      seoConfig.verification?.google && (
+        <meta name="google-site-verification" content={seoConfig.verification.google} />
+      )
+    }
     <!-- Open Graph -->
     <meta property="og:title" content={title ?? seoConfig.openGraph.title} />
     <meta property="og:description" content={description ?? seoConfig.openGraph.description} />
@@ -106,6 +108,7 @@ const locale = LANGUAGE_TO_LOCALE_MAP[currLang] || currLang;
                 : new URL(resolvedImage.url, siteOrigin).href
             }
           />
+          {resolvedImage.alt && <meta name="twitter:image:alt" content={resolvedImage.alt} />}
         </>
       )
     }
@@ -113,102 +116,28 @@ const locale = LANGUAGE_TO_LOCALE_MAP[currLang] || currLang;
     <slot name="head" />
   </head>
   <body class="preload">
-    <Toast />
     <slot />
     <script>
-      // 移除 preload class 以啟用 CSS transition，避免首次渲染閃爍。
-      const clearPreload = () => document.body.classList.remove('preload');
-      if (document.readyState === 'loading')
-        document.addEventListener('DOMContentLoaded', clearPreload, { once: true });
-      else clearPreload();
-      document.addEventListener('astro:page-load', clearPreload);
-    </script>
-    <script>
-      const root = '[data-lang-menu]';
-      const toggle = '[data-lang-menu-toggle]';
-      const list = '[data-lang-menu-list]';
-      const item = '[data-lang-menu-item]';
-      const hoverAttr = 'data-lang-menu-hover';
-
-      // 以 dataset 標記避免 astro:page-load 重複綁定事件到同一個 menu 元素
-      const initMenu = (menu: HTMLElement) => {
-        if (menu.dataset.langMenuBound === 'true') return;
-        menu.dataset.langMenuBound = 'true';
-
-        const btn = menu.querySelector<HTMLElement>(toggle);
-        const panel = menu.querySelector<HTMLElement>(list);
-        if (!btn || !panel) return;
-
-        const open = () => {
-          panel.classList.remove('hidden');
-          btn.setAttribute('aria-expanded', 'true');
-        };
-
-        const close = () => {
-          panel.classList.add('hidden');
-          btn.setAttribute('aria-expanded', 'false');
-        };
-
-        btn.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          panel.classList.contains('hidden') ? open() : close();
-        });
-
-        panel.addEventListener('click', (e) => e.stopPropagation());
-
-        if (menu.hasAttribute(hoverAttr)) {
-          let timer: number | undefined;
-          const scheduleClose = () => {
-            if (timer) window.clearTimeout(timer);
-            timer = window.setTimeout(close, 120);
-          };
-          const cancelClose = () => {
-            if (timer) window.clearTimeout(timer);
-          };
-
-          btn.addEventListener('mouseenter', open);
-          btn.addEventListener('mouseleave', scheduleClose);
-          panel.addEventListener('mouseenter', cancelClose);
-          panel.addEventListener('mouseleave', scheduleClose);
-        }
-
-        menu
-          .querySelectorAll<HTMLElement>(item)
-          .forEach((el) => el.addEventListener('click', close));
-      };
-
       const closeAll = () => {
-        document.querySelectorAll<HTMLElement>(list).forEach((el) => el.classList.add('hidden'));
-        document
-          .querySelectorAll<HTMLElement>(toggle)
-          .forEach((el) => el.setAttribute('aria-expanded', 'false'));
+        document.querySelectorAll<HTMLElement>('[data-lang-menu-toggle]').forEach((el) => {
+          el.setAttribute('aria-expanded', 'false');
+          el.blur();
+        });
       };
 
-      const initMenus = () => {
-        document.querySelectorAll<HTMLElement>(root).forEach(initMenu);
-      };
-
-      // window 單例：全域 click/Escape 監聽器只註冊一次，跨 Astro SPA 頁面共用。
-      const win = window as Window & { __langMenuInit?: boolean };
-      if (!win.__langMenuInit) {
-        win.__langMenuInit = true;
+      if (!document.body.dataset.langMenuInit) {
+        document.body.dataset.langMenuInit = 'true';
 
         document.addEventListener('click', (e) => {
           const target = e.target;
           if (!(target instanceof Element)) return;
-          if (!target.closest(root)) closeAll();
+          if (!target.closest('[data-lang-menu]')) closeAll();
         });
 
         document.addEventListener('keydown', (e) => {
           if (e.key === 'Escape') closeAll();
         });
-
-        if (document.readyState !== 'loading') initMenus();
-        else document.addEventListener('DOMContentLoaded', initMenus, { once: true });
-
-        document.addEventListener('astro:page-load', initMenus);
-      } else initMenus();
+      }
     </script>
   </body>
 </html>

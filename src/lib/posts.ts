@@ -46,19 +46,19 @@ const parseEntryLangAndSlug = (entry: PostEntry): ParsedEntry => {
   };
 };
 
-// request-level cache 避免同一請求內重複查詢
+// process-level cache：production 避免重複讀檔，dev 永遠重新 fetch（內容頻繁修改）。
 let publishedCache: Promise<PostEntry[]> | null = null;
 
 // 取得所有「已發布」文章
 const getPublishedBlogEntries = async (): Promise<PostEntry[]> => {
-  if (publishedCache) return publishedCache;
+  if (isProd && publishedCache) return publishedCache;
 
-  const cachePromise = getCollection(
-    'blog',
-    (entry: PostEntry) => !(isProd && entry.data.draft)
-  ).then((entries: PostEntry[] | null) => entries ?? []);
-  publishedCache = cachePromise;
-  return cachePromise;
+  const promise = getCollection('blog', (entry: PostEntry) => !(isProd && entry.data.draft)).then(
+    (entries: PostEntry[] | null) => entries ?? []
+  );
+
+  if (isProd) publishedCache = promise;
+  return promise;
 };
 
 // 產生文章的簡介
@@ -98,47 +98,47 @@ const normalizePostMeta = (entry: PostEntry, lang: Language, parsed?: ParsedEntr
   };
 };
 
+// 依語系 + slug 找對應的 entry（共用查詢）
+const findEntry = async (
+  lang: Language,
+  slug: string
+): Promise<{ entry: PostEntry; parsed: ParsedEntry } | null> => {
+  const entries = await getPublishedBlogEntries();
+  for (const entry of entries) {
+    const parsed = parseEntryLangAndSlug(entry);
+    if (parsed.lang === lang && parsed.slug === slug) return { entry, parsed };
+  }
+  return null;
+};
+
 // 透過語系、slug 來找單篇文章的 Metadata
 export const getPostMetaBySlug = async (
   lang: Language,
   targetSlug: string
 ): Promise<PostMeta | null> => {
-  const entries = await getPublishedBlogEntries();
-
-  for (const entry of entries) {
-    const parsed = parseEntryLangAndSlug(entry);
-    if (parsed.lang !== lang) continue;
-
-    if (parsed.slug === targetSlug) return normalizePostMeta(entry, lang, parsed);
-  }
-  return null;
+  const found = await findEntry(lang, targetSlug);
+  if (!found) return null;
+  return normalizePostMeta(found.entry, lang, found.parsed);
 };
 
 // 取得單篇文章的「完整內容」
 export const getPost = async (lang: Language, targetSlug: string): Promise<Post | null> => {
-  const entries = await getPublishedBlogEntries();
-
-  for (const entry of entries) {
-    const parsed = parseEntryLangAndSlug(entry);
-    if (parsed.lang !== lang) continue;
-
-    if (parsed.slug === targetSlug) {
-      const meta = normalizePostMeta(entry, lang, parsed);
-      const rendered = await render(entry);
-      return {
-        ...meta,
-        content: entry.body ?? '',
-        rendered,
-        headings: rendered.headings,
-      };
-    }
-  }
-  return null;
+  const found = await findEntry(lang, targetSlug);
+  if (!found) return null;
+  const { entry, parsed } = found;
+  const meta = normalizePostMeta(entry, lang, parsed);
+  const rendered = await render(entry);
+  return {
+    ...meta,
+    content: entry.body ?? '',
+    rendered,
+    headings: rendered.headings,
+  };
 };
 
 // 取得某個語系的所有文章的 Metadata 列表
 export const getPostsMeta = async (
-  lang: Language | 'all' = 'all',
+  lang: Language,
   options: { includeProtected?: boolean } = { includeProtected: true }
 ): Promise<PostMeta[]> => {
   const entries = await getPublishedBlogEntries();
@@ -146,11 +146,7 @@ export const getPostsMeta = async (
   let posts = entries
     .map((entry) => {
       const parsed = parseEntryLangAndSlug(entry);
-      if (!parsed.lang) return null;
-
-      if (lang !== 'all' && parsed.lang !== lang) return null;
-
-      // 注意這裡的第二個參數，我們傳入的是 parsed.lang (文章本身的語系)，而不是 lang (可能是 'all')
+      if (parsed.lang !== lang) return null;
       return normalizePostMeta(entry, parsed.lang, parsed);
     })
     .filter((post): post is PostMeta => post !== null);
@@ -175,25 +171,3 @@ export const getPostAvailableLangs = async (targetSlug: string): Promise<Languag
 
 // 產生文章解鎖用的 cookie 名稱
 export const getPostUnlockCookieName = (slug: string): string => `postUnlock-${slug}`;
-
-// Vite 的 glob 匯入，建置階段掃描所有文章目錄下的 components 檔案
-// 執行時期依 slug 動態載入對應文章的客製元件
-const BLOG_COMPONENT_MODULES = import.meta.glob<Record<string, unknown>>(
-  '/src/content/blog/**/components.{js,jsx,ts,tsx,astro}'
-);
-
-// 取得文章對應的擴充元件
-export const getPostExtraComponents = async (slug: string) => {
-  const normalizedSlug = typeof slug === 'string' ? slug.trim() : '';
-  if (!normalizedSlug) return undefined;
-
-  const matchKey = Object.keys(BLOG_COMPONENT_MODULES).find((filePath) =>
-    filePath.includes(`/blog/${normalizedSlug}/components.`)
-  );
-  if (!matchKey) return undefined;
-
-  const mod = await BLOG_COMPONENT_MODULES[matchKey]();
-  if (typeof mod !== 'object' || mod === null) return undefined;
-
-  return (mod.default ?? mod) as Record<string, unknown>;
-};

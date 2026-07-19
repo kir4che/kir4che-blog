@@ -27,7 +27,6 @@ export type MediaItem =
       height?: string | number;
       poster?: string;
       controls?: boolean;
-      autoPlay?: boolean;
       loop?: boolean;
       muted?: boolean;
       spoiler?: boolean;

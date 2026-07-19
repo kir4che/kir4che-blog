@@ -1,38 +1,42 @@
 ---
-export const prerender = true;
-
 import Announcement from '@/components/ui/Announcement.astro';
 import SiteLayout from '@/layouts/SiteLayout.astro';
+import { DEFAULT_POSTS_PER_PAGE, SUPPORTED_LANGUAGES } from '@/config';
 import { createTranslator, resolveLanguage } from '@/lib/i18n';
 import { paginate } from '@/lib/pagination';
-import { withLocalePrefix } from '@/lib/paths';
+import { createPageLink, withLocalePrefix } from '@/lib/paths';
 import { getPostsMeta } from '@/lib/posts';
-import { getHomeStaticPaths } from '@/lib/routing';
 import PostPreviewCard from '@/components/features/post/preview/PostPreviewCard.astro';
 import Pagination from '@/components/ui/Pagination.astro';
 
 export const getStaticPaths = async () => {
-  const paths = await getHomeStaticPaths();
-  // 只留第 2 頁以後（第 1 頁由 index.astro 處理）
-  return paths.filter((p) => p.params.page !== undefined);
+  const paths: { params: Record<string, string | undefined> }[] = [];
+  for (const lang of SUPPORTED_LANGUAGES) {
+    const posts = await getPostsMeta(lang, { includeProtected: false });
+    const totalPages = Math.ceil(posts.length / DEFAULT_POSTS_PER_PAGE) || 1;
+    for (let p = 2; p <= totalPages; p++) {
+      paths.push({ params: { lang, page: String(p) } });
+    }
+  }
+  return paths;
 };
 
 const lang = resolveLanguage(Astro.params.lang);
 const t = createTranslator(lang, 'HomePage');
 const page = parseInt(Astro.params.page as string, 10);
 
-const link = (href: string): string => {
-  if (href === '/') return withLocalePrefix('/', lang);
-  const pageNum = parseInt(href.replace(/^\//, ''), 10);
-  if (!isNaN(pageNum) && pageNum > 1) return withLocalePrefix(`/page/${pageNum}`, lang);
-  return withLocalePrefix(href, lang);
-};
+const link = createPageLink(lang);
 
 const visiblePosts = await getPostsMeta(lang, { includeProtected: false });
 const { items: currPosts, currPage, totalPages } = paginate(visiblePosts, page);
+
+const prevHref = withLocalePrefix(currPage - 1 === 1 ? '/' : `/page/${currPage - 1}`, lang);
+const nextHref = withLocalePrefix(`/page/${currPage + 1}`, lang);
 ---
 
 <SiteLayout title={t('title')} description={t('description')} noindex>
+  <link slot="head" rel="prev" href={prevHref} />
+  {currPage < totalPages && <link slot="head" rel="next" href={nextHref} />}
   <div class="flex min-h-full flex-1 flex-col gap-6">
     {t('announcement') && <Announcement text={t('announcement')} />}
     {

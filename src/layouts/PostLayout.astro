@@ -1,6 +1,6 @@
 ---
 import { Image as AstroImage } from 'astro:assets';
-import { createElement, type ComponentType } from 'react';
+import { createElement } from 'react';
 import type { MDXContent as MDXContentType } from 'astro';
 
 import type { Language, PostMeta } from '@/types';
@@ -55,39 +55,13 @@ interface Props {
   isProtected?: boolean;
   content?: MDXContentType;
   headings?: { depth: number; slug: string; text: string }[];
-  extraComponents?: Record<string, unknown>;
-}
-
-interface PokemonCardProps {
-  stage?: string;
 }
 
 const props = Astro.props;
 
 if (!props.post || !props.lang) throw new Error('PostLayout 至少需要提供 "post" 與 "lang" props。');
 
-const {
-  lang,
-  post,
-  otherLangs = [],
-  isProtected = false,
-  content,
-  headings = [],
-  extraComponents,
-} = props as Props;
-
-const PokemonCardComponent =
-  typeof extraComponents?.PokemonCard === 'function'
-    ? (extraComponents.PokemonCard as ComponentType<PokemonCardProps>)
-    : null;
-
-const CustomLink = (props: Parameters<typeof Link>[0] & { href?: string }) => {
-  if (PokemonCardComponent && props.href && props.href.startsWith('pokemon-card:')) {
-    const stage = props.href.replace('pokemon-card:', '');
-    return createElement(PokemonCardComponent, { stage });
-  }
-  return Link({ lang, ...props });
-};
+const { lang, post, otherLangs = [], isProtected = false, content, headings = [] } = props as Props;
 
 const MDX_COMPONENTS = {
   Accordion,
@@ -102,13 +76,12 @@ const MDX_COMPONENTS = {
   h4: H4,
   h5: H5,
   h6: H6,
-  a: CustomLink,
   Highlight,
   Image,
   Images,
   GalleryItem,
   Kbd,
-  Link: CustomLink,
+  Link,
   Rating,
   SmallText,
   Spoiler,
@@ -194,7 +167,18 @@ const articleSchema = {
         type: 'image/png',
       }
     : undefined}
+  pageTitle={!isProtected ? post.title : undefined}
 >
+  {
+    !isProtected && (
+      <fragment slot="head">
+        <meta property="article:published_time" content={new Date(post.date).toISOString()} />
+        {post.tags?.map((tag) => (
+          <meta property="article:tag" content={tag} />
+        ))}
+      </fragment>
+    )
+  }
   {
     isProtected && (
       <PostPasswordGate
@@ -202,16 +186,6 @@ const articleSchema = {
         slug={post.slug}
         lang={lang}
         backHref={withLocalePrefix('/archives', lang)}
-        texts={{
-          title: tPost('passwordGate.title'),
-          enterPassword: tPost('enterPassword'),
-          incorrectPassword: tPost('incorrectPassword'),
-          tooManyAttempts: tPost('tooManyAttempts'),
-          verifying: tCommon('button.verifying'),
-          submit: tCommon('button.submit'),
-          error: tPost('passwordGate.error'),
-          backToPosts: tPost('backToPosts'),
-        }}
       />
     )
   }
@@ -238,7 +212,7 @@ const articleSchema = {
         }
         <header class="mb-4">
           <h1 class="mb-4" transition:name={`post-title-${post.slug}`}>{post.title}</h1>
-          <div class="flex-between flex-wrap gap-x-4 gap-y-1">
+          <div class="flex-between flex-wrap gap-x-4 gap-y-1 select-none">
             <CategoryBadge lang={lang} categories={post.categories ?? []} />
             <div class="flex items-center gap-2">
               <PostMetaInfo lang={lang} date={post.date} wordCount={post.wordCount} />
@@ -282,11 +256,7 @@ const articleSchema = {
         {hasPlaces && <TripMap client:visible places={post.places ?? []} />}
         {
           content ? (
-            <MDXContent
-              id="post-body"
-              Content={content}
-              extraComponents={{ ...MDX_COMPONENTS, ...(extraComponents ?? {}) }}
-            />
+            <MDXContent id="post-body" Content={content} extraComponents={MDX_COMPONENTS} />
           ) : null
         }
         <div class="pt-8">
@@ -322,130 +292,96 @@ const articleSchema = {
         </div>
       </article>
       <RelatedPosts lang={lang} currSlug={post.slug} categories={post.categories ?? []} />
-      <div class="max-xl:hidden">
-        <Toc
-          client:media="(min-width: 1280px)"
-          headings={tocHeadings}
-          title={tPost('toc.title')}
-          expandLabel={tPost('toc.expand')}
-          collapseLabel={tPost('toc.collapse')}
-        />
-      </div>
+      <Toc
+        client:load
+        headings={tocHeadings}
+        title={tPost('toc.title')}
+        expandLabel={tPost('toc.expand')}
+        collapseLabel={tPost('toc.collapse')}
+      />
     </>
   </div>
   <Lightbox client:idle />
-  {
-    PokemonCardComponent && (
-      <div class="hidden" aria-hidden="true">
-        <PokemonCardComponent client:visible />
-      </div>
-    )
-  }
 </SiteLayout>
 
 <script type="application/ld+json" is:inline set:html={JSON.stringify(articleSchema)} />
 <script>
   import { LIGHTBOX_EVENT } from '@/components/mdx/LightboxEvents';
-  import { showToast } from '@/utils/toast';
-
-  // 複製網址到剪貼簿
-  const copyToClipboard = async (url: string, msgCopied: string, msgCopyFailed: string) => {
-    try {
-      await navigator.clipboard.writeText(url);
-      showToast(msgCopied, 'success');
-    } catch {
-      showToast(msgCopyFailed, 'error');
-    }
-  };
-
   let lightboxSlides: { src: string; alt?: string }[] = [];
 
-  // 掃描文章內所有 lightbox 圖片，去重後建立全域 slides 陣列。
   const rebuildLightboxSlides = () => {
-    if (!document.querySelector('[data-lightbox-slides]')) return;
-
     const postBody = document.getElementById('post-body');
     if (!postBody) return;
 
-    const allEls = Array.from(postBody.querySelectorAll<HTMLElement>('[data-lightbox-slides]'));
+    const allEls = Array.from(postBody.querySelectorAll<HTMLElement>('[data-lightbox-src]'));
     if (allEls.length === 0) return;
 
-    // 去重：多個 Images 元件可能引用同一張圖，以 src 為 key 只保留第一筆
-    const seen = new Set<string>();
     lightboxSlides = [];
-    const elToGlobalIndex = new Map<HTMLElement, number>();
-
-    for (const el of allEls) {
-      const localSlides: { src: string; alt?: string }[] = JSON.parse(
-        el.dataset.lightboxSlides ?? '[]'
-      );
-      const localIndex = Number(el.dataset.lightboxIndex ?? 0);
-      const slide = localSlides[localIndex];
-      if (!slide) continue;
-      if (!seen.has(slide.src)) {
-        seen.add(slide.src);
-        lightboxSlides.push(slide);
-      }
-      elToGlobalIndex.set(
-        el,
-        lightboxSlides.findIndex((s) => s.src === slide.src)
-      );
-    }
-
-    // 將去重後的全域 index 寫回 DOM，點擊時 dispatch 正確的 slide 位置。
-    for (const [el, idx] of elToGlobalIndex) el.dataset.lightboxGlobalIndex = String(idx);
+    allEls.forEach((el) => {
+      const src = el.dataset.lightboxSrc!;
+      const alt = el.dataset.lightboxAlt;
+      // 依序將 lightbox 圖片加入 lightboxSlides 陣列，並在元素上標記索引。
+      el.dataset.lightboxGlobalIndex = String(lightboxSlides.push({ src, alt }) - 1);
+    });
   };
 
-  // 單一 delegation 監聽器：捕獲 lightbox 圖片點擊 → 自訂事件
-  // 同時處理分享按鈕：Web Share API（行動裝置優先）→ 降級為複製連結
-  const handleDocumentClick = (e: MouseEvent) => {
-    const lbEl = (e.target as Element).closest('[data-lightbox-slides]') as HTMLElement | null;
-    if (lbEl) {
-      const index = Number(lbEl.dataset.lightboxGlobalIndex ?? 0);
-      window.dispatchEvent(
-        new CustomEvent(LIGHTBOX_EVENT, { detail: { slides: lightboxSlides, index } })
-      );
+  const handleLightboxClick = (e: MouseEvent) => {
+    const lbEl = (e.target as Element).closest('[data-lightbox-src]') as HTMLElement | null;
+    if (!lbEl) return;
+
+    const index = Number(lbEl.dataset.lightboxGlobalIndex ?? 0);
+    // 傳入 lightboxSlides 與 index 並觸發 lightbox 事件
+    window.dispatchEvent(
+      new CustomEvent(LIGHTBOX_EVENT, { detail: { slides: lightboxSlides, index } })
+    );
+  };
+
+  document.addEventListener('click', handleLightboxClick);
+
+  // 分享按鈕：Web Share API（行動裝置優先）→ 降級為複製連結 + 按鈕文字回饋
+  const handleShareClick = async (e: MouseEvent) => {
+    const shareBtn = (e.target as Element).closest<HTMLButtonElement>('[data-share-action]');
+    if (!shareBtn) return;
+
+    const url = window.location.href;
+    const labelSpan = shareBtn.querySelector<HTMLSpanElement>('span');
+    const originalText = labelSpan?.textContent ?? '';
+    const msgCopied = shareBtn.dataset.msgCopied ?? '';
+    const msgCopyFailed = shareBtn.dataset.msgCopyFailed ?? '';
+
+    if (navigator.share) {
+      await navigator.share({ url }).catch(() => {});
       return;
     }
 
-    const shareBtn = (e.target as Element).closest<HTMLButtonElement>('[data-share-action]');
-    if (shareBtn) {
-      const url = window.location.href;
-      const container = shareBtn.closest<HTMLElement>('[data-msg-copied]');
-      const msgCopied = container?.dataset.msgCopied ?? '';
-      const msgCopyFailed = container?.dataset.msgCopyFailed ?? '';
-
-      if (navigator.share) navigator.share({ url }).catch(() => {});
-      else void copyToClipboard(url, msgCopied, msgCopyFailed);
+    try {
+      await navigator.clipboard.writeText(url);
+      if (labelSpan && msgCopied) labelSpan.textContent = msgCopied;
+    } catch {
+      if (labelSpan && msgCopyFailed) labelSpan.textContent = msgCopyFailed;
     }
+
+    if (labelSpan)
+      setTimeout(() => {
+        labelSpan.textContent = originalText;
+      }, 2000);
   };
 
-  document.addEventListener('click', handleDocumentClick);
+  document.addEventListener('click', handleShareClick);
 
-  let onVisibilityChange: (() => void) | null = null;
-
-  // Astro SPA 換頁時重新初始化，先清除舊 visibility listener 避免重複綁定。
   const init = () => {
     rebuildLightboxSlides();
-
-    if (onVisibilityChange) {
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-      onVisibilityChange = null;
-    }
-
-    // 自動播放影片 visibility 控制
-    const autoPlayVideos = document.querySelectorAll<HTMLVideoElement>(
-      'video[data-auto-play="true"]'
-    );
-    if (autoPlayVideos.length) {
-      onVisibilityChange = () => {
-        autoPlayVideos.forEach((v) => (document.hidden ? v.pause() : v.play().catch(() => {})));
-      };
-      document.addEventListener('visibilitychange', onVisibilityChange);
-    }
   };
 
   init();
 
   document.addEventListener('astro:page-load', init);
+
+  // 監聽文章解鎖事件（PostPasswordGate），移除受保護內容的 hidden class。
+  if (!document.body.dataset.postUnlockInit) {
+    document.body.dataset.postUnlockInit = 'true';
+    window.addEventListener('post:unlocked', () => {
+      document.querySelector<HTMLElement>('[data-protected-content]')?.classList.remove('hidden');
+    });
+  }
 </script>

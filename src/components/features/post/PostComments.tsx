@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 type UtterancesTheme = 'github-dark' | 'github-light';
@@ -10,11 +12,12 @@ interface PostCommentsProps {
 const PostComments = ({ slug, hasPassword = false }: PostCommentsProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLocked, setIsLocked] = useState(hasPassword);
-  const [currentTheme, setCurrentTheme] = useState<UtterancesTheme>(() =>
-    typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
-      ? 'github-dark'
-      : 'github-light'
-  );
+  const [currentTheme, setCurrentTheme] = useState<UtterancesTheme>('github-light');
+
+  // mount 時檢查 cookie（cover PostPasswordGate 已經觸發 unlock 的情況）
+  useEffect(() => {
+    if (hasPassword && document.cookie.includes(`postUnlock-${slug}=`)) setIsLocked(false);
+  }, [hasPassword, slug]);
 
   // 監聽文章解鎖事件（PostPasswordGate），解鎖後才載入留言系統。
   useEffect(() => {

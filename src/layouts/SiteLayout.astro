@@ -15,7 +15,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import GlobalLangMenu from '@/components/ui/GlobalLangMenu.astro';
 import ThemeToggle from '@/components/ui/ThemeToggle.astro';
 
-const { title, description, canonical, image, noindex } = Astro.props;
+const { title, description, canonical, image, noindex, pageTitle } = Astro.props;
 
 const lang = getLocaleFromUrl(Astro.url);
 const tSearch = createTranslator(lang, 'common.search');
@@ -31,7 +31,7 @@ const simplifiedTags = tags.map(({ name, slug }) => ({ name, slug }));
 
 <BaseLayout {title} {description} {canonical} {image} {noindex}>
   <slot name="head" slot="head" />
-  <StructuredData />
+  <StructuredData {pageTitle} />
   <div
     id="layout-container"
     data-sidebar-open="false"
@@ -83,10 +83,10 @@ const simplifiedTags = tags.map(({ name, slug }) => ({ name, slug }));
           </div>
           <div id="mobile-search-portal" class="w-full"></div>
         </header>
-        <main class="relative z-0 flex-1">
+        <main class="relative flex-1">
           <slot />
         </main>
-        <footer class="flex-between py-6">
+        <footer class="flex-between py-6 select-none">
           <GlobalLangMenu id="global-lang-menu-footer" class="md:hidden" direction="top" />
           <p class="text-xs text-gray-400">
             © 2024 - {new Date().getFullYear()}{' '}
@@ -119,7 +119,7 @@ const simplifiedTags = tags.map(({ name, slug }) => ({ name, slug }));
     toggleBtn.setAttribute('aria-controls', 'right-sidebar');
 
     const lockBodyScroll = (isOpen: boolean) => {
-      document.body.style.overflow = isOpen && window.innerWidth < 1280 ? 'hidden' : '';
+      document.body.classList.toggle('overflow-hidden', isOpen && window.innerWidth < 1280);
     };
 
     const setSidebarState = (isOpen: boolean) => {

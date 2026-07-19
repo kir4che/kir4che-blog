@@ -29,14 +29,14 @@ const formattedWords = formatWordCount(wordCount);
 
 <div
   class={cn(
-    'flex flex-wrap items-center gap-2 text-xs/5 text-gray-700 dark:text-foreground-primary/90',
+    'flex flex-wrap items-center gap-2 text-xs/5 select-none text-gray-700 dark:text-foreground-primary/90',
     className
   )}
 >
   {
     formattedDate && (
       <time datetime={formattedDate.datetime} class="flex items-center gap-x-1">
-        <CalendarDays size={12} aria-hidden="true" />
+        <CalendarDays size={12} aria-hidden="true" class="pointer-events-none select-none" />
         {formattedDate.display}
       </time>
     )
@@ -44,7 +44,7 @@ const formattedWords = formatWordCount(wordCount);
   {
     formattedWords && (
       <span class="flex items-center gap-x-1">
-        <Pencil size={12} aria-hidden="true" />
+        <Pencil size={12} aria-hidden="true" class="pointer-events-none select-none" />
         {formattedWords} {t('unit.words')}
       </span>
     )

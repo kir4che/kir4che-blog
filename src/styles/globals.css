@@ -7,7 +7,7 @@
   themes: false;
   include:
     svg, properties, rootscrolllock, rootscrollgutter, rootcolor, alert, avatar, badge, button,
-    card, collapse, dropdown, input, loading, menu, toast;
+    card, collapse, dropdown, input, loading, menu;
   exclude: scrollbar;
 }
 

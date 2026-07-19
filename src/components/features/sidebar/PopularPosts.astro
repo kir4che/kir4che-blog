@@ -34,7 +34,7 @@ if (!t || posts.length === 0) return null;
             lang={lang}
             className="flex items-start gap-2 text-sm/5.5 text-foreground-primary hover:text-pink-700 dark:hover:text-pink-400"
           >
-            <span class="mt-0.5 shrink-0 text-xs font-bold text-pink-500 dark:text-pink-300">
+            <span class="mt-0.5 shrink-0 text-xs font-bold text-pink-500 select-none dark:text-pink-300">
               {index + 1}.
             </span>
             <span class="line-clamp-2">{title ?? t('popularPosts.untitledPost')}</span>

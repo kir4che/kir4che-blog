@@ -1,11 +1,9 @@
-import type { Language } from '@/types';
 import type { CSSProperties } from 'react';
 
 export type OgImageProps = {
   siteName: string;
   title: string;
   tags: string[];
-  lang: Language;
 };
 
 const MAX_TITLE_LENGTH = 80;
@@ -80,7 +78,7 @@ const tagStyle: CSSProperties = {
   fontWeight: '600',
 };
 
-export const OgImage = ({ siteName, title, tags, lang }: OgImageProps) => {
+export const OgImage = ({ siteName, title, tags }: OgImageProps) => {
   const decoded = title
     .replace(/&#39;/g, "'")
     .replace(/&amp;/g, '&')
@@ -90,13 +88,8 @@ export const OgImage = ({ siteName, title, tags, lang }: OgImageProps) => {
   const safeTitle =
     decoded.length > MAX_TITLE_LENGTH ? `${decoded.slice(0, MAX_TITLE_LENGTH - 1)}…` : decoded;
 
-  const fontFamily =
-    lang === 'tw'
-      ? '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
-      : '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-
   return (
-    <div style={{ ...containerStyle, fontFamily }}>
+    <div style={{ ...containerStyle, fontFamily: 'sans-serif' }}>
       <div style={headerStyle}>
         <div style={accentBarStyle} />
         <div style={siteNameStyle}>{siteName}</div>

@@ -1,17 +1,17 @@
 ---
-export const prerender = true;
-
 import PostLayout from '@/layouts/PostLayout.astro';
 import { resolveLanguage } from '@/lib/i18n';
-import {
-  getPost,
-  getPostAvailableLangs,
-  getPostExtraComponents,
-  getPostMetaBySlug,
-} from '@/lib/posts';
-import { getSlugStaticPaths } from '@/lib/routing';
+import { getPost, getPostAvailableLangs, getPostMetaBySlug, getPostsMeta } from '@/lib/posts';
+import { SUPPORTED_LANGUAGES } from '@/config';
 
-export const getStaticPaths = getSlugStaticPaths;
+export const getStaticPaths = async () => {
+  const paths: { params: Record<string, string> }[] = [];
+  for (const lang of SUPPORTED_LANGUAGES) {
+    const posts = await getPostsMeta(lang);
+    for (const post of posts) paths.push({ params: { lang, slug: post.slug } });
+  }
+  return paths;
+};
 
 const { lang: rawLang, slug } = Astro.params as { lang: string; slug: string };
 const lang = resolveLanguage(rawLang);
@@ -27,7 +27,6 @@ const availableLangs = await getPostAvailableLangs(slug);
 const otherLangs = availableLangs.filter((l) => l !== lang);
 const displayPost = post ?? postMeta;
 const postContent = post?.rendered?.Content ?? null;
-const extraComponents = await getPostExtraComponents(displayPost.slug);
 ---
 
 <PostLayout
@@ -37,5 +36,4 @@ const extraComponents = await getPostExtraComponents(displayPost.slug);
   isProtected={isProtected}
   content={postContent}
   headings={post?.headings ?? []}
-  extraComponents={extraComponents}
 />

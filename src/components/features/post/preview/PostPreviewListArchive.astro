@@ -12,7 +12,7 @@ interface Props {
 
 const { post, lang } = Astro.props;
 
-const href = getLocalizedPostPath({ lang, slug: post.slug });
+const href = getLocalizedPostPath(lang, post.slug);
 ---
 
 <div class="group flex items-center gap-3 border-b border-gray-200 py-2.5 dark:border-gray-800">
