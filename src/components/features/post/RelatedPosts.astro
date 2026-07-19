@@ -53,8 +53,11 @@ const relatedPosts: PostMeta[] = posts
           if (!date) return null;
 
           return (
-            <div class="bg-surface-secondary dark:bg-surface-secondary/50 w-55 shrink-0 snap-start rounded-md p-4 sm:w-62.5 md:w-70">
-              <div class="mb-3 aspect-video">
+            <a
+              href={getLocalizedPostPath(lang, post.slug)}
+              class="group md:bg-surface-secondary md:dark:bg-surface-secondary/50 block w-full border-b border-gray-100 transition-all duration-300 last:border-b-0 md:rounded-md md:border-0 md:p-4 md:py-3 md:hover:-translate-y-1 md:hover:shadow-sm dark:border-gray-800/60"
+            >
+              <div class="hidden md:mb-3 md:block md:aspect-video md:w-full md:overflow-hidden md:rounded-md">
                 <img
                   src={post.coverImage ?? `/og/${lang}/${post.slug}.png`}
                   alt={post.title}
@@ -82,7 +85,7 @@ const relatedPosts: PostMeta[] = posts
                   </time>
                 </div>
               )}
-            </div>
+            </a>
           );
         })}
       </div>

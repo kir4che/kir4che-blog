@@ -41,8 +41,7 @@ const availablePostLangs = currentPostMeta ? await getPostAvailableLangs(current
 
 const buildPostHref = (l: Language) => {
   if (currentPostMeta) {
-    if (availablePostLangs.includes(l))
-      return getLocalizedPostPath({ lang: l, slug: currentPostMeta.slug });
+    if (availablePostLangs.includes(l)) return getLocalizedPostPath(l, currentPostMeta.slug);
 
     return withLocalePrefix('/', l);
   }
@@ -52,7 +51,7 @@ const buildPostHref = (l: Language) => {
 };
 ---
 
-<div id={id} class={cn('dropdown relative', directionClass, className)} data-lang-menu>
+<div id={id} class={cn('dropdown relative group', directionClass, className)} data-lang-menu>
   <button
     type="button"
     class="flex items-center gap-x-1.5 text-sm hover:bg-inherit"
@@ -61,12 +60,12 @@ const buildPostHref = (l: Language) => {
   >
     <Languages size={16} aria-hidden="true" />
     <span>{t(`language.${lang}`)}</span>
-    <ChevronDown size={16} aria-hidden="true" />
+    <ChevronDown size={16} aria-hidden="true" class="pointer-events-none select-none" />
   </button>
   <ul
     role="menu"
     class={cn(
-      'dropdown-content menu bg-surface-secondary z-50 hidden w-24 rounded shadow-md md:w-32',
+      'dropdown-content menu bg-surface-secondary z-50 w-24 rounded shadow-md md:w-32 hidden group-focus-within:block',
       marginClass
     )}
     data-lang-menu-list

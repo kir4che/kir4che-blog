@@ -1,6 +1,4 @@
 ---
-export const prerender = true;
-
 import SiteLayout from '@/layouts/SiteLayout.astro';
 import { createTranslator, getLangStaticPaths, resolveLanguage } from '@/lib/i18n';
 import { withLocalePrefix } from '@/lib/paths';
@@ -35,7 +33,7 @@ const localizedTags = tags.map((tag) => ({
             aria-label={`${name} (${postCount} posts)`}
           >
             <span class="text-sm text-nowrap"># {name}</span>
-            <span class="flex-center text-foreground-secondary size-4 rounded-full bg-pink-500 text-[11px] font-bold dark:bg-pink-200">
+            <span class="flex-center text-foreground-secondary size-4 rounded-full bg-pink-500 text-[11px] font-bold select-none dark:bg-pink-200">
               {postCount}
             </span>
           </a>

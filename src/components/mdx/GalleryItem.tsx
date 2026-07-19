@@ -13,8 +13,8 @@ interface GalleryItemProps {
   resolvedHeight?: string;
   resolvedMinHeight?: string;
   resolvedMaxHeight?: string;
-  lightboxSlides?: string;
-  lightboxIndex?: number;
+  lightboxSrc?: string;
+  lightboxAlt?: string;
   spoiler?: boolean;
   spoilerText?: string;
   spoilerBtnText?: string;
@@ -27,8 +27,8 @@ export const GalleryItem = ({
   resolvedHeight,
   resolvedMinHeight,
   resolvedMaxHeight,
-  lightboxSlides,
-  lightboxIndex,
+  lightboxSrc,
+  lightboxAlt,
   spoiler = false,
   spoilerText = '內含劇透',
   spoilerBtnText = '點擊查看',
@@ -74,7 +74,6 @@ export const GalleryItem = ({
           title={item.title}
           poster={item.poster}
           controls={item.controls}
-          autoPlay={item.autoPlay}
           loop={item.loop}
           muted={item.muted}
           width="100%"
@@ -98,8 +97,8 @@ export const GalleryItem = ({
           imgWrapClass="min-h-(--gallery-min-height) max-h-(--gallery-max-height)"
           data-images-media
           className={cn('size-full overflow-hidden', item.className)}
-          lightboxSlides={lightboxSlides}
-          lightboxIndex={lightboxIndex}
+          lightboxSrc={lightboxSrc}
+          lightboxAlt={lightboxAlt}
           spoiler={spoiler}
           spoilerText={spoilerText}
           spoilerBtnText={spoilerBtnText}

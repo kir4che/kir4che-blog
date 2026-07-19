@@ -126,18 +126,6 @@ export const Images = ({
 
   const { container, column, stack } = ALIGNMENT_CLASSES[align];
 
-  const imageSlides = images
-    .filter((item) => item.type !== 'video')
-    .map((item) => ({ src: item.src, alt: 'alt' in item ? item.alt : undefined }));
-  const slidesJson = JSON.stringify(imageSlides);
-
-  let imageSlideIndex = -1;
-  const slideIndexMap = images.map((item) => {
-    if (item.type === 'video') return -1;
-    imageSlideIndex += 1;
-    return imageSlideIndex;
-  });
-
   const containerStyle: CSSProperties = {
     ['--gallery-max-width' as string]: width,
     width: '100%',
@@ -168,8 +156,8 @@ export const Images = ({
             resolvedHeight={resolvedHeight}
             resolvedMinHeight={styleVal(minHeight) || '200px'}
             resolvedMaxHeight={styleVal(maxHeight) ?? resolvedHeight ?? undefined}
-            lightboxSlides={item.type !== 'video' && slideIndexMap[i] >= 0 ? slidesJson : undefined}
-            lightboxIndex={slideIndexMap[i] >= 0 ? slideIndexMap[i] : 0}
+            lightboxSrc={item.type !== 'video' ? item.src : undefined}
+            lightboxAlt={'alt' in item ? item.alt : undefined}
             spoiler={item.spoiler ?? spoiler}
             spoilerText={item.spoilerText ?? spoilerText}
             spoilerBtnText={item.spoilerBtnText ?? spoilerBtnText}

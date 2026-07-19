@@ -15,11 +15,8 @@ interface SidebarData {
   }>;
 }
 
-const cache = new Map<Language, Promise<SidebarData>>();
-const isProd = import.meta.env.PROD;
-
 // 建立側邊欄資料
-const buildSidebarData = async (lang: Language): Promise<SidebarData> => {
+export const getSidebarData = async (lang: Language = DEFAULT_LANGUAGE): Promise<SidebarData> => {
   const posts: PostMeta[] = (await getPostsMeta(lang)) ?? [];
 
   const rawCategories = getAllCategoryByPosts(posts);
@@ -48,16 +45,4 @@ const buildSidebarData = async (lang: Language): Promise<SidebarData> => {
     tags,
     popularPosts,
   };
-};
-
-// 取得側邊欄資料
-export const getSidebarData = async (lang: Language = DEFAULT_LANGUAGE): Promise<SidebarData> => {
-  if (isProd) {
-    const cached = cache.get(lang);
-    if (cached) return cached;
-  }
-
-  const promise = buildSidebarData(lang);
-  if (isProd) cache.set(lang, promise);
-  return promise;
 };

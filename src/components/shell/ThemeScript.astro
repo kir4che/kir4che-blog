@@ -16,7 +16,9 @@
       root.style.color = theme === 'dark' ? '#e5e5e5' : '#262626';
     };
     applyTheme();
+    // 新 DOM 已替換但瀏覽器尚未繪製前，先套用主題，避免閃爍。
     document.addEventListener('astro:after-swap', applyTheme);
+    // 監聽 theme-changed 事件，當主題變更時重新套用主題。
     window.addEventListener('theme-changed', applyTheme);
   })();
 </script>

@@ -1,6 +1,4 @@
 ---
-export const prerender = true;
-
 import { Link } from '@lucide/astro';
 
 import { CONFIG } from '@/config';
@@ -28,7 +26,7 @@ const videos = Object.values(youtubes);
   <div class="bg-surface-secondary relative rounded-xl pb-10 shadow lg:pb-24">
     <DecorativeImage
       src={aboutImg.src}
-      class="absolute -right-8 -bottom-8 w-[50vw] md:-right-4 md:w-80"
+      class="absolute -right-8 -bottom-8 z-10 w-[50vw] md:-right-4 md:w-80"
     />
     <div class="relative px-4 py-6 md:px-6">
       <div
@@ -45,7 +43,7 @@ const videos = Object.values(youtubes);
           ></span>
           <span class="relative flex size-1.5">
             <span
-              class="absolute inline-flex size-full animate-ping rounded-full bg-pink-400 opacity-75"
+              class="pointer-events-none absolute inline-flex size-full animate-ping rounded-full bg-pink-400 opacity-75"
             ></span>
             <span class="relative inline-flex size-1.5 rounded-full bg-pink-500"></span>
           </span>

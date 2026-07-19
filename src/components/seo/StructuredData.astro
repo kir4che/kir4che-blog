@@ -2,8 +2,13 @@
 import { CONFIG, DEFAULT_LANGUAGE } from '@/config';
 import { getLocaleFromUrl, resolveLanguage } from '@/lib/i18n';
 
+interface Props {
+  pageTitle?: string;
+}
+
 type JsonLd = Record<string, unknown>;
 
+const { pageTitle } = Astro.props;
 const lang = getLocaleFromUrl(Astro.url);
 const locale = resolveLanguage(lang);
 
@@ -64,7 +69,7 @@ const entries: JsonLd[] = [
     '@type': 'WebPage',
     '@id': `${pageUrl}#webpage`,
     url: pageUrl,
-    name: blogTitle ?? CONFIG.siteInfo.name,
+    name: pageTitle ?? blogTitle ?? CONFIG.siteInfo.name,
     description: blogDescription,
     inLanguage: locale,
     isPartOf: {

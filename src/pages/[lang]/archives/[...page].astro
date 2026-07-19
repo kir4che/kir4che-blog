@@ -1,6 +1,4 @@
 ---
-export const prerender = true;
-
 import PostPreviewListArchive from '@/components/features/post/preview/PostPreviewListArchive.astro';
 import Pagination from '@/components/ui/Pagination.astro';
 import PostListLayout from '@/layouts/PostListLayout.astro';
@@ -8,20 +6,35 @@ import { createTranslator, resolveLanguage } from '@/lib/i18n';
 import { paginate } from '@/lib/pagination';
 import { withLocalePrefix } from '@/lib/paths';
 import { getPostsMeta } from '@/lib/posts';
-import { getArchiveStaticPaths } from '@/lib/routing';
+import { SUPPORTED_LANGUAGES } from '@/config';
 import type { PostMeta } from '@/types';
 
-export const getStaticPaths = getArchiveStaticPaths;
+interface Props {
+  items: PostMeta[];
+  currPage: number;
+  totalPages: number;
+}
 
+export const getStaticPaths = async () => {
+  const paths: { params: Record<string, string | undefined>; props: Props }[] = [];
+  for (const lang of SUPPORTED_LANGUAGES) {
+    const posts = await getPostsMeta(lang);
+    const totalPages = Math.ceil(posts.length / 25) || 1;
+    for (let p = 1; p <= totalPages; p++) {
+      const { items, currPage } = paginate(posts, p, 25);
+      paths.push({
+        params: { lang, page: p === 1 ? undefined : String(p) },
+        props: { items, currPage, totalPages },
+      });
+    }
+  }
+  return paths;
+};
+
+const { items: paginatedPosts, currPage, totalPages } = Astro.props as Props;
 const lang = resolveLanguage(Astro.params.lang);
 const t = createTranslator(lang, 'ArchivePage');
-
 const link = (href: string) => withLocalePrefix(href, lang);
-
-const page = Astro.params.page ? parseInt(Astro.params.page, 10) : 1;
-
-const allPosts = await getPostsMeta(lang);
-const { items: paginatedPosts, currPage, totalPages } = paginate(allPosts, page, 25);
 
 const postsByYear = paginatedPosts.reduce<Record<string, PostMeta[]>>((acc, post) => {
   const year = new Date(post.date).getFullYear();
@@ -34,9 +47,17 @@ const postsByYear = paginatedPosts.reduce<Record<string, PostMeta[]>>((acc, post
 }, {});
 
 const sortedEntries = Object.entries(postsByYear).sort(([a], [b]) => Number(b) - Number(a));
+
+const prevArchivesHref =
+  currPage === 2
+    ? withLocalePrefix('/archives', lang)
+    : withLocalePrefix(`/archives/${currPage - 1}`, lang);
+const nextArchivesHref = withLocalePrefix(`/archives/${currPage + 1}`, lang);
 ---
 
-<PostListLayout title={t('title')} description={t('description')}>
+<PostListLayout title={t('title')} description={t('description')} noindex={currPage > 1}>
+  {currPage > 1 && <link slot="head" rel="prev" href={prevArchivesHref} />}
+  {currPage < totalPages && <link slot="head" rel="next" href={nextArchivesHref} />}
   <div class="flex flex-col gap-6">
     {
       sortedEntries.map(([year, yearPosts]) => (

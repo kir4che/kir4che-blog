@@ -141,7 +141,8 @@
     "passwordGate": {
       "title": "此文章受密碼保護",
       "description": "請輸入密碼以查看內容。",
-      "error": "發生錯誤，請稍後再試。"
+      "error": "發生錯誤，請稍後再試。",
+      "networkError": "網路異常，請稍後再試。"
     },
     "toc": {
       "title": "文章目錄",
@@ -150,7 +151,9 @@
     },
     "share": {
       "native": "分享至...",
-      "label": "分享"
+      "label": "分享",
+      "copied": "已複製",
+      "copyFailed": "複製失敗"
     }
   },
   "CategoriesPage": {

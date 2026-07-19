@@ -3,13 +3,8 @@ import type { Category, CategoryColorScheme, CategoryInfo, PostMeta } from '@/ty
 
 type PostCountMap = Record<string, number>;
 
-// category name / slug → slug
-let categoryNameToSlugMap: ReadonlyMap<string, string> | null = null;
-
 // 建立「分類名稱 / slug → slug」
-const createCategoryNameToSlugMap = (): ReadonlyMap<string, string> => {
-  if (categoryNameToSlugMap) return categoryNameToSlugMap;
-
+const categoryNameToSlugMap: ReadonlyMap<string, string> = (() => {
   const entries: [string, string][] = [];
 
   for (const [slug, category] of Object.entries(categoryMap)) {
@@ -35,9 +30,8 @@ const createCategoryNameToSlugMap = (): ReadonlyMap<string, string> => {
     }
   }
 
-  categoryNameToSlugMap = new Map(entries);
-  return categoryNameToSlugMap;
-};
+  return new Map(entries);
+})();
 
 // 子分類 slug → 父分類 slug
 const subcategoryParentMap: ReadonlyMap<string, string> = (() => {
@@ -55,10 +49,7 @@ const subcategoryParentMap: ReadonlyMap<string, string> = (() => {
 })();
 
 // 計算每個分類（含父分類）的文章數量
-const calculatePostCounts = (
-  posts: PostMeta[],
-  nameToSlugMap: ReadonlyMap<string, string>
-): PostCountMap => {
+const calculatePostCounts = (posts: PostMeta[]): PostCountMap => {
   const counts: PostCountMap = {};
 
   for (const post of posts) {
@@ -69,7 +60,7 @@ const calculatePostCounts = (
       const name = raw?.trim().toLowerCase();
       if (!name) continue;
 
-      const slug = nameToSlugMap.get(name);
+      const slug = categoryNameToSlugMap.get(name);
       if (!slug) continue;
 
       slugsForPost.add(slug);
@@ -112,8 +103,7 @@ const processSubcategories = (
 
 // 依文章資料取得所有分類（含子分類），並計算文章數。
 export const getAllCategoryByPosts = (posts: PostMeta[], limit?: number): Category[] => {
-  const nameToSlugMap = createCategoryNameToSlugMap();
-  const postCounts = calculatePostCounts(posts, nameToSlugMap);
+  const postCounts = calculatePostCounts(posts);
 
   const categories = Object.entries(categoryMap)
     .reduce<Category[]>((acc, [slug, cat]) => {
@@ -162,15 +152,14 @@ const getCategoryInfoBySlug = (slug: string): CategoryInfo | null => {
   return null;
 };
 
-// 依 slug 取得分類（主分類或子分類），並包含文章數。
+// 依 slug 從已算好的分類陣列中取得分類（主分類或子分類）
 export const getCategoryBySlug = (
   slug: string,
-  posts: PostMeta[],
+  categories: Category[],
   scope: 'all' | 'main' | 'sub' = 'all'
 ): Category | CategoryInfo | null => {
   if (!slug) return null;
 
-  const categories = getAllCategoryByPosts(posts);
   const main = categories.find((category) => category.slug === slug);
   if (scope !== 'sub' && main) return main;
   if (scope === 'main') return null;
@@ -192,7 +181,6 @@ export const isPostInCategory = (
   if (!Array.isArray(post.categories) || !slug) return false;
 
   const targetSlug = slug.trim().toLowerCase();
-  const nameToSlugMap = createCategoryNameToSlugMap();
   const nameCandidates = new Set(
     Object.values(name ?? {})
       .map((value) => value?.trim().toLowerCase())
@@ -206,7 +194,7 @@ export const isPostInCategory = (
     if (normalized === targetSlug) return true;
     if (nameCandidates.has(normalized)) return true;
 
-    const mapped = nameToSlugMap.get(normalized);
+    const mapped = categoryNameToSlugMap.get(normalized);
     if (mapped && mapped.toLowerCase() === targetSlug) return true;
   }
 
@@ -219,13 +207,11 @@ export const normalizeCategories = (rawCategories: string[] = []): CategoryInfo[
 
   const result: CategoryInfo[] = [];
   const seen = new Set<string>(); // 避免重複加入分類
-  const nameToSlugMap = createCategoryNameToSlugMap();
-
   for (const raw of rawCategories) {
     const name = raw?.trim();
     if (!name) continue;
 
-    const slug = nameToSlugMap.get(name.toLowerCase());
+    const slug = categoryNameToSlugMap.get(name.toLowerCase());
     if (!slug) continue;
 
     const info = getCategoryInfoBySlug(slug);

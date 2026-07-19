@@ -1,5 +1,5 @@
 import { ChevronRight } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { cn } from '@/utils/cn';
 
@@ -21,26 +21,43 @@ const HEADER_OFFSET = 96;
 const Toc = ({ headings, title, expandLabel, collapseLabel }: TocProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const isOpenRef = useRef(isOpen);
+  isOpenRef.current = isOpen;
 
-  const headingIds = useMemo(() => headings.map((h) => h.id), [headings]);
+  // 找出當前 scroll 位置對應的 heading
+  const getActiveId = (ids: string[]) => {
+    const scrollY = window.scrollY + HEADER_OFFSET + 1;
+    let currentId = ids[0];
+    for (const id of ids) {
+      const el = document.getElementById(id);
+      if (el && el.offsetTop <= scrollY) currentId = id;
+    }
+    return currentId;
+  };
 
   // 監聽 scroll 位置，自動高亮當前所在的目錄標題。
   useEffect(() => {
-    if (headingIds.length === 0) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setActiveId(entry.target.id);
-        });
-      },
-      { rootMargin: `-${HEADER_OFFSET}px 0% -80% 0%` }
-    );
-    headingIds.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-    return () => observer.disconnect();
-  }, [headingIds]);
+    const ids = headings.map((h) => h.id);
+    if (ids.length === 0) return;
+
+    const updateActive = () => {
+      if (!isOpenRef.current) return;
+      setActiveId(getActiveId(ids));
+    };
+
+    window.addEventListener('scroll', updateActive, { passive: true });
+    updateActive();
+
+    return () => window.removeEventListener('scroll', updateActive);
+  }, [headings]);
+
+  // 打開 TOC 時重新計算當前 heading
+  useEffect(() => {
+    if (!isOpen) return;
+    const ids = headings.map((h) => h.id);
+    if (ids.length === 0) return;
+    setActiveId(getActiveId(ids));
+  }, [isOpen, headings]);
 
   // 點擊外部時關閉目錄列表
   useEffect(() => {
@@ -53,35 +70,12 @@ const Toc = ({ headings, title, expandLabel, collapseLabel }: TocProps) => {
     return () => document.removeEventListener('click', handleClick);
   }, [isOpen]);
 
-  // 自訂平滑滾動：手寫 easing + rAF，不用 scrollIntoView，因為自適應 duration（距離越遠滾越久），且支援 prefers-reduced-motion 直接跳轉。
-  const scrollToHeading = useCallback((id: string) => {
+  const scrollToHeading = (id: string) => {
     const el = document.getElementById(id);
     if (!el) return;
-    const targetY = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
-
-    // 使用者偏好減少動畫 → 直接跳轉
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      window.scrollTo(0, targetY);
-      setIsOpen(false);
-      return;
-    }
-
-    const startY = window.scrollY;
-    const distance = targetY - startY;
-    const duration = Math.min(Math.max(Math.abs(distance) * 0.45, 260), 700);
-    const startTime = performance.now();
-
-    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
-
-    const scroll = (now: number) => {
-      const progress = Math.min((now - startTime) / duration, 1);
-      window.scrollTo(0, startY + distance * easeOutCubic(progress));
-      if (progress < 1) requestAnimationFrame(scroll);
-    };
-
-    requestAnimationFrame(scroll);
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     setIsOpen(false);
-  }, []);
+  };
 
   if (headings.length === 0) return null;
 
@@ -89,23 +83,20 @@ const Toc = ({ headings, title, expandLabel, collapseLabel }: TocProps) => {
     <div data-toc-root>
       <div
         className={cn(
-          'fixed top-32 right-0 z-1001 flex max-h-[70vh] w-72 transform flex-col rounded-bl-lg bg-white shadow-lg ring-1 ring-gray-200/50 transition-transform duration-300 dark:bg-gray-800 dark:ring-white/5',
+          'fixed top-32 right-0 z-999 flex max-h-[70vh] w-72 transform flex-col rounded-bl-lg bg-white shadow-lg ring-1 ring-gray-200/50 transition-transform duration-300 dark:bg-gray-800 dark:ring-white/5',
           isOpen ? 'translate-x-0' : 'translate-x-full'
         )}
       >
         <button
           type="button"
           className="group absolute top-0 -left-8 z-10"
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsOpen((o) => !o);
-          }}
+          onClick={() => setIsOpen((o) => !o)}
           aria-label={isOpen ? collapseLabel : expandLabel}
           aria-expanded={isOpen}
         >
           <div
             className={cn(
-              'flex-center w-8 rounded-l-xl bg-white py-3 text-pink-600 shadow-sm ring-1 ring-gray-200/50 transition-all duration-300 dark:bg-gray-800 dark:text-pink-400 dark:ring-white/5',
+              'flex-center pointer-events-none w-8 rounded-l-xl bg-white py-3 text-pink-600 shadow-sm ring-1 ring-gray-200/50 transition-all duration-300 dark:bg-gray-800 dark:text-pink-400 dark:ring-white/5',
               isOpen ? 'h-24' : 'h-32'
             )}
           >
@@ -140,7 +131,6 @@ const Toc = ({ headings, title, expandLabel, collapseLabel }: TocProps) => {
                     href={`#${h.id}`}
                     onClick={(e) => {
                       e.preventDefault();
-                      e.stopPropagation();
                       scrollToHeading(h.id);
                     }}
                     className={cn(

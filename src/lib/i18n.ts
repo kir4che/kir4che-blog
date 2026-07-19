@@ -14,7 +14,8 @@ const UI = {
 } satisfies Record<Language, Messages>;
 
 // 供 [lang] 靜態頁面使用的 getStaticPaths
-export const getLangStaticPaths = () => SUPPORTED_LANGUAGES.map((lang) => ({ params: { lang } }));
+export const getLangStaticPaths = (): { params: { lang: Language } }[] =>
+  SUPPORTED_LANGUAGES.map((lang) => ({ params: { lang } }));
 
 // 判斷是否為支援的語系
 export const isSupportedLanguage = (value: unknown): value is Language =>

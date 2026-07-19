@@ -10,7 +10,6 @@ interface VideoProps {
   width?: string | number;
   align?: 'left' | 'center' | 'right';
   controls?: boolean | undefined;
-  autoPlay?: boolean;
   loop?: boolean;
   muted?: boolean;
   preload?: React.VideoHTMLAttributes<HTMLVideoElement>['preload'];
@@ -30,7 +29,6 @@ export const Video = ({
   width,
   align = 'center',
   controls,
-  autoPlay = false,
   loop = false,
   muted = true,
   preload,
@@ -42,22 +40,19 @@ export const Video = ({
   spoilerBtnText = '點擊查看',
   ...rest
 }: VideoProps) => {
-  const shouldAutoPlay = spoiler ? false : autoPlay;
-  const effectivePreload = preload ?? (shouldAutoPlay ? 'auto' : 'metadata');
+  const effectivePreload = preload ?? 'metadata';
 
   const video = (
     <div className="relative size-full overflow-hidden">
       <video
         src={src}
         controls={controls !== undefined ? controls : !loop}
-        autoPlay={shouldAutoPlay}
         loop={loop}
         muted={muted}
         playsInline
         preload={effectivePreload}
         poster={poster}
         className="size-full object-cover transition-opacity duration-300"
-        data-auto-play={shouldAutoPlay ? 'true' : undefined}
         {...(rest as React.VideoHTMLAttributes<HTMLVideoElement>)}
       />
     </div>

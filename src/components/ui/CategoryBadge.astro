@@ -32,7 +32,12 @@ const resolvedCategories = normalizeCategories(categories);
 
         return (
           <a href={`/${lang}/categories/${info.slug}/`} class:list={itemClasses} style={itemStyle}>
-            <Circle size={8} fill="currentColor" aria-hidden="true" />
+            <Circle
+              size={8}
+              fill="currentColor"
+              aria-hidden="true"
+              class="pointer-events-none select-none"
+            />
             {info.name[lang]}
           </a>
         );

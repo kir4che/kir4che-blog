@@ -25,7 +25,5 @@ export const paginate = <T>(
     currPage: safePage,
     totalPages,
     totalItems,
-    start: startIndex,
-    end: endIndex,
   };
 };

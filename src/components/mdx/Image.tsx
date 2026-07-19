@@ -16,8 +16,8 @@ interface ImageProps {
   imgClass?: string;
   imgWrapClass?: string;
   noLightbox?: boolean;
-  lightboxSlides?: string;
-  lightboxIndex?: number;
+  lightboxSrc?: string;
+  lightboxAlt?: string;
   spoiler?: boolean;
   spoilerText?: string;
   spoilerBtnText?: string;
@@ -36,8 +36,8 @@ export const Image = ({
   imgClass,
   imgWrapClass,
   noLightbox = false,
-  lightboxSlides,
-  lightboxIndex = 0,
+  lightboxSrc,
+  lightboxAlt,
   spoiler = false,
   spoilerText,
   spoilerBtnText,
@@ -72,7 +72,7 @@ export const Image = ({
       : undefined,
   };
 
-  const slides = lightboxSlides ?? JSON.stringify([{ src, alt }]);
+  const slides = lightboxSrc ?? src;
 
   return (
     <FigureShell
@@ -99,8 +99,8 @@ export const Image = ({
           )}
           style={imageWrapStyle}
           {...(!noLightbox && {
-            'data-lightbox-slides': slides,
-            'data-lightbox-index': lightboxIndex,
+            'data-lightbox-src': slides,
+            'data-lightbox-alt': lightboxAlt ?? alt,
           })}
         >
           <img

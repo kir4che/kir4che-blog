@@ -1,18 +1,82 @@
 ---
-export const prerender = true;
-
 import PostPreviewCard from '@/components/features/post/preview/PostPreviewCard.astro';
 import Pagination from '@/components/ui/Pagination.astro';
 import PostListLayout from '@/layouts/PostListLayout.astro';
-import { getCategoryBySlug, getCategoryStyle, isPostInCategory } from '@/lib/categories';
+import {
+  getAllCategoryByPosts,
+  getCategoryBySlug,
+  getCategoryStyle,
+  isPostInCategory,
+} from '@/lib/categories';
 import { createTranslator, resolveLanguage } from '@/lib/i18n';
 import { paginate } from '@/lib/pagination';
 import { withLocalePrefix } from '@/lib/paths';
 import { getPostsMeta } from '@/lib/posts';
-import { getCategoryStaticPaths } from '@/lib/routing';
-import type { Category, CategoryInfo } from '@/types';
+import { DEFAULT_POSTS_PER_PAGE, SUPPORTED_LANGUAGES } from '@/config';
+import type { Category, CategoryInfo, PostMeta } from '@/types';
 
-export const getStaticPaths = getCategoryStaticPaths;
+interface Props {
+  items: PostMeta[];
+  currPage: number;
+  totalPages: number;
+  totalItems: number;
+  mainCategory: Category;
+  subCategory: CategoryInfo | null;
+  hasSubCategory: boolean;
+}
+
+export const getStaticPaths = async () => {
+  const paths: { params: Record<string, string | undefined>; props: Props }[] = [];
+
+  for (const lang of SUPPORTED_LANGUAGES) {
+    const posts = await getPostsMeta(lang);
+    const categories = getAllCategoryByPosts(posts);
+    const allCatSlugs = categories.flatMap((cat) => [
+      cat.slug,
+      ...Object.keys(cat.subcategories ?? {}),
+    ]);
+
+    for (const catSlug of allCatSlugs) {
+      const resolved = getCategoryBySlug(catSlug, categories, 'all');
+      if (!resolved) continue;
+
+      const isSubCat = 'parentSlug' in resolved && !!resolved.parentSlug;
+      const subCategory = isSubCat ? (resolved as CategoryInfo) : null;
+      const mainCategory =
+        isSubCat && subCategory?.parentSlug
+          ? getCategoryBySlug(subCategory.parentSlug, categories, 'main')
+          : resolved;
+      if (!mainCategory || !('subcategories' in mainCategory)) continue;
+
+      const subcats = (mainCategory as Category).subcategories ?? {};
+      const filteredPosts = posts.filter((post) => {
+        if (subCategory) return isPostInCategory(post, subCategory.name, subCategory.slug);
+        return (
+          isPostInCategory(post, mainCategory.name, mainCategory.slug) ||
+          Object.values(subcats).some((sub) => isPostInCategory(post, sub.name, sub.slug))
+        );
+      });
+
+      const totalPages = Math.ceil(filteredPosts.length / DEFAULT_POSTS_PER_PAGE) || 1;
+      for (let p = 1; p <= totalPages; p++) {
+        const { items, currPage, totalPages: tp, totalItems } = paginate(filteredPosts, p);
+        paths.push({
+          params: { lang, catSlug, page: p === 1 ? undefined : String(p) },
+          props: {
+            items,
+            currPage,
+            totalPages: tp,
+            totalItems,
+            mainCategory,
+            subCategory,
+            hasSubCategory: isSubCat,
+          },
+        });
+      }
+    }
+  }
+  return paths;
+};
 
 const lang = resolveLanguage(Astro.params.lang);
 const t = createTranslator(lang, 'CategoriesPage');
@@ -20,44 +84,29 @@ const tNav = createTranslator(lang, 'nav');
 
 const link = (href: string) => withLocalePrefix(href, lang);
 
-const catSlug = Astro.params.catSlug as string;
-const page = Astro.params.page ? parseInt(Astro.params.page, 10) : 1;
-
-const posts = await getPostsMeta(lang);
-
-const resolved = getCategoryBySlug(catSlug, posts, 'all');
-if (!resolved) return new Response(null, { status: 404 });
-
-const isSubCategory = 'parentSlug' in resolved && resolved.parentSlug;
-const resolvedSub = isSubCategory ? (resolved as CategoryInfo) : null;
-
-const mainCategory = isSubCategory
-  ? getCategoryBySlug(resolvedSub!.parentSlug!, posts, 'main')
-  : resolved;
-if (!mainCategory) return new Response(null, { status: 404 });
-if (!('subcategories' in mainCategory)) return new Response(null, { status: 404 });
-
-const subCategory = resolvedSub;
-const hasSubCategory = subCategory;
-
-const pageTitle = isSubCategory
-  ? (subCategory!.name[lang] ?? subCategory!.name.en ?? Object.values(subCategory!.name)[0])
-  : (mainCategory.name[lang] ?? mainCategory.name.en ?? Object.values(mainCategory.name)[0]);
-
-const subcategories: Record<string, CategoryInfo> = (mainCategory as Category).subcategories ?? {};
-
-const filteredPosts = posts.filter((post) => {
-  if (subCategory) return isPostInCategory(post, subCategory.name, subCategory.slug);
-  if (isPostInCategory(post, mainCategory.name, mainCategory.slug)) return true;
-  return Object.values(subcategories).some((sub) => isPostInCategory(post, sub.name, sub.slug));
-});
-
 const {
   items: paginatedPosts,
   currPage: safePage,
   totalPages,
   totalItems,
-} = paginate(filteredPosts, page);
+  mainCategory,
+  subCategory,
+  hasSubCategory,
+} = Astro.props as Props;
+const catSlug = Astro.params.catSlug as string;
+
+const pageTitle =
+  hasSubCategory && subCategory
+    ? (subCategory.name[lang] ?? subCategory.name.en ?? Object.values(subCategory.name)[0])
+    : (mainCategory.name[lang] ?? mainCategory.name.en ?? Object.values(mainCategory.name)[0]);
+
+const subcategories: Record<string, CategoryInfo> = mainCategory.subcategories ?? {};
+
+const prevCatHref =
+  safePage === 2
+    ? withLocalePrefix(`/categories/${catSlug}`, lang)
+    : withLocalePrefix(`/categories/${catSlug}/${safePage - 1}`, lang);
+const nextCatHref = withLocalePrefix(`/categories/${catSlug}/${safePage + 1}`, lang);
 
 const siteUrl = Astro.site ?? new URL(Astro.url.origin);
 const homeBreadcrumbUrl = new URL(withLocalePrefix('/', lang), siteUrl).href;
@@ -90,7 +139,9 @@ const breadcrumbSchema = {
 };
 ---
 
-<PostListLayout title={pageTitle}>
+<PostListLayout title={pageTitle} noindex={safePage > 1}>
+  {safePage > 1 && <link slot="head" rel="prev" href={prevCatHref} />}
+  {safePage < totalPages && <link slot="head" rel="next" href={nextCatHref} />}
   <nav
     slot="header"
     class="flex items-baseline justify-between text-sm text-gray-400 dark:text-gray-300"
@@ -125,7 +176,7 @@ const breadcrumbSchema = {
         )
       }
     </div>
-    <span class="text-gray-500 dark:text-gray-400">
+    <span class="text-gray-500 select-none dark:text-gray-400">
       {t('postCount', { count: totalItems })}
     </span>
   </nav>

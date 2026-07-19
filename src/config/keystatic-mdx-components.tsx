@@ -141,14 +141,12 @@ export const mdxComponents = {
         defaultValue: 'center',
       }),
       controls: fields.checkbox({ label: 'Show Controls', defaultValue: true }),
-      autoPlay: fields.checkbox({ label: 'Auto Play', defaultValue: false }),
       loop: fields.checkbox({ label: 'Loop', defaultValue: false }),
       muted: fields.checkbox({ label: 'Muted', defaultValue: true }),
       poster: fields.text({ label: 'Poster URL' }),
     },
     ContentView: (props) => {
-      const { src, title, width, height, align, controls, autoPlay, loop, muted, poster } =
-        props.value;
+      const { src, title, width, height, align, controls, loop, muted, poster } = props.value;
       if (!src) {
         return (
           <div
@@ -171,7 +169,6 @@ export const mdxComponents = {
           height={height}
           align={align}
           controls={controls}
-          autoPlay={autoPlay}
           loop={loop}
           muted={muted}
           poster={poster}
@@ -377,7 +374,6 @@ export const mdxComponents = {
             ],
             defaultValue: 'center',
           }),
-          autoPlay: fields.checkbox({ label: 'Auto Play', defaultValue: false }),
           loop: fields.checkbox({ label: 'Loop', defaultValue: false }),
           muted: fields.checkbox({ label: 'Muted', defaultValue: true }),
           controls: fields.checkbox({ label: 'Show Controls', defaultValue: true }),
@@ -416,7 +412,6 @@ export const mdxComponents = {
         colSpan: img.colSpan || undefined,
         className: img.className || undefined,
         objPos: img.objPos || undefined,
-        autoPlay: img.autoPlay ?? undefined,
         loop: img.loop ?? undefined,
         muted: img.muted ?? undefined,
         controls: img.controls ?? undefined,

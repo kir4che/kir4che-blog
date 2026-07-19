@@ -1,6 +1,4 @@
 ---
-export const prerender = true;
-
 import SiteLayout from '@/layouts/SiteLayout.astro';
 import { getAllCategoryByPosts, getCategoryStyle } from '@/lib/categories';
 import { createTranslator, getLangStaticPaths, resolveLanguage } from '@/lib/i18n';
@@ -44,7 +42,7 @@ const categoryBasePath = withLocalePrefix('/categories', lang);
               class="bg-surface-secondary group relative overflow-hidden rounded-3xl border border-(--category-color)/20 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-(--category-color)/45 hover:shadow-[1px_4px_12px_rgba(233,92,133,0.16)] dark:border-(--category-color-dark)/25 dark:hover:border-(--category-color-dark)/45 dark:hover:shadow-[0_0_16px_rgba(255,214,224,0.12)]"
               style={getCategoryStyle(color)}
             >
-              <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,var(--category-color-glow),transparent_34%)] opacity-55 transition duration-300 group-hover:opacity-85 dark:bg-[radial-gradient(circle_at_top_right,var(--category-color-dark-glow),transparent_38%)]" />
+              <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,var(--category-color-glow),transparent_34%)] opacity-55 transition duration-300 group-hover:opacity-85 dark:bg-[radial-gradient(circle_at_top_right,var(--category-color-dark-glow),transparent_38%)]" />
               <div class="relative z-10 flex h-full flex-col gap-4">
                 <div class="flex-between gap-3">
                   <div class="min-w-0 space-y-2">
@@ -55,13 +53,13 @@ const categoryBasePath = withLocalePrefix('/categories', lang);
                         aria-label={`${categoryName} (${postCount} posts)`}
                       >
                         {categoryName}
-                        <span class="text-foreground-primary/35 text-base transition duration-300 group-hover:text-(--category-color) dark:group-hover:text-(--category-color-dark)">
+                        <span class="text-foreground-primary/35 text-base transition duration-300 select-none group-hover:text-(--category-color) dark:group-hover:text-(--category-color-dark)">
                           ↗
                         </span>
                       </a>
                     </h2>
                   </div>
-                  <div class="bg-background/80 flex-center size-7 rounded-full border border-black/5 dark:border-white/10">
+                  <div class="bg-background/80 flex-center size-7 rounded-full border border-black/5 select-none dark:border-white/10">
                     <div class="text-foreground-primary text-sm leading-none">{postCount}</div>
                   </div>
                 </div>
@@ -81,7 +79,9 @@ const categoryBasePath = withLocalePrefix('/categories', lang);
                           aria-label={`${subName} (${sub.postCount ?? 0} posts)`}
                         >
                           {subName}
-                          <span class="ml-1 text-[10px] opacity-70">{sub.postCount ?? 0}</span>
+                          <span class="ml-1 text-[10px] opacity-70 select-none">
+                            {sub.postCount ?? 0}
+                          </span>
                         </a>
                       );
                     })}

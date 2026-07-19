@@ -48,7 +48,7 @@ const remainingCount = filteredCategories.length - MAX_VISIBLE;
             className="inline-flex items-center gap-x-1 rounded-sm bg-surface-secondary/70 px-2.5 py-1 text-sm font-medium shadow-sm ring-1 ring-inset ring-(--category-color)/40 text-(--category-color) hover:bg-white dark:ring-(--category-color-dark)/40 dark:text-(--category-color-dark) dark:hover:bg-gray-700/70"
           >
             <span>{name}</span>
-            <span class="text-xs opacity-65">({postCount})</span>
+            <span class="text-xs opacity-65 select-none">({postCount})</span>
           </LocalizedLink>
         </li>
       ))

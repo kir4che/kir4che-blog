@@ -29,6 +29,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const srcDir = path.resolve(__dirname, 'src');
 
 export default defineConfig({
+  redirects: {
+    '/': '/tw/',
+  },
   site: env.PUBLIC_SITE_URL || 'https://kir4che.com',
   adapter: vercel(),
   build: {

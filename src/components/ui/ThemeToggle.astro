@@ -20,10 +20,10 @@ const { translations, iconOnly = false } = Astro.props;
   class="hover:text-foreground-primary dark:text-foreground-primary/80 flex w-fit items-center gap-x-1.5 bg-transparent text-sm text-gray-700"
   aria-label={translations.dark}
 >
-  <span data-theme-icon="sun" aria-hidden="true">
+  <span data-theme-icon="sun" aria-hidden="true" class="dark:hidden">
     <Sun size={16} />
   </span>
-  <span data-theme-icon="moon" aria-hidden="true">
+  <span data-theme-icon="moon" aria-hidden="true" class="hidden dark:block">
     <MoonStar size={16} />
   </span>
   {
@@ -37,44 +37,38 @@ const { translations, iconOnly = false } = Astro.props;
 
 <script>
   const syncToggle = (btn: HTMLElement, isDark: boolean) => {
-    const sun = btn.querySelector<HTMLElement>('[data-theme-icon="sun"]');
-    const moon = btn.querySelector<HTMLElement>('[data-theme-icon="moon"]');
     const label = btn.querySelector<HTMLElement>('[data-theme-label]');
     const labelLight = btn.dataset.labelLight ?? '';
     const labelDark = btn.dataset.labelDark ?? '';
-
-    if (sun) sun.style.display = isDark ? 'none' : '';
-    if (moon) moon.style.display = isDark ? '' : 'none';
 
     const nextLabel = isDark ? labelLight : labelDark;
     btn.setAttribute('aria-label', nextLabel);
     if (label) label.textContent = nextLabel;
   };
 
-  const init = () => {
+  const syncAll = () => {
     const isDark = document.documentElement.classList.contains('dark');
-
-    document.querySelectorAll<HTMLElement>('[data-theme-toggle]').forEach((btn) => {
-      syncToggle(btn, isDark);
-
-      if (btn.dataset.initialized === 'true') return;
-      btn.dataset.initialized = 'true';
-
-      btn.addEventListener('click', () => {
-        const next = !document.documentElement.classList.contains('dark');
-        document.documentElement.classList.toggle('dark', next);
-        localStorage.setItem('theme', next ? 'dark' : 'light');
-        window.dispatchEvent(
-          new CustomEvent('theme-changed', { detail: { theme: next ? 'dark' : 'light' } })
-        );
-        document
-          .querySelectorAll<HTMLElement>('[data-theme-toggle]')
-          .forEach((b) => syncToggle(b, next));
-      });
-    });
+    document
+      .querySelectorAll<HTMLElement>('[data-theme-toggle]')
+      .forEach((b) => syncToggle(b, isDark));
   };
 
-  init();
+  // 點擊時切換主題
+  document.addEventListener('click', (e) => {
+    // 使用者可能點到子元素，所以要找到最近的按鈕元素。
+    const btn = (e.target as Element).closest<HTMLElement>('[data-theme-toggle]');
+    if (!btn) return;
 
-  document.addEventListener('astro:page-load', init);
+    const next = !document.documentElement.classList.contains('dark');
+    document.documentElement.classList.toggle('dark', next);
+    localStorage.setItem('theme', next ? 'dark' : 'light');
+    // 通知其他元件主題已經改變
+    window.dispatchEvent(new CustomEvent('theme-changed'));
+    document
+      .querySelectorAll<HTMLElement>('[data-theme-toggle]')
+      .forEach((b) => syncToggle(b, next));
+  });
+
+  syncAll();
+  document.addEventListener('astro:page-load', syncAll);
 </script>

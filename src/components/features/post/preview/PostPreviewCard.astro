@@ -15,7 +15,7 @@ interface Props {
 }
 
 const { post, lang, priority = false, hideImage = false, class: className } = Astro.props;
-const href = getLocalizedPostPath({ lang, slug: post.slug });
+const href = getLocalizedPostPath(lang, post.slug);
 const showCover = Boolean(post.coverImage) && !hideImage;
 ---
 
@@ -104,7 +104,7 @@ const showCover = Boolean(post.coverImage) && !hideImage;
             )
           }
         </div>
-        <div class="mt-auto flex flex-wrap items-end gap-2">
+        <div class="mt-auto flex flex-wrap items-end gap-2 select-none">
           <CategoryBadge
             lang={lang}
             categories={post.categories ?? []}
@@ -132,7 +132,7 @@ const showCover = Boolean(post.coverImage) && !hideImage;
       {
         showCover && (
           <div
-            class="absolute inset-0 z-10"
+            class="pointer-events-none absolute inset-0 z-10"
             style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.35), rgba(0,0,0,0.5))' }}
           />
         )

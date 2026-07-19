@@ -144,7 +144,8 @@
     "passwordGate": {
       "title": "This article is password protected",
       "description": "Please enter the password to view the content.",
-      "error": "Something went wrong. Please try again."
+      "error": "Something went wrong. Please try again.",
+      "networkError": "Network error, please try again later."
     },
     "toc": {
       "title": "ToC",
@@ -153,7 +154,9 @@
     },
     "share": {
       "native": "Share to…",
-      "label": "Share"
+      "label": "Share",
+      "copied": "Copied",
+      "copyFailed": "Copy failed"
     }
   },
   "CategoriesPage": {

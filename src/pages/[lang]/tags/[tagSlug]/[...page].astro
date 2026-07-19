@@ -1,40 +1,72 @@
 ---
-export const prerender = true;
-
 import PostPreviewCard from '@/components/features/post/preview/PostPreviewCard.astro';
 import Pagination from '@/components/ui/Pagination.astro';
 import PostListLayout from '@/layouts/PostListLayout.astro';
 import { createTranslator, resolveLanguage } from '@/lib/i18n';
 import { paginate } from '@/lib/pagination';
 import { withLocalePrefix } from '@/lib/paths';
+import { DEFAULT_POSTS_PER_PAGE, SUPPORTED_LANGUAGES } from '@/config';
 import { getPostsMeta } from '@/lib/posts';
-import { getTagStaticPaths } from '@/lib/routing';
-import { getTagDisplayName } from '@/lib/tags';
+import { getTagsByPosts } from '@/lib/tags';
 import { slugify } from '@/utils/path';
+import type { PostMeta } from '@/types';
 
-export const getStaticPaths = getTagStaticPaths;
+interface Props {
+  items: PostMeta[];
+  currPage: number;
+  totalPages: number;
+  totalItems: number;
+  tagName: string;
+  tagSlug: string;
+}
 
+export const getStaticPaths = async () => {
+  const paths: { params: Record<string, string | undefined>; props: Props }[] = [];
+  for (const lang of SUPPORTED_LANGUAGES) {
+    const posts = await getPostsMeta(lang);
+    const tags = getTagsByPosts(posts, undefined, lang);
+    for (const tag of tags) {
+      const taggedPosts = posts.filter((post) =>
+        post.tags.some((raw) => slugify(raw) === tag.slug)
+      );
+      const totalPages = Math.ceil(taggedPosts.length / DEFAULT_POSTS_PER_PAGE) || 1;
+      for (let p = 1; p <= totalPages; p++) {
+        const { items, currPage, totalPages: tp, totalItems } = paginate(taggedPosts, p);
+        paths.push({
+          params: { lang, tagSlug: tag.slug, page: p === 1 ? undefined : String(p) },
+          props: {
+            items,
+            currPage,
+            totalPages: tp,
+            totalItems,
+            tagName: tag.name,
+            tagSlug: tag.slug,
+          },
+        });
+      }
+    }
+  }
+  return paths;
+};
+
+const { items, currPage, totalPages, totalItems, tagName, tagSlug } = Astro.props as Props;
 const lang = resolveLanguage(Astro.params.lang);
 const t = createTranslator(lang, 'TagsPage');
 const link = (href: string) => withLocalePrefix(href, lang);
 
-const tagSlug = Astro.params.tagSlug as string;
-const page = Astro.params.page ? parseInt(Astro.params.page, 10) : 1;
-
-const allPosts = await getPostsMeta(lang);
-const taggedPosts = allPosts.filter((post) => post.tags.some((raw) => slugify(raw) === tagSlug));
-
-const { items, currPage, totalPages, totalItems } = paginate(taggedPosts, page);
-
-const originalTagName = taggedPosts[0]?.tags.find((t) => slugify(t) === tagSlug) ?? tagSlug;
-
-const tagName = getTagDisplayName(tagSlug, originalTagName, lang);
+const prevTagHref =
+  currPage === 2
+    ? withLocalePrefix(`/tags/${tagSlug}`, lang)
+    : withLocalePrefix(`/tags/${tagSlug}/${currPage - 1}`, lang);
+const nextTagHref = withLocalePrefix(`/tags/${tagSlug}/${currPage + 1}`, lang);
 ---
 
-<PostListLayout title={`#${tagName}`}>
+<PostListLayout title={`#${tagName}`} noindex={currPage > 1}>
+  {currPage > 1 && <link slot="head" rel="prev" href={prevTagHref} />}
+  {currPage < totalPages && <link slot="head" rel="next" href={nextTagHref} />}
   <h1 slot="header" class="mb-4 flex items-baseline justify-between">
     <span># {tagName}</span>
-    <span class="text-foreground-primary/80 text-sm font-normal">
+    <span class="text-foreground-primary/80 text-sm font-normal select-none">
       {t('postCount', { count: totalItems ?? 0 })}
     </span>
   </h1>

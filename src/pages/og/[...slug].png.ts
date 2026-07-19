@@ -25,7 +25,6 @@ export const GET: APIRoute = async ({ params, url }) => {
         siteName,
         title: post.title,
         tags: post.tags,
-        lang: post.lang,
       }),
       { width: 1200, height: 630 }
     );
