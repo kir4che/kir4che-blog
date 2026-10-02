@@ -44,7 +44,7 @@ import CategoryBadge from '@/components/ui/CategoryBadge.astro';
 import KofiBtn from '@/components/ui/KofiBtn.astro';
 import SiteLayout from '@/layouts/SiteLayout.astro';
 import { createTranslator } from '@/lib/i18n';
-import { withLocalePrefix } from '@/lib/paths';
+import { getLocalizedPostPath, withLocalePrefix } from '@/lib/paths';
 import { normalizeTag } from '@/lib/tags';
 import { createDateFormatter, parseToISODate } from '@/utils/date';
 
@@ -115,7 +115,7 @@ const tocHeadings = headings.map((h) => ({
 }));
 
 const siteUrl = Astro.site ?? new URL(Astro.url.origin);
-const articleUrl = new URL(withLocalePrefix(`/posts/${post.slug}`, lang), siteUrl).href;
+const articleUrl = new URL(getLocalizedPostPath(lang, post.slug), siteUrl).href;
 // 每篇文章的 schema.org Article 結構化資料
 const articleSchema = {
   '@context': 'https://schema.org',
@@ -159,6 +159,7 @@ const articleSchema = {
 <SiteLayout
   title={isProtected ? tPost('passwordGate.title') : post.title}
   description={isProtected ? tPost('passwordGate.description') : post.description}
+  type={!isProtected ? 'article' : 'website'}
   image={!isProtected
     ? {
         url: `/og/${lang}/${post.slug}.png`,
