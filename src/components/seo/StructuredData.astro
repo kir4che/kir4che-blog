@@ -1,18 +1,20 @@
 ---
-import { CONFIG, DEFAULT_LANGUAGE } from '@/config';
-import { getLocaleFromUrl, resolveLanguage } from '@/lib/i18n';
+import { CONFIG, DEFAULT_LANGUAGE, LANGUAGE_TO_LOCALE_MAP } from '@/config';
+import { getLocaleFromUrl } from '@/lib/i18n';
 
 interface Props {
   pageTitle?: string;
+  pageDescription?: string;
 }
 
 type JsonLd = Record<string, unknown>;
 
-const { pageTitle } = Astro.props;
+const { pageTitle, pageDescription } = Astro.props;
 const lang = getLocaleFromUrl(Astro.url);
-const locale = resolveLanguage(lang);
+const locale = LANGUAGE_TO_LOCALE_MAP[lang];
 
 const siteUrl = Astro.site ?? new URL(Astro.url.origin);
+const siteOrigin = siteUrl.toString().replace(/\/+$/, '');
 
 // 取得社群連結，為了讓 Google 知道部落格與這些連結的關聯。
 const sameAs = Object.values(CONFIG.siteInfo.socialLinks).filter(Boolean) as string[];
@@ -27,17 +29,17 @@ const blogDescription =
   CONFIG.siteInfo.blog.description?.[lang] ?? CONFIG.siteInfo.blog.description?.[DEFAULT_LANGUAGE];
 
 const pagePath = Astro.url.pathname;
-const pageUrl = pagePath ? `${siteUrl}${pagePath}` : siteUrl;
+const pageUrl = pagePath ? `${siteOrigin}${pagePath}` : siteOrigin;
 
-const organizationId = `${siteUrl}/#organization`;
-const personId = `${siteUrl}/#person`;
-const websiteId = `${siteUrl}/#website`;
+const organizationId = `${siteOrigin}/#organization`;
+const personId = `${siteOrigin}/#person`;
+const websiteId = `${siteOrigin}/#website`;
 
 const websiteEntry: JsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   '@id': websiteId,
-  url: siteUrl,
+  url: siteOrigin,
   name: blogTitle ?? CONFIG.siteInfo.name,
 };
 
@@ -47,10 +49,10 @@ const entries: JsonLd[] = [
     '@context': 'https://schema.org',
     '@type': 'Organization',
     '@id': organizationId,
-    url: siteUrl,
+    url: siteOrigin,
     name: CONFIG.siteInfo.name,
     alternateName,
-    logo: `${siteUrl}/images/avatar.webp`,
+    logo: `${siteOrigin}/images/avatar.webp`,
     sameAs,
   },
   // Person
@@ -59,7 +61,7 @@ const entries: JsonLd[] = [
     '@type': 'Person',
     '@id': personId,
     name: CONFIG.siteInfo.name,
-    url: siteUrl,
+    url: siteOrigin,
     sameAs,
   },
   websiteEntry,
@@ -70,7 +72,7 @@ const entries: JsonLd[] = [
     '@id': `${pageUrl}#webpage`,
     url: pageUrl,
     name: pageTitle ?? blogTitle ?? CONFIG.siteInfo.name,
-    description: blogDescription,
+    description: pageDescription ?? blogDescription,
     inLanguage: locale,
     isPartOf: {
       '@type': 'WebSite',

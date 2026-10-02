@@ -19,10 +19,11 @@ interface Props {
     height?: number;
     type?: string;
   };
+  type?: 'website' | 'article';
   noindex?: boolean;
 }
 
-const { title, description, canonical, image, noindex } = Astro.props;
+const { title, description, canonical, image, type = 'website', noindex } = Astro.props;
 
 const siteOrigin = Astro.site ?? new URL(Astro.url.origin);
 const currUrl = Astro.url;
@@ -32,7 +33,7 @@ const seoConfig = getSeoConfig(siteOrigin, currLang, currUrl);
 const canonicalUrl = canonical
   ? canonical.startsWith('http')
     ? canonical
-    : `${siteOrigin}${canonical}`
+    : new URL(canonical, siteOrigin).href
   : seoConfig.canonical;
 const resolvedImage = image ?? seoConfig.openGraph.images[0] ?? null;
 const shouldIndex = noindex ? 'noindex,nofollow' : seoConfig.robots;
@@ -63,7 +64,7 @@ const locale = LANGUAGE_TO_LOCALE_MAP[currLang] || currLang;
     <meta property="og:title" content={title ?? seoConfig.openGraph.title} />
     <meta property="og:description" content={description ?? seoConfig.openGraph.description} />
     <meta property="og:url" content={canonicalUrl} />
-    <meta property="og:type" content={seoConfig.openGraph.type} />
+    <meta property="og:type" content={type === 'article' ? 'article' : seoConfig.openGraph.type} />
     <meta property="og:site_name" content={seoConfig.openGraph.siteName} />
     <meta property="og:locale" content={seoConfig.openGraph.locale} />
     {

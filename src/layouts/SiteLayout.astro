@@ -15,7 +15,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import GlobalLangMenu from '@/components/ui/GlobalLangMenu.astro';
 import ThemeToggle from '@/components/ui/ThemeToggle.astro';
 
-const { title, description, canonical, image, noindex, pageTitle } = Astro.props;
+const { title, description, canonical, image, type, noindex, pageTitle } = Astro.props;
 
 const lang = getLocaleFromUrl(Astro.url);
 const tSearch = createTranslator(lang, 'common.search');
@@ -29,9 +29,9 @@ const { categories = [], tags = [], popularPosts = [] } = await getSidebarData(l
 const simplifiedTags = tags.map(({ name, slug }) => ({ name, slug }));
 ---
 
-<BaseLayout {title} {description} {canonical} {image} {noindex}>
+<BaseLayout {title} {description} {canonical} {image} {type} {noindex}>
   <slot name="head" slot="head" />
-  <StructuredData {pageTitle} />
+  <StructuredData pageTitle={pageTitle ?? title} pageDescription={description} />
   <div
     id="layout-container"
     data-sidebar-open="false"

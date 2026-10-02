@@ -10,6 +10,7 @@ const getLocalizedValue = (
 ): string | undefined => map[lang] ?? map[defaultLang];
 
 export const getSeoConfig = (siteUrl: URL, lang: Language, url?: URL | string) => {
+  const siteOrigin = siteUrl.toString().replace(/\/+$/, '');
   const blogTitle = getLocalizedValue(CONFIG.siteInfo.blog.title, lang) ?? CONFIG.siteInfo.name;
   const blogDescription =
     getLocalizedValue(CONFIG.siteInfo.blog.description, lang) ?? 'kir4che Blog';
@@ -18,7 +19,7 @@ export const getSeoConfig = (siteUrl: URL, lang: Language, url?: URL | string) =
 
   const rawPathname = typeof url === 'string' ? url : url?.pathname;
   const strippedPath = stripLocalePrefix(ensurePathname(rawPathname));
-  const canonicalUrl = `${siteUrl}${withLocalePrefix(strippedPath, lang)}`;
+  const canonicalUrl = `${siteOrigin}${withLocalePrefix(strippedPath, lang)}`;
 
   const localeToUrl: Record<string, string> = {};
   const openGraphLocaleAlternates: string[] = [];
@@ -27,7 +28,7 @@ export const getSeoConfig = (siteUrl: URL, lang: Language, url?: URL | string) =
     Language,
     string,
   ][]) {
-    localeToUrl[localeValue] = `${siteUrl}${withLocalePrefix(strippedPath, languageKey)}`;
+    localeToUrl[localeValue] = `${siteOrigin}${withLocalePrefix(strippedPath, languageKey)}`;
     if (languageKey !== lang) openGraphLocaleAlternates.push(localeValue);
   }
 
@@ -38,7 +39,7 @@ export const getSeoConfig = (siteUrl: URL, lang: Language, url?: URL | string) =
     height: number;
     type?: string;
   } = {
-    url: `${siteUrl}/images/default-og.jpg`,
+    url: `${siteOrigin}/images/default-og.jpg`,
     alt: blogTitle,
     width: 1200,
     height: 630,
