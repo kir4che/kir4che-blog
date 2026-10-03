@@ -96,17 +96,25 @@
   },
   "AboutPage": {
     "title": "About Me",
-    "description": "Hi, I’m Molly, a front-end developer who loves building web interfaces, playing games, and documenting life through vlogs. Get to know my work and passions.",
-    "intro": "Hi, I'm Molly",
+    "description": "Hi, I’m Molly, a frontend developer who loves building web interfaces, playing games, and documenting life through vlogs. Get to know my work and passions.",
+    "intro": "Hi, I'm Molly 🍒",
     "coverImageAlt": "About page cover image",
     "personalInfo": {
-      "job": "👩🏻‍💻 Currently working as a Front-end Developer",
+      "job": "👩🏻‍💻 Frontend dev leveling up my skills",
       "mbti": "🦫 MBTI is a practical ISTJ (Logistician)",
-      "hobby": "🎮 Enjoys various games—Hearthstone, SF6, sandbox games—and also watches LoL esports.",
-      "hobby2": "🇯🇵 Recently got back into anime—really into Conan, YuYu Hakusho, Zatch Bell, and Gintama.",
-      "hobby3": "🧶 Crocheting—currently challenging myself to make a vest."
+      "hobby": "🎮 Gamer at heart, into Hearthstone, BTD, sandbox games, and catching LoL esports.",
+      "hobby2": "🇯🇵 Back on my anime era — let's chat about our favorites! (•̀௰•́ )",
+      "hobby3": "🧶 Crochet addict — attempting to crochet clothes."
     },
     "vlogIntro": "I love trying new things, and recently started vlogging to document every moment of life.",
+    "bangumi": {
+      "title": "My anime list",
+      "watched": "Watched",
+      "watching": "Watching now!",
+      "loading": "Loading my Bangumi lists…",
+      "notConfigured": "The watchlist is not configured yet.",
+      "error": "The watchlist could not be loaded. Please try again later."
+    },
     "resumeSubtitle": "Online Resume & Portfolio",
     "title_3": "💌 How to reach me:",
     "cats": {
