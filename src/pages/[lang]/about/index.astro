@@ -6,6 +6,7 @@ import youtubes from '@/data/youtubes';
 import { createTranslator, getLangStaticPaths, resolveLanguage } from '@/lib/i18n';
 
 import { Image, Images } from '@/components/mdx';
+import BangumiCollections from '@/components/features/about/BangumiCollections.astro';
 import DecorativeImage from '@/components/ui/DecorativeImage.astro';
 import ExternalLink from '@/components/ui/ExternalLink.astro';
 import SiteLayout from '@/layouts/SiteLayout.astro';
@@ -103,6 +104,14 @@ const videos = Object.values(youtubes);
           </section>
         </div>
       </section>
+      <BangumiCollections
+        title={t('bangumi.title')}
+        watchedTitle={t('bangumi.watched')}
+        watchingTitle={t('bangumi.watching')}
+        loadingText={t('bangumi.loading')}
+        notConfiguredText={t('bangumi.notConfigured')}
+        errorText={t('bangumi.error')}
+      />
       <section class="relative mt-10 space-y-2.5">
         <h3 class="heading -ml-4 md:-ml-6">{t('title_3')}</h3>
         <ExternalLink

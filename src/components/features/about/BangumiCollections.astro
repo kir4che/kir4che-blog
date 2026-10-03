@@ -1,0 +1,183 @@
+---
+interface Props {
+  title: string;
+  watchedTitle: string;
+  watchingTitle: string;
+  loadingText: string;
+  notConfiguredText: string;
+  errorText: string;
+}
+
+const { title, watchedTitle, watchingTitle, loadingText, notConfiguredText, errorText } =
+  Astro.props;
+---
+
+<section
+  class="mt-10 space-y-4"
+  data-bangumi
+  data-loading-text={loadingText}
+  data-not-configured-text={notConfiguredText}
+  data-error-text={errorText}
+  aria-labelledby="bangumi-title"
+>
+  <h3 id="bangumi-title" class="heading -ml-4 md:-ml-6">{title}</h3>
+  <p data-bangumi-status class="text-sm opacity-70">{loadingText}</p>
+  <div class="space-y-8">
+    <section
+      data-bangumi-section="watching"
+      class="hidden space-y-3"
+      aria-labelledby="bangumi-watching-title"
+    >
+      <h4
+        id="bangumi-watching-title"
+        class="text-base font-semibold text-pink-700 dark:text-pink-300"
+      >
+        {watchingTitle}
+      </h4>
+      <div data-bangumi-list class="flex gap-3 overflow-hidden"></div>
+    </section>
+    <section
+      data-bangumi-section="watched"
+      class="hidden space-y-3"
+      aria-labelledby="bangumi-watched-title"
+    >
+      <h4
+        id="bangumi-watched-title"
+        class="text-base font-semibold text-pink-700 dark:text-pink-300"
+      >
+        {watchedTitle}
+      </h4>
+      <div data-bangumi-list class="flex gap-3 overflow-hidden"></div>
+    </section>
+  </div>
+</section>
+
+<script>
+  type BangumiItem = {
+    id: number;
+    title: string;
+    originalTitle?: string;
+    image?: string;
+    url: string;
+    rate?: number;
+  };
+
+  type BangumiResponse = {
+    configured?: boolean;
+    watched?: BangumiItem[];
+    watching?: BangumiItem[];
+  };
+
+  const initBangumi = () => {
+    const root = document.querySelector<HTMLElement>('[data-bangumi]');
+    if (!root || root.dataset.initialized === 'true') return;
+    root.dataset.initialized = 'true';
+
+    const status = root.querySelector<HTMLElement>('[data-bangumi-status]');
+    const setStatus = (message: string) => {
+      if (status) status.textContent = message;
+    };
+
+    const createCard = (item: BangumiItem) => {
+      const link = document.createElement('a');
+      link.href = item.url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.className =
+        'group flex flex-col overflow-hidden rounded border border-pink-200/70 bg-surface-secondary shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-pink-300 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pink-500 dark:border-white/10 dark:hover:border-pink-700/70';
+      link.setAttribute('aria-label', item.title);
+
+      if (item.image) {
+        const image = document.createElement('img');
+        image.src = item.image;
+        image.alt = item.title;
+        image.loading = 'lazy';
+        image.decoding = 'async';
+        image.className =
+          'aspect-3/4 w-full object-cover transition-transform duration-300 group-hover:scale-105';
+        link.append(image);
+      }
+
+      const content = document.createElement('div');
+      content.className = 'flex flex-1 flex-col gap-1 p-2';
+
+      const title = document.createElement('p');
+      title.textContent = item.title;
+      title.className =
+        'line-clamp-1 text-sm font-semibold leading-5 text-foreground-primary transition-colors group-hover:text-pink-700 dark:group-hover:text-pink-300';
+      content.append(title);
+
+      if (item.originalTitle) {
+        const originalTitle = document.createElement('p');
+        originalTitle.textContent = item.originalTitle;
+        originalTitle.className = 'line-clamp-1 text-[11px] opacity-60';
+        content.append(originalTitle);
+      }
+
+      if (item.rate) {
+        const rating = document.createElement('p');
+        rating.textContent = `${item.rate}/10`;
+        rating.className =
+          'mt-auto self-end rounded-full bg-pink-100 px-1.5 py-0.5 text-[10px] leading-none font-medium text-pink-700 dark:bg-pink-900/40 dark:text-pink-300';
+        content.append(rating);
+      }
+
+      link.append(content);
+      return link;
+    };
+
+    const renderList = (name: 'watched' | 'watching', items: BangumiItem[]) => {
+      const section = root.querySelector<HTMLElement>(`[data-bangumi-section="${name}"]`);
+      const list = section?.querySelector<HTMLElement>('[data-bangumi-list]');
+      if (!section || !list || items.length === 0) return false;
+
+      items.forEach((item) => list.append(createCard(item)));
+      const cards = Array.from(list.children) as HTMLElement[];
+      const resizeObserver = new ResizeObserver(() => {
+        const gap = 12;
+        const minCardWidth = 112;
+        const maxCardWidth = 150;
+        const visibleCount = Math.max(
+          1,
+          Math.floor((list.clientWidth + gap) / (minCardWidth + gap))
+        );
+        const cardWidth = Math.min(
+          maxCardWidth,
+          (list.clientWidth - gap * (visibleCount - 1)) / visibleCount
+        );
+
+        cards.forEach((card, index) => {
+          card.hidden = index >= visibleCount;
+          card.style.width = `${cardWidth}px`;
+          card.style.maxWidth = `${maxCardWidth}px`;
+          card.style.flex = '0 0 auto';
+        });
+      });
+      resizeObserver.observe(list);
+      section.classList.remove('hidden');
+      return true;
+    };
+
+    fetch('/api/bangumi/collections')
+      .then((response) => {
+        if (!response.ok) throw new Error('Bangumi request failed');
+        return response.json() as Promise<BangumiResponse>;
+      })
+      .then((data) => {
+        if (!data.configured) {
+          setStatus(root.dataset.notConfiguredText ?? '');
+          return;
+        }
+
+        const haswatched = renderList('watched', data.watched ?? []);
+        const hasDoing = renderList('watching', data.watching ?? []);
+        const hasItems = haswatched || hasDoing;
+        if (!hasItems) root.hidden = true;
+        else if (status) status.remove();
+      })
+      .catch(() => setStatus(root.dataset.errorText ?? ''));
+  };
+
+  initBangumi();
+  document.addEventListener('astro:page-load', initBangumi);
+</script>
