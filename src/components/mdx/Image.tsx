@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 import { cn } from '@/utils/cn';
 import { FigureShell } from './FigureShell';
@@ -7,7 +7,7 @@ import { MediaSpoiler } from './MediaSpoiler';
 interface ImageProps {
   src: string;
   alt?: string;
-  title?: string;
+  title?: ReactNode;
   width?: string | number;
   height?: string | number;
   align?: 'left' | 'center' | 'right';

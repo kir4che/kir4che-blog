@@ -1,11 +1,11 @@
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 import { FigureShell } from './FigureShell';
 import { MediaSpoiler } from './MediaSpoiler';
 
 interface VideoProps {
   src: string;
-  title?: string;
+  title?: ReactNode;
   height?: string | number;
   width?: string | number;
   align?: 'left' | 'center' | 'right';

@@ -1,9 +1,10 @@
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 import type { MediaItem } from '@/types';
 import { cn } from '@/utils/cn';
 
 import { GalleryItem } from './GalleryItem';
+import { FigCaption } from './FigureShell';
 
 type ParsedCssLength = {
   raw: string;
@@ -52,7 +53,7 @@ const toPixelNumber = (
 
 interface ImagesProps {
   images?: MediaItem[];
-  title?: string;
+  title?: ReactNode;
   width?: string | number;
   minWidth?: string | number;
   height?: string | number;
@@ -164,11 +165,7 @@ export const Images = ({
           />
         ))}
       </div>
-      {title && (
-        <figcaption className="line-clamp-1 text-center text-xs text-pink-700 dark:text-pink-200">
-          {title}
-        </figcaption>
-      )}
+      {title && <FigCaption title={title} />}
     </div>
   );
 };

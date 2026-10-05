@@ -117,6 +117,10 @@
       }
     }
 
+    figcaption code {
+      @apply text-xs;
+    }
+
     .expressive-code {
       @apply my-4;
     }

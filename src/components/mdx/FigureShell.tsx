@@ -10,12 +10,34 @@ const ALIGNMENT_CLASSES = {
 
 interface FigureShellProps {
   align?: 'left' | 'center' | 'right';
-  title?: string;
+  title?: ReactNode;
   className?: string;
   style?: CSSProperties;
   children?: ReactNode;
   [key: string]: unknown;
 }
+
+const renderInlineCode = (title: ReactNode) => {
+  if (typeof title !== 'string') return title;
+  return title
+    .split(/(`[^`]*`)/g)
+    .map((part, i) =>
+      part.length > 2 && part.startsWith('`') && part.endsWith('`') ? (
+        <code key={i}>{part.slice(1, -1)}</code>
+      ) : (
+        part
+      )
+    );
+};
+
+export const FigCaption = ({ title }: { title: ReactNode }) => (
+  <figcaption
+    className="line-clamp-1 text-center text-xs text-pink-700 dark:text-pink-200"
+    title={typeof title === 'string' ? title.replaceAll('`', '') : undefined}
+  >
+    {renderInlineCode(title)}
+  </figcaption>
+);
 
 export const FigureShell = ({
   align = 'center',
@@ -31,10 +53,6 @@ export const FigureShell = ({
     {...(rest as React.HTMLAttributes<HTMLElement>)}
   >
     {children}
-    {title && (
-      <figcaption className="line-clamp-1 text-center text-xs text-pink-700 dark:text-pink-200">
-        {title}
-      </figcaption>
-    )}
+    {title && <FigCaption title={title} />}
   </figure>
 );
