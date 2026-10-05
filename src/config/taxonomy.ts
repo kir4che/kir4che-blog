@@ -87,6 +87,7 @@ export const tagMap: Record<string, TagDefinition> = {
   security: tag('security', '資訊安全', 'Security'),
   seo: tag('seo', 'SEO', 'SEO'),
   t1: tag('t1', 'T1', 'T1'),
+  threejs: tag('threejs', 'Three.js', 'Three.js'),
   tool: tag('tool', '工具', 'Tools'),
   trip: tag('trip', '旅遊', 'Trip'),
   typescript: tag('typescript', 'TypeScript', 'TypeScript'),

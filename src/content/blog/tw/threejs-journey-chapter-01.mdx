@@ -1,0 +1,847 @@
+---
+title: Three.js Journey 筆記 Ch01
+date: 2026-10-01
+updatedAt: 2026-10-01
+showUpdatedAt: false
+categories: ['frontend']
+tags: ['notes', 'threejs']
+featured: false
+draft: false
+protected: false
+places: []
+---
+## WebGL
+
+不需任何插件，一個讓瀏覽器能直接使用 GPU 來繪製 2D / 3D 圖形的 JavaScript API，成畫在 `<canvas>` 元素上，支援所有現代瀏覽器。
+
+### CPU 計算速度更快，為什麼不用 CPU 計算？
+
+畫 3D 圖形需要同時處理**大量像素、頂點的重複計算**，CPU 雖然單核心很強，但核心數少、偏向處理「一件一件複雜的任務」，無法同時處理這種高度平行的計算；而 GPU 雖然單核心較簡單，但有成千上萬個小核心可以進行「並行計算」，因此在圖形渲染上會比 CPU 快非常多。
+
+### 為什麼需要 Threes.js？
+
+原生 WebGL 太難了！雖然它因為處在底層，你可以優化各個方面，也擁有更多控制權，但像是要在畫布上繪製一個三角形就至少要 100 行程式碼。
+
+---
+
+## Three.js
+
+Three.js 是一個 JavaScript 3D 函式庫，讓你可以在瀏覽器中使用 WebGL 建立與渲染 3D 圖形。\
+任何 3D 場景通常需要四個核心元素：
+
+<Table
+  data={{
+    headers: ['元素', 'Three.js 物件'],
+    rows: [
+      ['場景', '`Scene`'],
+      ['攝影機', '`Camera`'],
+      ['渲染器', '`WebGLRenderer`'],
+      ['物件', '`Mesh` / `Object3D`'],
+    ],
+  }}
+/>
+
+渲染器會根據攝影機的視角，將場景中的物件繪製到畫面上。
+
+---
+
+## 03 First Scene
+
+1. 先建立一個場景
+
+```js
+const scene = new THREE.Scene()
+```
+
+2. 創建一個 Mesh（網格物件）
+
+```js
+const geometry = new THREE.BoxGeometry(1, 1, 1)
+const material = new THREE.MeshBasicMaterial({ color: 0xff0000 })
+const mesh = new THREE.Mesh(geometry, material)
+scene.add(mesh)
+```
+
+這樣就建立了一個「紅色、1 x 1 x 1」的立方體，再用 `Mesh` 把 Geometry 跟 Material 組合成可渲染物體。
+
+> **什麼是 Mesh？**\
+> Mesh = Geometry（幾何形狀 / 點線面）+ Material（材質）
+
+3. 建立 Camera
+
+   ```js
+   const sizes = {
+     width: 800,
+     height: 600
+   }
+
+   // 相機 
+   const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height)
+   scene.add(camera)
+   ```
+
+   [PerspectiveCamera](#PerspectiveCamera) 透視相機：模擬人眼，近大遠小。
+4. 建立 Renderer
+
+* 做法 A：讓「渲染器」自動幫你建立畫布
+  1. 在 JS 中建立渲染器
+  2. 設定畫布大小
+  3. 用 document.appendChild 把這個生成的畫布「塞進」HTML（通常是 body）中
+* 做法 B ⭐️：手動在 HTML 建立畫布
+
+  1. 先在 `index.html` 中加上 `<canvas>`
+  2. 用 `document.querySelector` 或 `getElementById` 抓出這塊畫布
+  3. 建立渲染器，並把這塊畫布當成參數「傳進去」。
+
+  ```html
+  <body>
+      <canvas class="webgl"></canvas>
+  </body>
+  ```
+
+  ```js
+  // 從 HTML 中抓取剛剛寫好的畫布
+  const canvas = document.querySelector('.webgl');
+
+  // 建立渲染器，並告訴它：「請把畫面畫在 canvas 上」。
+  const renderer = new THREE.WebGLRenderer({
+      canvas: canvas
+  });
+
+  // 設定畫面大小
+  renderer.setSize(800, 600);
+  ```
+
+  ※ 這裡做 B
+
+5. 渲染從相機拍到的場景
+
+   ```js
+   renderer.render(scene, camera)
+   ```
+
+   這時候卻是顯示出黑畫面（沒有任何報錯）
+
+   <Image src="https://cdn.kir4che.com/threejs-journey/threejs-journey_threejs-ch01-black-screen.webp" width="65%" height="100%" align="center" objPos="center" noLightbox={false} />
+
+   Three.js 預設所有物件都放在座標原點 `(0, 0, 0)`，相機也是，所以相機目前在物件「內部」，什麼都看不到。
+
+   > **為什麼相機看不到物件內部？**\
+   > Three.js 為了幫電腦省效能，預設只會畫物體的「表面」，內部直接隱形，這也叫作背面剔除（Backface Culling）。\
+   > 如果真的需要畫出內部（背面），只要在 `THREE.MeshBasicMaterial` 加上 `side: THREE.DoubleSide` 即可。
+6. 移動物件 - `position`、`rotation`、`scale`
+
+   現在先使用 `position` 將相機向後移動
+
+   ```js
+   const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height)
+   camera.position.z = 3
+   scene.add(camera)
+   ```
+
+   這樣就看到 `geometry` 了～
+
+<Image src="https://cdn.kir4che.com/threejs-journey/threejs-journey_threejs-ch01-red-cube.webp" width="65%" height="100%" align="center" objPos="center" noLightbox={false} />
+
+> 所有繼承自 `Object3D` 的類別 ex. `Camera`、`Mesh`、`Light`、`Scene` 等都擁有 `position`、`rotation`、`scale`、`quaternion` 這些屬性，而這些屬性最終會被編譯成矩陣（matrices）。
+
+---
+
+## 04 Transform Objects
+
+### 移動物件
+
+`position` 擁有 3 個基本屬性：`x`、`y`、`z`，這是在 3D 空間中定位物件所需的三個軸。\
+在 Three.js 中，慣例上：
+
+* `y` 軸 → 向上
+* `z` 軸 → 向後
+* `x` 軸 → 向右
+
+> 不同的 3D 環境對於軸的方向定義不一樣，比如 Blender `z` 軸反而是朝上。
+
+自行定義 1 單位的實際長度，你要是 1cm、1m 或 1km 都行，建議依「場景需求」設定。\
+📌 請在呼叫 `render()` 前設定位置，否則會在移動前就先渲染。
+
+### `position` 是 `Vector3` 實例
+
+`position` 並非普通物件，而是 `Vector3` 的實例，除了 `x`、`y`、`z` 以外，還有其他實用的方法：
+
+1. 取得向量長度：`mesh.position.length()`
+2. 取得與另一個 `Vector3` 的距離（需在建立相機後使用）：`mesh.position.distanceTo(camera.position)`
+3. 正規化（Normalize）：`mesh.position.normalize()` 會將向量長度設成 1，但方向不變。
+4. 用 `set()` 一次設定三個軸：`mesh.position.set(0.7, -0.6, 1)`
+
+### `AxesHelper`
+
+創建一個可視化的「三維座標」，顯示 x、y、z 軸從場景中心出發延伸到對應方向的線段。
+
+```js
+const axesHelper = new THREE.AxesHelper(2) // 2 是線段長度
+scene.add(axesHelper)
+```
+
+<Image src="https://cdn.kir4che.com/threejs-journey/threejs-journey_threejs-ch01-axes-helper.webp" width="50%" height="100%" align="center" objPos="center" noLightbox={false} />
+
+* 🟢 綠線 → Y 軸
+* 🔴 紅線 → X 軸
+* 🔵 藍線 → Z 軸（與相機對齊，預設看不到）
+
+### 縮放物件 `scale`
+
+`scale` 同樣是 `Vector3`，預設 x、y、z 都是 1（無縮放）。
+
+```js
+mesh.scale.x = 2 // 放大為兩倍
+mesh.scale.y = 0.5 // 縮小為一半
+mesh.scale.z = 0.25
+```
+
+> ⚠️ 避免「負值」，軸方向可能會錯亂產生 bug。
+
+### 旋轉物件
+
+旋轉有兩種屬性可用：rotation（extend Euler）跟 quaternion，日常使用選擇習慣的即可，因為兩個屬性皆會自動互相同步，你更新 rotation 會更新 quaternion，更新 quaternion 又會更新 rotation。
+
+<Image src="https://cdn.kir4che.com/threejs-journey/threejs-journey_threejs-ch01-pitch-yaw-roll.webp" width="50%" height="100%" align="center" objPos="center" noLightbox={false} />
+
+#### Rotation
+
+想像一根棍子直插物件中心，往該軸旋轉：
+
+<Table
+  data={{
+    headers: ['軸', '術語', '比喻'],
+    rows: [
+      ['x', 'pitch', '左右轉頭、旋轉木馬'],
+      ['y', 'yaw', '點頭 / 仰頭、車輪'],
+      ['z', 'roll', '側滾、飛機螺旋槳'],
+    ],
+  }}
+/>
+
+單位是**弧度（radians）**，半圈 = π，使用 `Math.PI`：
+
+```js
+mesh.rotation.x = Math.PI * 0.25
+mesh.rotation.y = Math.PI * 0.25
+```
+
+**⚠️ Gimbal Lock 問題**\
+旋轉順序不管你撰寫的程式碼順序，**預設 x → y → z**，所以當你旋轉某個軸時會改變其他軸的方向，可能導致某個軸失效。\
+ex. 先把 x 軸轉 90 度，原本的 y 軸朝上 ↑，這時會變朝前 →，這時再轉 Y 軸會以為是「左右轉」，但實際上變「前後滾」了。\
+👉🏻 可用 `reorder()` 改變旋轉順序（要在設定 rotation 前呼叫）
+
+```js
+mesh.rotation.reorder('YXZ')
+```
+
+也就是請 reorder 等一下在計算矩陣時，請用「Y → X → Z」的順序套用我儲存的這三個值。
+
+#### Quaternion
+
+用四個數字 `(x, y, z, w)` 來表達，不像 Euler 分三個軸依序套用，而是**一次描述整體旋轉**，所以不會有軸互相影響的問題。\
+**為什麼較難直覺理解？**\
+Euler 看到數字就知道意思：
+
+```js
+mesh.rotation.y = Math.PI * 0.5  // Y 軸轉 90 度
+```
+
+Quaternion 看數字很難知道轉了多少：
+
+```js
+mesh.quaternion.set(0, 0.707, 0, 0.707)  // ？
+```
+
+所以通常不會直接手寫 Quaternion 的值，都是透過方法來操作，不直接設定數字：
+
+```js
+// 從 Euler 轉換
+mesh.quaternion.setFromEuler(new THREE.Euler(0, Math.PI * 0.5, 0))
+
+// 動畫插值
+mesh.quaternion.slerp(targetQuaternion, 0.1)
+```
+
+### `lookAt()`
+
+讓物件自動朝向目標（將 -z 軸對準目標），不用自己算旋轉角度：
+
+```js
+camera.lookAt(new THREE.Vector3(0, -1, 0)) // 讓相機對準特定座標點
+camera.lookAt(mesh.position) // 讓相機自動對準物體中心
+```
+
+### 合併變換（Combining Transformations）
+
+`position`、`rotation` / `quaternion`、`scale` 這三種**不同屬性**的變換，不管程式碼怎麼寫的順序，結果都一樣。因為這些都只是在**儲存值**，等 `renderer.render()` 才會一起計算。
+
+### Scene Graph（群組）
+
+當場景中有大量物件時，可用 `Group` 將它們打包，統一管理變換：
+
+```js
+// Group 就像一個容器，裡面的物件會繼承 Group 的變換。
+const house = new THREE.Group()
+scene.add(house)
+
+// 把所有部件加進 group
+house.add(wall)
+house.add(roof)
+house.add(door)
+house.add(window)
+
+// 之後想移動整棟房子，只要動 group 就好，它會整個移動。
+house.position.set(5, 0, 0)  // 整棟移過去
+house.scale.set(2, 2, 2)     // 整棟放大
+house.rotation.y = Math.PI   // 整棟旋轉
+```
+
+`Group` 繼承自 `Object3D`，同樣擁有 `position`、`scale`、`rotation`、`lookAt` 等屬性。
+
+---
+
+## 05 Animations
+
+### `requestAnimationFrame`
+
+在**下一幀前執行指定函式**的瀏覽器 API，透過在函式內部不斷呼叫自己，讓每個下一幀都執行指定函式，就等於是每幀都在執行，形成無限迴圈。
+
+```js
+const tick = () => {
+    // 更新物件
+    mesh.rotation.y += 0.01
+    // 渲染
+    renderer.render(scene, camera)
+    // 呼叫下一幀
+    window.requestAnimationFrame(tick)
+}
+tick()
+```
+
+**裝置的幀率會影響顯示的速度不一致**！在高幀率螢幕上會旋轉較快，反之。\
+👉🏻 解法：**deltaTime、Clock** 或選擇 GSAP
+
+#### 適應幀率（deltaTime）
+
+用 `Date.now()` 取得當前時間戳記，以「時間」為基準，計算**與上一幀的時間差（deltaTime）** 來補償，讓動畫速度在任何幀率下都一致。
+
+```js
+let time = Date.now()
+
+const tick = () => {
+    const currentTime = Date.now()
+    const deltaTime = currentTime - time  // 離上一幀過多少 ms
+    time = currentTime
+
+    mesh.rotation.y += 0.01 * deltaTime
+
+    renderer.render(scene, camera)
+    window.requestAnimationFrame(tick)
+}
+
+tick()
+```
+
+#### Clock
+
+Three.js 內建 `Clock` 類別，更方便處理時間計算。
+
+* `getElapsedTime()`：從 Clock 建立到現在的總秒數
+* `getDelta()`：距離上次呼叫這個方法經過的秒數，不建議用，除非完全了解 Clock 的內部運作，不然容易造成動畫異常。
+
+```js
+const clock = new THREE.Clock()
+
+const tick = () => {
+    const elapsedTime = clock.getElapsedTime()  // 從 Clock 建立到現在經過幾秒
+    mesh.rotation.y = elapsedTime
+    // 用 sin、cos 可以讓物體來回旋轉（像鐘擺）
+    mesh.rotation.x = Math.sin(elapsedTime)  
+
+    renderer.render(scene, camera)
+    window.requestAnimationFrame(tick)
+}
+
+tick()
+```
+
+#### 使用 GSAP
+
+```js
+// 建立一個 tween（從 A 到 B 的動畫）
+gsap.to(mesh.position, { duration: 1, delay: 1, x: 2 })
+
+const tick = () => {
+    renderer.render(scene, camera)
+    window.requestAnimationFrame(tick)
+}
+
+tick()
+```
+
+GSAP 內建 `requestAnimationFrame`，會在背景自動更新數值，不需手動更新動畫，也就不用放進 `tick`，但仍需保留 `tick` 來持續渲染場景。
+
+### 如何選擇？
+
+* 簡單循環動畫（旋轉、位移）
+  * 想要「總共過多久」→ Clock `getElapsedTime()`
+  * 想要「距離上一幀多久」→ 用 `Date.now()` 算 deltaTime
+* 複雜動畫（緩動、序列、時間軸）→ GSAP
+
+---
+
+## 06 Cameras
+
+`Camera` 是抽象類別，不直接使用，其他相機都繼承自它。
+
+<Table
+  data={{
+    headers: ['相機', '用途'],
+    rows: [
+      ['`ArrayCamera`', '多相機分割畫面，像多人分屏遊戲。'],
+      ['`StereoCamera`', '模擬雙眼視差，用於 VR 裝置或紅藍眼鏡。'],
+      ['`CubeCamera`', '拍攝六個方向，用於環境反射或陰影貼圖。'],
+      ['`OrthographicCamera`', '無透視感，物件遠近大小相同，適合 RTS 遊戲。'],
+      ['`PerspectiveCamera` ✅', '模擬真實相機透視感'],
+    ],
+  }}
+/>
+
+<Image src="https://cdn.kir4che.com/threejs-journey/threejs-journey_threejs-ch01-perspectivecamera-vs-orthographiccamera.webp" width="100%" height="100%" align="center" objPos="center" noLightbox={false} />
+
+### `PerspectiveCamera`
+
+模擬人眼或真實相機，近大遠小。
+
+```js
+const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
+```
+
+<Table
+  data={{
+    headers: ['參數', '說明'],
+    rows: [
+      ['`fov`（75）', '垂直視角，以角度為單位，角度越小像望遠鏡（物件放大拉近），越大像魚眼鏡頭。預設 50，建議 45 ~ 75。'],
+      ['`aspect ratio`', '寬高比，基本上設為 Canvas 的寬高比例 `sizes.width / sizes.height` 即可。'],
+      ['`near`（0.1）', '最近的可見距離，以外的不會被渲染，直接消失不顯示。'],
+      ['`far`（100）', '最遠的可見距離'],
+    ],
+  }}
+/>
+
+> ⚠️ `near`、`far` 不要設太極端 ex. 0.0001、9999999，可能導致 z-fighting，兩個面互相爭搶渲染順序，畫面閃爍。
+
+### `OrthographicCamera`
+
+無透視感，物件不論遠近大小一樣：
+
+```js
+const aspectRatio = sizes.width / sizes.height
+const camera = new THREE.OrthographicCamera(
+    -1 * aspectRatio,  // left，乘上 aspectRatio 避免畫面被拉伸變形。
+     1 * aspectRatio,  // right
+     1,                // top
+    -1,                // bottom
+     0.1,              // near
+     100               // far
+)
+```
+
+把 `OrthographicCamera` 想像成「平面座標」：
+
+```js
+        top: 1
+          ↑
+left:-1 ←   → right:1
+          ↓
+       bottom:-1
+```
+
+這個框是一個中心點位於 `(0, 0)` 的 2x2 正方形
+
+#### 為什麼會變形？
+
+這個 2x2 的正方形框，最後要**塞進 canvas 裡顯示**。如果 canvas 是 800x600（長方形），Three.js 會把正方形框**強制拉伸**填滿 canvas，所以物件就變形了。
+
+```
+相機框（正方形）    canvas（長方形）
+  ┌────┐    →    ┌──────────┐
+  │    │         │          │  ← 被拉寬了
+  └────┘         └──────────┘
+```
+
+所以可把左右範圍乘上 `aspectRatio`，讓相機框變成跟 canvas 一樣的長寬比。
+
+### Controls
+
+以滑鼠 / 鍵盤控制相機的工具，不用自己寫 `mousemove` 那些邏輯。
+
+<Table
+  data={{
+    headers: ['控制器', '用途'],
+    rows: [
+      ['`FlyControls`', '模擬飛機無視重力的自由飛行，可朝三軸自由移動、旋轉。'],
+      ['`FirstPersonControls`', '鼠標不鎖定的第一人稱走動，適合要兼顧點擊網頁 UI 的 3D 導覽。'],
+      ['`PointerLockControls`', '鼠標隱藏並鎖定的標準 FPS 視角'],
+      ['`OrbitControls` ✅', '繞點旋轉、平移、縮放'],
+      ['`TrackballControls`', '類似 `OrbitControls`，但無垂直角度限制，可上下顛倒。'],
+      ['`TransformControls`', '在物件上顯示控制器，用來移動物件。'],
+      ['`DragControls`', '拖放物件'],
+    ],
+  }}
+/>
+
+---
+
+### OrbitControls（軌道控制器）
+
+```js
+const controls = new OrbitControls(camera, canvas)
+
+// 設定看向的目標位置
+// controls.target.y = 2
+// controls.update() // 改完 target 要立刻 update
+
+// 開啟阻尼（讓移動更順滑）
+controls.enableDamping = true
+
+const tick = () => {
+	// 開啟 damping 後每幀都要 update，不然鼠標停了延遲感就停了。 
+	controls.update()
+	renderer.render(scene, camera) 
+	window.requestAnimationFrame(tick)
+}
+
+tick()
+```
+
+建立後就可以：
+
+* 左鍵拖曳 → 繞著目標點旋轉
+* 右鍵拖曳 → 平移
+* 滾輪 → 縮放\
+  目標點預設是場景中心 `(0, 0, 0)`，也就是上面設定的 `controls.target.y = 2` 那個位置。
+
+> 使用 Controls 前，先確認它是否支援你需要的所有功能，不然後期可能要大幅改寫。
+
+---
+
+## 07 Fullscreen and resizing
+
+### viewport
+
+### 讓 Canvas 填滿視窗
+
+取得 viewport 大小：`window.innerWidth`、`window.innerHeight` 來取代固定數值
+
+```js
+const sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight
+}
+```
+
+### 處理視窗縮放（Resize）
+
+<Images images={[{"type":"image","src":"https://cdn.kir4che.com/threejs-journey/threejs-journey_threejs-ch01-resize-demo-1.webp","alt":"未更新 renderer.setSize()：Canvas 尺寸固定導致留白","title":"未更新 `renderer.setSize()`：Canvas 尺寸固定導致留白","objPos":"center","loop":false,"muted":true,"controls":true},{"type":"image","src":"https://cdn.kir4che.com/threejs-journey/threejs-journey_threejs-ch01-resize-demo-2.webp","alt":"未更新 camera.updateProjectionMatrix()：長寬比失真導致物體變形","title":"未更新 `camera.updateProjectionMatrix()`：長寬比失真導致物體變形","objPos":"center","loop":false,"muted":true,"controls":true}]} width="100%" minWidth="150px" align="center" />
+
+監聽 `resize` 事件，同步更新 sizes、相機、渲染器：
+
+```js
+window.addEventListener('resize', () => {
+    // 更新尺寸
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+
+    // 更新相機
+    camera.aspect = sizes.width / sizes.height
+    // 改完相機屬性必須呼叫，將屬性重新計算進 Matrix。
+    camera.updateProjectionMatrix()
+
+    // 更新渲染器
+    renderer.setSize(sizes.width, sizes.height)
+})
+```
+
+### 處理像素比（Pixel Ratio）
+
+像素比是指**螢幕上一個軟體像素對應幾個實體像素**
+
+<Table
+  data={{
+    headers: ['像素比', '說明', '裝置'],
+    rows: [
+      ['1', '1 個軟體像素 = 1 個實體像素', '一般螢幕'],
+      ['2', '1 個軟體像素 = 2x2 = 4 個實體像素', 'Retina 螢幕（Apple）'],
+      ['3', '1 個軟體像素 = 3x3 = 9 個實體像素', '高階手機螢幕'],
+    ],
+  }}
+/>
+
+> 像素比越高，需要渲染的像素數量越多，邊緣就越細緻平滑，鋸齒感越少，但也越容易影響效能。
+
+限制最高 Pixel Ratio 為 2（肉眼能分辨的極限約為 2），避免效能問題：
+
+```js
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+```
+
+### 處理全螢幕（Fullscreen）
+
+雙擊切換全螢幕，需相容 Safari（webkit 前綴）：
+
+```js
+window.addEventListener('dblclick', () => {
+    const fullscreenElement = document.fullscreenElement || document.webkitFullscreenElement
+
+    if (!fullscreenElement) {
+        // 進入全螢幕
+        if (canvas.requestFullscreen) {
+            canvas.requestFullscreen()
+        } else if (canvas.webkitRequestFullscreen) {
+            canvas.webkitRequestFullscreen()
+        }
+    } else {
+        // 離開全螢幕
+        if (document.exitFullscreen) {
+            document.exitFullscreen()
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen()
+        }
+    }
+})
+```
+
+> `document.fullscreenElement` 為 `null` 表示目前不在全螢幕，反之則在全螢幕中。
+
+---
+
+## 08 Geometries
+
+### Geometry
+
+定義 3D 物件的形狀
+
+* 繼承自 `BufferGeometry`
+* 由「Vertices（頂點）、Faces（面）」組成
+
+> 頂點除了儲存位置，還可以存其他資料 ex. UV 座標、法向量（normals）等。
+
+<Table
+  data={{
+    headers: ['Geometry', '用途'],
+    rows: [
+      ['`BoxGeometry`', '方塊'],
+      ['`PlaneGeometry`', '平面'],
+      ['`CircleGeometry`', '圓形或扇形'],
+      ['`ConeGeometry`', '錐形'],
+      ['`CylinderGeometry`', '圓柱'],
+      ['`RingGeometry`', '平面環形'],
+      ['`TorusGeometry`', '甜甜圈形'],
+      ['`TorusKnotGeometry`', '扭結形'],
+      ['`DodecahedronGeometry`', '12 面球體'],
+      ['`OctahedronGeometry`', '8 面球體'],
+      ['`TetrahedronGeometry`', '4 面球體'],
+      ['`IcosahedronGeometry`', '三角面大小均等的球體'],
+      ['`SphereGeometry`', '最常見的球體，面看起來像四邊形。'],
+      ['`ShapeGeometry`', '依路徑建立形狀'],
+      ['`TubeGeometry`', '依路徑建立管狀'],
+      ['`ExtrudeGeometry`', '依路徑擠出形狀，可控制斜角。'],
+      ['`LatheGeometry`', '旋轉體，像花瓶。'],
+      ['`TextGeometry`', '3D 文字，需提供 typeface JSON 字型。'],
+    ],
+  }}
+/>
+
+#### BoxGeometry
+
+```js
+new THREE.BoxGeometry(width, height, depth, widthSegments, heightSegments, depthSegments)
+```
+
+<Table
+  data={{
+    headers: ['參數', '說明'],
+    rows: [
+      ['`width`', 'X 軸大小'],
+      ['`height`', 'Y 軸大小'],
+      ['`depth`', 'Z 軸大小'],
+      ['`widthSegments`', 'X 軸細分數量'],
+      ['`heightSegments`', 'Y 軸細分數量'],
+      ['`depthSegments`', 'Z 軸細分數量'],
+    ],
+  }}
+/>
+
+#### 細分（Segments）
+
+決定模型表面要切出幾個「網格」，底層會自動將每一面（網格）拆成 2 個三角形（2 triangles per face）。
+
+* 預設 1 = 完整的一塊不切割
+* `wireframe`：查看網格模型的三角形結構
+
+```js
+const material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true })
+```
+
+> 細分越多畫面越細緻，但頂點和面的數量也越多，影響效能。
+
+#### 自訂 `BufferGeometry`
+
+> 使用 `Float32Array` 自訂 Three.js 的 `BufferGeometry` 是建立高效 3D 模型的標準方法
+
+以「建立單一三角形」為例，`Float32Array` 內每 3 個值 `(x, y, z)` 決定一個頂點。
+
+```js
+const geometry = new THREE.BufferGeometry()
+
+const positionsArray = new Float32Array([
+    0, 0, 0,  // 頂點 1 (x, y, z)
+    0, 1, 0,  // 頂點 2
+    1, 0, 0   // 頂點 3
+])
+
+// 第二個參數 3 代表「每 3 個數值組成一個座標」
+const positionsAttribute = new THREE.BufferAttribute(positionsArray, 3)
+
+geometry.setAttribute('position', positionsAttribute)
+
+// 👉🏻 自動計算面法向量，確保材質能正確受光。
+geometry.computeVertexNormals() 
+```
+
+Three.js 會依照頂點順序自動建立面
+
+> **`Float32Array`**：JavaScript 中一個長度固定，只能存 32 位元浮點數的「型別陣列（Typed Array）」，比一般 Array 更省內存，適合處理大量運算。
+
+ex. 建立 50 個隨機三角形：
+
+```js
+const geometry = new THREE.BufferGeometry()
+
+const count = 50
+// 陣列長度 = 三角形數量(50) * 頂點數(3) * 座標軸(3)
+const positionsArray = new Float32Array(count * 3 * 3)
+
+for (let i = 0; i < count * 3 * 3; i++) {
+    // 產生 -2 到 2 的隨機座標
+    positionsArray[i] = (Math.random() - 0.5) * 4
+}
+
+geometry.setAttribute('position', new THREE.BufferAttribute(positionsArray, 3))
+geometry.computeVertexNormals() // 記得計算光影
+```
+
+<Image src="https://cdn.kir4che.com/threejs-journey/threejs-journey_threejs-ch01-50-random-triangles.webp" width="65%" height="100%" align="center" objPos="center" noLightbox={false} />
+
+#### Index
+
+許多幾何體的相鄰面會交會在同一頂點，這時就需使用 `index`（Non-indexed geometry），每繪製一個三角形都必須宣告 3 個獨立的頂點資料。\
+若設定了 `index`，你可以先建立一個「不重複」的頂點資料庫（`position` 等 BufferAttribute），接著用一個整數陣列（即 `index`）來指定「用第幾號頂點來拼湊這個面」，以此達成重複利用頂點的目的。
+
+---
+
+## 09 Debug UI - lil-gui
+
+`lil-gui` 是現行主流的 Debug GUI 工具庫，Three.js 官方範例標準配備，其極輕量、無依賴、完全相容 `dat.gui` API。
+
+### 安裝與導入
+
+```js
+npm install lil-gui
+
+// 在 script.js 中導入
+import GUI from 'lil-gui'
+// import * as dat from 'lil-gui'
+
+// 初始化
+const gui = new GUI()
+```
+
+### Tweaks
+
+被加進 GUI 控制面板中，用來即時微調（Tweak）的參數項目 ex. Range、Color、Text、Checkbox、Select、Button。\
+大部分是以 `gui.add(物件, 物件屬性)` 加入並使用：
+
+```js
+const mesh = new THREE.Mesh(geometry, material)
+screen.add(mesh)
+
+gui.add(mesh.position, 'y').min(-3).max(3).step(0.01)
+gui.add(material, "wireframe");
+gui.addColor(material, "color").onChange(() => {
+	console.log(material.color);
+	material.color.set(material.color);
+});
+```
+
+也可以透過 `debugObject` 自訂變數按鈕
+
+```js
+const debugObject = {
+  spin: () => gsap.to(mesh.rotation, { y: mesh.rotation.y + Math.PI * 2 }),
+};
+gui.add(debugObject, "spin");
+```
+
+<Image src="https://cdn.kir4che.com/threejs-journey/threejs-journey_threejs-ch01-lil-gui-tweak.gif" width="65%" height="100%" align="center" objPos="center" noLightbox={false} />
+
+但若要修改像 `widthSegments`（寬度細分數）這樣的值時，直接綁定會出錯。因為其參數在**渲染時只會執行一次**，所以修改細分時需將舊的模型銷毀，重新渲染一個新的。
+
+```js
+debugObject.subdivision = 2;
+gui
+  .add(debugObject, "subdivision")
+  .min(0)
+  .max(10)
+  .step(1)
+  .onFinishChange((value) => {
+    mesh.geometry.dispose(); // 釋放舊的 geometry 記憶體
+    mesh.geometry = new THREE.BoxGeometry(1, 1, 1, value, value, value);
+  });
+```
+
+<Image src="https://cdn.kir4che.com/threejs-journey/threejs-journey_threejs-ch01-subdivision-rebuild.gif" width="65%" height="100%" align="center" objPos="center" noLightbox={false} />
+
+> 1. **為什麼需要 `mesh.geometry.dispose()`？沒加也沒報錯？**\
+>    沒報錯是因為 JavaScript 的記憶體被回收了，但 WebGL 不受 JS 垃圾回收（GC）自動管理，所以 GPU 顯卡記憶體（VRAM）沒有被釋放，久了頁面可能會卡頓或閃退。
+> 2. **為什麼用 `onFinishChange` 不能用 `onChange`？**\
+>    效能問題，肉眼在簡單模型看不出差異，但背後執行次數差了幾十倍。
+>    * `onChange`：拖曳滑鼠的每一毫秒、每一個像素移動都在銷毀並重建模型（拖一次觸發 50 \~ 100 次）。遇到大模型或複雜網格時，畫面會立刻掉幀卡死。
+>    * `onFinishChange`：放開滑鼠時才執行一次（只重建 1 次）
+
+#### Folders
+當控制項目超過 5 個時，不分類會很亂。
+
+```js
+const cubeTweaks = gui.addFolder('Awesome cube') // 建立一個資料夾
+cubeTweaks.close() // 預設閉合
+
+cubeTweaks.add(mesh.position, 'y')
+cubeTweaks.add(mesh.material, 'wireframe')
+```
+
+也可以巢狀資料夾：
+
+```js
+const visualFolder = cubeTweaks.addFolder('Visuals');
+visualFolder.add(mesh.material, 'wireframe');
+```
+
+---
+
+## 10 Textures
+
+---
+
+## 11 Materials
+
+---
+
+## 12 3D Text
+
+---
+
+## 13 Go live
