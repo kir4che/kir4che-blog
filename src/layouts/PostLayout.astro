@@ -162,7 +162,7 @@ const articleSchema = {
   type={!isProtected ? 'article' : 'website'}
   image={!isProtected
     ? {
-        url: `/og/${lang}/${post.slug}.png`,
+        url: `/og/${lang}/${post.slug}.png?v=2`,
         width: 1200,
         height: 630,
         type: 'image/png',

@@ -6,6 +6,14 @@ import { CONFIG, DEFAULT_LANGUAGE } from '@/config';
 import { OgImage } from '@/lib/og/OgImage';
 import { getOgPostBySlug } from '@/lib/og/getOgPost';
 import { ImageResponse } from '@vercel/og';
+import notoSansTCFontUrl from '@/assets/og/NotoSansTC-Bold.ttf?inline';
+
+const notoSansTCFont = Uint8Array.from(
+  Buffer.from(notoSansTCFontUrl.split(',')[1], 'base64')
+).buffer;
+const ogFonts = [
+  { name: 'Noto Sans TC', data: notoSansTCFont, weight: 700 as const, style: 'normal' as const },
+];
 
 export const GET: APIRoute = async ({ params, url }) => {
   const slugParam = params.slug;
@@ -26,7 +34,11 @@ export const GET: APIRoute = async ({ params, url }) => {
         title: post.title,
         tags: post.tags,
       }),
-      { width: 1200, height: 630 }
+      {
+        width: 1200,
+        height: 630,
+        fonts: ogFonts,
+      }
     );
 
     const buffer = new Uint8Array(await image.arrayBuffer());

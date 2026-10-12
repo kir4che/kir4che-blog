@@ -89,7 +89,7 @@ export const OgImage = ({ siteName, title, tags }: OgImageProps) => {
     decoded.length > MAX_TITLE_LENGTH ? `${decoded.slice(0, MAX_TITLE_LENGTH - 1)}…` : decoded;
 
   return (
-    <div style={{ ...containerStyle, fontFamily: 'sans-serif' }}>
+    <div style={{ ...containerStyle, fontFamily: 'Noto Sans TC' }}>
       <div style={headerStyle}>
         <div style={accentBarStyle} />
         <div style={siteNameStyle}>{siteName}</div>
