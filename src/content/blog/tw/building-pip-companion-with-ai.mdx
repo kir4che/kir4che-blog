@@ -1,0 +1,131 @@
+---
+title: 不想再將就 PiP，我用 AI 做了自己的子母畫面擴充功能
+description: 從每天邊看影片邊做事的習慣出發，我用 AI 開發子母畫面擴充功能「幕伴 PiP」，並依照自己的使用情境加入字幕、彈幕、浮動留言區等功能。
+date: '2026-10-12T00:00:00.000Z'
+categories:
+  - side-project
+tags:
+  - pip
+  - browser-extension
+  - ai
+draft: false
+featured: true
+showUpdatedAt: false
+---
+
+我很常一邊看影片，一邊做其他事情，所以子母畫面（PiP）幾乎是每天都會用到的功能。但市面上一直沒有完全符合我需求的 PiP 擴充功能——有的只支援彈幕，有的只支援字幕，還有的限定特定平台。想來想去，既然找不到夠用的，不如自己動手做一個。
+
+於是我使用 AI 開發「<Link href="https://chromewebstore.google.com/detail/gnfofimkbdmkbjejmkdmihdpemlgejlm?utm_source=item-share-cb">幕伴 PiP · PiP Companion</Link>」
+
+<Image
+  src="https://raw.githubusercontent.com/kir4che/pip-companion/main/docs/images/pip-companion-social-preview.zh-TW.png"
+  alt="幕伴 PiP 宣傳主圖"
+  width="100%"
+/>
+
+我用的是 GPT，為了省錢大多用 Luna；要開發新功能或要做大範圍的程式碼檢查、重構時，才會切到 Sol。
+
+一開始我先請 AI 做出最基本的 PiP，確認影片能在小窗播放後，才開始整理自己想加上的功能，像是字幕顯示、音量增幅、倍速增幅和彈幕，接著再把每個功能往下細想 ex. 字幕除了要顯示，還要能自訂樣式；音量和倍速不能只能用滑鼠調整，我也希望能透過鍵盤操作；有些平台沒有原生彈幕，只有聊天室訊息，那能不能把聊天室內容轉成彈幕顯示？
+
+把需求想清楚後，我會一次挑一個功能交給 AI，請它先規劃如何實作、可能會影響到哪些地方，再照著討論好的階段性完成。做完後我會自己實際操作，看看和原本想的一不一樣或是有沒有什麼錯誤，有的話再把測試情境整理出來，反覆調整。
+
+## 不只是把影片縮小
+
+最初，我參考原生 PiP，先做出播放／暫停、音量與倍速調整等基本控制，接著再想，音量能不能超過 100%？倍速能不能突破平台上限？於是也加入音量增幅和更自由的倍速控制。
+
+除了播放控制，我也加上字幕顯示、截圖和浮動留言區：
+
+- **字幕**除了要能顯示在 PiP 畫面上，還能自訂字體、大小、顏色和位置。
+- **截圖**則可以透過快捷鍵 <Kbd>Alt</Kbd> + <Kbd>P</Kbd> 把原生影片畫面存成圖片
+- **浮動留言區**則是比較特別的功能，因為我有時在看影片時，會想看看留言區，但又不想錯過影片畫面，所以我將留言區做成可以浮在影片下方，能夠在不離開影片畫面的情況下隨時查看。
+
+<div style={{ position: 'relative', width: '100%', height: 0, paddingBottom: '50%' }}>
+  <iframe
+    allow="fullscreen"
+    allowFullScreen
+    height="100%"
+    src="https://streamable.com/e/5bdkye?loop=0&nocontrols=1"
+    title="幕伴 PiP 彈幕功能操作示範"
+    width="100%"
+    loading="lazy"
+    style={{ border: 'none', width: '100%', height: '100%', position: 'absolute', left: 0, top: 0, overflow: 'hidden' }}
+  />
+</div>
+
+<Images
+  images={[
+    {
+      src: 'https://duk.tw/Uring6.webp',
+      alt: '幕伴 PiP 截圖示範：用快捷鍵擷取的影片畫面存成 PNG 檔。',
+      colSpan: 1.25,
+    },
+    {
+      src: 'https://duk.tw/xavAwt.webp',
+      alt: '幕伴 PiP 浮動留言區示範：YouTube 播放器控制列上的留言按鈕以紅色標出，影片下方浮動顯示留言區。',
+    },
+  ]}
+  width="100%"
+  minWidth="250px"
+  height="auto"
+  maxHeight="none"
+  align="center"
+/>
+
+## 我花最多心力的彈幕
+
+彈幕是我最重視的影片需求，我個人是非常喜歡看彈幕，看影片會多一層互動感，也能看到其他觀眾的即時反應。
+所以我必定希望我的 PiP 有完整的彈幕功能，雖然有很多擴充功能都能顯示彈幕在 PiP 上又或是能將 Youtube 聊天室訊息轉成彈幕，但都零零散散的，並沒有一個擴充功能完整支援多平台的彈幕功能，這也是我想自己開發的最大原因。
+
+幕伴 PiP 除了可以將原生有彈幕的 Bilibili、巴哈動畫瘋的彈幕顯示在 PiP 上，也能將 YouTube、Twitch 的聊天室訊息轉成彈幕，疊在原生影片（或 PiP）上。
+
+<Images
+  images={[
+    {
+      src: 'https://duk.tw/2YiuHV.webp',
+      alt: '幕伴 PiP 將 YouTube 聊天室訊息轉成彈幕，顯示在原生影片上。',
+      title: 'YouTube 聊天室轉彈幕',
+    },
+    {
+      src: 'https://duk.tw/Fjcjmn.webp',
+      alt: '幕伴 PiP 將 Twitch 聊天室訊息轉成彈幕，顯示在原生影片上。',
+      title: 'Twitch 聊天室轉彈幕',
+    },
+  ]}
+  width="100%"
+  minWidth="250px"
+  height="auto"
+  align="center"
+/>
+
+處理彈幕的過程跟我想像的一樣很複雜 XD 彈幕原本就有不同的位置、速度和動畫，搬進尺寸小很多的 PiP 後，還得重新處理字體大小和彈幕軌道，才不會全部擠在一起。遇到彈幕一下子湧進來時，也沒辦法保證每一則都能完整顯示，所以我暫時先不追求<Highlight color="yellow">「全部塞進畫面」，而是讓能顯示的彈幕盡量保持好讀</Highlight>。
+
+<Accordion title='彈幕是怎麼安排顯示的？'>
+我也替彈幕設了幾個上限：PiP 畫面最多同時顯示 **100 則**，還沒輪到軌道的訊息最多排 **300 則**，但最多只會等 **250 毫秒**，太晚就會略過，不會把過期的留言一直堆在佇列裡。實際能用的軌道數還會看 PiP 的大小和彈幕顯示區域，因此畫面變小時，可同時安排的彈幕也會比較少。
+
+顯示時間則依彈幕類型而不同。一般由右往左移動的彈幕，在預設速度下會跑約 **6.5 秒**；固定在上方或下方的彈幕約顯示 **4 秒**。調整彈幕速度後，移動彈幕的速度和顯示時間也會跟著變；Bilibili 的特殊彈幕則依來源資料設定的動畫時間播放。影片倒退或跳轉時，程式也會嘗試補回剛剛錯過的彈幕，不過這是回補範圍，不代表每則彈幕平常會在畫面停留這麼久。
+</Accordion>
+
+我最近也在持續開發「額外彈幕」，也就是把 A 影片的彈幕放到 B 影片上。會有這個想法是我因為我有在看 LoL 比賽直播而聯想到的，看 LoL 相關直播一定是習慣使用 Twitch，但 Twitch 直播有時會延遲很嚴重，就會不得已轉去 YT 看，但 YT 的聊天室人數又少，要看聊天室沒有 Twitch 精采。假設能把 Twitch 聊天室疊到 YT 直播上，不是一舉兩得嗎？！
+
+> 原本有要讓 Twitch 直播也可以吃 YT 聊天室，但目前在抓 YT 聊天室遇到瓶頸，YT 影片本來要讓聊天室轉彈幕就不是很順了（有時會需要開一下聊天室面板再關掉才會出現），但這部份非緊急需求，所以暫緩處理。
+
+除了 Twitch、YT，目前 Bilibili、巴哈動畫瘋也能作為額外彈幕來源，且經測試還能提供給 Netflix 使用！但動畫瘋目前仍無法接收額外彈幕，一接頁面就無回應，原因還在找 Ծ‸Ծ
+
+跨網站要把影片時間、彈幕資料和播放器狀態對起來，實際上比我一開始想的麻煩不少。
+
+## 目前支援的平台
+
+幕伴 PiP 目前主要測試過 YouTube、Bilibili、Twitch、巴哈動畫瘋和 Netflix，但並非只有這些平台能使用，基本上其他平台也能使用 幕伴 PiP 的基本功能。
+
+> 安裝前可先至<Link href="https://github.com/kir4che/pip-companion/blob/main/docs/platform-support.zh-TW.md">平台支援與限制</Link>確認
+
+## 想找功能更完整的 PiP 嗎？
+
+如果你跟我一樣喜歡用 PiP，也想讓小窗不只是播放影片，還能顯示字幕、彈幕，並提供更完整的播放控制，可以試試「幕伴 PiP」d(`･∀･)b
+
+- <Link href="https://chromewebstore.google.com/detail/gnfofimkbdmkbjejmkdmihdpemlgejlm?utm_source=item-share-cb">到 Chrome 線上應用程式商店安裝</Link>
+- <Link href="https://github.com/kir4che/pip-companion">到 GitHub 查看專案原始碼</Link>
+
+目前還在持續改善，如果你使用後發現問題，或有覺得「如果這裡也能做就好了」的功能，歡迎到 <Link href="https://github.com/kir4che/pip-companion/issues">GitHub Issues</Link> 跟我說。
+
+畢竟這個擴充功能最初就是因為我自己用不順手才開始做的，之後也想繼續從實際使用情境出發，把它慢慢變得更好用。

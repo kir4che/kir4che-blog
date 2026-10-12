@@ -64,9 +64,11 @@ export const categoryMap: Record<string, Category> = {
 };
 
 export const tagMap: Record<string, TagDefinition> = {
+  ai: tag('ai', 'AI', 'AI'),
   astro: tag('astro', 'Astro', 'Astro'),
   'astral-vows': tag('astral-vows', 'Astral Vows', 'Astral Vows'),
   bundler: tag('bundler', '打包工具', 'Bundler'),
+  'browser-extension': tag('browser-extension', '瀏覽器擴充功能', 'Browser Extension'),
   css: tag('css', 'CSS', 'CSS'),
   deployment: tag('deployment', '部署', 'Deployment'),
   express: tag('express', 'Express', 'Express'),
@@ -81,6 +83,7 @@ export const tagMap: Record<string, TagDefinition> = {
   musings: tag('musings', '隨筆', 'Musings'),
   'next-js': tag('next-js', 'Next.js', 'Next.js'),
   notes: tag('notes', '筆記', 'Notes'),
+  pip: tag('pip', 'PiP', 'PiP'),
   pokemon: tag('pokemon', 'Pokemon', 'Pokemon'),
   pokmon: tag('pokmon', '寶可夢', 'Pokemon'),
   react: tag('react', 'React', 'React'),
