@@ -38,10 +38,11 @@ const canonicalUrl = canonical
 const resolvedImage = image ?? seoConfig.openGraph.images[0] ?? null;
 const shouldIndex = noindex ? 'noindex,nofollow' : seoConfig.robots;
 const locale = LANGUAGE_TO_LOCALE_MAP[currLang] || currLang;
+const gaMeasurementId = import.meta.env.PUBLIC_GA4_ID;
 ---
 
 <!doctype html>
-<html lang={locale}>
+<html lang={locale} data-ga4-id={gaMeasurementId}>
   <head>
     <ThemeScript />
     <meta charset="utf-8" />
@@ -49,6 +50,34 @@ const locale = LANGUAGE_TO_LOCALE_MAP[currLang] || currLang;
     <meta name="color-scheme" content="light dark" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="preconnect" href="https://cdn.kir4che.com" crossorigin />
+    <script is:inline>
+      const gaMeasurementId = document.documentElement.dataset.ga4Id;
+      if (gaMeasurementId) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+          window.dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', gaMeasurementId, { send_page_view: false });
+
+        let previousPage = document.referrer;
+        document.addEventListener('astro:page-load', () => {
+          const pageLocation = window.location.href;
+          gtag('event', 'page_view', {
+            page_title: document.title,
+            page_location: pageLocation,
+            page_path: `${window.location.pathname}${window.location.search}`,
+            page_referrer: previousPage,
+          });
+          previousPage = pageLocation;
+        });
+
+        const analyticsScript = document.createElement('script');
+        analyticsScript.async = true;
+        analyticsScript.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(gaMeasurementId)}`;
+        document.head.append(analyticsScript);
+      }
+    </script>
     <title>
       {title ? seoConfig.title.template.replace('%s', title) : seoConfig.title.default}
     </title>
